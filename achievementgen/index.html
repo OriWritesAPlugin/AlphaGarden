@@ -38,6 +38,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <input type="button" value="Update" onClick="draw()"><input type="button" value="Export" onClick="sendoff()">
             </form> 
             <canvas id="achv_canvas"></canvas>
+          </div>
+          <div id="help_div">Yo.</div>
 
         <script type="text/javascript">
           function sendoff(form) {
@@ -54,8 +56,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             achv_div.removeChild(old_canvas);
             achv_div.appendChild(canvas);
             canvas.id = "achv_canvas";
+            canvas.style.width = "300px";
+            canvas.style.height = "95px";
             if (canvas.getContext) {
               var ctx = canvas.getContext('2d');
+              ctx.canvas.width  = 300;
+              ctx.canvas.height = 95;
               var title_text = 'bold 12px Verdana, Geneva, sans-serif'
               var main_text = '10px Verdana, Geneva, sans-serif'
               var points_text = 'bold 12px Verdana, Geneva, sans-serif'
