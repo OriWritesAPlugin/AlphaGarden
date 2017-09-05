@@ -8,7 +8,7 @@
     <body onload=draw()>
         <div id="page_div">
         <h1 id="title">Custom Achievement Generator (CUSAGE)</h1>
-        <div class="achievement_div">
+        <div id="achievement_div">
             <form id="input_form">
                 Achievement Name: 
                 <input type="text" name="title" value="Located the Generator">
@@ -25,11 +25,11 @@
                 Image URL:
                 <input type="text" name="img" value="https://i.imgur.com/zy0db8g.png">
                 <br><br>
-                <input type="checkbox" name="crop" value="crop" checked>Crop image to fit into curved box<br>
+                <input type="checkbox" name="crop" value="crop" checked="true">Crop image to fit into curved box<br>
                 <br>
-                <input type="button" value="Generate" onClick="draw()"><input type="button" value="Export" onClick="sendoff()">
+                <input type="button" value="Update" onClick="draw()"><input type="button" value="Export" onClick="sendoff()">
             </form> 
-            <canvas id="achv_canvas" width="305" height="95"></canvas>
+            <canvas id="achv_canvas"></canvas>
 
         <script type="text/javascript">
           function sendoff(form) {
@@ -38,9 +38,14 @@
             document.write('<img src="'+img_out+'"/>');
           }
 
-          function draw(form) {
+          function draw() {
             var form = document.getElementById("input_form");
-            var canvas = document.getElementById('achv_canvas');
+            var old_canvas = document.getElementById('achv_canvas');
+            var canvas = document.createElement('canvas');
+            var achv_div = document.getElementById("achievement_div");
+            achv_div.removeChild(old_canvas);
+            achv_div.appendChild(canvas);
+            canvas.id = "achv_canvas";
             if (canvas.getContext) {
               var ctx = canvas.getContext('2d');
               var title_text = 'bold 12px Verdana, Geneva, sans-serif'
@@ -49,7 +54,7 @@
               var date_text = 'italic bold 10px Verdana, Geneva, sans-serif'
               ctx.strokeStyle = "#000000";
               ctx.fillStyle = "rgba(255, 255, 255, 1)";
-              roundRect(ctx, 0, 0, 305, 95,10,true,true);
+              roundRect(ctx, 0, 0, 300, 95,10,true,true);
               //color:#731d08;
               ctx.fillStyle = "#731d08";
               ctx.font = title_text;
@@ -62,7 +67,7 @@
               ctx.fillStyle = "#777";
               ctx.font = date_text;
               var date = "Earned: "+form.date.value;
-              ctx.fillText(date,300-ctx.measureText(date).width,85);       
+              ctx.fillText(date,295-ctx.measureText(date).width,85);       
               var img = new Image();
               img.crossOrigin = "anonymous";
               img.src = form.img.value;

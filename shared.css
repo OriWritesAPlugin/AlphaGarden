@@ -51,4 +51,4 @@ input[type=button]:hover {
 #output_div {color: #DFC48C; margin-left:575px; margin-right: 10px; background-color: #201920; border: none; font-size: 14px; font-family: monospace; resize: vertical;}
 #input_form {color: #DFC48C; background-color: #201920; border: none; font-size: 14px; font-family: monospace; resize: vertical;}
 #import_input {height: 10px; width: 95%; margin: 10px}
-.achievement_div {border-radius: 3px; width:305px; height: 90px; margin-left:auto; margin-right:auto;}
+#achievement_div {border-radius: 3px; width:305px; height: 90px; margin-left:auto; margin-right:auto;}
