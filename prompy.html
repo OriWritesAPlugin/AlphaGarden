@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="utf-8"/>
+    <head>
+        <title>Prompy</title>
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
+    </head>
+    <body onload>
+        <a href="index.html">&lt;Tool Hub</a>
+        <h1 id="title">Prompy</h1>
+        <h2 id="subtitle">The stupidest little prompt bot. Disclaimer: results are random and might be messed up, use at your own discretion.</h2>
+        <div id=content_div>
+            <input type="button" class="chunky" value="&gt;&gt; Bring On the Prompt &lt;&lt;" onClick="gen()">
+            </br></br></br>
+            <div id="output_text"></div>
+        </div>
+    </body>
+    <script type="text/javascript">
+        //Verb: %
+        verb = ["destroyed","discovered","loved","hunted","learned","gave","accepted","longed for",
+        "knew","missed","fought","forgot","created","conquered","burned","tested","designed","generated",
+        "wanted","remembered","corrected","understood","found","killed","ate","forgave","hated","pushed",
+        "hungered","transformed","broke","repaired","brought","enjoyed","mended","fled","helped",
+        "regretted","circumvented","disobeyed","obeyed","endured","adapted","watched","solved","attempted",
+        "dreamed","hoped","lamented","worshipped","saved","cared for","treasured","embraced","spoiled",
+        "coddled","married","consumed","studied","made","stole"];
+        //Adj: ^
+        adjective = ["extinct","inverse","frigid","colorful",
+        "airborne","eventual","forgotten","forbidden","unknown","happy","excited","uncertain","brave",
+        "clever","dark","bright","documented","cultivated","cultured","brutish","wise","running",
+        "fighting","joyful","sneaky","backwards","curious","exquisite","verdant","lush","lively",
+        "unlucky","beautiful","wrong","silly", "deadly", "first", "last","solid","powerful",
+        "late","early","untroubled","serene","hectic","chaotic","lawful","cowardly","religious",
+        "new","old","loved","hated","pleasant","honest","fair","unfair","creative","lonely","funny"];
+        //Adverb: # 
+        adverb = ["quickly","succinctly","generously","unfortunately","fortunately","previously",
+        "without warning","earlier","after the fact","utterly","mercilessly","joyfully","curiously",
+        "quickly","pleasantly","excitedly","exquisitely","long","always","dearly","mercifully","slowly",
+        "painfully","remarkably","posthumously","humorously","remorselessly","beforehand"];
+        //Noun: *
+        noun = ["joy","egg","sunrise","forest","crystal","clanmate","island","dragon","night","tomorrow",
+        "idea","scroll","candle","archive","jungle","garden","food","god","friend","love","pet","familiar",
+        "vault","cavern","trade route","ship","ocean","swamp","regret","fire","magic","plant","animal",
+        "beastclan","mistake","day","troop","commander","dog","reminder","concept","void","shade","flight",
+        "tundra","guardian","mirror","skydancer","imperial","snapper","bogsneak","coatl","pearlcatcher",
+        "ridgeback","fae","shark","coin","gem","sunset","woodland","treasure","cat","sun","star","clan",
+        "element","dream","nightmare","favorite","time","name","note","year","eon","hope","armor","weapon",
+        "sword","shield","helmet","future","past","thing","war","battle","trading post","auction house",
+        "venue","coliseum","letter","law","government","ruler","king","queen","daydream","investment",
+        "shirt","remainder","stranger","warrior","cloud","longneck","centaur","dragon","dragon","insect",
+        "blacksmith","scout","loremaster","archivist","diplomat","mayor","corpse","skeleton","sorceror",
+        "mage","illusion","hell"];
+        //Preposition: &
+        preposition = ["before","after","above","below","during","around","inside","earlier"];
+
+        ground = ["where have ^ *s gone?","the * % it","% & *, and % #","here, ^ *s are # ^",
+        "they % #","are you sure *s % that?","*s never % and never %","#, dear, for the *'s sake",
+        "they were ^, or they thought they were","*s never % #","maybe they % *s, maybe they didn't",
+        "everything was ^ and nothing %","% by *, and % #.","but *s really % the *?",
+        "and so *s % the *","as ^ as they were, their * was ^","^, #!","they % what they couldn't have %",
+        "* %, at least for the moment","they were ^, right? you % them #","*s were ^ about ^ *s",
+        "the * was ^ before the * % it","you were ^ about *s","the *s hadn't % #","&, they % *s",
+        "& the *, the *s # %","*s % &, and it was ^","had you ever % &? i % the * myself",
+        "they % what had, &, % their *","you % me, eventually","i wish they never % *s",
+        "it was their fault the *s were %","before they knew it, the * was %","the *s had # % themselves",
+        "the * was % & we % it","the * was & the *","i % them, you know","& that, they % the *", "*s # %",
+        "they % them, i'm sure","you % and then you %","they never % them & that","the *s were ^",
+        "i never % the *","*s have *s","the * had *s, the ^ thing","you % it, huh?","they % &","never %, never will",
+        "& that, no","*s & me, *s & me","^ * is my *","the * % them","it's the *'s * now",
+        "*s % *s","*s are ^ in the right claws","* % me, huh?","just tell her i % her #","*s % & we %",
+        "just tell him i % him #","*s are % # if *s previously %","*s are just *s plus *s",
+        "you % *s & them","he had never % *s &","she had never % *s &","*s % us, in the end",
+        "* was the ^ thing on my mind","*! they cried, and the * was ^","*s % & you","the * said they % it",
+        "after all, * had % it &", "things like *s are # %", "the * was % #","*s don't know how ^ they are",
+        "* was our *, and * our *","* was the ^ *","first *s, then *s","i % the *, but it didn't matter",
+        "we knew *s would save us","she was ^, she was ^","he was ^, he was ^","after that, the * % the rest",
+        "they were hardly ^","#, before the *s come!","&, they % their *","% by what they %","% by what she %",
+        "always make sure you've % your * before leaving","%? hardly","*s come to those who've % them",
+        "the ^ *s became their ^ *","'*s and *s,' they told me, '% #'","* is a ^ thing","% until they weren't",
+        "*s: nature's ^ *","*s % *s, and *s, *s","the * was ^, and no one % it","%? you're sure?",
+        "don't let *s be *s","^ *s are a rarity","# %, # %","% by *s","a box full of *s",
+        "hold *s & they're %","i % you","they % to be ^","*! they said, but the * was ^",
+        "i never % until i %","you were ^ before you were ^","they % #","sow *s, harvest *s",
+        "% before they knew it","%, which was a ^ surprise","*s? in my *?","they % *s and *s, but never *s",
+        "just imagine! me, the clan's *!","they'd make a fine *","they regretted that '*' wasn't an option",
+        "earlier, i'd have said *s were ^","&? there's nothing there","they were ^ apart and ^ together",
+        "*s make the * grow ^","aren't *s just *s with extra steps?","they're not *s, they're *s!",
+        "i % them, not just the *s, but the *s and the *s too","i see through the *s of the *",
+        "have you ever % the * of '*, the ^'?","^, they called him, and ^","but what about ^ *s?",
+        "but everything changed when the * nation attacked","starting to think *s were a bad idea",
+        "current mood: ^ but not ^","her greatest invention made *s from *s","% in the end",
+        "# % without the *'s *","^? only & *s","*s? those aren't mine","*s for the * god",
+        "^ but not ^, at least while *s are %","the * was %, the * %","^ *","the * that % it",
+        "*, % #","* while the *'s still ^","eventually, even ^ *s are %","and so the *s %",
+        "*s? where we're going, we don't need 'em","% by what he %","*s were %",
+        "don't worry, i % *s","never knew a * i %","^? i wouldn't say that","they % as # as they dared"];
+
+        replace_keys = {"%": verb, "\\^": adjective, "#": adverb, "\\*": noun, "\&": preposition};
+
+        function gen() {
+            var ground_string = ground[Math.floor((Math.random() * ground.length))];
+            for (var i in replace_keys){
+				//ground_string = ground_string.replace(RegExp(i, "g"), "buuts");
+				ground_string = ground_string.replace(RegExp(i, "g"),
+					function replace_key(x){
+						return replace_keys[i][Math.floor((Math.random() * replace_keys[i].length))];
+					});   
+			}
+            ground_string += "</br>";
+            document.getElementById("output_text").innerHTML = ground_string;
+        }
+
+    </script>
+
+</html>
