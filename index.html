@@ -5,82 +5,17 @@
         <title>Tool Index</title>
         <link rel="stylesheet" type="text/css"  href="shared.css" />
     </head>
-    <body onload=gen()>>
+    <body onload=gen()>
         <h1 id="title">Tool and Service Hub</h1>
         <h2>This is the hub for all the tools/services designed by Oranitha (FR user 160660). All are free to use, most are open source. See individual projects for license info. If you write tools, let me know and we can crosslink.</h2>
-        <ul>
-		  <li>CODACOT : Coliseum data collection made easy : [site] [source] [thread] [data]</li>
-		  <li>Cusage : Custom achievements, also made easy : [site] [source] [thread]</li>
-		  <li>Pen Pal Directory : Find your new FR pen pal : [form] [source] [thread] [sheet]</li>
-		  <li>Prompy : Stupid bot for lore and art prompts : [site] [source] [thread]</li>
-		  <li>Cordiscov : Register, find, join FR Discords : [form] [source] [thread] [sheet]</li>
-		</ul> 
+        <div id=content_div>
+            <ul>
+    		  <li>CODACOT : Coliseum data collection made easy</br><a href="https://oriwritesaplugin.github.io/Codacot/">[site]</a> <a href="https://github.com/OriWritesAPlugin/Codacot">[source]</a> <a href="http://www1.flightrising.com/forums/gde/2242582">[thread]</a> <a href="http://www1.flightrising.com/forums/qnc/2270850">[challenge]</a> <a href="https://docs.google.com/spreadsheets/d/1VsBY6QZCXVwp-K62tbYZpXcDBjJ12Qpz-M_EPE-osbM/edit#gid=1817177816">[data]</a></li></br>
+    		  <li>CUSAGE : Custom achievements, also made easy</br><a href="file:///Users/Rebecca_Haluska/Desktop/Misc%20FR%20Tools/achievementgen.html">[site]</a> <a href="https://github.com/OriWritesAPlugin/FR-Miscellany/blob/master/achievementgen.html">[source]</a> <a href="http://www1.flightrising.com/forums/cc/2272462">[thread]</a></li></br>
+    		  <li>Pen Pal Directory : Find your new FR pen pal</br><a href="">[form]</a> <a href="">[source]</a> <a href="">[thread]</a> [sheet]</li></br>
+    		  <li>Prompy : Stupid bot for lore and art prompts</br><a href="https://oriwritesaplugin.github.io/FR-Miscellany/prompy.html">[site]</a> <a href="https://github.com/OriWritesAPlugin/FR-Miscellany/blob/master/prompy.html">[source]</a> [thread]</li></br>
+    		  <li>Cordiscov : Register, find, join FR Discords</br><a href="">[form]</a> <a href="">[source]</a> <a href="">[thread]</a> [sheet]</li></br>
+    		</ul> 
+        </div>
     </body>
-    <script type="text/javascript">
-        //Verb: %
-        verb = ["destroyed","discovered","loved","hunted","mattered","learned","gave","accepted","longed for",
-        "knew","missed","fought","forgot","created","conquered","burned","tested","designed","generated",
-        "wanted","remembered","corrected","understood","found","killed","ate","forgave","hated","pushed",
-        "hungered","transformed","broke","repaired","brought","slipped","mended","fled","helped",
-        "regretted","circumvented","disobeyed","obeyed","endured","adapted","watched","solved","attempted",
-        "dreamed","hoped","lamented","worshipped","saved"];
-        //Adj: ^
-        adjective = ["extinct","inverse","frigid","colorful",
-        "airborne","eventual","forgotten","forbidden","unknown","happy","excited","uncertain","brave",
-        "clever","dark","bright","documented","cultivated","cultured","brutish","wise","running",
-        "fighting","joyful","sneaky","backwards","curious","exquisite","verdant","lush","lively",
-        "unlucky","beautiful","wrong","silly", "deadly", "first", "last","solid","powerful"];
-        //Adverb: # 
-        adverb = ["quickly","succinctly","generously","unfortunately","fortunately","previously",
-        "without warning","earlier","when they remembered to have","after the fact","when they could have","utterly",
-        "quickly","pleasantly","excitedly","exquisitely","long","always","dearly","mercifully","slowly",
-        "painfully","remarkably"];
-        //Noun: *
-        noun = ["joy","egg","sunrise","forest","crystal","clanmate","island","dragon","night","tomorrow",
-        "idea","scroll","candle","library","jungle","garden","food","god","friend","love","pet","familiar",
-        "vault","cavern","trade route","ship","ocean","swamp","regret","fire","magic","plant","animal",
-        "beastclan","infant","day","troop","commander","dog","reminder","concept","void","Shade","Flight",
-        "tundra","guardian","mirror","skydancer","imperial","snapper","bogsneak","coatl","pearlcatcher",
-        "ridgeback","fae","shark","coin","gem","sunset","woodland","pack","cat","sun","star","clan",
-        "element","dream","nightmare","favorite","time","name","note"];
-        //Preposition: &
-        preposition = ["by","before","after","above","below","during","beyond","past","around","in",
-        "eventually","never"];
-
-        ground = ["where have ^ *s gone?","the * %, ^ of *.","% & *, and % #","here, ^ *s are # ^",
-        "they % #","are you sure *s % that?","*s never % and never %","#, dear, for the *'s sake",
-        "they were ^, or they thought they were","* never % #","maybe they % *s, maybe they didn't",
-        "everything was ^ and nothing %","% by *, and % #.","but *s really % the *?",
-        "and so * % the *","as ^ as they were, their * was ^","^, #!","they % what they couldn't have %",
-        "* %, at least for the moment","they were #, right? you % them #","*s were ^ about ^ *s",
-        "the * was ^ before the * % them","you were ^ about *s","the *s hadn't % #","&, they % *s",
-        "& the *, the *s # %","*s came &, and it was ^","had you ever % &? i % the * myself",
-        "they % what had, & them, % their *","you % me, eventually","i wish they never % *",
-        "it was their fault the *s were %","before they knew it, * was %","the *s had # % themselves",
-        "the * was % & we % it","the * was & the *","i % them, you know","& that, they % the *", "*s ^ %",
-        "they % them, i'm sure","you % and then you %","they never % them & that","the *s were ^",
-        "i never % the *","*s have *s","the * had *s, the ^ thing","you % it, huh?","they % &","they % ^",
-        "& that, no","*s & me, *s & me","^ * is my *","the * % them","it's the *'s * now",
-        "*s % *s","*s are ^ in the right claws","* % me, huh?","just tell her i % her #","*s % & we %",
-        "just tell him i % him #","*s are % # if *s previously %","*s are just *s plus *",
-        "you % *s & them","he had never % *s &","she had never % *s &","* % us, in the end"
-        "* was the ^ thing on my mind","*! they cried, and * was ^","* % & you","the * said they % it",
-        "after all, * had % it &", "things like * are # %"];
-
-        replace_keys = {"%": verb, "\\^": adjective, "#": adverb, "\\*": noun, "\&": preposition};
-
-        function gen() {
-            var ground_string = ground[Math.floor((Math.random() * ground.length))];
-            for (var i in replace_keys){
-				//ground_string = ground_string.replace(RegExp(i, "g"), "buuts");
-				ground_string = ground_string.replace(RegExp(i, "g"),
-					function replace_key(x){
-						return replace_keys[i][Math.floor((Math.random() * replace_keys[i].length))];
-					});
-			}
-            alert(ground_string);
-        }
-
-    </script>
-
 </html>
