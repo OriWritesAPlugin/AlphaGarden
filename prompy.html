@@ -24,7 +24,7 @@
         "regretted","circumvented","disobeyed","obeyed","endured","adapted","watched","solved","attempted",
         "dreamed","hoped","lamented","worshipped","saved","cared for","treasured","embraced","spoiled",
         "coddled","married","consumed","studied","made","stole","banished","recalled","commanded",
-        "rescued","immortalized","danced","struggled"];
+        "rescued","immortalized","danced","struggled","deserted","drowned","celebrated"];
         //Adj: ^
         adjective = ["extinct","inverse","frigid","colorful","unfathomable","erratic","infectious",
         "airborne","eventual","forgotten","forbidden","unknown","happy","excited","uncertain","brave",
@@ -33,13 +33,13 @@
         "unlucky","beautiful","wrong","silly", "deadly", "first", "last","solid","powerful",
         "late","early","untroubled","serene","hectic","chaotic","lawful","cowardly","religious",
         "new","old","loved","hated","pleasant","honest","fair","unfair","creative","lonely","funny",
-        "hideous","distasteful","convoluted","regal","irritating","dead","living"];
+        "hideous","distasteful","convoluted","regal","irritating","dead","living","loud"];
         //Adverb: # 
         adverb = ["quickly","succinctly","generously","unfortunately","fortunately","previously",
         "without warning","earlier","after the fact","utterly","mercilessly","joyfully","curiously",
         "quickly","pleasantly","excitedly","exquisitely","long","always","dearly","mercifully","slowly",
         "painfully","remarkably","posthumously","humorously","remorselessly","unavoidably","clumsily",
-        "uncertainly","with gusto","gracefully"];
+        "uncertainly","with gusto","gracefully","mysterious","thoroughly"];
         //Noun: *
         noun = ["joy","egg","sunrise","forest","crystal","clanmate","island","dragon","night","tomorrow",
         "idea","scroll","candle","archive","jungle","garden","food","god","friend","love","pet","familiar",
@@ -52,7 +52,8 @@
         "venue","coliseum","letter","law","government","ruler","king","queen","daydream","investment",
         "shirt","remainder","stranger","warrior","cloud","longneck","centaur","dragon","dragon","insect",
         "blacksmith","scout","loremaster","archivist","diplomat","mayor","corpse","skeleton","sorceror",
-        "mage","illusion","hell","druid","necromancer","feeling","wound"];
+        "mage","illusion","hell","druid","necromancer","feeling","wound","book","lie","road","universe",
+        "dreamer","sage","fortune-teller","fortunes"];
         //Preposition: &
         preposition = ["before","after","above","below","during","around","inside","earlier"];
 
@@ -70,7 +71,7 @@
         "they % them, i'm sure","you % and then you %","they never % them & that","the *s were ^",
         "i never % the *","*s have *s","the * had *s, the ^ thing","you % it, huh?","they % &","never %, never will",
         "& that, no","*s & me, *s & me","^ * is my *","the * % them","it's the *'s * now",
-        "*s % *s","*s are ^ in the right claws","* % me, huh?","just tell her i % her #","*s % & we %",
+        "*s % *s","*s are ^ in the right claws","*s % me, huh?","just tell her i % her #","*s % & we %",
         "just tell him i % him #","*s are % # if *s previously %","*s are just *s plus *s",
         "you % *s & them","he had never % *s &","she had never % *s &","*s % us, in the end",
         "* was the ^ thing on my mind","*! they cried, and the * was ^","*s % & you","the * said they % it",
@@ -98,13 +99,16 @@
         "*s? where we're going, we don't need 'em","% by what he %","*s were %",
         "don't worry, i % *s","never knew a * i %","^? i wouldn't say that","they % as # as they dared",
         "she % with *s","they % with *s","she % with *s","they % with the * & them","# % by *s",
-        "^ and ^, ","# ^","if you %, you wouldn't be ^","they % him with *s","they % the * they % for",
+        "^ and ^","# ^","if you %, you wouldn't be ^","they % him with *s","they % the * they % for",
         "*s aren't everything","the * % even if the * didn't","it was the most ^ * they could remember",
         "don't think you've % them, not yet","the * remembered what the * forgot","*s, but more ^ than ^",
         "it was ^, but they % it anyways","*s? not since the * was %","they lost their *",
         "*s aren't a replacement for *s","what happened to *s, anyways?","ever seen a ^ *?",
         "they % me, didn't they?","by the time *s % me, i was already ^","* without the ^ bits",
-        "# %, they % their *s"];
+        "# %, they % their *s","* never % us","*s weren't what the * had %","^ *s, come back to me",
+        "% before they ever %","the * was a mistake","we expected *s but got *s","# % and % #",
+        "they % the * while ^ *s looked on","they forgot about the ^ *s","^ *s, but % #",
+        "you seen that *? they say it % a whole *","*? around here? nah","stop trying to sell me *s"];
 
         replace_keys = {"%": verb, "\\^": adjective, "#": adverb, "\\*": noun, "\&": preposition};
 
