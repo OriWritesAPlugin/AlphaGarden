@@ -1,7 +1,7 @@
 @charset "utf-8";
 body {
     font-family: monospace, Verdana, sans-serif;
-    font-size: 10px;
+    font-size: 12px;
     color: #DFC48C;
     line-height: 1.2;
     background-color: #201920;
@@ -24,7 +24,7 @@ select {
     font-size: 12px;
 }
 input[type=button] {
-    width: 42%;
+    width: 5%;
     font-family: monospace, Verdana, sans-serif;
     border-radius: 5px;
     padding: 8px;
@@ -118,3 +118,13 @@ input.chunky {
     margin-left: auto;
     margin-right: auto;
 }
+input[type="button"].inc_button {
+    padding: 5px 3px 3px 3px;
+    width: 27px; margin: 0px; background: #392839; border:none; font-family: verdana; color:white
+}
+input[type="text"].position_div {
+    padding: 5px 3px 3px 3px;
+    width: 27px; margin: 0px; background: #392839; border:none; font-family: verdana; color:white
+}
+
+.name_div {padding: 5px 4px 3px 0px; width: 200px; text-align: right; border: none; color:white; margin: 0px; height: 100%; background: #272127;}

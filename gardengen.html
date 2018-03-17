@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="utf-8"/>
+      <!--Copyright 2017 Oranitha
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.-->
+
+    <head>
+        <title>Garden Gen</title>
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
+    </head>
+    <body onload=setup_page()>
+        <div id="page_div">
+        <h1 id="title">Custom Garden Generator (CUGAGE)</h1>
+        <div id="garden_div">
+            <form id="master_form">
+                Change Ground:
+                <select id="ground_select" onchange="auto_draw()"></select>
+                <br><br>
+                Add Element: 
+                <img id="preview_img" src="" alt="loading..." width=64 height=64>
+                <select id="element_select" onchange="img_preview()">
+                </select><input type="button" value="Add" onClick="add_element()">
+                <br><br>
+                <input type="checkbox" id="refresh" value="refresh">Auto-update image<br>
+            </form> 
+            <div id="elements_div">
+            </div>
+            <form id="out_form">
+              <input type="button" value="Update" onClick="draw()">
+              <input type="button" value="Export" onClick="sendoff()">
+            </form>
+            <canvas id="garden_canvas"></canvas>
+          </div>
+        <script type="text/javascript">
+
+          elements = [
+                       {name: 'crappy oak', url: "https://i.imgur.com/Fr00Esi.png"},
+                       {name: 'crappy bush', url: "https://i.imgur.com/7F0DEby.png"},
+                       {name: 'crappy pine', url: "https://i.imgur.com/Pzf75rI.png"},
+                       {name: 'crappy cloud', url: "https://i.imgur.com/4nJ8xZ0.png"},
+                       {name: 'crappy dragon', url: "https://i.imgur.com/OfcW217.png"}
+                     ]
+          //Use "offset" to say how far above your ground items should be placed. For example, if your grass
+          //is 30 pixels tall, but you want those top 20 pixels to be painted in front of objects and the objects
+          //themselves "sprouting" from the ground at 10px, the offset is 10.
+          //Set offset to -1 if you want things resting exactly on top of your ground.
+          grounds = [
+                      {name: 'crappy grass', url: "https://i.imgur.com/qxFjxBp.png", offset: -1},
+                      {name: 'alien grass', url: "https://i.imgur.com/95whC7X.png", offset: -1},
+                      {name: 'deep grass', url: "https://i.imgur.com/FNvg2im.png", offset: 10}
+                    ]
+
+          var images = {};
+
+          function sendoff(form) {
+            var canvas = document.getElementById("garden_canvas");
+            var img_out = canvas.toDataURL("image/png");
+            document.write('<img src="'+img_out+'"/>');
+          }
+
+          function img_preview() {
+            var img = document.getElementById("preview_img");
+            var select = document.getElementById("element_select");
+            img.src = elements[select.selectedIndex].url;
+          }
+
+          function add_element() {
+
+            var selected_elem = document.getElementById("element_select")
+            image_name = elements[selected_elem.selectedIndex].url;
+
+            if(!images.hasOwnProperty(image_name)){
+              image = new Image();
+              image.crossOrigin = "anonymous";
+              image.src = image_name;
+              images[image_name] = image;
+              image.onload = function(){auto_draw();}
+            }
+
+            var container = document.createElement("div");
+            var del_button = document.createElement("input");
+            configure_button(del_button,"X");
+            del_button.onclick = function(){delete_element(container)};
+            var name = document.createElement("div");
+            name.innerHTML = selected_elem.value;
+            name.id = "name";
+            name.value = elements[selected_elem.selectedIndex].url;
+            name.className += " name_div";
+            name.style.display = "inline-block";
+            container.appendChild(del_button);
+            container.appendChild(name);
+            //Buttons for adjusting position
+            var position = document.createElement("input");
+            var up_button = document.createElement("input");
+            var down_button = document.createElement("input");
+            configure_positional(position);
+            configure_button(up_button, "->");
+            configure_button(down_button, "<-")
+            up_button.onclick = function(){alter_counter(position,1)};
+            down_button.onclick = function(){alter_counter(position,-1)};
+            container.appendChild(down_button);
+            container.appendChild(position);
+            container.appendChild(up_button);
+
+            var parent_div = document.getElementById("elements_div");
+            parent_div.appendChild(container);
+          }
+
+          function delete_element(element) {
+            element.parentNode.removeChild(element);
+            draw();
+          }
+
+          //Change position
+          function alter_counter(element, amount){
+            element.value = +element.value + amount;
+            auto_draw();
+          }
+
+          //Utility function for configuring buttons
+          function configure_button(button, symbol) {
+            button.type = "button";
+            button.value = symbol;
+            button.className += " inc_button";
+            button.onclick = function(){inc_counter(linked_data)};
+          }
+
+          //Utility function for setting up positional counters
+          function configure_positional(element){
+            element.id = "pos";
+            element.type = "text";
+            element.value = "0";
+            element.className += " position_div";
+            element.onchange = function(){auto_draw()};
+          }
+
+          function auto_draw(){
+            if(document.getElementById("refresh").checked) {
+                draw();
+              }
+          }
+
+          function setup_page() {
+            var ground_list = document.getElementById("ground_select");
+            var element_list = document.getElementById("element_select");
+            for (var i = 0, len = grounds.length; i < len; i++) {
+              var option = document.createElement("option");
+              option.value = grounds[i].name;
+              option.text = grounds[i].name;
+              ground_list.appendChild(option);
+            }
+            for (var i = 0, len = elements.length; i < len; i++) {
+              var option = document.createElement("option");
+              option.value = elements[i].name;
+              option.text = elements[i].name;
+              element_list.appendChild(option);
+            }
+            ground_list.selectedIndex = 0;
+            element_list.selectedIndex = 0;
+            img_preview();
+            draw();
+          }
+
+          function draw() {
+            var ground_url = grounds[document.getElementById("ground_select").selectedIndex].url;
+            var ground_specified_height = grounds[document.getElementById("ground_select").selectedIndex].offset;
+            var ground_img = new Image();
+            ground_img.crossOrigin = "anonymous";
+            ground_img.src = ground_url;
+            var element_kids = document.getElementById("elements_div").children;
+            var old_canvas = document.getElementById('garden_canvas');
+            var canvas = document.createElement('canvas');
+            var achv_div = document.getElementById("garden_div");
+            achv_div.removeChild(old_canvas);
+            achv_div.appendChild(canvas);
+            canvas.id = "garden_canvas";
+            canvas.style.width = ground_img.naturalWidth;
+            canvas.style.height = 95;
+            if (canvas.getContext) {
+              var ctx = canvas.getContext('2d');
+              ctx.canvas.width  = ground_img.naturalWidth;
+              ctx.canvas.height = 95;  
+              if(ground_specified_height<0){
+                vert_offset = ctx.canvas.height - ground_img.naturalHeight; 
+              }
+              else{
+                vert_offset = ctx.canvas.height - ground_specified_height;
+              }   
+              for (var i = 0; i<element_kids.length; i++){
+                hrz_offset = element_kids[i].children[3].value;
+                img_name = element_kids[i].children[1].value;
+                img_ref = images[img_name]
+                ctx.drawImage(img_ref,hrz_offset,vert_offset-img_ref.naturalHeight);
+              }
+              ground_img.onload = function(){ctx.drawImage(ground_img, 0, ctx.canvas.height - ground_img.naturalHeight)};
+            }
+          }
+        </script>
+    </body>
+</html>
