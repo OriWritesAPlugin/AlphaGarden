@@ -118,6 +118,13 @@ input.chunky {
     margin-left: auto;
     margin-right: auto;
 }
+#canvas_back_div{
+    vertical-align: top;
+    display: inline-block;
+    background-color: #201920;
+    margin: 0px 1% 0px 1%;
+    overflow: hidden;
+}
 input[type="button"].inc_button {
     padding: 5px 3px 3px 3px;
     width: 27px; margin: 0px; background: #392839; border:none; font-family: verdana; color:white
