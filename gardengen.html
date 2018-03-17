@@ -16,7 +16,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <body onload=setup_page()>
         <div id="page_div">
         <h1 id="title">Custom Garden Generator (CUGAGE)</h1>
-        <p>Welcome to CUGAGE! This is a heavily indev version of the tool. Start by selecting a ground type, </p>
+        <p>Welcome to CUGAGE! This is a heavily indev version of the tool. First select a ground type, 
+        then ADD various element to your scene.<br><br>Use the buttons that appear to move or delete it--you can also move it by 
+        editing the number between the arrows. Layering is done with the top item being the furthest back.<br><br>When 
+        you are satisfied with your garden, hit EXPORT to be taken to a page where you can right-click and save
+        your image. Host it somewhere like imgur.com to use it on Flight Rising!</p>
         <div id="garden_div">
             <form id="master_form">
                 Change Ground:
@@ -25,15 +29,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 Add Element: 
                 <img id="preview_img" src="" alt="loading..." width=64 height=64>
                 <select id="element_select" onchange="preload_element()">
-                </select><input type="button" value="Add" onClick="add_element()">
+                </select><input type="button" value="ADD" onClick="add_element()">
                 <br><br>
                 <input type="checkbox" id="refresh" value="refresh">Auto-update image<br>
             </form> 
             <div id="elements_div">
             </div>
             <form id="out_form">
-              <input type="button" value="Update" onClick="draw()">
-              <input type="button" value="Export" onClick="sendoff()">
+              <input type="button" value="UPDATE" onClick="draw()">
+              <input type="button" value="EXPORT" onClick="sendoff()">
             </form>
             <canvas id="garden_canvas"></canvas>
           </div>
