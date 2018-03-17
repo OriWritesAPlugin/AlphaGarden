@@ -30,8 +30,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                   <select id="ground_select" onchange="preload_background()"></select><br>
                 </div>
                 <div id="custom_size_div" style="display: none;">
-                  Height: <input type="text" id="heightconf" onchange="auto_draw()" value=300><br>
-                  Width: <input type="text" id="widthconf" onchange="auto_draw()" value=95><br>
+                  Height: <input type="text" id="heightconf" onchange="auto_draw()" value=95><br>
+                  Width: <input type="text" id="widthconf" onchange="auto_draw()" value=300><br>
                 </div>
                 <input type="checkbox" id="refresh" value="refresh" onchange="auto_draw()" checked="checked">Auto-update image<br>
                 <input type="checkbox" id="whitebox" value="refresh" onchange="toggle_back_color()" checked="unchecked">Preview white background<br>
@@ -224,6 +224,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             }
             ground_list.selectedIndex = 0;
             element_list.selectedIndex = 0;
+            toggle_back_color(); //Why
+            toggle_back(); //Whyyyy
             preload_element();
             preload_background();
           }
