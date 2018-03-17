@@ -16,6 +16,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <body onload=setup_page()>
         <div id="page_div">
         <h1 id="title">Custom Garden Generator (CUGAGE)</h1>
+        <p>Welcome to CUGAGE! This is a heavily indev version of the tool. Start by selecting a ground type, </p>
         <div id="garden_div">
             <form id="master_form">
                 Change Ground:
@@ -23,7 +24,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <br><br>
                 Add Element: 
                 <img id="preview_img" src="" alt="loading..." width=64 height=64>
-                <select id="element_select" onchange="img_preview()">
+                <select id="element_select" onchange="preload_element()">
                 </select><input type="button" value="Add" onClick="add_element()">
                 <br><br>
                 <input type="checkbox" id="refresh" value="refresh">Auto-update image<br>
@@ -70,12 +71,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             document.write('<img src="'+img_out+'"/>');
           }
 
-          function img_preview() {
-            var img = document.getElementById("preview_img");
-            var select = document.getElementById("element_select");
-            img.src = elements[select.selectedIndex].url;
-          }
-
           function preload_background() {
             var selected_back = document.getElementById("ground_select")
             image_name = grounds[selected_back.selectedIndex].url;
@@ -89,11 +84,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             auto_draw();
           }
 
-          function add_element() {
-
-            var selected_elem = document.getElementById("element_select")
-            image_name = elements[selected_elem.selectedIndex].url;
-
+          function preload_element() {
+            var img = document.getElementById("preview_img");
+            var selected_elem = document.getElementById("element_select");
+            var image_name = elements[selected_elem.selectedIndex].url;
             if(!images.hasOwnProperty(image_name)){
               image = new Image();
               image.crossOrigin = "anonymous";
@@ -101,7 +95,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               image.src = image_name;
               images[image_name] = image;
             }
+            img.src = image_name;
+          }
 
+          function add_element() {
+            var selected_elem = document.getElementById("element_select");
             var container = document.createElement("div");
             var del_button = document.createElement("input");
             configure_button(del_button,"X");
@@ -129,6 +127,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
             var parent_div = document.getElementById("elements_div");
             parent_div.appendChild(container);
+            auto_draw();
           }
 
           function delete_element(element) {
@@ -182,7 +181,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             }
             ground_list.selectedIndex = 0;
             element_list.selectedIndex = 0;
-            img_preview();
+            preload_element();
             preload_background();
           }
 
