@@ -19,7 +19,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <div id="garden_div">
             <form id="master_form">
                 Change Ground:
-                <select id="ground_select" onchange="auto_draw()"></select>
+                <select id="ground_select" onchange="preload_background()"></select>
                 <br><br>
                 Add Element: 
                 <img id="preview_img" src="" alt="loading..." width=64 height=64>
@@ -43,19 +43,26 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                        {name: 'crappy bush', url: "https://i.imgur.com/7F0DEby.png"},
                        {name: 'crappy pine', url: "https://i.imgur.com/Pzf75rI.png"},
                        {name: 'crappy cloud', url: "https://i.imgur.com/4nJ8xZ0.png"},
-                       {name: 'crappy dragon', url: "https://i.imgur.com/OfcW217.png"}
+                       {name: 'crappy dragon', url: "https://i.imgur.com/OfcW217.png"},
+                       {name: 'crappy badge', url: "https://i.imgur.com/wmuw7Zz.png"}
                      ]
           //Use "offset" to say how far above your ground items should be placed. For example, if your grass
           //is 30 pixels tall, but you want those top 20 pixels to be painted in front of objects and the objects
           //themselves "sprouting" from the ground at 10px, the offset is 10.
           //Set offset to -1 if you want things resting exactly on top of your ground.
+
+          //Use "forefront" to say that your background should be drawn in front of everything. If it's set to false,
+          //your background will appear BEHIND everything else.
           grounds = [
-                      {name: 'crappy grass', url: "https://i.imgur.com/qxFjxBp.png", offset: -1},
-                      {name: 'alien grass', url: "https://i.imgur.com/95whC7X.png", offset: -1},
-                      {name: 'deep grass', url: "https://i.imgur.com/FNvg2im.png", offset: 10}
+                      {name: 'crappy grass', url: "https://i.imgur.com/qxFjxBp.png", offset: -1, forefront: true},
+                      {name: 'alien grass', url: "https://i.imgur.com/95whC7X.png", offset: -1, forefront: true},
+                      {name: 'deep grass', url: "https://i.imgur.com/FNvg2im.png", offset: 10, forefront: true},
+                      {name: 'display case', url: "https://i.imgur.com/200xivp.png", offset: 25, forefront: false},
+                      {name: 'space', url: "https://i.imgur.com/oR02lvQ.png", offset: 35, forefront: false}
                     ]
 
           var images = {};
+          var backgrounds = {};
 
           function sendoff(form) {
             var canvas = document.getElementById("garden_canvas");
@@ -69,6 +76,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             img.src = elements[select.selectedIndex].url;
           }
 
+          function preload_background() {
+            var selected_back = document.getElementById("ground_select")
+            image_name = grounds[selected_back.selectedIndex].url;
+            if(!backgrounds.hasOwnProperty(image_name)){
+              image = new Image();
+              image.crossOrigin = "anonymous";
+              image.onload = function(){auto_draw();};
+              image.src = image_name;
+              backgrounds[image_name] = image;
+            }
+            auto_draw();
+          }
+
           function add_element() {
 
             var selected_elem = document.getElementById("element_select")
@@ -77,9 +97,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             if(!images.hasOwnProperty(image_name)){
               image = new Image();
               image.crossOrigin = "anonymous";
+              image.onload = function(){auto_draw();}
               image.src = image_name;
               images[image_name] = image;
-              image.onload = function(){auto_draw();}
             }
 
             var container = document.createElement("div");
@@ -113,7 +133,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
           function delete_element(element) {
             element.parentNode.removeChild(element);
-            draw();
+            auto_draw();
           }
 
           //Change position
@@ -163,15 +183,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             ground_list.selectedIndex = 0;
             element_list.selectedIndex = 0;
             img_preview();
-            draw();
+            preload_background();
           }
 
           function draw() {
-            var ground_url = grounds[document.getElementById("ground_select").selectedIndex].url;
-            var ground_specified_height = grounds[document.getElementById("ground_select").selectedIndex].offset;
-            var ground_img = new Image();
-            ground_img.crossOrigin = "anonymous";
-            ground_img.src = ground_url;
+            var ground_data = grounds[document.getElementById("ground_select").selectedIndex];
+            var ground_img = backgrounds[ground_data.url];
             var element_kids = document.getElementById("elements_div").children;
             var old_canvas = document.getElementById('garden_canvas');
             var canvas = document.createElement('canvas');
@@ -185,19 +202,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               var ctx = canvas.getContext('2d');
               ctx.canvas.width  = ground_img.naturalWidth;
               ctx.canvas.height = 95;  
-              if(ground_specified_height<0){
+              if(ground_data.offset<0){
                 vert_offset = ctx.canvas.height - ground_img.naturalHeight; 
               }
               else{
-                vert_offset = ctx.canvas.height - ground_specified_height;
+                vert_offset = ctx.canvas.height - ground_data.offset;
               }   
+              ctx.drawImage(ground_img, 0, ctx.canvas.height - ground_img.naturalHeight);
               for (var i = 0; i<element_kids.length; i++){
                 hrz_offset = element_kids[i].children[3].value;
                 img_name = element_kids[i].children[1].value;
                 img_ref = images[img_name]
                 ctx.drawImage(img_ref,hrz_offset,vert_offset-img_ref.naturalHeight);
               }
-              ground_img.onload = function(){ctx.drawImage(ground_img, 0, ctx.canvas.height - ground_img.naturalHeight)};
+              if(ground_data.forefront){
+                ctx.drawImage(ground_img, 0, ctx.canvas.height - ground_img.naturalHeight);
+              }
             }
           }
         </script>
