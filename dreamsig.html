@@ -23,7 +23,7 @@
         <br></form>
         <p>NOT WORKING YET, BUT SOON(TM): drag and drop to arrange to your liking:</p>
         <div id="light_div"></div><br>
-        <span>FINALLY, hit the button to copy your code to your clipboard (Ctrl+P to use):</span><input type="button" id="printout" onClick="printout(this.id)" value="Copy"><br>
+        <span>FINALLY, hit the button to copy your code to your clipboard (Ctrl+V to use):</span><input type="button" id="printout" onClick="printout(this.id)" value="Copy"><br>
         <div id="out_div"></div><br>
         <script type="text/javascript">
 
@@ -63,7 +63,10 @@
                 document.execCommand("copy");
                 document.body.removeChild(textArea);
                 clicked.value = "Copied"
-            }
+                setTimeout(function(){ 
+                    clicked.value = "Copy";
+                }, 1000);
+                        }
 
             function alter_buddy_list(selecting_id){
                 var checkbox = document.getElementById(selecting_id);
