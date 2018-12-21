@@ -118,6 +118,13 @@ input.chunky {
     margin-left: auto;
     margin-right: auto;
 }
+#light_div {
+    border-radius: 3px;
+    padding: 10px;
+    background-color: #EFD49C;
+    margin-left: auto;
+    margin-right: auto;
+}
 #canvas_back_div{
     vertical-align: top;
     display: inline-block;
