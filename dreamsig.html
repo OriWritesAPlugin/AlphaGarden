@@ -29,7 +29,10 @@
         <input type="checkbox" id="destiny" onClick="alter_buddy_list(this.id)" value="destiny" name="sigils"><label for="destiny"> destiny, duty, mission</label><br>
         <input type="checkbox" id="secrecy" onClick="alter_buddy_list(this.id)" value="secrecy" name="sigils"><label for="secrecy"> secrecy, conspiracy, cults</label><br>
         <input type="checkbox" id="sorrow" onClick="alter_buddy_list(this.id)" value="sorrow" name="sigils"><label for="sorrow"> sorrow, loss, grieving</label><br>
-        <input type="checkbox" id="lucid" onClick="alter_buddy_list(this.id)" value="lucid" name="sigils"><label for="lucidity"> This was a lucid dream</label><br> 
+        <input type="checkbox" id="love" onClick="alter_buddy_list(this.id)" value="love" name="sigils"><label for="love"> love, romance, sensuality</label><br>
+        <input type="checkbox" id="animals" onClick="alter_buddy_list(this.id)" value="animals" name="sigils"><label for="animals"> animals, monsters, shapeshifting</label><br>
+        <input type="checkbox" id="norecall" onClick="alter_buddy_list(this.id)" value="norecall" name="sigils"><label for="norecall"> Recall is minor to nonexistant</label><br> 
+        <input type="checkbox" id="lucid" onClick="alter_buddy_list(this.id)" value="lucid" name="sigils"><label for="lucidity"> This was a lucid dream</label><br>         
         <br></form>
         <p>NOT WORKING YET, BUT SOON(TM): drag and drop to arrange to your liking:</p>
         <div id="light_div"></div><br>
@@ -57,6 +60,9 @@
                         "music": "https://i.imgur.com/v0pG4F0.png",
                         "secrecy": "https://i.imgur.com/iyclcTv.png",
                         "sorrow": "https://i.imgur.com/QMnIMdV.png",
+                        "love": "https://i.imgur.com/wLHn5jk.png",
+                        "animals": "https://i.imgur.com/7ez8rje.png",
+                        "norecall": "https://i.imgur.com/096zTKj.gif",
                         "lucid": "https://i.imgur.com/FU8J6iH.gif"
                     }
 
@@ -106,7 +112,7 @@
             function create_buddy(identifier, parent){
                 new_bud = document.createElement('img');
                 new_bud.id = identifier+"_buddy";
-                if(identifier == "lucid"){
+                if(identifier == "lucid" || identifier == "norecall"){
                     new_bud.src = "dreamicons/"+identifier+".gif";
                 } else {
                     new_bud.src = "dreamicons/"+identifier+".png";
