@@ -5,39 +5,72 @@
         <title>Dream Signature</title>
         <link rel="stylesheet" type="text/css"  href="shared.css" />
     </head>
-    <body onload="uncheck_all()">
+    <body onload="uncheck_all()" style="font-size: 16px">
         <a href="index.html">&lt;Tool Hub</a>
         <h1 id="title">Dream Signature Generator</h1>
-        <h2 id="subtitle">Use this tool to choose and arrange images to describe a recorded dream.</h2><br>
-        <p>FIRST, select anything important to the dream:</p>
-        <form id="checkbox_form">
-        <input type="checkbox" id="flight" onClick="alter_buddy_list(this.id)" value="flight" name="sigils"><label for="flight"> flight, freedom, exploration</label><br>
-        <input type="checkbox" id="alien" onClick="alter_buddy_list(this.id)" value="alien" name="sigils"><label for="alien"> alienness, surrealness, unfamiliarity</label><br>
-        <input type="checkbox" id="shelter" onClick="alter_buddy_list(this.id)" value="shelter" name="sigils"><label for="shelter"> shelter, indoors, security</label><br>
-        <input type="checkbox" id="powers" onClick="alter_buddy_list(this.id)" value="powers" name="sigils"><label for="powers"> powers, enhancement, magic</label><br>
-        <input type="checkbox" id="discovery" onClick="alter_buddy_list(this.id)" value="discovery" name="sigils"><label for="discovery"> discovery, knowledge, education</label><br>
-        <input type="checkbox" id="discomfort" onClick="alter_buddy_list(this.id)" value="discomfort" name="sigils"><label for="fear"> fear, discomfort, unease</label><br>
-        <input type="checkbox" id="friendship" onClick="alter_buddy_list(this.id)" value="friendship" name="sigils"><label for="friendship"> friendship, companion, assistance</label><br>
-        <input type="checkbox" id="embarrassment" onClick="alter_buddy_list(this.id)" value="embarrassing" name="sigils"><label for="embarrassing"> embarrassment, humiliation, rejection</label><br>
-        <input type="checkbox" id="nature" onClick="alter_buddy_list(this.id)" value="nature" name="sigils"><label for="nature"> nature, plants, growth</label><br>
-        <input type="checkbox" id="combat" onClick="alter_buddy_list(this.id)" value="combat" name="sigils"><label for="combat"> combat, aggression, anger</label><br>
-        <input type="checkbox" id="ocean" onClick="alter_buddy_list(this.id)" value="ocean" name="sigils"><label for="ocean"> ocean, water, storms</label><br>
-        <input type="checkbox" id="wounds" onClick="alter_buddy_list(this.id)" value="wounds" name="sigils"><label for="wounds"> wounds, gore, disease</label><br>
-        <input type="checkbox" id="space" onClick="alter_buddy_list(this.id)" value="space" name="sigils"><label for="space"> space, emptiness, void</label><br>
-        <input type="checkbox" id="music" onClick="alter_buddy_list(this.id)" value="music" name="sigils"><label for="music"> music, sound, song</label><br>
-        <input type="checkbox" id="time" onClick="alter_buddy_list(this.id)" value="time" name="sigils"><label for="powers"> time, chronology, progress</label><br>
-        <input type="checkbox" id="destiny" onClick="alter_buddy_list(this.id)" value="destiny" name="sigils"><label for="destiny"> destiny, duty, mission</label><br>
-        <input type="checkbox" id="secrecy" onClick="alter_buddy_list(this.id)" value="secrecy" name="sigils"><label for="secrecy"> secrecy, conspiracy, cults</label><br>
-        <input type="checkbox" id="sorrow" onClick="alter_buddy_list(this.id)" value="sorrow" name="sigils"><label for="sorrow"> sorrow, loss, grieving</label><br>
-        <input type="checkbox" id="love" onClick="alter_buddy_list(this.id)" value="love" name="sigils"><label for="love"> love, romance, sensuality</label><br>
-        <input type="checkbox" id="animals" onClick="alter_buddy_list(this.id)" value="animals" name="sigils"><label for="animals"> animals, monsters, shapeshifting</label><br>
-        <input type="checkbox" id="norecall" onClick="alter_buddy_list(this.id)" value="norecall" name="sigils"><label for="norecall"> Recall is minor to nonexistant</label><br> 
-        <input type="checkbox" id="lucid" onClick="alter_buddy_list(this.id)" value="lucid" name="sigils"><label for="lucidity"> This was a lucid dream</label><br>         
-        <br></form>
-        <p>NOT WORKING YET, BUT SOON(TM): drag and drop to arrange to your liking:</p>
-        <div id="light_div"></div><br>
-        <span>FINALLY, hit the button to copy your code to your clipboard (Ctrl+V to use):</span><input type="button" id="printout" onClick="printout(this.id)" value="Copy"><br>
-        <div id="out_div"></div><br>
+        <div class='center-parent'><div class='inline-flex-parent'>
+             <input id="full" type="radio" name="form_type" value="full" checked="checked" onchange="format_page()"> Full Form
+             <input type="radio" name="form_type" style="margin-left: 30px" value='sig"' onchange="format_page()"> Signature Only
+        </div></div>
+        <br>
+        <div id="form-centering-div" class='center-parent'><div class='inline-flex-parent'>
+            <div id="full-form-div" class='form-container'>
+            <form id="full_form" class="unselectable">
+            Title of dream:<input id="dream_title" type="text" name="title"></br>
+            Trigger warnings:<input id="dream_warnings" type="text" name="warnings"></br>
+            <u>What would you like others to do?:</u></br>
+            <input type="checkbox" id="discuss" name="allow"><label for="discuss"> Discuss this dream</label></br>
+            <input type="checkbox" id="interpret" name="allow"><label for="interpret"> Interpret this dream</label></br>
+            <input type="checkbox" id="draw" name="allow"><label for="draw"> Illustrate this dream as a 'Good Morning' banner</label><br>
+            </br>
+            <u>Select what <a href="https://docs.google.com/document/d/1U2jhEFsE1EXAr5IZMoppslEEltn1GMyYq9il-lAuQ9I/edit">recall techniques</a> you used, if any:</u></br>
+            <input type="checkbox" id="Self-Care" name="recall"><label for="self_care"> Self-Care</label></br>
+            <input type="checkbox" id="Meditation" name="recall"><label for="meditation"> Meditation</label></br>
+            <input type="checkbox" id="Reality Checks" name="recall"><label for="reality_checks"> Reality Checks</label></br>
+            <input type="checkbox" id="Ritualization" name="recall"><label for="ritualization"> Ritualization</label></br>
+            <input type="checkbox" id="Chatting" name="recall"><label for="chatting"> Chatting</label></br>
+            <input type="checkbox" id="Visualization" name="recall"><label for="visualization"> Visualization</label></br>
+            <input type="checkbox" id="Hinting" name="recall"><label for="hinting"> Hinting</label></br>
+            <input type="checkbox" id="Early Wake" name="recall"><label for="early_wake"> Early Wake</label></br>
+            <input type="checkbox" id="MILD/WILD" name="recall"><label for="mild"> MILD/WILD</label></br>
+            <input type="checkbox" id="Aromatherapy" name="recall"><label for="aromatherapy"> Aromatherapy</label></br>
+            <input type="checkbox" id="Other" name="recall"><label for="other"> Other</label></br>
+            </form>
+            </div>
+            <div class='form-container'>
+            <u>Concepts involved:</u></br>
+            <form id="checkbox_form" class="unselectable">
+            <input type="checkbox" id="flight" onClick="alter_buddy_list(this.id)" value="flight" name="sigils"><label for="flight"> flight, freedom, exploration</label><br>
+            <input type="checkbox" id="alien" onClick="alter_buddy_list(this.id)" value="alien" name="sigils"><label for="alien"> alienness, surrealness, unfamiliarity</label><br>
+            <input type="checkbox" id="shelter" onClick="alter_buddy_list(this.id)" value="shelter" name="sigils"><label for="shelter"> shelter, indoors, security</label><br>
+            <input type="checkbox" id="powers" onClick="alter_buddy_list(this.id)" value="powers" name="sigils"><label for="powers"> powers, enhancement, magic</label><br>
+            <input type="checkbox" id="discovery" onClick="alter_buddy_list(this.id)" value="discovery" name="sigils"><label for="discovery"> discovery, knowledge, education</label><br>
+            <input type="checkbox" id="discomfort" onClick="alter_buddy_list(this.id)" value="discomfort" name="sigils"><label for="discomfort"> fear, discomfort, unease</label><br>
+            <input type="checkbox" id="friendship" onClick="alter_buddy_list(this.id)" value="friendship" name="sigils"><label for="friendship"> friendship, companion, assistance</label><br>
+            <input type="checkbox" id="embarrassment" onClick="alter_buddy_list(this.id)" value="embarrassment" name="sigils"><label for="embarrassment"> embarrassment, humiliation, rejection</label><br>
+            <input type="checkbox" id="nature" onClick="alter_buddy_list(this.id)" value="nature" name="sigils"><label for="nature"> nature, plants, growth</label><br>
+            <input type="checkbox" id="combat" onClick="alter_buddy_list(this.id)" value="combat" name="sigils"><label for="combat"> combat, aggression, anger</label><br>
+            <input type="checkbox" id="ocean" onClick="alter_buddy_list(this.id)" value="ocean" name="sigils"><label for="ocean"> ocean, water, storms</label><br>
+            <input type="checkbox" id="wounds" onClick="alter_buddy_list(this.id)" value="wounds" name="sigils"><label for="wounds"> wounds, gore, disease</label><br>
+            <input type="checkbox" id="space" onClick="alter_buddy_list(this.id)" value="space" name="sigils"><label for="space"> space, emptiness, void</label><br>
+            <input type="checkbox" id="music" onClick="alter_buddy_list(this.id)" value="music" name="sigils"><label for="music"> music, sound, song</label><br>
+            <input type="checkbox" id="time" onClick="alter_buddy_list(this.id)" value="time" name="sigils"><label for="time"> time, chronology, progress</label><br>
+            <input type="checkbox" id="destiny" onClick="alter_buddy_list(this.id)" value="destiny" name="sigils"><label for="destiny"> destiny, duty, mission</label><br>
+            <input type="checkbox" id="secrecy" onClick="alter_buddy_list(this.id)" value="secrecy" name="sigils"><label for="secrecy"> secrecy, conspiracy, cults</label><br>
+            <input type="checkbox" id="sorrow" onClick="alter_buddy_list(this.id)" value="sorrow" name="sigils"><label for="sorrow"> sorrow, loss, grieving</label><br>
+            <input type="checkbox" id="love" onClick="alter_buddy_list(this.id)" value="love" name="sigils"><label for="love"> love, romance, sensuality</label><br>
+            <input type="checkbox" id="animals" onClick="alter_buddy_list(this.id)" value="animals" name="sigils"><label for="animals"> animals, monsters, shapeshifting</label><br>
+            <input type="checkbox" id="norecall" onClick="alter_buddy_list(this.id)" value="norecall" name="sigils"><label for="norecall"> Recall is minor to nonexistant</label><br> 
+            <input type="checkbox" id="lucid" onClick="alter_buddy_list(this.id)" value="lucid" name="sigils"><label for="lucid"> This was a lucid dream</label><br>         
+            </form>
+            </div>
+        </div>
+        </br></br>
+        <div class="inline-flex-parent">
+        <input type="button" id="printout" onClick="printform(this.id)" style="font-size: 16px" value="Copy to Clipboard"><br>
+        <div id="light_div" style="width: 800px; min-height: 38px"></div>
+        </div>
+        <div id="out_div"></div>
         <script type="text/javascript">
 
             thread_url = "http://www1.flightrising.com/forums/gend/2593123"
@@ -68,17 +101,63 @@
 
             var selected_buddies = []
 
-            function printout(identifier) {
+            function format_page() {
+                var full = document.getElementById("full").checked;
+                form_centerer = document.getElementById("form-centering-div");
+                full_form = document.getElementById("full-form-div");
+                printout = document.getElementById("printout");
+
+                if(full){
+                    form_centerer.style.textAlign = "center";
+                    full_form.style.display = "inline";
+                    printout.style.marginLeft = "0px";
+                } else {
+                    form_centerer.style.textAlign = "left";
+                    full_form.style.display = "none";
+                    printout.style.marginLeft = "14px";
+                }
+            }
+
+            function printform(identifier) {
                 var clicked = document.getElementById(identifier);
                 var target = document.getElementById("out_div");
-                var outstring = "";
-                var lead = "[url="+thread_url+"][img]";
-                var follow = "[/img][/url]";
-                for(var i = 0; i < selected_buddies.length ; i++){
-                    bud = selected_buddies[i];
-                    outstring += lead + mapping[bud] + follow;
-                }
                 var textArea = document.createElement("textarea");
+                var full = document.getElementById("full").checked;
+                if(full){
+                    outstring = "[center][size=5][b]";
+                    outstring += document.getElementById("dream_title").value;
+                    outstring += "[/size][/b]\n\n";
+                    outstring += printbuddies();
+                    conditions = "";
+                    if (document.getElementById("discuss").checked){
+                        conditions += "| Discuss |";
+                    }
+                    if (document.getElementById("interpret").checked){
+                        conditions += "| Interpret |";
+                    }
+                    if (document.getElementById("draw").checked){
+                        conditions += "| Draw |";
+                    }
+                    if (conditions) {
+                        outstring += ("\n\n[b]" + conditions + "[/b]\n");
+                    }
+                    outstring += "[/center]\n[b]Trigger Warnings:[/b] ";
+                    outstring += document.getElementById("dream_warnings").value;
+                    outstring += "\n[b]Dreaming Techniques:[/b] "
+                    var techniques = document.getElementsByName("recall");
+                    var techsChecked = [];
+                    for (var i=0; i<techniques.length; i++) {
+                        // And stick the checked ones onto an array...
+                        if (techniques[i].checked) {
+                            techsChecked.push(techniques[i].id);
+                        }
+                    }
+                    outstring += (techsChecked.join(", ") + "\n\n");
+                    outstring += "(Dream goes here)\n\n[b]Notes:[/b]"
+
+                }else{
+                    outstring = printbuddies();
+                }
                 textArea.style.width = '2em';
                 textArea.style.height = '2em';
                 textArea.style.background = 'transparent';
@@ -88,11 +167,22 @@
                 textArea.select();
                 document.execCommand("copy");
                 document.body.removeChild(textArea);
-                clicked.value = "Copied"
+                clicked.value = "Copied! Ctrl+V"
                 setTimeout(function(){ 
-                    clicked.value = "Copy";
+                    clicked.value = "Copy to Clipboard";
                 }, 1000);
-                        }
+            }
+
+            function printbuddies(){
+                var outstring = "";
+                var lead = "[url="+thread_url+"][img]";
+                var follow = "[/img][/url]";
+                for(var i = 0; i < selected_buddies.length ; i++){
+                    bud = selected_buddies[i];
+                    outstring += lead + mapping[bud] + follow;
+                }
+                return outstring;
+            }
 
             function alter_buddy_list(selecting_id){
                 var checkbox = document.getElementById(selecting_id);
@@ -140,7 +230,8 @@
             }
 
             // Blindly copied from SO:
-            function uncheck_all(){ 
+            function uncheck_all(){
+                  document.getElementById("full").checked = "checked";
                   var w = document.getElementsByTagName('input'); 
                   for(var i = 0; i < w.length; i++){ 
                     if(w[i].type=='checkbox'){ 
