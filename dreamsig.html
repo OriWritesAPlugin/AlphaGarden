@@ -5,25 +5,26 @@
         <title>Dream Signature</title>
         <link rel="stylesheet" type="text/css"  href="shared.css" />
     </head>
-    <body onload="uncheck_all()" style="font-size: 16px">
+    <body onload="uncheck_all()" style="font-size: 15px; font-family: Verdana, sans-serif; line-height: normal;">
         <a href="index.html">&lt;Tool Hub</a>
-        <h1 id="title">Dream Signature Generator</h1>
         <div class='center-parent'><div class='inline-flex-parent'>
+        <label id="smaller-title">Dream Signature Generator:
              <input id="full" type="radio" name="form_type" value="full" checked="checked" onchange="format_page()"> Full Form
-             <input type="radio" name="form_type" style="margin-left: 30px" value='sig"' onchange="format_page()"> Signature Only
-        </div></div>
-        <br>
+             <input type="radio" name="form_type" value='sig"' onchange="format_page()"> Signature Only
+        </label></div></div>
         <div id="form-centering-div" class='center-parent'><div class='inline-flex-parent'>
             <div id="full-form-div" class='form-container'>
             <form id="full_form" class="unselectable">
-            Title of dream:<input id="dream_title" type="text" name="title"></br>
-            Trigger warnings:<input id="dream_warnings" type="text" name="warnings"></br>
-            <u>What would you like others to do?:</u></br>
-            <input type="checkbox" id="discuss" name="allow"><label for="discuss"> Discuss this dream</label></br>
-            <input type="checkbox" id="interpret" name="allow"><label for="interpret"> Interpret this dream</label></br>
-            <input type="checkbox" id="draw" name="allow"><label for="draw"> Illustrate this dream as a 'Good Morning' banner</label><br>
+
+            <b>Title of dream:</b><input id="dream_title" type="text" name="dream_desc"></br>
+            <b>Trigger warnings:</b><input id="dream_warnings" type="text" name="dream_desc"></br>
+
+            <b>What would you like others to do?:</b></br>
+            <input type="checkbox" id="discuss" name="allow"><label for="discuss"> Discuss it</label></br>
+            <input type="checkbox" id="interpret" name="allow"><label for="interpret"> Interpret it</label></br>
+            <input type="checkbox" id="draw" name="allow"><label for="draw"> Draw it as a 'Good Morning' doodle</label><br>
             </br>
-            <u>Select what <a href="https://docs.google.com/document/d/1U2jhEFsE1EXAr5IZMoppslEEltn1GMyYq9il-lAuQ9I/edit">recall techniques</a> you used, if any:</u></br>
+            <b>Select what <a name="lightmode" href="https://docs.google.com/document/d/1U2jhEFsE1EXAr5IZMoppslEEltn1GMyYq9il-lAuQ9I/edit">techniques</a> you used, if any:</b></br>
             <input type="checkbox" id="Self-Care" name="recall"><label for="Self-Care"> Self-Care</label></br>
             <input type="checkbox" id="Meditation" name="recall"><label for="Meditation"> Meditation</label></br>
             <input type="checkbox" id="Reality Checks" name="recall"><label for="Reality Checks"> Reality Checks</label></br>
@@ -37,8 +38,9 @@
             <input type="checkbox" id="Other" name="recall"><label for="Other"> Other</label></br>
             </form>
             </div>
+            <div id="inline-spacer-div"></div>
             <div class='form-container'>
-            <u>Concepts involved:</u></br>
+            <b>Concepts involved:</b></br>
             <form id="checkbox_form" class="unselectable">
             <input type="checkbox" id="flight" onClick="alter_buddy_list(this.id)" value="flight" name="sigils"><label for="flight"> flight, freedom, exploration</label><br>
             <input type="checkbox" id="alien" onClick="alter_buddy_list(this.id)" value="alien" name="sigils"><label for="alien"> alienness, surrealness, unfamiliarity</label><br>
@@ -67,8 +69,8 @@
         </div>
         </br></br>
         <div class="inline-flex-parent">
-        <input type="button" id="printout" onClick="printform(this.id)" style="font-size: 16px" value="Copy to Clipboard"><br>
-        <div id="light_div" style="width: 800px; min-height: 38px"></div>
+        <input type="button" id="printout" onClick="printform(this.id)" value="Copy to Clipboard"><br>
+        <div id="light_div"></div>
         </div>
         <div id="out_div"></div>
         <script type="text/javascript">
@@ -103,18 +105,15 @@
 
             function format_page() {
                 var full = document.getElementById("full").checked;
-                form_centerer = document.getElementById("form-centering-div");
+                spacer = document.getElementById("inline-spacer-div");
                 full_form = document.getElementById("full-form-div");
                 printout = document.getElementById("printout");
-
                 if(full){
-                    form_centerer.style.textAlign = "center";
                     full_form.style.display = "inline";
-                    printout.style.marginLeft = "0px";
+                    spacer.style.display = "inline";
                 } else {
-                    form_centerer.style.textAlign = "left";
                     full_form.style.display = "none";
-                    printout.style.marginLeft = "14px";
+                    spacer.style.display = "none";
                 }
             }
 

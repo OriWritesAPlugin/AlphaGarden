@@ -12,6 +12,11 @@ select {
 a {
     color: #FFF4DC
 }
+
+a[name=lightmode]{
+    color: #3F353D
+}
+
 input[type=text],
 select {
     width: 100%;
@@ -38,6 +43,24 @@ input[type=button] {
 input[type=button]:hover {
     background-color: #3F353D;
 }
+
+input[name="form_type"] {
+    vertical-align: 3px;
+    margin-left: 10px;
+}
+
+input[name=dream_desc]{
+    font-family: Verdana, sans-serif;
+    font-size: 18px;
+    border-width: 0px 0px 2px 0px;
+    border-style: dotted;
+    margin: 2px 10px 12px 0px;
+    width: 90%;
+    padding: 0px;
+    background-color: #f6eacf;
+    color: #2F252D;
+}
+
 input.chunky {
     width: 400px;
     font-family: monospace, Verdana, sans-serif;
@@ -57,31 +80,41 @@ input.chunky {
     margin: 0 auto;
 }
 
-.inline-flex-parent {display: inline-flex;}
+.inline-flex-parent {
+    display: inline-flex;
+    width: 70%;
+}
+
+#inline-spacer-div {
+    width: 3%;
+}
 
 .form-container {
     text-align: left;
     padding: 15px;
-    margin: 0px 15px 0px 15px;
+
     border-radius: 5px;
-    background-color: #2F252D;
+    background-color: #f6eacf;
+    color: #2F252D;
+    width: 50%;
 }
 
 #printout {
-    font-family: monospace, Verdana, sans-serif;
+    font-family: Verdana, sans-serif;
     border-radius: 5px;
     padding: 5px;
     margin: 0px 20px 0px 0px;
     border: 0px;
-    color: #DFC48C;
-    background-color: #2F252D;
-    font-size: 16px;
+    background-color: #f6eacf;
+    color: #2F252D;
+    font-size: 15px;
     width: 140px;
     white-space: normal;
+    font-weight: bold;
 }
 
 #printout:hover {
-    background-color: #3F353D;
+    background-color: #DFC48C;
 }
 
 .unselectable {
@@ -93,24 +126,8 @@ input.chunky {
     user-select: none;
 }
 
-#dream_title {
-    font-family: monospace, Verdana, sans-serif;
-    font-size: 18px;
-    border-width: 0px 0px 2px 0px;
-    border-style: dotted;
-    margin: 10px 10px 6px 0px;
-    width: 90%;
-    padding: 0px;
-}
-
 #dream_warnings {
-    font-family: monospace, Verdana, sans-serif;
     font-size: 16px;
-    border-width: 0px 0px 2px 0px;
-    border-style: dotted;
-    margin: 10px 10px 10px 0px;
-    width: 90%;
-    padding: 0px;
 }
 
 #page_div {
@@ -137,6 +154,12 @@ input.chunky {
     text-align: center;
     margin-bottom: 10px;
     font-size: 28px;
+}
+#smaller-title {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 20px;
+    color: #f6eacf;
 }
 #subtitle {
     text-align: center;
@@ -183,10 +206,12 @@ input.chunky {
 }
 #light_div {
     border-radius: 3px;
-    padding: 5px;
-    background-color: #EFD49C;
+    padding: 7px 5px 0px 5px;
+    background-color: #f6eacf;
     margin-left: auto;
     margin-right: auto;
+    width: 80%;
+    min-height: 36px;
 }
 #canvas_back_div{
     vertical-align: top;
