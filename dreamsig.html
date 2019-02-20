@@ -5,10 +5,12 @@
         <title>Dream Signature</title>
         <link rel="stylesheet" type="text/css"  href="shared.css" />
     </head>
-    <body onload="uncheck_all()" style="font-size: 15px; font-family: Verdana, sans-serif; line-height: normal;">
+    <body onload="uncheck_all()" style="font-size: 16px; line-height: 1.3;">
         <a href="index.html">&lt;Tool Hub</a>
-        <div class='center-parent'><div class='inline-flex-parent'>
-        <label id="smaller-title">Dream Signature Generator:
+        <div class='center-parent'>
+        <label id="smaller-title"><b>Dream Signature Generator</b></label>
+        <br>
+        <div class='inline-flex-parent' style="text-align: center">
              <input id="full" type="radio" name="form_type" value="full" checked="checked" onchange="format_page()"> Full Form
              <input type="radio" name="form_type" value='sig"' onchange="format_page()"> Signature Only
         </label></div></div>
@@ -16,20 +18,20 @@
             <div id="full-form-div" class='form-container'>
             <form id="full_form" class="unselectable">
 
-            <b>Title of dream:</b><input id="dream_title" type="text" name="dream_desc"></br>
-            <b>Trigger warnings:</b><input id="dream_warnings" type="text" name="dream_desc"></br>
+            Title of dream:<input id="dream_title" type="text" name="dream_desc"></br>
+            Trigger warnings:<input id="dream_warnings" type="text" name="dream_desc"></br>
 
-            <b>What would you like others to do?:</b></br>
+            <u>What would you like others to do?:</u></br>
             <input type="checkbox" id="discuss" name="allow"><label for="discuss"> Discuss it</label></br>
             <input type="checkbox" id="interpret" name="allow"><label for="interpret"> Interpret it</label></br>
             <input type="checkbox" id="draw" name="allow"><label for="draw"> Draw it as a 'Good Morning' doodle</label><br>
             </br>
-            <b>Select what <a name="lightmode" href="https://docs.google.com/document/d/1U2jhEFsE1EXAr5IZMoppslEEltn1GMyYq9il-lAuQ9I/edit">techniques</a> you used, if any:</b></br>
+            <u>Select what <a name="lightmode" href="https://docs.google.com/document/d/1U2jhEFsE1EXAr5IZMoppslEEltn1GMyYq9il-lAuQ9I/edit">techniques</a> you used, if any:</u></br>
             <input type="checkbox" id="Self-Care" name="recall"><label for="Self-Care"> Self-Care</label></br>
             <input type="checkbox" id="Meditation" name="recall"><label for="Meditation"> Meditation</label></br>
             <input type="checkbox" id="Reality Checks" name="recall"><label for="Reality Checks"> Reality Checks</label></br>
             <input type="checkbox" id="Ritualization" name="recall"><label for="Ritualization"> Ritualization</label></br>
-            <input type="checkbox" id="Chatting" name="recall"><label for="Chatting"> Chatting</label></br>
+            <input type="checkbox" id="Rallying" name="recall"><label for="Rallying"> Rallying</label></br>
             <input type="checkbox" id="Visualization" name="recall"><label for="Visualization"> Visualization</label></br>
             <input type="checkbox" id="Hinting" name="recall"><label for="Hinting"> Hinting</label></br>
             <input type="checkbox" id="Early Wake" name="recall"><label for="Early Wake"> Early Wake</label></br>
@@ -40,7 +42,7 @@
             </div>
             <div id="inline-spacer-div"></div>
             <div class='form-container'>
-            <b>Concepts involved:</b></br>
+            <u>Concepts involved:</u></br>
             <form id="checkbox_form" class="unselectable">
             <input type="checkbox" id="flight" onClick="alter_buddy_list(this.id)" value="flight" name="sigils"><label for="flight"> flight, freedom, exploration</label><br>
             <input type="checkbox" id="alien" onClick="alter_buddy_list(this.id)" value="alien" name="sigils"><label for="alien"> alienness, surrealness, unfamiliarity</label><br>
@@ -141,7 +143,13 @@
                         outstring += ("\n\n[b]" + conditions + "[/b]\n");
                     }
                     outstring += "[/center]\n[b]Trigger Warnings:[/b] ";
-                    outstring += document.getElementById("dream_warnings").value;
+                    warnings = document.getElementById("dream_warnings").value;
+                    if (warnings) {
+                        outstring += warnings
+                    } else {
+                        outstring += "None"
+                    }
+
                     outstring += "\n[b]Dreaming Techniques:[/b] "
                     var techniques = document.getElementsByName("recall");
                     var techsChecked = [];
@@ -151,8 +159,12 @@
                             techsChecked.push(techniques[i].id);
                         }
                     }
-                    outstring += (techsChecked.join(", ") + "\n\n");
-                    outstring += "(Dream goes here)\n\n[b]Notes:[/b]"
+                    if (techsChecked.length > 0) {
+                       outstring += (techsChecked.join(", ")); 
+                    } else {
+                       outstring += "None"
+                    }
+                    outstring += "\n\n(Dream goes here)\n\n[b]Notes:[/b]"
 
                 }else{
                     outstring = printbuddies();
