@@ -12,15 +12,18 @@
           <label id="smaller-title"><b>Coliseum Cultivation Bingo</b></label>
           <br>
           <div class='inline-flex-parent' style="text-align: center">
-               <input id="difficulty" type="radio" name="difficulty" value="Easy" checked="checked" onchange="generate_board()"> Easy
-               <input type="radio" name="difficulty" value='Medium' onchange="generate_board()"> Medium
+               <input id="difficulty" type="radio" name="difficulty" value="Easy" onchange="generate_board()"> Easy
+               <input type="radio" name="difficulty" value='Medium' checked="checked" onchange="generate_board()"> Medium
                <input type="radio" name="difficulty" value='Hard' onchange="generate_board()"> Hard
                <input type="radio" name="difficulty" value='Pain' onchange="generate_board()"> Pain
           </div>
           <div class='inline-flex-parent' style="text-align: center">
-               <input id="size" type="radio" name="size" value="3" checked="checked" onchange="generate_board()"> 3x3
-               <input type="radio" name="size" value='5' onchange="generate_board()"> 5x5
+               <input id="size" type="radio" name="size" value="3" onchange="generate_board()"> 3x3
+               <input type="radio" name="size" value='5' checked="checked" onchange="generate_board()"> 5x5
                <input type="radio" name="size" value='7' onchange="generate_board()"> 7x7
+          </div>
+          <div class='inline-flex-parent' style="text-align: center">
+               <input id="min_dupes" type="checkbox" checked="checked" onchange="generate_board()"> Minimal duplicates
           </div>
         </div>
         <div id="board_div" class='center-parent'></div>
@@ -36,31 +39,40 @@
             easy_challenges = [
             {"description": "No drops", "points": 300},
             {"description": "Dragon misses", "points": 50},
+            {"description": "Enemy misses", "points": 50},
+            {"description": "Dragon crits", "points": 50},
             {"description": "All enemies 1 species", "points": 50},
             {"description": "Any familiar", "points": 100},
-            {"description": "Any familiar", "points": 100},
-            {"description": "Any Swipp/Bald mat", "points": 50},
+            {"description": "Neutral elem familiar", "points": 200},
+            {"description": "Venue elem familiar", "points": 200},
+            {"description": "Swipp or Bald item", "points": 50},
             {"description": "5 different drops", "points": 200},
+            {"description": "Something green", "points": 100},
             {"description": "Openable", "points": 100},
             {"description": "Captcha", "points": 100},
-            {"description": "Battlestone", "points": 100},
+            {"description": "Any battle stone", "points": 100},
             {"description": "3x 1 item", "points": 200}]
             raw_medium_challenges = [
-            {"description": "Apparel", "points": 350},
-            {"description": "Apparel", "points": 350},
+            {"description": "Any apparel", "points": 350},
+            {"description": "Torso or head apparel", "points": 550},
+            {"description": "Limb or tail apparel", "points": 550},
             {"description": "Gene", "points": 500},
-            {"description": "3x Swipp/Bald mat", "points": 300},
-            {"description": "Skin/skin crate", "points": 400},
+            {"description": "3x Swipp or Bald item", "points": 300},
+            {"description": "Skin or skin crate", "points": 400},
             {"description": "Vista", "points": 400},
             {"description": "Eye vial", "points": 500},
             ]
             medium_challenges = easy_challenges.concat(raw_medium_challenges);
             raw_hard_challenges = [
             {"description": "Boss familiar", "points": 3000},
+            {"description": "Wing apparel", "points": 2500},
+            {"description": "Ambush or rally stone", "points": 1800},
             {"description": "2 familiars at once", "points": 2000},
             {"description": "Unhatched egg", "points": 3000},
             {"description": "Venue apparel", "points": 1000},
-            {"description": "Eliminate", "points": 3000}
+            {"description": "2 misses in a row", "points": 800},
+            {"description": "Eliminate", "points": 3000},
+            {"description": "Swipp, Bald, or hibden fam", "points": 2000}
             ]
 
             icons = [
@@ -86,12 +98,53 @@
                 }
             }
 
+            /* Randomize array in-place using Durstenfeld shuffle algorithm */
+            function shuffleArray(array) {
+                for (var i = array.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var temp = array[i];
+                    array[i] = array[j];
+                    array[j] = temp;
+                }
+                return array
+            }
+
+            function assemble_challenge_list(){
+              var size = parseInt(getRadioValue("size"));
+              var difficulty = getRadioValue("difficulty");
+              var minimal_duplicates = document.getElementById("min_dupes").checked;
+              var initial_challenge_list;
+              if (difficulty=="Easy"){
+                initial_challenge_list = easy_challenges;
+              } else if (difficulty=="Medium"){
+                initial_challenge_list = medium_challenges;
+              } else if (difficulty=="Hard"){
+                initial_challenge_list = hard_challenges;
+              } else {
+                initial_challenge_list = pain_challenges;
+              }
+              var challenges = [];
+              if(minimal_duplicates){
+                while(challenges.length < size*size){
+                  scrambled_challenges = shuffleArray(initial_challenge_list.slice(0));
+                  challenges.push.apply(challenges, scrambled_challenges);
+                }
+              }
+              else{
+                for(var i=0; i < size*size; i++){
+                  challenges.push(initial_challenge_list[Math.floor(Math.random() * initial_challenge_list.length)])
+                }
+              }
+              return challenges;
+            }
+
             function clear_board() {
               var board = document.getElementById("board_div")
               while (board.lastChild) {
                   board.removeChild(board.lastChild);
               }
               current_board = [];
+              document.getElementsByTagName("BODY")[0].style.background = darker_soil;
             }
 
             function has_bingo() {
@@ -139,18 +192,8 @@
             function generate_board() {
                 clear_board()
                 var size = parseInt(getRadioValue("size"));
-                var difficulty = getRadioValue("difficulty");
                 var board = document.getElementById("board_div");
-                var challenges;
-                if (difficulty=="Easy"){
-                  challenges = easy_challenges;
-                } else if (difficulty=="Medium"){
-                  challenges = medium_challenges;
-                } else if (difficulty=="Hard"){
-                  challenges = hard_challenges;
-                } else {
-                  challenges = pain_challenges;
-                }
+                var challenges = assemble_challenge_list();
                 // Populate the board
                 for(var i=0; i < size; i++){
                   var new_row = document.createElement('div');
@@ -158,7 +201,7 @@
                   board.appendChild(new_row);
                   current_board.push([]);
                   for(var j=0; j < size; j++){
-                    var challenge = challenges[Math.floor(Math.random() * challenges.length)];
+                    var challenge = challenges[i*size+j];
                     add_bingo_square(new_row, i, j, challenge)
                     current_board[i].push({"earned": false,
                                            "challenge": challenge,
