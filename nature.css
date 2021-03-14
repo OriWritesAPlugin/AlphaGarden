@@ -51,15 +51,12 @@ a {
   pointer-events: none;
   padding: 0.6vh;
   color: #FFFFFF;
-}
-
-.unselectable {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .name_div {padding: 5px 4px 3px 0px; width: 200px; text-align: right; border: none; color:white; margin: 0px; height: 100%; background: #272127;}
