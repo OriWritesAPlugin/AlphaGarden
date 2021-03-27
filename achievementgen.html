@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <meta charset="utf-8"/>
-      <!--Copyright 2017 Oranitha
+      <!--Copyright 2021 Oranitha
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -18,13 +18,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <h1 id="title">Custom Achievement Generator (CUSAGE)</h1>
         <div id="achievement_div">
             <form id="input_form">
-                Achievement Name: 
+                Achievement Name:
                 <input type="text" name="title" value="Located the Generator">
                 <br><br>
-                Achievement Text: 
+                Achievement Text:
                 <input type="text" name="text" value="You found an achievement generator! Hopefully it wasn't well-hidden.">
                 <br><br>
-                Point Value: 
+                Point Value:
                 <input type="text" name="points" value="10">
                 <br><br>
                 Date Earned:
@@ -37,7 +37,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <br>
                 <input type="button" style="width: 40%" value="Update" onClick="draw()">
                 <input type="button" value="Export" style="width: 40%" onClick="sendoff()">
-            </form> 
+            </form>
             <canvas id="achv_canvas"></canvas>
           </div>
           <div id="help_div">Yo.</div>
@@ -82,7 +82,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               ctx.fillStyle = "#777";
               ctx.font = date_text;
               var date = "Earned: "+form.date.value;
-              ctx.fillText(date,295-ctx.measureText(date).width,85);       
+              ctx.fillText(date,295-ctx.measureText(date).width,85);
               var img = new Image();
               img.crossOrigin = "anonymous";
               img.src = form.img.value;
@@ -100,7 +100,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           }
 
         //This method was shared by Colin Wiseman on SO, originally sourced from a tutorial:
-        //http://www.html5canvastutorials.com/tutorials/html5-canvas-wrap-text-tutorial/  
+        //http://www.html5canvastutorials.com/tutorials/html5-canvas-wrap-text-tutorial/
         function wrapText(context, text, x, y, maxWidth, lineHeight) {
           var words = text.split(' ');
           var line = '';
@@ -132,7 +132,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
          * @param {Number} y The top left y coordinate
          * @param {Number} width The width of the rectangle
          * @param {Number} height The height of the rectangle
-         * @param {Number} [radius = 5] The corner radius; It can also be an object 
+         * @param {Number} [radius = 5] The corner radius; It can also be an object
          *                 to specify different radii for corners
          * @param {Number} [radius.tl = 0] Top left
          * @param {Number} [radius.tr = 0] Top right
