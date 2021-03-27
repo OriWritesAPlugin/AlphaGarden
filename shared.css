@@ -70,7 +70,7 @@ input.chunky {
     border: 0px;
     color: #DFC48C;
     background-color: #2F252D;
-    font-size: 22px;  
+    font-size: 22px;
 }
 
 .center-parent{
@@ -199,6 +199,17 @@ input.chunky {
     height: 90px;
     margin-left: auto;
     margin-right: auto;
+}
+#raffle_div {
+    border-radius: 3px;
+    width: 40%;
+    height: 90px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#calc_raffle_stats {
+    width: auto;
+    margin: 0;
 }
 #light_div {
     border-radius: 3px;
