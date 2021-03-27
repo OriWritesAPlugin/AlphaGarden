@@ -2,7 +2,9 @@
 body {
     font-size: 2vh;
     font-family: sans-serif;
-    color: #FFF4DC;
+    color: #FFFFFF;
+    background: #134e5e; /* fallback for old browsers */
+    background: linear-gradient(to right, #093028, #237a57); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     line-height: 1.2;
     background-color: #441100;
     transition: background 0.5s linear;
@@ -41,7 +43,9 @@ a {
     text-align:center;
     width: 12vh;
     height: 12vh;
-    background: #552200;
+    border-color: #71b280;
+    border-style: dashed;
+    border-width: thin;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -50,7 +54,6 @@ a {
   word-wrap: break-word;
   pointer-events: none;
   padding: 0.6vh;
-  color: #FFFFFF;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;

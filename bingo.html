@@ -32,9 +32,8 @@
         </footer>
         <script type="text/javascript">
 
-            var lighter_soil = "#552200"; // Used for every other patch for readability
-            var darker_soil = "#441100";
-            var grass = "#004400";
+            var dark_grass = "linear-gradient(to right, #093028, #237a57)";
+            var grass = "linear-gradient(to right, #134e5e, #71b280)";
 
             easy_challenges = [
             {"description": "No drops", "points": 300},
@@ -87,7 +86,6 @@
                "https://i.imgur.com/DYzd6UU.png",
                "https://i.imgur.com/kfKp6wF.png",
                "https://i.imgur.com/lThkZyH.png",
-               "https://i.imgur.com/9cXFZB3.png",
                "https://i.imgur.com/Y6LskTa.png",
                "https://i.imgur.com/Nq8KV8B.png"
             ]
@@ -152,7 +150,6 @@
                   board.removeChild(board.lastChild);
               }
               current_board = [];
-              document.getElementsByTagName("BODY")[0].style.background = darker_soil;
             }
 
             function has_bingo() {
@@ -225,24 +222,29 @@
             var col = parseInt(coords[1]);
             var square_info = current_board[row][col];
             var bingo_square = document.getElementById(id);
-            var square_earned = !square_info["earned"];
+            square_info["earned"] = !square_info["earned"];
             bingo_square.lastChild.style.opacity = 0.5;  // Make label translucent
-            if(square_earned){
+            if(square_info["earned"]){
               bingo_square.style.background = 'url(' + square_info["icon"] + ')  no-repeat center center';
             } else {
-              if((col+row) % 2 == 0){
-                bingo_square.style.background = darker_soil;
-              } else {
-                bingo_square.style.background = lighter_soil;
-              }
+              bingo_square.style.background = "none";
             }
-            square_info["earned"] = square_earned;
             var body = document.getElementsByTagName("BODY")[0];
             if(has_bingo()){
-              body.style.background = grass;
+              transition_all_bingo_borders("#ffffff");
             } else {
-              body.style.background = darker_soil;
+              transition_all_bingo_borders("#71b280");
             }
+          }
+
+          function transition_all_bingo_borders(color){
+            var delay = 30; // 0.1 seconds
+            for(let i=0; i<current_board.length; i++){
+                for(let j=0; j<current_board[i].length; j++){
+                  let own_delay = delay*(i*current_board.length+j);
+                  setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = color;}, own_delay);
+                }
+              }
           }
 
           function add_bingo_square(parent, column, row, challenge){
@@ -250,9 +252,6 @@
             var bingo_square = document.createElement('div');
             bingo_square.id = id;
             bingo_square.className = 'bingo_box';
-            if((column+row) % 2 == 0){
-              bingo_square.style.background = darker_soil;
-            }
             bingo_square.addEventListener("click", toggle_status);
             bingo_square.addEventListener('touchend', function(e){
                     toggle_status(e);
