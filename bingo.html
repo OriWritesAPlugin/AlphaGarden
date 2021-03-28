@@ -32,8 +32,7 @@
         </footer>
         <script type="text/javascript">
 
-            var dark_grass = "linear-gradient(to right, #093028, #237a57)";
-            var grass = "linear-gradient(to right, #134e5e, #71b280)";
+            var alt_background = "linear-gradient(to right, #134e5e, #71b280)";
 
             easy_challenges = [
             {"description": "No drops", "points": 300},
@@ -231,18 +230,22 @@
             }
             var body = document.getElementsByTagName("BODY")[0];
             if(has_bingo()){
-              transition_all_bingo_borders("#ffffff");
+              transition_all_bingo_borders("#ffffff", row, col);
             } else {
-              transition_all_bingo_borders("#71b280");
+              transition_all_bingo_borders("#71b280", row, col);
             }
           }
 
-          function transition_all_bingo_borders(color){
-            var delay = 30; // 0.1 seconds
+          function transition_all_bingo_borders(color, origin_row, origin_column){
+            var root_delay = 70;  // in milliseconds
             for(let i=0; i<current_board.length; i++){
                 for(let j=0; j<current_board[i].length; j++){
-                  let own_delay = delay*(i*current_board.length+j);
-                  setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = color;}, own_delay);
+                  // Yes these lets are necessary
+                  let mapped_row = origin_row;
+                  let mapped_column = origin_column;
+                  // Delay proportional to distance from origin
+                  let delay = root_delay*(((mapped_column-j)**2+(mapped_row-i)**2)**(1/2))
+                  setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = color;}, delay);
                 }
               }
           }
