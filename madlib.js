@@ -9,7 +9,7 @@ verb = ["destroyed","discovered","loved","hunted","learned","gave","accepted","l
 "rescued","immortalized","danced","struggled","deserted","drowned","celebrated","bought","hurt",
 "read","surprised","reformed","chased","feared","informed","believed","reorganized","orphaned",
 "converted","betrayed","corrupted","chose","grew","invented","plagued","haunted","concerned",
-"reformed"];
+"reformed","doomed","witnessed"];
 //Adj: ^
 adjective = ["extinct","inverse","frigid","colorful","unfathomable","erratic","infectious",
 "airborne","eventual","forgotten","forbidden","unknown","happy","excited","uncertain","brave",
@@ -25,14 +25,15 @@ adjective = ["extinct","inverse","frigid","colorful","unfathomable","erratic","i
 "secret","forsaken","overgrown","concerning","good","evil","neutral","feral","helpless","calm",
 "scientific","unrestrained","obsessive","gorgeous","disrespectful","organized","competent",
 "heretical","mechanical","rough","scarred","glowing","soft","excellent","best","fashionable",
-"romantic","uncontrollable","cursed","blessed","sad","questionable"];
+"romantic","uncontrollable","cursed","blessed","sad","questionable","graceful","temporary",
+"unremarkable","lucky"];
 //Adverb: #
 adverb = ["succinctly","generously","unfortunately","fortunately","previously",
 "without warning","earlier","after the fact","utterly","mercilessly","joyfully","curiously",
 "quickly","pleasantly","excitedly","exquisitely","long","always","dearly","mercifully","slowly",
 "painfully","remarkably","posthumously","humorously","remorselessly","unavoidably","clumsily",
 "uncertainly","with gusto","gracefully","mysteriously","thoroughly","gleefully","beautifully",
-"overwhelmingly","underwhelmingly"];
+"overwhelmingly","underwhelmingly","chaotically"];
 //Noun: *
 noun = ["joy","egg","sunrise","forest","crystal","clanmate","island","dragon","night","tomorrow",
 "idea","scroll","candle","archive","jungle","garden","food","god","friend","love","pet","familiar",
@@ -56,8 +57,8 @@ noun = ["joy","egg","sunrise","forest","crystal","clanmate","island","dragon","n
 "movement","migration","representative","lair","rainbow","sweater","shame","hardship","thunderbolt",
 "faith","decision","scream","charm","comfort","pleasure","song","heretic","mother","father",
 "sibling","failure","tradition","pain","salvation","monster","abomination","tree","cavern system",
-"home","instinct","clown","mannerism","death","world","clanmate","river","romance","curse","blessing",
-"fate","poem","disaster"];
+"home","instinct","clown","mannerism","death","world","mate","river","romance","curse","blessing",
+"fate","poem","disaster","friendship"];
 //Preposition: &
 preposition = ["before","after","above","below","during","around","inside","over"];
 
