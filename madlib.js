@@ -8,7 +8,8 @@ verb = ["destroyed","discovered","loved","hunted","learned","gave","accepted","l
 "coddled","married","consumed","studied","made","stole","banished","recalled","commanded",
 "rescued","immortalized","danced","struggled","deserted","drowned","celebrated","bought","hurt",
 "read","surprised","reformed","chased","feared","informed","believed","reorganized","orphaned",
-"converted","betrayed","corrupted","chose","grew","invented"];
+"converted","betrayed","corrupted","chose","grew","invented","plagued","haunted","concerned",
+"reformed"];
 //Adj: ^
 adjective = ["extinct","inverse","frigid","colorful","unfathomable","erratic","infectious",
 "airborne","eventual","forgotten","forbidden","unknown","happy","excited","uncertain","brave",
@@ -23,7 +24,8 @@ adjective = ["extinct","inverse","frigid","colorful","unfathomable","erratic","i
 "suspicious","educated","magical","tacky","physical","unfamiliar", "sudden", "helpful",
 "secret","forsaken","overgrown","concerning","good","evil","neutral","feral","helpless","calm",
 "scientific","unrestrained","obsessive","gorgeous","disrespectful","organized","competent",
-"heretical","mechanical","rough","scarred","glowing","soft"];
+"heretical","mechanical","rough","scarred","glowing","soft","excellent","best","fashionable",
+"romantic","uncontrollable","cursed","blessed","sad","questionable"];
 //Adverb: #
 adverb = ["succinctly","generously","unfortunately","fortunately","previously",
 "without warning","earlier","after the fact","utterly","mercilessly","joyfully","curiously",
@@ -54,7 +56,8 @@ noun = ["joy","egg","sunrise","forest","crystal","clanmate","island","dragon","n
 "movement","migration","representative","lair","rainbow","sweater","shame","hardship","thunderbolt",
 "faith","decision","scream","charm","comfort","pleasure","song","heretic","mother","father",
 "sibling","failure","tradition","pain","salvation","monster","abomination","tree","cavern system",
-"home","instinct"];
+"home","instinct","clown","mannerism","death","world","clanmate","river","romance","curse","blessing",
+"fate","poem","disaster"];
 //Preposition: &
 preposition = ["before","after","above","below","during","around","inside","over"];
 
