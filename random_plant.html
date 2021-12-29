@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="utf-8"/>
+    <head>
+        <title>Misc. Tools</title>
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
+    </head>
+    <body onload="preload_plants()">
+        <a href="index.html">&lt;Tool Hub</a>
+        <h1 id="title">Randaplant</h1>
+        <h2 id="subtitle">Generates a randomized plant to be used as a badge in bingo.</h2>
+        <div id=content_div>
+            <input type="button" class="chunky" value="&gt;&gt; Bring On the Plant&lt;&lt;" onClick="gen_randoplant()">
+            </br></br></br>
+            <div id="output"><canvas id="output_canvas" width="64" height="64"></canvas></div>
+        </div>
+    </body>
+    <script src="gen_plant.js"></script>
+    <script type="text/javascript">
+        async function gen_randoplant() {
+            var canvas = document.getElementById("output_canvas");
+            var ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.imageSmoothingEnabled = false;
+            var ret_canvas = await gen_plant();
+            ctx.drawImage(ret_canvas, 0, 0, 64, 64);
+            //var canvas = document.getElementById("output_canvas");
+            //gen_plant(document.getElementById("output_canvas"));
+        }
+    </script>
+    </body>
+</html>
