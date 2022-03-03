@@ -5,40 +5,56 @@
 // Javascript can't access images by path.
 // This workaround is hideous, but what can ya do :) (while hosting to github and not using ajax, I mean)
 var foliage = ["https://i.imgur.com/DHEhYZb.png", "https://i.imgur.com/YVmcV0F.png", "https://i.imgur.com/pnUE2t6.png", 
-               "https://i.imgur.com/cIW3sEs.png", "https://i.imgur.com/VdpvRzM.png", "https://i.imgur.com/ygeds4o.png",
+               "https://i.imgur.com/GpiPbrr.png", "https://i.imgur.com/VdpvRzM.png", "https://i.imgur.com/ygeds4o.png",
                "https://i.imgur.com/ZF7Qrri.png", "https://i.imgur.com/hO69AYK.png",
                "https://i.imgur.com/AmPyApO.png", "https://i.imgur.com/T7UmO2T.png", "https://i.imgur.com/yYUgUTy.png",
                "https://i.imgur.com/tDlJVQv.png", "https://i.imgur.com/fT6Djoh.png", "https://i.imgur.com/9qBemPD.png",
                "https://i.imgur.com/mw6S3zF.png", "https://i.imgur.com/a8nknTl.png", "https://i.imgur.com/N4F6R7c.png"];
-foliage = ["https://i.imgur.com/SNeVw4R.png", "https://i.imgur.com/DHEhYZb.png"]
-var basic_flowers = ["https://i.imgur.com/MguYO3C.png", "https://i.imgur.com/wWEcDGb.png", "https://i.imgur.com/91qw9lR.png",
-                     "https://i.imgur.com/wbp9xX6.png", "https://i.imgur.com/Yif3R6i.png", "https://i.imgur.com/D6EF5qt.png"];
-var complex_flowers = ["https://i.imgur.com/JnS0o47.png", "https://i.imgur.com/qzCN0hL.png", "https://i.imgur.com/yCnPCSK.png",
-                       "https://i.imgur.com/JAjNhuw.png", "https://i.imgur.com/cinsz3D.png", "https://i.imgur.com/8k4MgSd.png"];
+foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/gO6uJIn.png", "https://i.imgur.com/CfPqdWF.png",
+           "https://i.imgur.com/NFM09J5.png", "https://i.imgur.com/YrS30Es.png", "https://i.imgur.com/kyfs2Yl.png",
+           "https://i.imgur.com/nMW2bBb.png", "https://i.imgur.com/tBQb6yy.png", "https://i.imgur.com/5j6u58a.png",
+           "https://i.imgur.com/Mb1wqi1.png", "https://i.imgur.com/Rk7vvo3.png", "https://i.imgur.com/DdEYVYA.png",
+           "https://i.imgur.com/IF5MQWY.png", "https://i.imgur.com/Z6njdmV.png", "https://i.imgur.com/cDAqt4U.png",
+           "https://i.imgur.com/117aiCY.png", "https://i.imgur.com/7ZrX05Y.png"];
+var basic_flowers = ["https://i.imgur.com/G4h84Ht.png", "https://i.imgur.com/vXQYMkL.png"];
+var complex_flowers = ["https://i.imgur.com/p1ipMdS.png", "https://i.imgur.com/UUFJO7h.png"];
 
-var base_foliage = ["#8f974a", "#4b692f"];
-var base_foliage_light = "#8f974a";
+var base_foliage_palette = ["#aed740", "#76c935", "#50aa37", "#2f902b"];
+var base_foliage_light = base_foliage_palette[1];  // second from lightest
 var base_foliage_dark = "#4b692f";
-var base_flower_light = "#d77bba";
+var base_flower_palette = ["f3addd", "d87fbc", "c059a0", "aa3384"];
+var base_flower_light = base_flower_palette[0];
 var base_flower_dark = "bd4b99";
 var base_flower_accent = "fbf236";
 
 var work_canvas_size = 32;  // in pixels
 
-// Roll more than two_foliage_roll out of 10 to have two pieces of base foliage, etc.
-var two_foliage_roll = 0.5;
-var three_foliage_roll = 0.9;
+// Roll more than two_foliage_roll out of 1 to have two pieces of base foliage, etc.
+var two_foliage_roll = 0.95;
+var three_foliage_roll = 0.99;
 
 var place_complex_flower = "#ff943a";
 var place_simple_flower = "#e900ff";
 
-var foliage_palettes = [["#8f974a", "4b692f"], ["468816", "4b692f"], ["207316", "0d4f2e"], ["ad6f30", "942020"], ["23943a", "0a713d"],
-["807f58","626a4f"],["40423a","31332e"],["1a9410","037c16"],["6da576","548a5c"],["d48dc7","bf709d"],["38b463","249049"],
-["82541e","6a3a17"],["634534","533b2e"],
-// repeats to cheaply up the likelihood of green
-["8f974a", "4b692f"], ["468816", "4b692f"], ["207316", "0d4f2e"], ["6da576","548a5c"]];
-var flower_palettes = [["d77bba", "bd4b99"], ["d77bba", "bd4b99"], ["fbf236", "efce35"], ["7835ef", "5a23e6"], ["fefeee", "f2f2d6"],
-                       ["6da576","548a5c"], ["ce1e37", "b10c23"], ["7dcfd6", "5bbc98"], ["e3d572", "cab851"]];
+var common_foliage_palettes = [["#aed740", "#76c935", "#50aa37", "#2f902b"], ["a2ac4d", "8f974a", "66732a", "4b692f"],
+                               ["7ad8b7","5eb995", "3e946d", "277b50"], ["9dbb86", "679465", "476f58", "2f4d47"],
+                               ["8fbe99", "7faf89", "58906f", "2f4d47"], ["fdff07", "b9d50f", "669914", "34670b"]];
+var uncommon_foliage_palettes = [["e7d7c1", "a78a7f", "735751", "704542"], ["fdff07", "d3a740", "b2773a", "934634"]];
+var rare_foliage_palettes = [["f1ccc2", "e5b7b7", "d396a8", "c9829d"], ["9c6695", "734978", "4c2d5c", "2f1847"],
+                             ["d1d2f9", "a3bcf9", "7796cb", "576490"]]; 
+
+//, ["468816", "4b692f"], ["207316", "0d4f2e"], ["ad6f30", "942020"], ["23943a", "0a713d"],
+//["807f58","626a4f"],["40423a","31332e"],["1a9410","037c16"],["6da576","548a5c"],["d48dc7","bf709d"],["38b463","249049"],
+//["82541e","6a3a17"],["634534","533b2e"],
+
+// For testing
+var foliage_palettes = common_foliage_palettes.concat(uncommon_foliage_palettes).concat(rare_foliage_palettes);
+
+var flower_palettes = [["f3addd", "d87fbc", "c059a0", "aa3384"],["f1ccc2", "e5b7b7", "d396a8", "c9829d"],
+                       ["9c6695", "734978", "4c2d5c", "2f1847"],["d1d2f9", "a3bcf9", "7796cb", "576490"],
+                       ["e7d7c1", "a78a7f", "735751", "704542"], ["fdff07", "d3a740", "b2773a", "934634"]];
+//["d77bba", "bd4b99"], ["d77bba", "bd4b99"], ["fbf236", "efce35"], ["7835ef", "5a23e6"], ["fefeee", "f2f2d6"],
+//                       ["6da576","548a5c"], ["ce1e37", "b10c23"], ["7dcfd6", "5bbc98"], ["e3d572", "cab851"]];
 
 
 async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, chance, anchor_to_bottom=false){
@@ -123,31 +139,27 @@ async function gen_plant() {
     complex_flower_coords = get_flower_coords(place_complex_flower, work_ctx);
 
     // Recolor the foliage
-    // If the recoloring is slow, there's no reason why we couldn't do it in one pass...but it's 16x16, so let's hold off for now.
-    var new_light, new_dark, new_accent;
-    [new_light, new_dark] = foliage_palettes[Math.floor(Math.random()*foliage_palettes.length)];
-    replace_color(hexToRgb(base_foliage_light), hexToRgb(new_light), work_ctx);
-    replace_color(hexToRgb(base_foliage_dark), hexToRgb(new_dark), work_ctx);
+    var new_foliage_palette = foliage_palettes[Math.floor(Math.random()*foliage_palettes.length)];
+    replace_color_palette(base_foliage_palette, new_foliage_palette, work_ctx);
 
     // Place the flowers
     var flower_url;
     if(simple_flower_coords.length > 0){
         flower_url = basic_flowers[Math.floor(Math.random()*basic_flowers.length)];
-        await place_image_at_coords_with_chance(flower_url, simple_flower_coords, work_ctx, 0.75);
+        await place_image_at_coords_with_chance(flower_url, simple_flower_coords, work_ctx, 0.5);
     }
     if(complex_flower_coords.length > 0){
         // Chance that if there's already simple flowers, we keep using that flower
         if(simple_flower_coords.length == 0 || Math.random()>0.5){
             flower_url = complex_flowers[Math.floor(Math.random()*complex_flowers.length)];
         }
-        await place_image_at_coords_with_chance(flower_url, complex_flower_coords, work_ctx, 0.9, true);
+        await place_image_at_coords_with_chance(flower_url, complex_flower_coords, work_ctx, 0.8, true);
     }
 
     // Recolor the flowers
-    [new_light, new_dark] = flower_palettes[Math.floor(Math.random()*flower_palettes.length)];
+    var new_flower_palette = flower_palettes[Math.floor(Math.random()*flower_palettes.length)];
+    replace_color_palette(base_flower_palette, new_flower_palette, work_ctx);
     new_accent = flower_palettes[Math.floor(Math.random()*flower_palettes.length)][0];
-    replace_color(hexToRgb(base_flower_light), hexToRgb(new_light), work_ctx);
-    replace_color(hexToRgb(base_flower_dark), hexToRgb(new_dark), work_ctx);
     replace_color(hexToRgb(base_flower_accent), hexToRgb(new_accent), work_ctx);
 
     // We can draw a canvas directly on another canvas
@@ -184,6 +196,37 @@ function replace_color(old_rgb, new_rgb, ctx) {
               imageData.data[i]=newRed;
               imageData.data[i+1]=newGreen;
               imageData.data[i+2]=newBlue;
+          }
+      }
+    // put the data back on the canvas  
+    ctx.putImageData(imageData,0,0);
+}
+
+// Palettes MUST be the same length, FYI
+function replace_color_palette(old_palette, new_palette, ctx) {
+    var oldRGB, newRGB;
+    // We do some truly hideous hacks because I'm bad at Javascript :)
+    // Basically, we use the r, g, and b as a 3-level key into an object
+    // If we follow it to the bottom and something exists, it's something we replace
+    var paletteSwap = {};
+    for(var i=0; i<old_palette.length; i++){
+        oldRGB = hexToRgb(old_palette[i]);
+        paletteSwap[oldRGB[0]] = {};
+        paletteSwap[oldRGB[0]][oldRGB[1]] = {};
+        paletteSwap[oldRGB[0]][oldRGB[1]][oldRGB[2]] = hexToRgb(new_palette[i]);
+    }
+    // taken from https://stackoverflow.com/questions/16228048/replace-a-specific-color-by-another-in-an-image-sprite
+    var imageData = ctx.getImageData(0, 0, work_canvas_size, work_canvas_size);
+    for (var i=0;i<imageData.data.length;i+=4)
+      {
+          // god this is painful to look at. I'm sorry.
+          if(paletteSwap[imageData.data[i]] != undefined &&
+             paletteSwap[imageData.data[i]][imageData.data[i+1]] != undefined &&
+             paletteSwap[imageData.data[i]][imageData.data[i+1]][imageData.data[i+2]] != undefined){
+              newRGB = paletteSwap[imageData.data[i]][imageData.data[i+1]][imageData.data[i+2]];
+              imageData.data[i]=newRGB[0];
+              imageData.data[i+1]=newRGB[1];
+              imageData.data[i+2]=newRGB[2];
           }
       }
     // put the data back on the canvas  
