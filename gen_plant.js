@@ -1,15 +1,22 @@
 // This contains the code for generating a random plant badge.
+// I wrote it with limited internet access, meaning that it looks like Python and uses no clever Javascript tricks.
+// You've been warned!
 
 // Javascript can't access images by path.
 // This workaround is hideous, but what can ya do :) (while hosting to github and not using ajax, I mean)
-var foliage = ["https://i.imgur.com/DHEhYZb.png", "https://i.imgur.com/YVmcV0F.png", "https://i.imgur.com/zqt4vSP.png", 
-               "https://i.imgur.com/jplFR6T.png", "https://i.imgur.com/VdpvRzM.png", "https://i.imgur.com/ygeds4o.png",
-               "https://i.imgur.com/ZF7Qrri.png"];
+var foliage = ["https://i.imgur.com/DHEhYZb.png", "https://i.imgur.com/YVmcV0F.png", "https://i.imgur.com/pnUE2t6.png", 
+               "https://i.imgur.com/cIW3sEs.png", "https://i.imgur.com/VdpvRzM.png", "https://i.imgur.com/ygeds4o.png",
+               "https://i.imgur.com/ZF7Qrri.png", "https://i.imgur.com/hO69AYK.png",
+               "https://i.imgur.com/AmPyApO.png", "https://i.imgur.com/T7UmO2T.png", "https://i.imgur.com/yYUgUTy.png",
+               "https://i.imgur.com/tDlJVQv.png", "https://i.imgur.com/fT6Djoh.png", "https://i.imgur.com/9qBemPD.png",
+               "https://i.imgur.com/mw6S3zF.png", "https://i.imgur.com/a8nknTl.png", "https://i.imgur.com/N4F6R7c.png"];
+foliage = ["https://i.imgur.com/SNeVw4R.png", "https://i.imgur.com/DHEhYZb.png"]
 var basic_flowers = ["https://i.imgur.com/MguYO3C.png", "https://i.imgur.com/wWEcDGb.png", "https://i.imgur.com/91qw9lR.png",
                      "https://i.imgur.com/wbp9xX6.png", "https://i.imgur.com/Yif3R6i.png", "https://i.imgur.com/D6EF5qt.png"];
 var complex_flowers = ["https://i.imgur.com/JnS0o47.png", "https://i.imgur.com/qzCN0hL.png", "https://i.imgur.com/yCnPCSK.png",
                        "https://i.imgur.com/JAjNhuw.png", "https://i.imgur.com/cinsz3D.png", "https://i.imgur.com/8k4MgSd.png"];
 
+var base_foliage = ["#8f974a", "#4b692f"];
 var base_foliage_light = "#8f974a";
 var base_foliage_dark = "#4b692f";
 var base_flower_light = "#d77bba";
@@ -26,13 +33,19 @@ var place_complex_flower = "#ff943a";
 var place_simple_flower = "#e900ff";
 
 var foliage_palettes = [["#8f974a", "4b692f"], ["468816", "4b692f"], ["207316", "0d4f2e"], ["ad6f30", "942020"], ["23943a", "0a713d"],
+["807f58","626a4f"],["40423a","31332e"],["1a9410","037c16"],["6da576","548a5c"],["d48dc7","bf709d"],["38b463","249049"],
+["82541e","6a3a17"],["634534","533b2e"],
 // repeats to cheaply up the likelihood of green
-["8f974a", "4b692f"], ["468816", "4b692f"], ["207316", "0d4f2e"]];
-var flower_palettes = [["d77bba", "bd4b99"], ["d77bba", "bd4b99"], ["fbf236", "efce35"], ["7835ef", "5a23e6"], ["fefeee", "f2f2d6"]];
+["8f974a", "4b692f"], ["468816", "4b692f"], ["207316", "0d4f2e"], ["6da576","548a5c"]];
+var flower_palettes = [["d77bba", "bd4b99"], ["d77bba", "bd4b99"], ["fbf236", "efce35"], ["7835ef", "5a23e6"], ["fefeee", "f2f2d6"],
+                       ["6da576","548a5c"], ["ce1e37", "b10c23"], ["7dcfd6", "5bbc98"], ["e3d572", "cab851"]];
 
 
 async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, chance, anchor_to_bottom=false){
     // In canvas context ctx, place image at img_path "centered" at each (x,y) in list_of_coords with chance odds (ex 0.66 for 66%)
+    // 50% chance to horizontally mirror each one (TODO)
+    // Wondering if the shared ctx save/reload and use of async-await is giving me the "floating flowers" issue in here.
+    // I may revisit (creating a canvas just for the image and flipping it there), but it feels like overkill for now.
     var img = new Image();
     img.src = img_url;
     img.crossOrigin = "anonymous"
@@ -41,7 +54,7 @@ async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, c
       return function() {
       var w_offset = Math.floor(img.width/2);
       if(!anchor_to_bottom){
-        var h_offset = Math.floor(img.height/2);
+        var h_offset = Math.floor(img.height/2)-1;
       } else {
         var h_offset = -img.height + 1;
       }
@@ -98,11 +111,11 @@ async function gen_plant() {
       if(Math.random() < 0.5){
         do_flip=true;
         work_ctx.save();
-        work_ctx.translate(work_canvas.width, 0);
-        work_ctx.scale(-1, 1);
-      } else {do_flip=false;} // horizontally flip at random
+        //work_ctx.translate(work_canvas_size, 0);
+        //work_ctx.scale(-1, 1);
+      } else {do_flip=false};
       await place_image_at_coords_with_chance(imgs[i], [[Math.floor(work_canvas_size/2)-1, work_canvas_size-1]], work_ctx, 1, true);
-      if(do_flip){work_ctx.restore();}
+    if(do_flip){work_ctx.restore();}
     }
 
     // Figure out where to put each kind of flower, replacing marker pixels as we go
