@@ -4,28 +4,45 @@
 
 // Javascript can't access images by path.
 // This workaround is hideous, but what can ya do :) (while hosting to github and not using ajax, I mean)
-var foliage = ["https://i.imgur.com/DHEhYZb.png", "https://i.imgur.com/YVmcV0F.png", "https://i.imgur.com/pnUE2t6.png", 
-               "https://i.imgur.com/GpiPbrr.png", "https://i.imgur.com/VdpvRzM.png", "https://i.imgur.com/ygeds4o.png",
-               "https://i.imgur.com/ZF7Qrri.png", "https://i.imgur.com/hO69AYK.png",
-               "https://i.imgur.com/AmPyApO.png", "https://i.imgur.com/T7UmO2T.png", "https://i.imgur.com/yYUgUTy.png",
-               "https://i.imgur.com/tDlJVQv.png", "https://i.imgur.com/fT6Djoh.png", "https://i.imgur.com/9qBemPD.png",
-               "https://i.imgur.com/mw6S3zF.png", "https://i.imgur.com/a8nknTl.png", "https://i.imgur.com/N4F6R7c.png"];
-foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/gO6uJIn.png", "https://i.imgur.com/CfPqdWF.png",
-           "https://i.imgur.com/NFM09J5.png", "https://i.imgur.com/YrS30Es.png", "https://i.imgur.com/kyfs2Yl.png",
-           "https://i.imgur.com/nMW2bBb.png", "https://i.imgur.com/tBQb6yy.png", "https://i.imgur.com/5j6u58a.png",
-           "https://i.imgur.com/Mb1wqi1.png", "https://i.imgur.com/Rk7vvo3.png", "https://i.imgur.com/DdEYVYA.png",
-           "https://i.imgur.com/IF5MQWY.png", "https://i.imgur.com/Z6njdmV.png", "https://i.imgur.com/cDAqt4U.png",
-           "https://i.imgur.com/117aiCY.png", "https://i.imgur.com/7ZrX05Y.png"];
+all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.png", "https://i.imgur.com/wsC3ifp.png",
+               "https://i.imgur.com/NFM09J5.png", "https://i.imgur.com/urBlTiV.png", "https://i.imgur.com/kyfs2Yl.png",
+               "https://i.imgur.com/nMW2bBb.png", "https://i.imgur.com/tBQb6yy.png", "https://i.imgur.com/5j6u58a.png",
+               "https://i.imgur.com/Mb1wqi1.png", "https://i.imgur.com/Rk7vvo3.png", "https://i.imgur.com/DdEYVYA.png",
+               "https://i.imgur.com/IF5MQWY.png", "https://i.imgur.com/Z6njdmV.png", "https://i.imgur.com/cDAqt4U.png",
+               "https://i.imgur.com/117aiCY.png", "https://i.imgur.com/7ZrX05Y.png", "https://i.imgur.com/ZMe5J0j.png",
+               "https://i.imgur.com/wLsuJSX.png", "https://i.imgur.com/dxJbfgi.png", "https://i.imgur.com/l1MK3yJ.png",
+               "https://i.imgur.com/kTbrzeL.png", "https://i.imgur.com/s4Uav2q.png", "https://i.imgur.com/6GPgZzr.png",
+               "https://i.imgur.com/E6ikrq8.png", "https://i.imgur.com/krfsneI.png", "https://i.imgur.com/4hhVL8W.png",
+               "https://i.imgur.com/vtf2YZj.png"];
+// Done this way because of the silly imgur link workaround--we need to be able to preserve the numbering so we can figure
+// out which plant is which
+common_foliage = [all_foliage[0]]  // (expand this later)
+// for testing
+foliage = all_foliage;
+
+// Rarity level:
+// 1: only common things available
+// 2: adds uncommon foliage
+// 3?: adds complex flowers, use common ones instead at lower rarities??
+// 3/4: adds uncommon foliage colors
+// 4?: adds chance of doubles? triples need to die
+// 4/6: adds rare foliage
+// 5/7: adds rare foliage colors
+// 8: add rare flower colors
+// 9: increased weight of uncommon + rare colors?
+// 10: increased weight of rare colors?
+
+// bingo difficulty could be difficulty*size_rating+1. so an easy*small is (1*1+1=2), easy*medium is (1*2+1), hard*big is (3*3+1=10), pain*medium is (2*4+1=9)
+// maybe you sometimes get a free max(1,difficulty-2) plant as a bonus so that that level 1 is somewhat relevant. or something.
+
+
 var basic_flowers = ["https://i.imgur.com/G4h84Ht.png", "https://i.imgur.com/vXQYMkL.png"];
 var complex_flowers = ["https://i.imgur.com/p1ipMdS.png", "https://i.imgur.com/UUFJO7h.png"];
 
 var base_foliage_palette = ["#aed740", "#76c935", "#50aa37", "#2f902b"];
 var base_foliage_light = base_foliage_palette[1];  // second from lightest
-var base_foliage_dark = "#4b692f";
 var base_flower_palette = ["f3addd", "d87fbc", "c059a0", "aa3384"];
-var base_flower_light = base_flower_palette[0];
-var base_flower_dark = "bd4b99";
-var base_flower_accent = "fbf236";
+var base_accent_palette = ["fff4cc", "ffe47b", "ffd430", "ecb600"];
 
 var work_canvas_size = 32;  // in pixels
 
@@ -156,11 +173,11 @@ async function gen_plant() {
         await place_image_at_coords_with_chance(flower_url, complex_flower_coords, work_ctx, 0.8, true);
     }
 
-    // Recolor the flowers
+    // Recolor the flowers and accent
     var new_flower_palette = flower_palettes[Math.floor(Math.random()*flower_palettes.length)];
     replace_color_palette(base_flower_palette, new_flower_palette, work_ctx);
-    new_accent = flower_palettes[Math.floor(Math.random()*flower_palettes.length)][0];
-    replace_color(hexToRgb(base_flower_accent), hexToRgb(new_accent), work_ctx);
+    var new_accent_palette = flower_palettes[Math.floor(Math.random()*flower_palettes.length)];
+    replace_color_palette(base_accent_palette, new_accent_palette, work_ctx);
 
     // We can draw a canvas directly on another canvas
     return work_canvas;
