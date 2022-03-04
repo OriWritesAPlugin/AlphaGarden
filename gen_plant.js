@@ -12,20 +12,38 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/117aiCY.png", "https://i.imgur.com/7ZrX05Y.png", "https://i.imgur.com/ZMe5J0j.png",
                "https://i.imgur.com/wLsuJSX.png", "https://i.imgur.com/dxJbfgi.png", "https://i.imgur.com/l1MK3yJ.png",
                "https://i.imgur.com/kTbrzeL.png", "https://i.imgur.com/s4Uav2q.png", "https://i.imgur.com/6GPgZzr.png",
-               "https://i.imgur.com/E6ikrq8.png", "https://i.imgur.com/krfsneI.png", "https://i.imgur.com/4hhVL8W.png",
-               "https://i.imgur.com/vtf2YZj.png"];
-// Done this way because of the silly imgur link workaround--we need to be able to preserve the numbering so we can figure
-// out which plant is which
-common_foliage = [all_foliage[0]]  // (expand this later)
+               "https://i.imgur.com/E6ikrq8.png", "https://i.imgur.com/MyF1tCA.png", "https://i.imgur.com/5y1UeDM.png",
+               "https://i.imgur.com/uYswz0s.png", "https://i.imgur.com/qGczjJf.png", "https://i.imgur.com/PaWgGAq.png"];
+// Doing it this way lets us preserve the numbering to know which plant is which.
+// But it's also key to how the seeds work!
+common_foliage = [0]  // (expand this later)
 // for testing
 foliage = all_foliage;
+
+//seed format is 1<foliage><flower>1<color><color><color><rngnum>
+//random 1s are to avoid the encoding dropping the leading 0s
+//foliage, flower, and the colors are all fixed-length 3 digits (ex: 100102310140060012147483647) for a max of 999 possibilities
+//this number's way too big for Javascript without mantissa (Maxint is 9007199254740992 and we need highest precision and I don't know how Javascript does Things) so we break it like this:
+
+// 1foliageflower-1colorcolorcolor-actualrandomnumberseed
+// and then we put it in base64 for slightly-shorter-fixed-length purposes (yes I checked on the fixed-length, don't worry!)
+
+// 1001023 ->  D0Y/
+
+// 1014006001 -> 8cIDx
+
+// D0Y/8cIDx  that's...more or less typable? And also shorter which is important for our purposes
+
+// if you don't break on the proper lengths, you get 1074841275891953 which is Big Wrong
+
+
 
 // Rarity level:
 // 1: only common things available
 // 2: adds uncommon foliage
 // 3?: adds complex flowers, use common ones instead at lower rarities??
 // 3/4: adds uncommon foliage colors
-// 4?: adds chance of doubles? triples need to die
+// 4?: adds chance of doubles? triples need to die. maybe doubles too. add uncommon flower colors instead?
 // 4/6: adds rare foliage
 // 5/7: adds rare foliage colors
 // 8: add rare flower colors
@@ -41,44 +59,49 @@ var complex_flowers = ["https://i.imgur.com/p1ipMdS.png", "https://i.imgur.com/U
 
 var base_foliage_palette = ["#aed740", "#76c935", "#50aa37", "#2f902b"];
 var base_foliage_light = base_foliage_palette[1];  // second from lightest
+var base_accent_palette = ["fef4cc", "fde47b", "ffd430", "ecb600"];
 var base_flower_palette = ["f3addd", "d87fbc", "c059a0", "aa3384"];
-var base_accent_palette = ["fff4cc", "ffe47b", "ffd430", "ecb600"];
+var overall_palette = base_foliage_palette.concat(base_accent_palette).concat(base_flower_palette);
 
 var work_canvas_size = 32;  // in pixels
 
-// Roll more than two_foliage_roll out of 1 to have two pieces of base foliage, etc.
+// Roll more than two_foliage_roll out of 1 to have two pieces of base foliage.
 var two_foliage_roll = 0.95;
-var three_foliage_roll = 0.99;
 
 var place_complex_flower = "#ff943a";
 var place_simple_flower = "#e900ff";
 
 var common_foliage_palettes = [["#aed740", "#76c935", "#50aa37", "#2f902b"], ["a2ac4d", "8f974a", "66732a", "4b692f"],
                                ["7ad8b7","5eb995", "3e946d", "277b50"], ["9dbb86", "679465", "476f58", "2f4d47"],
-                               ["8fbe99", "7faf89", "58906f", "2f4d47"], ["fdff07", "b9d50f", "669914", "34670b"]];
-var uncommon_foliage_palettes = [["e7d7c1", "a78a7f", "735751", "704542"], ["fdff07", "d3a740", "b2773a", "934634"]];
-var rare_foliage_palettes = [["f1ccc2", "e5b7b7", "d396a8", "c9829d"], ["9c6695", "734978", "4c2d5c", "2f1847"],
-                             ["d1d2f9", "a3bcf9", "7796cb", "576490"]]; 
-
-//, ["468816", "4b692f"], ["207316", "0d4f2e"], ["ad6f30", "942020"], ["23943a", "0a713d"],
-//["807f58","626a4f"],["40423a","31332e"],["1a9410","037c16"],["6da576","548a5c"],["d48dc7","bf709d"],["38b463","249049"],
-//["82541e","6a3a17"],["634534","533b2e"],
+                               ["8fbe99", "7faf89", "3f7252", "285d3c"], ["fdff07", "b9d50f", "669914", "34670b"],
+                               ["b0f7a9", "7dcc75", "63aa5a", "448d3c"], ["c5af7a", "a6905c", "806d40", "69582e"],
+                               ["6ee964", "54c44b", "3da136", "228036"]];
+var uncommon_foliage_palettes = [["e7d7c1", "a78a7f", "735751", "603f3d"], ["9c6695", "734978", "4c2d5c", "2f1847"],
+                                 ["f8cd1e", "d3a740", "b2773a", "934634"], ["e4eaf3", "c0cfe7", "9ab3db", "7389ad"],
+                                 ["b98838", "8c6526", "8c6526", "54401f"], ["8f8090", "655666", "453946", "2a212b"]];
+var med_rarity_foliage_palettes = common_foliage_palettes.concat(uncommon_foliage_palettes);
+var rare_foliage_palettes = [["f5dbd7", "eec3c3", "d396a8", "c9829d"], ["d1d2f9", "a3bcf9", "7796cb", "576490"],
+                             ["eff0ba", "e2c3b2", "ce86a8", "c56497"], ["e88c50", "d0653e", "af3629", "9b1f1f"]]; 
+var high_rarity_foliage_palettes = med_rarity_foliage_palettes.concat(rare_foliage_palettes);
 
 // For testing
-var foliage_palettes = common_foliage_palettes.concat(uncommon_foliage_palettes).concat(rare_foliage_palettes);
+var foliage_palettes = high_rarity_foliage_palettes;
 
-var flower_palettes = [["f3addd", "d87fbc", "c059a0", "aa3384"],["f1ccc2", "e5b7b7", "d396a8", "c9829d"],
-                       ["9c6695", "734978", "4c2d5c", "2f1847"],["d1d2f9", "a3bcf9", "7796cb", "576490"],
-                       ["e7d7c1", "a78a7f", "735751", "704542"], ["fdff07", "d3a740", "b2773a", "934634"]];
-//["d77bba", "bd4b99"], ["d77bba", "bd4b99"], ["fbf236", "efce35"], ["7835ef", "5a23e6"], ["fefeee", "f2f2d6"],
-//                       ["6da576","548a5c"], ["ce1e37", "b10c23"], ["7dcfd6", "5bbc98"], ["e3d572", "cab851"]];
+var flower_palettes = [["fef4cc", "fde47b", "ffd430", "ecb600"],["f3addd", "d87fbc", "c059a0", "aa3384"]];
+flower_palettes = flower_palettes.concat(uncommon_foliage_palettes);
+
+var rare_flower_palettes = [];
+rare_flower_palettes = rare_flower_palettes.concat(rare_foliage_palettes);
+
+// For testing
+flower_palettes = flower_palettes.concat(rare_flower_palettes);
 
 
 async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, chance, anchor_to_bottom=false){
     // In canvas context ctx, place image at img_path "centered" at each (x,y) in list_of_coords with chance odds (ex 0.66 for 66%)
-    // 50% chance to horizontally mirror each one (TODO)
+    // 50% chance to horizontally mirror each one? (TODO)
     // Wondering if the shared ctx save/reload and use of async-await is giving me the "floating flowers" issue in here.
-    // I may revisit (creating a canvas just for the image and flipping it there), but it feels like overkill for now.
+    // I may revisit (and mirror the final canvas instead), but it feels like overkill for now.
     var img = new Image();
     img.src = img_url;
     img.crossOrigin = "anonymous"
@@ -131,10 +154,8 @@ async function gen_plant() {
     const foliage_roll = Math.random();
     if(foliage_roll < two_foliage_roll){
         foliage_amount = 1;
-    } else if(foliage_roll < three_foliage_roll){
-        foliage_amount = 2;
     } else {
-        foliage_amount = 3;
+        foliage_amount = 2;
     }
     // https://stackoverflow.com/questions/19269545/how-to-get-a-number-of-random-elements-from-an-array
     // TODO look up =>...probably not a cursed GTE :)
@@ -155,10 +176,6 @@ async function gen_plant() {
     simple_flower_coords = get_flower_coords(place_simple_flower, work_ctx);
     complex_flower_coords = get_flower_coords(place_complex_flower, work_ctx);
 
-    // Recolor the foliage
-    var new_foliage_palette = foliage_palettes[Math.floor(Math.random()*foliage_palettes.length)];
-    replace_color_palette(base_foliage_palette, new_foliage_palette, work_ctx);
-
     // Place the flowers
     var flower_url;
     if(simple_flower_coords.length > 0){
@@ -173,11 +190,12 @@ async function gen_plant() {
         await place_image_at_coords_with_chance(flower_url, complex_flower_coords, work_ctx, 0.8, true);
     }
 
-    // Recolor the flowers and accent
+    // We do all the recolors at once because Speed?(TM)?
+    var new_foliage_palette = foliage_palettes[Math.floor(Math.random()*foliage_palettes.length)];
     var new_flower_palette = flower_palettes[Math.floor(Math.random()*flower_palettes.length)];
-    replace_color_palette(base_flower_palette, new_flower_palette, work_ctx);
     var new_accent_palette = flower_palettes[Math.floor(Math.random()*flower_palettes.length)];
-    replace_color_palette(base_accent_palette, new_accent_palette, work_ctx);
+    var new_overall_palette = new_foliage_palette.concat(new_accent_palette).concat(new_flower_palette);
+    replace_color_palette(overall_palette, new_overall_palette, work_ctx);
 
     // We can draw a canvas directly on another canvas
     return work_canvas;
@@ -228,8 +246,10 @@ function replace_color_palette(old_palette, new_palette, ctx) {
     var paletteSwap = {};
     for(var i=0; i<old_palette.length; i++){
         oldRGB = hexToRgb(old_palette[i]);
-        paletteSwap[oldRGB[0]] = {};
-        paletteSwap[oldRGB[0]][oldRGB[1]] = {};
+        // (cries in defaultdict)
+        // but seriously there might be a better way. As is, this stuff's prolly power word kill for JS devs...
+        if(paletteSwap[oldRGB[0]] == undefined){paletteSwap[oldRGB[0]] = {};}
+        if(paletteSwap[oldRGB[0]][oldRGB[1]] == undefined){paletteSwap[oldRGB[0]][oldRGB[1]] = {};}
         paletteSwap[oldRGB[0]][oldRGB[1]][oldRGB[2]] = hexToRgb(new_palette[i]);
     }
     // taken from https://stackoverflow.com/questions/16228048/replace-a-specific-color-by-another-in-an-image-sprite
