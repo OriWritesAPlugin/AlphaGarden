@@ -34,9 +34,9 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/uYswz0s.png", "https://i.imgur.com/qGczjJf.png", "https://i.imgur.com/PaWgGAq.png",
                "https://i.imgur.com/KbACyd2.png", "https://i.imgur.com/NzGJLcK.png", "https://i.imgur.com/62lbxgE.png",
                "https://i.imgur.com/t6NI9ZW.png", "https://i.imgur.com/ubsbt7W.png", "https://i.imgur.com/W0099oE.png",
-               "https://i.imgur.com/xEnajhL.png", "https://i.imgur.com/NF6IfWI.png", "https://i.imgur.com/DNJakBN.png",
+               "https://i.imgur.com/xEnajhL.png", "https://i.imgur.com/wHwGcaT.png", "https://i.imgur.com/DNJakBN.png",
                "https://i.imgur.com/65fD3Wt.png", "https://i.imgur.com/GhHUZAm.png", "https://i.imgur.com/Wtmyg00.png",
-               "https://i.imgur.com/k7FDQzk.png", "https://i.imgur.com/hnTjsH8.png", "https://i.imgur.com/WtEkBOg.png",
+               "https://i.imgur.com/k7FDQzk.png", "https://i.imgur.com/hnTjsH8.png", "https://i.imgur.com/lZTagv4.png",
                "https://i.imgur.com/mQaUMgT.png", "https://i.imgur.com/t2NAP7b.png", "https://i.imgur.com/abzacy8.png",
                "https://i.imgur.com/Wax3h14.png", "https://i.imgur.com/Ps4w9LV.png", "https://i.imgur.com/3RpiB9t.png"];
 // Doing it this way lets us preserve the numbering to know which plant is which.
@@ -159,9 +159,24 @@ async function preload_single_image(url){
 // These "master lists" comprise of everything in that category, regardless of rarity
 // There's then sub-lists that contain the indices from the master list in each rarity category
 // This function picks a random entry from a master, limited to what's allowed by the sublist.
-function random_by_rarity(rarity_list, master_list) {
+// However, we need the in-between step of indices into the master_list, so we do it less elegantly
+// with random_from_list and parse_plant_data.
+function old_random_by_rarity(rarity_list, master_list) {
     var ep = rarity_list[Math.floor(Math.random()*rarity_list.length)];
     return master_list[ep];
+}
+
+function random_from_list(list) {
+    return list[Math.floor(Math.random()*list.length)];
+}
+
+function parse_plant_data(plant_data){
+    return {"foliage": all_foliage[plant_data["foliage"]],
+            "simple_feature": all_features[plant_data["simple_feature"]],
+            "complex_feature": all_features[plant_data["complex_feature"]],
+            "foliage_palette": all_palettes[plant_data["foliage_palette"]],
+            "feature_palette": all_palettes[plant_data["feature_palette"]],
+            "accent_palette": all_palettes[plant_data["accent_palette"]]}
 }
 
 
@@ -218,12 +233,12 @@ function gen_plant_data(rarity) {
 
     if(override_foliage.length > 0){available_foliage = override_foliage};
 
-    return {"foliage": random_by_rarity(available_foliage, all_foliage),
-            "simple_feature": random_by_rarity(simple_features, all_features),
-            "complex_feature": random_by_rarity(available_complex_features, all_features),
-            "foliage_palette": random_by_rarity(available_foliage_palettes, all_palettes),
-            "feature_palette": random_by_rarity(available_feature_palettes, all_palettes),
-            "accent_palette": random_by_rarity(available_accent_palettes, all_palettes)}
+    return {"foliage": random_from_list(available_foliage),
+            "simple_feature": random_from_list(simple_features),
+            "complex_feature": random_from_list(available_complex_features),
+            "foliage_palette": random_from_list(available_foliage_palettes),
+            "feature_palette": random_from_list(available_feature_palettes),
+            "accent_palette": random_from_list(available_accent_palettes)}
 }
 
 //seed format is 1<foliage><simple_feature><complex_feature>1<color><color><color><rngnum>
@@ -233,13 +248,67 @@ function gen_plant_data(rarity) {
 
 // 1foliagesimplefeaturecomplexfeature-1colorcolorcolor-actualrandomnumberseed
 // and then we put it in base64 for slightly-shorter-fixed-length purposes
-function encode_plant_data() {}
-function decode_plant_data() {}
+function encode_plant_data(plant_data) {
+    function to_padstr(entry){
+        return String(plant_data[entry]).padStart(3, '0');
+    }
+    var part_one = parseInt("1"+to_padstr("foliage")+to_padstr("simple_feature")+to_padstr("complex_feature"));
+    var part_two = parseInt("1"+to_padstr("foliage_palette")+to_padstr("feature_palette")+to_padstr("accent_palette"));
+    return Base64.fromInt(part_one)+Base64.fromInt(part_two);
+}
+
+
+function decode_plant_data(plant_data) {
+    // Conversion city baybeee
+    // Might be able to do something clever with mods instead, but we'll check performance first
+    var part_one = String(Base64.toInt(plant_data.slice(0,5)));
+    var part_two = String(Base64.toInt(plant_data.slice(5)));
+    return {"foliage": parseInt(part_one.slice(1,4)),
+            "simple_feature": parseInt(part_one.slice(4,7)),
+            "complex_feature": parseInt(part_one.slice(7,10)),
+            "foliage_palette": parseInt(part_two.slice(1,4)),
+            "feature_palette": parseInt(part_two.slice(4,7)),
+            "accent_palette": parseInt(part_two.slice(7,10))}
+}
+
+// Stolen from https://stackoverflow.com/questions/6213227/fastest-way-to-convert-a-number-to-radix-64-in-javascript
+Base64 = (function () {
+    var digitsStr = 
+    //   0       8       16      24      32      40      48      56     63
+    //   v       v       v       v       v       v       v       v      v
+        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+-";
+    var digits = digitsStr.split('');
+    var digitsMap = {};
+    for (var i = 0; i < digits.length; i++) {
+        digitsMap[digits[i]] = i;
+    }
+    return {
+        fromInt: function(int32) {
+            var result = '';
+            while (true) {
+                result = digits[int32 & 0x3f] + result;
+                int32 >>>= 6;
+                if (int32 === 0)
+                    break;
+            }
+            return result;
+        },
+        toInt: function(digitsStr) {
+            var result = 0;
+            var digits = digitsStr.split('');
+            for (var i = 0; i < digits.length; i++) {
+                result = (result << 6) + digitsMap[digits[i]];
+            }
+            return result;
+        }
+    };
+})();
 
 async function gen_plant(plant_data) {
     // Returns the image data for a generated plant
     var work_canvas = document.createElement("canvas");
     var work_ctx=work_canvas.getContext("2d");
+    plant_data = parse_plant_data(plant_data);
     work_canvas.width = work_canvas_size;
     work_canvas.height = work_canvas_size;
     /* How much base foliage to combine

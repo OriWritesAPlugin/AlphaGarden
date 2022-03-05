@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="utf-8"/>
+    <head>
+        <title>Randagarden</title>
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
+    </head>
+    <body onload="do_preload()">
+        <h1 id="title">Test Code</h1>
+        <h2 id="subtitle">What will it do?</h2>
+        <label for="seed_list">Paste in your seeds (comma-separated):</label>
+        <input type="text" id="seed_list" name="seed_list" size="4">
+        <div id=content_div>
+            </br></br>
+            <input type="button" class="chunky" value="&gt;&gt; Thanks for testing!&lt;&lt;" onClick="gen_randogarden()">
+            </br></br></br>
+            <div id="output"><canvas id="output_canvas" width="450" height="64"></canvas></div>
+        </div>
+    </body>
+    <script src="gen_plant.js"></script>
+    <script type="text/javascript">
+        // Welcome to the source! Here's the seeds I used to finally get the garden generator working: 
+        // yhNA2ysxuY,xcitgz2Ku-,zWn82y+ZhK,+36P2ywfx3,y5Dm2y5HQq
+        // Those are the only seeds in the code (though the code itself is admittedly a bit seedy :))
+        var img_loadup = []
+
+        // Stolen from https://stackoverflow.com/questions/17386707/how-to-check-if-a-canvas-is-blank
+        // returns true if every pixel's uint32 representation is 0 (or "blank")
+        function isCanvasBlank(canvas) {
+          const context = canvas.getContext('2d');
+          const pixelBuffer = new Uint32Array(
+            context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
+                );
+          return !pixelBuffer.some(color => color !== 0);
+        }
+
+        async function gen_randogarden() {
+            var canvas = document.getElementById("output_canvas");
+            var ctx = canvas.getContext("2d");
+            // Remove spaces then split on commas
+            var seeds = document.getElementById("seed_list").value.split(" ").join("").split(",");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.imageSmoothingEnabled = false;
+            var promises = []
+            for(var i=0; i<seeds.length; i++){
+                promises.push(place_plants(seeds[i], 1+Math.floor(Math.random()*3), ctx));
+            }
+            for(var i=0; i<promises.length; i++){
+                await promises[i];
+            }
+        }
+
+        async function place_plants(seed, count, ctx){
+            plant_canvas = await gen_plant_from_seed(seed);
+            for(var i=0; i<count; i++){
+                ctx.drawImage(plant_canvas, Math.floor(Math.random()*(450-64)), 0, 64, 64);
+            }
+            return true
+        }
+
+        async function gen_plant_from_seed(seed) {
+            var plant_data = decode_plant_data(seed);
+            var ret_canvas = await gen_plant(plant_data);
+            // Trying to track down a very slippery bug...
+            if(isCanvasBlank(ret_canvas)){
+                // So far this seems to """fix""" it, meaning plant_data isn't the problem?
+                // I also saw doubles (most?) of the time when it did draw.
+                // Delayed canvas shenanigans, or an issue with the doubles code?
+                // I think it's the former, I disabled doubles and it's still happening...
+                ret_canvas = await gen_plant(plant_data);
+            }
+            return ret_canvas;
+        }
+
+
+        async function do_preload() {
+            await preload_all_images();
+        }
+    </script>
+    </body>
+</html>
