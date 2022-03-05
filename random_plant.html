@@ -2,13 +2,12 @@
 <html>
     <meta charset="utf-8"/>
     <head>
-        <title>Misc. Tools</title>
+        <title>Randaplant</title>
         <link rel="stylesheet" type="text/css"  href="shared.css" />
     </head>
-    <body onload="preload_plants()">
-        <a href="index.html">&lt;Tool Hub</a>
+    <body onload="do_preload()">
         <h1 id="title">Randaplant</h1>
-        <h2 id="subtitle">Generates a randomized plant to be used as a badge in bingo.</h2>
+        <h2 id="subtitle">Generates a semi-random plant (or related object). There's a couple dozen thousand possibilities and growing.</h2>
         <div id=content_div>
             <input type="button" class="chunky" value="&gt;&gt; Bring On the Plant&lt;&lt;" onClick="gen_randoplant()">
             </br></br></br>
@@ -17,15 +16,40 @@
     </body>
     <script src="gen_plant.js"></script>
     <script type="text/javascript">
+        var img_loadup = []
+
+        // Stolen from https://stackoverflow.com/questions/17386707/how-to-check-if-a-canvas-is-blank
+        // returns true if every pixel's uint32 representation is 0 (or "blank")
+        function isCanvasBlank(canvas) {
+          const context = canvas.getContext('2d');
+
+          const pixelBuffer = new Uint32Array(
+            context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
+                );
+          return !pixelBuffer.some(color => color !== 0);
+        }
+
         async function gen_randoplant() {
             var canvas = document.getElementById("output_canvas");
             var ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.imageSmoothingEnabled = false;
-            var ret_canvas = await gen_plant();
+            var plant_data = gen_plant_data(7);
+            var ret_canvas = await gen_plant(plant_data);
+            // Trying to track down a very slippery bug...
+            if(isCanvasBlank(ret_canvas)){
+                // So far this seems to """fix""" it, meaning plant_data isn't the problem?
+                // I also saw doubles (most?) of the time when it did draw.
+                // Delayed canvas shenanigans, or an issue with the doubles code?
+                // I think it's the former, I disabled doubles and it's still happening...
+                ret_canvas = await gen_plant(plant_data);
+            }
             ctx.drawImage(ret_canvas, 0, 0, 64, 64);
-            //var canvas = document.getElementById("output_canvas");
-            //gen_plant(document.getElementById("output_canvas"));
+        }
+
+
+        async function do_preload() {
+            img_loadup = preload_all_images();
         }
     </script>
     </body>
