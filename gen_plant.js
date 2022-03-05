@@ -13,12 +13,15 @@ var work_canvas_size = 32;  // in pixels
 var two_foliage_roll = 0.95;
 
 // A pixel of these colors indicates we should place the corresponding feature type
-var place_complex_feature = "#ff943a";
-var place_simple_feature = "#e900ff";
+var place_complex_feature = "ff943a";
+var place_simple_feature = "e900ff";
+
+// Holder for all the images we'll need
+var refs = {};
 
 // Javascript can't access images by path.
 // This workaround is hideous, but what can ya do :) (while hosting to github and not using ajax, I mean)
-//0-indexed count: 42
+//0-indexed count: 50
 all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.png", "https://i.imgur.com/wsC3ifp.png",
                "https://i.imgur.com/NFM09J5.png", "https://i.imgur.com/urBlTiV.png", "https://i.imgur.com/kyfs2Yl.png",
                "https://i.imgur.com/nMW2bBb.png", "https://i.imgur.com/tBQb6yy.png", "https://i.imgur.com/5j6u58a.png",
@@ -29,19 +32,21 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/kTbrzeL.png", "https://i.imgur.com/s4Uav2q.png", "https://i.imgur.com/6GPgZzr.png",
                "https://i.imgur.com/E6ikrq8.png", "https://i.imgur.com/MyF1tCA.png", "https://i.imgur.com/5y1UeDM.png",
                "https://i.imgur.com/uYswz0s.png", "https://i.imgur.com/qGczjJf.png", "https://i.imgur.com/PaWgGAq.png",
-               "https://i.imgur.com/bD2FqpL.png", "https://i.imgur.com/NzGJLcK.png", "https://i.imgur.com/62lbxgE.png",
+               "https://i.imgur.com/KbACyd2.png", "https://i.imgur.com/NzGJLcK.png", "https://i.imgur.com/62lbxgE.png",
                "https://i.imgur.com/t6NI9ZW.png", "https://i.imgur.com/ubsbt7W.png", "https://i.imgur.com/W0099oE.png",
                "https://i.imgur.com/xEnajhL.png", "https://i.imgur.com/NF6IfWI.png", "https://i.imgur.com/DNJakBN.png",
                "https://i.imgur.com/65fD3Wt.png", "https://i.imgur.com/GhHUZAm.png", "https://i.imgur.com/Wtmyg00.png",
-               "https://i.imgur.com/k7FDQzk.png"];
+               "https://i.imgur.com/k7FDQzk.png", "https://i.imgur.com/hnTjsH8.png", "https://i.imgur.com/WtEkBOg.png",
+               "https://i.imgur.com/mQaUMgT.png", "https://i.imgur.com/t2NAP7b.png", "https://i.imgur.com/abzacy8.png",
+               "https://i.imgur.com/Wax3h14.png", "https://i.imgur.com/Ps4w9LV.png", "https://i.imgur.com/3RpiB9t.png"];
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
-common_foliage = [0, 1, 5, 8, 12, 14, 19, 26, 28, 38, 41];
-uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42]);
-rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40]);
+common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48];
+uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50]);
+rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49]);
 boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
-//override_foliage = [39];
+override_foliage = [];
 
 
 // bingo difficulty could be difficulty*size_rating+1. so an easy*small is (1*1+1=2), easy*medium is (1*2+1), hard*big is (3*3+1=10), pain*medium is (2*4+1=9)
@@ -111,45 +116,34 @@ async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, c
     // 50% chance to horizontally mirror each one? (TODO)
     // Wondering if the shared ctx save/reload and use of async-await is giving me the "floating flowers" issue in here.
     // I may revisit (and mirror the final canvas instead), but it feels like overkill for now.
-    var img = new Image();
-    img.src = img_url;
-    img.crossOrigin = "anonymous"
-    // closure to load an image because yes
-    img.onload = (function(list_of_coords) {
-      return function() {
-      var w_offset = Math.floor(img.width/2);
-      if(!anchor_to_bottom){
-        var h_offset = Math.floor(img.height/2)-1;
-      } else {
-        var h_offset = -img.height + 1;
+    img = refs[img_url];
+    var w_offset = Math.floor(img.width/2);
+    if(!anchor_to_bottom){
+      var h_offset = Math.floor(img.height/2)-1;
+    } else {
+      var h_offset = -img.height + 1;
+    }
+    for (var i=0;i<list_of_coords.length;i++) {
+      if (Math.random() < chance){
+        [x,y] = list_of_coords[i];
+        ctx.drawImage(img, x-w_offset, y+h_offset);
       }
-      for (var i=0;i<list_of_coords.length;i++) {
-        if (Math.random() < chance){
-          [x,y] = list_of_coords[i];
-          ctx.drawImage(img, x-w_offset, y+h_offset);
-        }
-      }
-    }})(list_of_coords);
-    await img.decode();
-    return img;
+    }
 }
 
 async function preload_all_images()
-// TODO: Gross prototype nonsense.
+// TODO: Gross prototype nonsense. Must be called ahead. Loads refs.
 {
-  refs = []
   lists_to_load = [all_foliage, all_features]
   for(var i=0; i<lists_to_load.length; i++){
       for(var j=0; j<lists_to_load[i].length;j++){
         var promise = preload_single_image(lists_to_load[i][j]);
-        refs.push(promise);
+        refs[lists_to_load[i][j]] = promise;
       }
   }
-  for(var i=0; i<refs.length; i++){
-    await refs[i];
+  for(const key in refs){
+      refs[key] = await refs[key];
   }
-  // to keep in memory
-  return refs
 }
 
 // Sound of me not being 100% confident in my async usage yet
@@ -157,6 +151,7 @@ async function preload_single_image(url){
     var img=new Image();
     img.src=url;
     img.crossOrigin = "anonymous"
+    var loaded_img = img.decode();  // To throw it in mem without blocking?
     return img
 }
 
@@ -182,6 +177,20 @@ function random_by_rarity(rarity_list, master_list) {
 // 8: guarantees uncommon or rare feature color
 // 9: guarantees uncommon or rare foliage color
 // 10: guarantees uncommon or rare foliage
+
+// Rarity level rework:
+// 0: only common things
+// 1: uncommon feature/accent colors
+// 2: uncommon foliage colors
+// 3: adds uncommon foliage but resets colors to common
+// 4: adds back uncommon feature/accent colors
+// 5: adds uncommon and rare foliage colors
+// 6: adds rare feature/accent colors
+// 7: adds rare foliage but resets all colors to common
+// 8: adds back uncommon and rare feature/accent colors
+// 9: adds back uncommon/rare foliage colors
+// 10: ups chance for uncommon/rare foliage colors
+
 function gen_plant_data(rarity) {
     var available_foliage = common_foliage;
     var available_complex_features = simple_features;  // Needed to disable/enable complex features
@@ -207,7 +216,8 @@ function gen_plant_data(rarity) {
     if(rarity>=9){available_foliage_palettes = boosted_rare_palettes;}
     if(rarity>=10){available_foliage = boosted_rare_foliage;}
 
-    //available_foliage = override_foliage;
+    if(override_foliage.length > 0){available_foliage = override_foliage};
+
     return {"foliage": random_by_rarity(available_foliage, all_foliage),
             "simple_feature": random_by_rarity(simple_features, all_features),
             "complex_feature": random_by_rarity(available_complex_features, all_features),
