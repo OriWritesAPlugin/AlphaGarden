@@ -21,7 +21,7 @@ var refs = {};
 
 // Javascript can't access images by path.
 // This workaround is hideous, but what can ya do :) (while hosting to github and not using ajax, I mean)
-//0-indexed count: 50
+//0-indexed count: 52
 all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.png", "https://i.imgur.com/wsC3ifp.png",
                "https://i.imgur.com/NFM09J5.png", "https://i.imgur.com/urBlTiV.png", "https://i.imgur.com/kyfs2Yl.png",
                "https://i.imgur.com/nMW2bBb.png", "https://i.imgur.com/tBQb6yy.png", "https://i.imgur.com/5j6u58a.png",
@@ -32,18 +32,21 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/kTbrzeL.png", "https://i.imgur.com/s4Uav2q.png", "https://i.imgur.com/6GPgZzr.png",
                "https://i.imgur.com/E6ikrq8.png", "https://i.imgur.com/MyF1tCA.png", "https://i.imgur.com/5y1UeDM.png",
                "https://i.imgur.com/uYswz0s.png", "https://i.imgur.com/qGczjJf.png", "https://i.imgur.com/PaWgGAq.png",
-               "https://i.imgur.com/KbACyd2.png", "https://i.imgur.com/NzGJLcK.png", "https://i.imgur.com/62lbxgE.png",
+               "https://i.imgur.com/EAJRyo4.png", "https://i.imgur.com/NzGJLcK.png", "https://i.imgur.com/62lbxgE.png",
                "https://i.imgur.com/t6NI9ZW.png", "https://i.imgur.com/ubsbt7W.png", "https://i.imgur.com/W0099oE.png",
                "https://i.imgur.com/xEnajhL.png", "https://i.imgur.com/wHwGcaT.png", "https://i.imgur.com/DNJakBN.png",
                "https://i.imgur.com/65fD3Wt.png", "https://i.imgur.com/GhHUZAm.png", "https://i.imgur.com/Wtmyg00.png",
                "https://i.imgur.com/k7FDQzk.png", "https://i.imgur.com/hnTjsH8.png", "https://i.imgur.com/lZTagv4.png",
                "https://i.imgur.com/mQaUMgT.png", "https://i.imgur.com/t2NAP7b.png", "https://i.imgur.com/abzacy8.png",
-               "https://i.imgur.com/Wax3h14.png", "https://i.imgur.com/Ps4w9LV.png", "https://i.imgur.com/3RpiB9t.png"];
+               "https://i.imgur.com/Wax3h14.png", "https://i.imgur.com/Ps4w9LV.png", "https://i.imgur.com/3RpiB9t.png",
+               "https://i.imgur.com/LIicGxR.png", "https://i.imgur.com/fVqQjNM.png"];
+all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
+             "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
 common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48];
 uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50]);
-rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49]);
+rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 52]);
 boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
 override_foliage = [];
@@ -57,14 +60,14 @@ var simple_features = [0, 1];
 var complex_features = [2, 3];
 
 
-// zero-indexed count: 40
+// zero-indexed count: 43
 var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a", "66732a", "4b692f"],
                     ["7ad8b7", "5eb995", "3e946d", "277b50"], ["9dbb86", "679465", "476f58", "2f4d47"],
-                    ["8fbe99", "7faf89", "3f7252", "285d3c"], ["fdff07", "b9d50f", "669914", "34670b"],
+                    ["8fbe99", "679465", "3f7252", "215a3f"], ["fdff07", "b9d50f", "669914", "34670b"],
                     ["b0f7a9", "7dcc75", "63aa5a", "448d3c"], ["c5af7a", "a6905c", "806d40", "69582e"],
                     ["6ee964", "54c44b", "3da136", "228036"], ["e7d7c1", "a78a7f", "735751", "603f3d"],
                     ["9c6695", "734978", "4c2d5c", "2f1847"], ["f8cd1e", "d3a740", "b2773a", "934634"],
-                    ["e4eaf3", "c0cfe7", "9ab3db", "7389ad"], ["b98838", "8c6526", "8c6526", "54401f"],
+                    ["e4eaf3", "c0cfe7", "9ab3db", "7389ad"], ["b98838", "8c6526", "674426", "54401f"],
                     ["8f8090", "655666", "453946", "2a212b"], ["f5dbd7", "eec3c3", "d396a8", "c9829d"],
                     ["d1d2f9", "a3bcf9", "7796cb", "576490"], ["eff0ba", "e2c3b2", "ce86a8", "c56497"],
                     ["e88c50", "d0653e", "af3629", "9b1f1f"], ["fef4cc", "fde47b", "ffd430", "ecb600"],
@@ -78,21 +81,24 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
                     ["a6705a", "8b4e35", "6c2e1c", "571d0e"], ["fa9292", "f55757", "e32b2b", "ca0e18"],
                     ["93aaff", "5778f5", "3a5ad2", "233fa8"], ["ffcf80", "ffb63e", "ff9300", "da7500"],
                     ["effeee", "def8dd", "cbf1c9", "b4d9b2"], ["cd41d9", "b309c0", "860d9e", "61067b"],
-                    ["8cf5f8", "30e8ed", "18c9d4", "0798a6"]];
+                    ["8cf5f8", "30e8ed", "18c9d4", "0798a6"], ["b5c085", "7b9b64", "47774a", "305540"],
+                    ["9bcf4b", "719e34", "45681a", "274409"], ["4fb81d", "339324", "1d7628", "075a2d"]]
                     
 
 // There's three types of palette:
 // Foliage: Generally the bulk of a plant. Greens and browns are most common
 // Feature: Think of the secondary on a dragon. Structures like trunks, flower brachts
 // Accent: Think of the tertiary. Has bonus loud, bright colors that would look garish in a patch. Tone used for flowers (eventually)
-var common_foliage_palettes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 21, 22, 23];
+
+// Note that some common foliage colors are double-weighted because they're very nice greens :)
+var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 21, 21, 22, 23, 41, 42, 43];
 common_foliage_palettes = common_foliage_palettes.concat(common_foliage_palettes);  // Cheap greenery boost
 var common_accent_palettes = [19, 20, 35, 36, 37, 38, 39, 40];
 var common_feature_palettes = [20, 32, 33, 34];
 var uncommon_palettes = [9, 10, 11, 12, 13, 14, 24, 25];
 var rare_palettes = [15, 16,  17, 18, 26, 27, 28, 29, 30, 31];
 
-/*common_foliage_palettes = [];
+/*common_foliage_palettes = [];.
 uncommon_palettes = [];
 rare_palettes = [];
 common_feature_palettes = [];
@@ -134,7 +140,7 @@ async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, c
 async function preload_all_images()
 // TODO: Gross prototype nonsense. Must be called ahead. Loads refs.
 {
-  lists_to_load = [all_foliage, all_features]
+  lists_to_load = [all_foliage, all_features, Object.values(all_named)];
   for(var i=0; i<lists_to_load.length; i++){
       for(var j=0; j<lists_to_load[i].length;j++){
         var promise = preload_single_image(lists_to_load[i][j]);
@@ -166,8 +172,32 @@ function old_random_by_rarity(rarity_list, master_list) {
     return master_list[ep];
 }
 
-function random_from_list(list) {
-    return list[Math.floor(Math.random()*list.length)];
+function random_from_list(list, prng=null) {
+    if(prng==null){return list[Math.floor(Math.random()*list.length)]};
+    return list[Math.floor(prng()*list.length)];
+}
+
+
+//Seeded prng. Taken from https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
+function mulberry32(a) {
+    return function() {
+      var t = a += 0x6D2B79F5;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+}
+
+// Seed generator. Taken from https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
+function xmur3(str) {
+    for(var i = 0, h = 1779033703 ^ str.length; i < str.length; i++) {
+        h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+        h = h << 13 | h >>> 19;
+    } return function() {
+        h = Math.imul(h ^ (h >>> 16), 2246822507);
+        h = Math.imul(h ^ (h >>> 13), 3266489909);
+        return (h ^= h >>> 16) >>> 0;
+    }
 }
 
 function parse_plant_data(plant_data){
@@ -206,7 +236,7 @@ function parse_plant_data(plant_data){
 // 9: adds back uncommon/rare foliage colors
 // 10: ups chance for uncommon/rare foliage colors
 
-function gen_plant_data(rarity) {
+function gen_plant_data(rarity, seed_string=null) {
     var available_foliage = common_foliage;
     var available_complex_features = simple_features;  // Needed to disable/enable complex features
     var available_foliage_palettes = common_foliage_palettes;
@@ -233,12 +263,16 @@ function gen_plant_data(rarity) {
 
     if(override_foliage.length > 0){available_foliage = override_foliage};
 
-    return {"foliage": random_from_list(available_foliage),
-            "simple_feature": random_from_list(simple_features),
-            "complex_feature": random_from_list(available_complex_features),
-            "foliage_palette": random_from_list(available_foliage_palettes),
-            "feature_palette": random_from_list(available_feature_palettes),
-            "accent_palette": random_from_list(available_accent_palettes)}
+    var prng;
+    if(seed_string == null){prng = null;}
+    else{prng = mulberry32(xmur3(seed_string)());}
+
+    return {"foliage": random_from_list(available_foliage, prng),
+            "simple_feature": random_from_list(simple_features, prng),
+            "complex_feature": random_from_list(available_complex_features, prng),
+            "foliage_palette": random_from_list(available_foliage_palettes, prng),
+            "feature_palette": random_from_list(available_feature_palettes, prng),
+            "accent_palette": random_from_list(available_accent_palettes, prng)}
 }
 
 //seed format is 1<foliage><simple_feature><complex_feature>1<color><color><color><rngnum>
@@ -398,8 +432,20 @@ function replace_color(old_rgb, new_rgb, ctx) {
     ctx.putImageData(imageData,0,0);
 }
 
+
+// Basically just wraps replace_color_palette
+function replace_color_palette_single_image(old_palette, new_palette, img){
+    var work_canvas = document.createElement("canvas");
+    var work_ctx=work_canvas.getContext("2d");
+    work_canvas.width = img.width;
+    work_canvas.height = img.height;
+    work_ctx.drawImage(img, 0, 0);
+    replace_color_palette(old_palette, new_palette, work_ctx, img.width, img.height);
+    return work_canvas;
+}
+
 // Palettes MUST be the same length, FYI
-function replace_color_palette(old_palette, new_palette, ctx) {
+function replace_color_palette(old_palette, new_palette, ctx, work_canvas_width=work_canvas_size, work_canvas_height=work_canvas_size) {
     var oldRGB, newRGB;
     // We do some truly hideous hacks because I'm bad at Javascript :)
     // Basically, we use the r, g, and b as a 3-level key into an object
@@ -414,7 +460,8 @@ function replace_color_palette(old_palette, new_palette, ctx) {
         paletteSwap[oldRGB[0]][oldRGB[1]][oldRGB[2]] = hexToRgb(new_palette[i]);
     }
     // taken from https://stackoverflow.com/questions/16228048/replace-a-specific-color-by-another-in-an-image-sprite
-    var imageData = ctx.getImageData(0, 0, work_canvas_size, work_canvas_size);
+    var imageData;
+    imageData = ctx.getImageData(0, 0, work_canvas_width, work_canvas_height);
     for (var i=0;i<imageData.data.length;i+=4)
       {
           // god this is painful to look at. I'm sorry.
@@ -459,3 +506,4 @@ function get_marker_coords(marker_hex, ctx) {
     ctx.putImageData(imageData,0,0);
     return ret_coords
   }
+
