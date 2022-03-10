@@ -2,21 +2,38 @@
 <html>
     <meta charset="utf-8"/>
     <head>
-        <title>Randaplant</title>
+        <title>Endless Garden Utilities</title>
         <link rel="stylesheet" type="text/css"  href="shared.css" />
     </head>
     <body onload="do_preload()">
-        <h1 id="title">Randaplant</h1>
-        <h2 id="subtitle">Generates a semi-random plant (or related object). There's a couple dozen thousand possibilities and growing.</h2>
+        <h1 id="title">Garden Utilities</h1>
+        <h2 id="subtitle">Various tools for working with the plants</h2>
         <div id=content_div>
-            <input type="button" class="chunky" value="&gt;&gt; Bring On the Plant&lt;&lt;" onClick="gen_randoplant()">
-            </br></br></br>
-            <div id="output"><canvas id="output_canvas" width="64" height="64"></canvas></div>
+            <div id=plantmix_div>
+                <label for="plant_1_text">First seed:</label>
+                <input type="text" id="plant_1_text" name="plant_1_text" size="4" placeholder="Click here and paste!">
+                <label for="plant_2_text">Second seed:</label>
+                <input type="text" id="plant_2_text" name="plant_2_text" size="4" placeholder="Click here and paste!">
+                <br><br>
+                <input type="button" class="chunky_wrap" value="Mix plants" onClick="mix_plants()">   <input type="button" class="chunky_wrap" value="Claim mix" onClick="claim_mix()">
+                <br><br><canvas id="mix_output_canvas" width="64" height="64"></canvas></div>
+                <p id="mix_output_text"></p>
+            </div>
+                <div>
+                <label for="seed_id">ID of user or lored dragon:</label>
+                <input type="text" id="seed_id" name="seed_id" size="4" placeholder="Click here and paste! Even a sentence of lore counts!">
+                </br><br>
+                <input type="button" class="chunky_wrap" value="Get plant" onClick="gen_seeded_plant()">
+                </br></br></br>
+                <div id="output"><canvas id="output_canvas" width="64" height="64"></canvas></div>
+                <div id="output_text"></div>
+            </div>
         </div>
     </body>
     <script src="gen_plant.js"></script>
     <script type="text/javascript">
         var img_loadup = []
+        var last_child_seed;
 
         // Stolen from https://stackoverflow.com/questions/17386707/how-to-check-if-a-canvas-is-blank
         // returns true if every pixel's uint32 representation is 0 (or "blank")
@@ -29,12 +46,41 @@
           return !pixelBuffer.some(color => color !== 0);
         }
 
-        async function gen_randoplant() {
-            var canvas = document.getElementById("output_canvas");
+        async function mix_plants() {
+            var canvas = document.getElementById("mix_output_canvas");
             var ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.imageSmoothingEnabled = false;
-            var plant_data = gen_plant_data(7);
+            
+            var plant_1 = decode_plant_data(document.getElementById("plant_1_text").value.split(" ").join(""));
+            var plant_2 = decode_plant_data(document.getElementById("plant_2_text").value.split(" ").join(""));
+            var child_data = {};
+            for(keyname in plant_1){
+                if(Math.random() >= 0.5){child_data[keyname] = plant_1[keyname];}
+                else {child_data[keyname] = plant_2[keyname];}
+            }
+            last_child_seed = encode_plant_data(child_data);
+            last_child_canvas = await gen_plant(child_data);
+            ctx.drawImage(last_child_canvas, 0, 0, 64, 64);
+        }
+
+        function claim_mix() {
+            var plant_1 = document.getElementById("plant_1_text");
+            var plant_2 = document.getElementById("plant_2_text");
+            var claim_text = "New seed: <b>"+last_child_seed+"</b>. To claim, remove these seeds from your collection: <b>"
+                             +plant_1.value+"</b>, <b>"+plant_2.value+"</b>. Thanks for mixing, enjoy!";
+            document.getElementById("mix_output_text").innerHTML = claim_text;
+            plant_1.value = "";
+            plant_2.value = "";
+        }
+
+        async function gen_seeded_plant() {
+            var canvas = document.getElementById("output_canvas");
+            var ctx = canvas.getContext("2d");
+            var seed_string = document.getElementById("seed_id").value.split(" ").join("")
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.imageSmoothingEnabled = false;
+            var plant_data = gen_plant_data(7, seed_string);
             var ret_canvas = await gen_plant(plant_data);
             // Trying to track down a very slippery bug...
             if(isCanvasBlank(ret_canvas)){
@@ -45,6 +91,7 @@
                 ret_canvas = await gen_plant(plant_data);
             }
             ctx.drawImage(ret_canvas, 0, 0, 64, 64);
+            document.getElementById("output_text").innerHTML = encode_plant_data(plant_data);
         }
 
 
