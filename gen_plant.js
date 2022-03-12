@@ -21,7 +21,7 @@ var refs = {};
 
 // Javascript can't access images by path.
 // This workaround is hideous, but what can ya do :) (while hosting to github and not using ajax, I mean)
-//0-indexed count: 52
+//0-indexed count: 51
 all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.png", "https://i.imgur.com/wsC3ifp.png",
                "https://i.imgur.com/NFM09J5.png", "https://i.imgur.com/urBlTiV.png", "https://i.imgur.com/kyfs2Yl.png",
                "https://i.imgur.com/nMW2bBb.png", "https://i.imgur.com/tBQb6yy.png", "https://i.imgur.com/5j6u58a.png",
@@ -32,21 +32,22 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/kTbrzeL.png", "https://i.imgur.com/s4Uav2q.png", "https://i.imgur.com/6GPgZzr.png",
                "https://i.imgur.com/E6ikrq8.png", "https://i.imgur.com/MyF1tCA.png", "https://i.imgur.com/5y1UeDM.png",
                "https://i.imgur.com/uYswz0s.png", "https://i.imgur.com/qGczjJf.png", "https://i.imgur.com/PaWgGAq.png",
-               "https://i.imgur.com/EAJRyo4.png", "https://i.imgur.com/NzGJLcK.png", "https://i.imgur.com/62lbxgE.png",
+               // Row below is zero-indexed 30, 31, 32
+               "https://i.imgur.com/0fBhPPY.png", "https://i.imgur.com/NzGJLcK.png", "https://i.imgur.com/62lbxgE.png",
                "https://i.imgur.com/t6NI9ZW.png", "https://i.imgur.com/ubsbt7W.png", "https://i.imgur.com/W0099oE.png",
                "https://i.imgur.com/xEnajhL.png", "https://i.imgur.com/wHwGcaT.png", "https://i.imgur.com/DNJakBN.png",
                "https://i.imgur.com/65fD3Wt.png", "https://i.imgur.com/GhHUZAm.png", "https://i.imgur.com/Wtmyg00.png",
-               "https://i.imgur.com/k7FDQzk.png", "https://i.imgur.com/hnTjsH8.png", "https://i.imgur.com/lZTagv4.png",
+               "https://i.imgur.com/k7FDQzk.png", "https://i.imgur.com/hnTjsH8.png", "https://i.imgur.com/yIZJ19G.png",
                "https://i.imgur.com/mQaUMgT.png", "https://i.imgur.com/t2NAP7b.png", "https://i.imgur.com/abzacy8.png",
                "https://i.imgur.com/Wax3h14.png", "https://i.imgur.com/Ps4w9LV.png", "https://i.imgur.com/3RpiB9t.png",
-               "https://i.imgur.com/LIicGxR.png", "https://i.imgur.com/fVqQjNM.png"];
+               "https://i.imgur.com/LIicGxR.png", "https://i.imgur.com/6M8DI7u.png", "https://i.imgur.com/TOf1Cqu.png"];
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
 common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48];
-uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50]);
-rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 52]);
+uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50, 51]);
+rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49]);
 boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
 override_foliage = [];
@@ -60,7 +61,7 @@ var simple_features = [0, 1];
 var complex_features = [2, 3];
 
 
-// zero-indexed count: 43
+// zero-indexed count: 48
 var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a", "66732a", "4b692f"],
                     ["7ad8b7", "5eb995", "3e946d", "277b50"], ["9dbb86", "679465", "476f58", "2f4d47"],
                     ["8fbe99", "679465", "3f7252", "215a3f"], ["fdff07", "b9d50f", "669914", "34670b"],
@@ -69,20 +70,24 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
                     ["9c6695", "734978", "4c2d5c", "2f1847"], ["f8cd1e", "d3a740", "b2773a", "934634"],
                     ["e4eaf3", "c0cfe7", "9ab3db", "7389ad"], ["b98838", "8c6526", "674426", "54401f"],
                     ["8f8090", "655666", "453946", "2a212b"], ["f5dbd7", "eec3c3", "d396a8", "c9829d"],
-                    ["d1d2f9", "a3bcf9", "7796cb", "576490"], ["eff0ba", "e2c3b2", "ce86a8", "c56497"],
+                    ["d1d2f9", "a3bcf9", "7796cb", "576490"], ["f6e9a4", "e8b78e", "d5737d", "c45088"],
                     ["e88c50", "d0653e", "af3629", "9b1f1f"], ["fef4cc", "fde47b", "ffd430", "ecb600"],
+                    // next row is zero-indexed 20, 21                    
                     ["f3addd", "d87fbc", "c059a0", "aa3384"], ["3ac140", "1b9832", "116d22", "085c17"],
                     ["eaf4bd", "aade87", "6cc750", "1aaa09"], ["b77e4e", "88572e", "674426", "543a24"],
                     ["b7ed6c", "83d764", "47be5c", "0ca553"], ["f3eacf", "e4d4be", "ccb4a4", "b69389"],
                     ["edc55c", "d99b61", "bf7464", "a6636c"], ["8bfdd6", "55dbc3", "25b8b5", "0b8c9d"],
                     ["f5e2af", "f3c13d", "cba134", "a7832d"], ["a66547", "6e3837", "542c37", "45283a"],
-                    ["f1ffc9", "bfffbd", "a8edfe", "a4cffe"], ["fff9cf", "f4d6bc", "eaaba8", "dc91b8"],
+                    ["cedd80", "95c27d", "52a279", "057d77"], ["fff9cf", "f4d6bc", "eaaba8", "dc91b8"],
                     ["b77e4e", "88572e", "674426", "543a24"], ["c5af7a", "a6905c", "806d40", "69582e"],
                     ["a6705a", "8b4e35", "6c2e1c", "571d0e"], ["fa9292", "f55757", "e32b2b", "ca0e18"],
                     ["93aaff", "5778f5", "3a5ad2", "233fa8"], ["ffcf80", "ffb63e", "ff9300", "da7500"],
                     ["effeee", "def8dd", "cbf1c9", "b4d9b2"], ["cd41d9", "b309c0", "860d9e", "61067b"],
                     ["8cf5f8", "30e8ed", "18c9d4", "0798a6"], ["b5c085", "7b9b64", "47774a", "305540"],
-                    ["9bcf4b", "719e34", "45681a", "274409"], ["4fb81d", "339324", "1d7628", "075a2d"]]
+                    ["9bcf4b", "719e34", "45681a", "274409"], ["4fb81d", "339324", "1d7628", "075a2d"],
+                    ["6e7706", "465f14", "234d21", "033a34"], ["78a562", "4e875a", "2a6e53", "0c584d"],
+                    ["077773", "135260", "21294d", "2e033a"], ["e0ea8a", "bdbb5c", "b0983a", "a5791b"],
+                    ["fcf050", "dca02a", "c46212", "ae2c00"]];
                     
 
 // There's three types of palette:
@@ -91,14 +96,14 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
 // Accent: Think of the tertiary. Has bonus loud, bright colors that would look garish in a patch. Tone used for flowers (eventually)
 
 // Note that some common foliage colors are double-weighted because they're very nice greens :)
-var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 21, 21, 22, 23, 41, 42, 43];
+var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 21, 21, 22, 23, 41, 42, 43, 44, 45];
 common_foliage_palettes = common_foliage_palettes.concat(common_foliage_palettes);  // Cheap greenery boost
 var common_accent_palettes = [19, 20, 35, 36, 37, 38, 39, 40];
-var common_feature_palettes = [20, 32, 33, 34];
-var uncommon_palettes = [9, 10, 11, 12, 13, 14, 24, 25];
-var rare_palettes = [15, 16,  17, 18, 26, 27, 28, 29, 30, 31];
+var common_feature_palettes = [20, 29, 32, 33, 34];
+var uncommon_palettes = [9, 10, 11, 12, 13, 14, 24, 25, 46, 47];
+var rare_palettes = [15, 16,  17, 18, 26, 27, 28, 30, 31, 48];
 
-/*common_foliage_palettes = [];.
+/*common_foliage_palettes = [];
 uncommon_palettes = [];
 rare_palettes = [];
 common_feature_palettes = [];
@@ -223,7 +228,7 @@ function parse_plant_data(plant_data){
 // 9: guarantees uncommon or rare foliage color
 // 10: guarantees uncommon or rare foliage
 
-// Rarity level rework:
+// Rarity level rework thoughts (NYI):
 // 0: only common things
 // 1: uncommon feature/accent colors
 // 2: uncommon foliage colors
@@ -506,4 +511,3 @@ function get_marker_coords(marker_hex, ctx) {
     ctx.putImageData(imageData,0,0);
     return ret_coords
   }
-
