@@ -17,7 +17,7 @@ You could tune this to any purpose by changing the bingo board goals and the lab
 
 
 
-That said, I'm opening it to a community that I hope will contribute art, so it'll be ARR to start. After it's all tested out, I'll scrub the ARR content (leaving presumably just sprites I myself drew) and release under MIT or something. Probably!
+That said, I'm giving it to a community to start, and allowing/welcoming art contributions, so it'll initially be CC BY-NC-ND 4.0 to fit community expectations (of course check the LICENSE itself, it takes precedence). After it's all tested out, I'll scrub content from any contributor that doesn't opt in to a more permissive license. Maybe MIT? Sorry, I know that license is a hassle for git, I'm hopeful the testing-out period won't take too long.
 
 
-Sorry, end-of-project documentation brain is hitting. I'll be back to gussy this up later (hopefully).
+End-of-project documentation brain is hitting. I'll be back to gussy this up later (hopefully).
