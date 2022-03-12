@@ -9,24 +9,34 @@
         <h1 id="title">Garden Utilities</h1>
         <h2 id="subtitle">Various tools for working with the plants</h2>
         <div id=content_div>
-            <div id=plantmix_div>
-                <label for="plant_1_text">First seed:</label>
-                <input type="text" id="plant_1_text" name="plant_1_text" size="4" placeholder="Click here and paste!">
-                <label for="plant_2_text">Second seed:</label>
-                <input type="text" id="plant_2_text" name="plant_2_text" size="4" placeholder="Click here and paste!">
-                <br><br>
-                <input type="button" class="chunky_wrap" value="Mix plants" onClick="mix_plants()">   <input type="button" class="chunky_wrap" value="Claim mix" onClick="claim_mix()">
-                <br><br><canvas id="mix_output_canvas" width="64" height="64"></canvas></div>
-                <p id="mix_output_text"></p>
-            </div>
-                <div>
-                <label for="seed_id">ID of user or lored dragon:</label>
-                <input type="text" id="seed_id" name="seed_id" size="4" placeholder="Click here and paste! Even a sentence of lore counts!">
-                </br><br>
-                <input type="button" class="chunky_wrap" value="Get plant" onClick="gen_seeded_plant()">
-                </br></br></br>
-                <div id="output"><canvas id="output_canvas" width="64" height="64"></canvas></div>
-                <div id="output_text"></div>
+            <div id="attempt_at_organizing_div", class="collection_row">
+                <div id=plantmix_div class=garden_util_box>
+                    <label for="plant_1_text">First seed:</label>
+                    <input type="text" id="plant_1_text" name="plant_1_text" size="4" placeholder="Click here and paste!">
+                    <label for="plant_2_text">Second seed:</label>
+                    <input type="text" id="plant_2_text" name="plant_2_text" size="4" placeholder="Click here and paste!">
+                    <br><br>
+                    <input type="button" class="chunky_wrap" value="Mix plants" onClick="mix_plants()">   <input type="button" class="chunky_wrap" value="Claim mix" onClick="claim_mix()">
+                    <br><br><canvas id="mix_output_canvas" width="64" height="64"></canvas>
+                    <p id="mix_output_text"></p>
+                </div>
+                <div id=id_lookup_div class=garden_util_box>
+                    <label for="seed_id">ID of user or lored dragon:</label>
+                    <input type="text" id="seed_id" name="seed_id" size="4" placeholder="Click here and paste! Even a sentence of lore counts!">
+                    </br><br>
+                    <input type="button" class="chunky_wrap" value="Get plant" onClick="gen_seeded_plant()">
+                    </br></br></br>
+                    <canvas id="output_canvas" width="64" height="64"></canvas>
+                    <div id="output_text"></div>
+                </div>
+                <div id=seed_collection_display_container class=garden_util_box style="width: 500px">
+                     <label for="seed_collection">Your seed collection:</label>
+                    <input type="text" id="seed_collection" name="seed_collection" size="4" placeholder="Click here and paste!">
+                    </br><br>
+                    <input type="button" class="chunky_wrap" value="Display collection" onClick="display_collection()">
+                    <br>
+                    <div id="collection_display_div" width="450"></div>
+                </div>
             </div>
         </div>
     </body>
@@ -67,8 +77,8 @@
         function claim_mix() {
             var plant_1 = document.getElementById("plant_1_text");
             var plant_2 = document.getElementById("plant_2_text");
-            var claim_text = "New seed: <b>"+last_child_seed+"</b>. To claim, remove these seeds from your collection: <b>"
-                             +plant_1.value+"</b>, <b>"+plant_2.value+"</b>. Thanks for mixing, enjoy!";
+            var claim_text = "<b>"+last_child_seed+"</b></br></br>To claim, discard:<br><b>"
+                             +plant_1.value+"</b><br><b>"+plant_2.value+"</b>";
             document.getElementById("mix_output_text").innerHTML = claim_text;
             plant_1.value = "";
             plant_2.value = "";
@@ -93,6 +103,43 @@
             ctx.drawImage(ret_canvas, 0, 0, 64, 64);
             document.getElementById("output_text").innerHTML = encode_plant_data(plant_data);
         }
+
+        function display_collection() {
+            //clear what's already in there
+            var collection_div = document.getElementById("collection_display_div")
+            while (collection_div.lastChild) {collection_div.removeChild(collection_div.lastChild);}
+            var collection = document.getElementById("seed_collection").value.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");
+            for(var i=0; i<collection.length; i+=5){
+              var new_row = document.createElement('div');
+              new_row.className = "collection_row";
+              collection_div.appendChild(new_row);
+              for(var j=0; j < 5; j++){
+                if(!collection[i+j]){return;}
+                add_collection_entry(new_row, i, j, collection[i+j])
+              }
+           }
+       }
+
+      async function add_collection_entry(parent, column, row, seed){
+        var id = column + "_" + row;
+        var entry = document.createElement('div');
+        entry.id = id;
+        entry.className = 'collection_box';
+        var label = document.createElement('label');
+        var plant_canvas = await gen_plant(decode_plant_data(seed)); // Maybe I should just scale the plants up in gen_plant...
+        var scale_canvas = document.createElement("canvas");
+        scale_canvas.width = 66;
+        scale_canvas.height = 66;
+        var scale_ctx = scale_canvas.getContext("2d");
+        scale_ctx.imageSmoothingEnabled = false;
+        scale_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
+        label.htmlFor = id;
+        label.className = 'collection_label';
+        label.appendChild(document.createTextNode(seed));
+        entry.appendChild(label);
+        entry.appendChild(scale_canvas);
+        parent.appendChild(entry);
+      }
 
 
         async function do_preload() {

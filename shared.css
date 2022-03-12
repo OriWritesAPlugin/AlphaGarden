@@ -73,6 +73,19 @@ input.chunky {
     font-size: 22px;
 }
 
+input.chunky_wrap {
+    width: auto;
+    font-family: monospace, Verdana, sans-serif;
+    border-radius: 5px;
+    padding: 4px;
+    margin: 0px;
+    display: inline-block;
+    border: 0px;
+    color: #DFC48C;
+    background-color: #2F252D;
+    font-size: 22px;
+}
+
 .center-parent{
     text-align: center;
     width: 95%;
@@ -226,6 +239,44 @@ input.chunky {
     background-color: #201920;
     margin: 0px 1% 0px 1%;
     overflow: hidden;
+}
+.collection_row {
+   display: flex;
+   justify-content: center;
+   align-content: center;
+}
+
+.garden_util_box {
+    align-items: center;
+    justify-content: center;
+    flex-direction:column;
+    text-align:center;
+    border-color: #DFC48C;
+    border-style: dashed;
+    border-width: thin;
+    padding: 20px;
+}
+  
+
+.collection_box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction:column;
+    text-align:center;
+    width: 90px;
+    height: 90px;
+    border-color: #DFC48C;
+    border-style: dashed;
+    border-width: thin;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.collection_label {
+  word-wrap: break-word;
+  padding: 0.6vh;
+  font-size: 12px;
 }
 input[type="button"].inc_button {
     padding: 5px 3px 3px 3px;
