@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<!--This was created for Nature Dominance. Don't redistribute or reskin. Thank you!-->
+<html>
+    <meta charset="utf-8"/>
+    <head>
+        <title>Overgrowth Bingo</title>
+        <link rel="stylesheet" type="text/css"  href="nature.css" />
+    </head>
+    <body onload="do_setup()">
+        <div class='center-parent'>
+          <label id="smaller-title"><b>Overgrowth Bingo</b></label>
+          <br>
+          <div class='inline-flex-parent' style="text-align: center">
+               <input id="difficulty" type="radio" name="difficulty" value="Easy" onchange="generate_board()"> Easy
+               <input type="radio" name="difficulty" value='Medium' checked="checked" onchange="generate_board()"> Medium
+               <input type="radio" name="difficulty" value='Hard' onchange="generate_board()"> Hard
+               <input type="radio" name="difficulty" value='Pain' onchange="generate_board()"> Pain
+          </div>
+          <div class='inline-flex-parent' style="text-align: center">
+               <input id="size" type="radio" name="size" value="3" onchange="generate_board()"> 3x3
+               <input type="radio" name="size" value='5' checked="checked" onchange="generate_board()"> 5x5
+               <input type="radio" name="size" value='7' onchange="generate_board()"> 7x7
+          </div>
+          <p id="seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> earned yet!</p>
+        </div>
+        <div id="board_div" class='center-parent'></div>
+    </body>
+    <script src="gen_plant.js"></script>
+    <script type="text/javascript">
+
+        var alt_background = "linear-gradient(to right, #134e5e, #71b280)";
+
+        all_challenges = {"e": { 
+            "a": {"description": "No drops", "points": 300, "category": "coli"},
+            "b": {"description": "Dragon misses", "points": 50, "category": "coli"},
+            "c": {"description": "Enemy misses", "points": 50, "category": "coli"},
+            "d": {"description": "Dragon crits", "points": 50, "category": "coli"},
+            "e": {"description": "All enemies 1 species", "points": 50, "category": "coli"},
+            "f": {"description": "Any familiar", "points": 100, "category": "coli"},
+            "g": {"description": "Neutral elem familiar", "points": 200, "category": "coli"},
+            "h": {"description": "Venue elem familiar", "points": 200, "category": "coli"},
+            "i": {"description": "Swipp or Bald item", "points": 50, "category": "coli"},
+            "j": {"description": "5 different items", "points": 200, "category": "coli"},
+            "k": {"description": "Get something green", "points": 100, "category": "coli"},
+            "l": {"description": "Openable", "points": 100, "category": "coli"},
+            "m": {"description": "Captcha", "points": 100, "category": "coli"},
+            "n": {"description": "Any battle stone", "points": 100, "category": "coli"},
+            "o": {"description": "Health potion", "points": 150, "category": "coli"},
+            "p": {"description": "3x 1 item", "points": 200, "category": "coli"},
+            "q": {"description": "Free space", "points": 0, "category": "neutral"},
+            "r": {"description": "Spend 5 min in coli", "points": 200, "category": "coli"},
+            "s": {"description": "Get something brown", "points": 100, "category": "coli"}
+                      }, "m": {
+            "a": {"description": "Any apparel", "points": 350, "category": "coli"},
+            "b": {"description": "Boss fight", "points": 250, "category": "coli"},
+            "c": {"description": "Acuity or might fragment", "points": 250, "category": "coli"},
+            "d": {"description": "Berserk or scholar stone", "points": 450, "category": "coli"},
+            "e": {"description": "Elemental attack stone", "points": 250, "category": "coli"},
+            "f": {"description": "Gene", "points": 500, "category": "coli"},
+            "g": {"description": "3x Swipp or Bald item", "points": 300, "category": "coli"},
+            "h": {"description": "Skin or skin crate", "points": 450, "category": "coli"},
+            "i": {"description": "Scroll of renaming", "points": 400, "category": "coli"},
+            "j": {"description": "Vista", "points": 450, "category": "coli"},
+            "k": {"description": "Eye vial", "points": 550, "category": "coli"},
+            "l": {"description": "Max breath on 1 dragon", "points": 350, "category": "coli"},
+            "m": {"description": "Do square above or below", "points": 200, "category": "neutral"},
+            "n": {"description": "Do square left or right", "points": 200, "category": "neutral"},
+            "o": {"description": "Do 2 corner squares", "points": 200, "category": "neutral"},
+            "p": {"description": "Spend 15 min in coli", "points": 600, "category": "coli"},
+            "q": {"description": "Exactly 6 different items", "points": 550, "category": "coli"}
+                    }, "h": {
+            "a": {"description": "Boss familiar", "points": 3000, "category": "coli"},
+            "b": {"description": "Wing apparel", "points": 2500, "category": "coli"},
+            "c": {"description": "Runestone", "points": 2500, "category": "coli"},
+            "d": {"description": "Deity doll", "points": 2500, "category": "coli"},
+            "e": {"description": "Ambush or rally stone", "points": 1000, "category": "coli"},
+            "f": {"description": "2 familiars at once", "points": 2000, "category": "coli"},
+            "g": {"description": "Unhatched egg", "points": 3000, "category": "coli"},
+            "h": {"description": "Venue apparel", "points": 1000, "category": "coli"},
+            "i": {"description": "2 boss fights in a row", "points": 1000, "category": "coli"},
+            "j": {"description": "2 misses in a row", "points": 800, "category": "coli"},
+            "k": {"description": "Eliminate", "points": 3000, "category": "coli"},
+            "l": {"description": "Swipp, Bald, or hibden fam", "points": 1600, "category": "coli"},
+            "m": {"description": "Spend 30 min in coli", "points": 1200, "category": "coli"},
+            "n": {"description": "3x openable at once", "points": 300, "category": "coli"}
+        }};
+
+        const difficulties = {"Easy": {"challenge_set": ["e","e","m"], "starting_rarity": 0},
+                              "Medium": {"challenge_set": ["e","m","m"], "starting_rarity": 3},
+                              "Hard": {"challenge_set":  ["e","m","h"], "starting_rarity": 6},
+                              "Pain": {"challenge_set":  ["m","h"], "starting_rarity": 8}};
+        all_difficulty_sets = assemble_difficulty_sets();
+        const slot_max_retries = 15;  // how many times to retry having a non-duplicate challenge before allowing duplicates
+
+        // When there are (num) squares revealed, there should be idx_of(num)+1 plants revealed. If not, add another plant.
+        // Making it a dict certainly looks a bit silly, but it does make the later code very clean.
+        // TODO: Javascript has a list comprehension equivalent (I think?), so clean this up.
+        const plants_revealed_at = {3: 1, 7: 2, 11: 3, 15: 4, 20: 5, 25: 6, 30: 7, 35: 8, 41: 9, 47: 10, 49: 11};
+        // "At difficulty <Easy>, the first plant is rarity <Easy>[starting_rarity]. It feeds this pattern:
+        // 0 0
+        // 1 1 1
+        // 2 2 2 2
+        // 3 3 3 3 3
+        // 4 4 4 4 4 4...
+        // This holds something like "Easy": {1: 0, ...} to 7 "rows". I have no idea why I'd ever have 2+3...+8=35 plants on one board, but hey.
+        const plant_rarity_lookup = calc_rarity_progression();
+
+        const icons = [
+           "https://i.imgur.com/GSNkSxm.png",
+           "https://i.imgur.com/TuZ3QXY.png",
+           "https://i.imgur.com/2Fbxx1b.png",
+           "https://i.imgur.com/EHvEUAI.png",
+           "https://i.imgur.com/M1AHxdW.png",
+           "https://i.imgur.com/sey4Maz.png",
+           "https://i.imgur.com/45exDh2.png",
+           "https://i.imgur.com/GaJzue4.png"
+        ]
+
+
+        var num_squares_revealed = 0;
+        var num_plants_revealed = 0;
+        var current_board = [];
+        var revealed_seeds = [];
+        var current_difficulty;
+
+        function randomFromArray(arr){return arr[Math.floor(Math.random()*arr.length)]}
+
+        function calc_rarity_progression(){
+            var lookup = {};
+            const num_rows = 8;
+            // TODO: There's obviously a way to calculate this,..fun later, let's get it working for now.
+            current_plant_num = 1;
+            for(difficulty in difficulties){
+                lookup[difficulty] = {};
+                var current_rarity = difficulties[difficulty]["starting_rarity"]
+                for(var i=1; i<num_rows; i++){
+                    // The +1 here is because the pattern is 0, 0, 1, 1, 1...., not 0, 1, 1...
+                    for(var j=0; j<i+1; j++){
+                        lookup[difficulty][current_plant_num] = current_rarity;
+                        current_plant_num ++;
+                    }
+                    current_rarity ++;
+                }
+                current_plant_num = 1;
+            }
+            return lookup;
+        }
+
+        function assemble_difficulty_sets(){
+            var all_names = {};
+            for(const challenge_difficulty in all_challenges){
+                all_names[challenge_difficulty] = [];
+                for(const challenge_name in all_challenges[challenge_difficulty]){
+                    all_names[challenge_difficulty].push(challenge_difficulty+challenge_name);
+                }
+            }
+            var all_difficulty_sets = {};
+            for(const board_difficulty in difficulties){
+                all_difficulty_sets[board_difficulty] = [];
+                for(var i=0; i< difficulties[board_difficulty]["challenge_set"].length; i++){
+                    difficulty_instance = difficulties[board_difficulty]["challenge_set"][i];
+                    all_difficulty_sets[board_difficulty] = all_difficulty_sets[board_difficulty].concat(all_names[difficulty_instance]);
+                }
+            }
+            return all_difficulty_sets;
+        }
+
+        function getRadioValue(name) {
+            var ele = document.getElementsByName(name);
+            for(i = 0; i < ele.length; i++) {
+                if(ele[i].checked)
+                return ele[i].value;
+            }
+        }
+
+        /* Gawkily randomize in place */
+        function shuffleArray(arr) {
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+        }
+
+        function assemble_challenge_list(size, difficulty){
+            initial_challenge_list = all_difficulty_sets[difficulty];
+            var challenges = [];
+            while(challenges.length < size*size){
+              shuffleArray(initial_challenge_list);
+              challenges = challenges.concat(initial_challenge_list);
+            }
+            return challenges;
+        }
+
+        function clear_board() {
+          var board = document.getElementById("board_div")
+          while (board.lastChild) {
+              board.removeChild(board.lastChild);
+          }
+          current_board = [];
+          num_squares_revealed = 0;
+          num_plants_revealed = 0;
+        }
+
+        function has_bingo() {
+          bingo = false;
+          // Naive method is fine here don't @ me
+          // First we check for horizontal bingo
+          for(var i=0; i<current_board.length; i++){
+            if(current_board[i][0]["earned"]){
+              bingo = true;  // temporary
+              for(var j=0; j<current_board[i].length; j++){
+                if(!current_board[i][j]["earned"]){
+                  bingo = false;
+                  break;}}
+            if(bingo){break;}
+          }}
+          if(bingo){return bingo;}
+          // Vertical bingo is practically identical
+          for(var i=0; i<current_board[0].length; i++){
+            if(current_board[0][i]["earned"]){
+              bingo = true;  // temporary
+              for(var j=0; j<current_board[0].length; j++){
+                if(!current_board[j][i]["earned"]){
+                  bingo = false;
+                  break;}}
+            if(bingo){break;}
+          }}
+          if(bingo){return bingo;}
+          // Diagonal bingo
+          bingo = true;  // temporary
+          for(var i=0; i<current_board.length; i++){
+            if(!current_board[i][i]["earned"]){
+              bingo = false;
+              break;
+          }}
+          if(bingo){return bingo;}
+          bingo = true;  // temporary
+          for(var i=0; i<current_board.length; i++){
+            if(!current_board[current_board.length-1-i][i]["earned"]){
+              bingo = false;
+              break;
+          }}
+          return bingo;
+        }
+
+        function generate_board() {
+            clear_board();
+            var size = parseInt(getRadioValue("size"));
+            var difficulty = getRadioValue("difficulty");
+            current_difficulty = difficulty;  // TODO: Clean this up, use current_difficulty/current_size everywhere.
+            var board = document.getElementById("board_div");
+            var challenges = assemble_challenge_list(size, difficulty);
+            for(var i=0; i < size; i++){
+              var new_row = document.createElement('div');
+              new_row.className = "bingo_row";
+              board.appendChild(new_row);
+              current_board.push([]);
+              for(var j=0; j < size; j++){
+                var challenge_name = challenges[i*size+j];
+                add_bingo_square(new_row, i, j, challenge_name)
+                current_board[i].push({"earned": false,
+                                       "challenge": challenge_name,
+                                       "icon": icons[Math.floor(Math.random() * icons.length)]});
+              }
+            }
+          }
+
+      async function toggle_status(e){
+        var id = e.target.id;
+        coords = id.split("_");
+        var row = parseInt(coords[0]);
+        var col = parseInt(coords[1]);
+        var square_info = current_board[row][col];
+        var bingo_square = document.getElementById(id);
+        square_info["earned"] = !square_info["earned"];
+        bingo_square.lastChild.style.opacity = 0.3;  // Make label translucent
+        if(square_info["earned"]){
+          num_squares_revealed ++;
+          // Null is treated as 0...Javascript!
+          if(num_plants_revealed < plants_revealed_at[num_squares_revealed]){
+            // Time to reveal a plant!
+            num_plants_revealed ++;
+            rarity = plant_rarity_lookup[current_difficulty][num_plants_revealed];
+            plant_data = gen_plant_data(rarity);
+            plant_canvas = await gen_plant(plant_data);
+            // TODO: This next scaling bit seems incredibly silly
+            var scale_canvas = document.createElement("canvas");
+            scale_canvas.width = 64;
+            scale_canvas.height = 64;
+            var scale_ctx = scale_canvas.getContext("2d");
+            scale_ctx.imageSmoothingEnabled = false;
+            scale_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
+            square_info['icon'] = scale_canvas.toDataURL();
+            revealed_seeds.push(encode_plant_data(plant_data));
+            document.getElementById("seed_list").innerHTML = revealed_seeds.join(", ");
+          }
+          bingo_square.style.background = 'url(' + square_info["icon"] + ')  no-repeat center center';
+        } else {
+          num_squares_revealed --;
+          bingo_square.style.background = "none";
+        }
+        var body = document.getElementsByTagName("BODY")[0];
+        if(has_bingo()){
+          transition_all_bingo_borders("#ffffff", row, col);
+        } else {
+          shimmer_bingo_borders("#71b280", "#b1f2c0", row, col);
+        }
+      }
+
+      function transition_all_bingo_borders(color, origin_row, origin_column){
+        var root_delay = 70;  // in milliseconds
+        for(let i=0; i<current_board.length; i++){
+            for(let j=0; j<current_board[i].length; j++){
+              // Yes these lets are necessary
+              let mapped_row = origin_row;
+              let mapped_column = origin_column;
+              // Delay proportional to distance from origin
+              let delay = root_delay*(((mapped_column-j)**2+(mapped_row-i)**2)**(1/2))
+              setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = color;}, delay);
+            }
+          }
+      }
+
+      function shimmer_bingo_borders(original_color, new_color, origin_row, origin_column) {
+        var root_delay = 100;  // in milliseconds
+        for(let i=0; i<current_board.length; i++){
+            for(let j=0; j<current_board[i].length; j++){
+              // Yes these lets are necessary
+              let mapped_row = origin_row;
+              let mapped_column = origin_column;
+              // Delay proportional to distance from origin
+              let delay = root_delay*(((mapped_column-j)**2+(mapped_row-i)**2)**(1/2));
+              let flip_delay = delay + 200;
+              setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = new_color;}, delay);
+              setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = original_color;}, flip_delay);
+            }
+        }
+      }
+
+      function add_bingo_square(parent, column, row, challenge_name){
+        var id = column + "_" + row;
+        var bingo_square = document.createElement('div');
+        bingo_square.id = id;
+        bingo_square.className = 'bingo_box';
+        bingo_square.addEventListener("click", toggle_status);
+        bingo_square.addEventListener('touchend', function(e){
+                toggle_status(e);
+                e.preventDefault()
+            })
+
+        var label = document.createElement('label')
+        var challenge = all_challenges[challenge_name[0]][challenge_name.slice(1)];
+        label.htmlFor = id;
+        label.className = 'bingo_label';
+        label.appendChild(document.createTextNode(challenge["description"]));
+
+        bingo_square.appendChild(label);
+        parent.appendChild(bingo_square);
+      }
+
+    function do_setup(){
+        preload_all_images();
+        generate_board();
+    }
+
+    </script>
+</html>
