@@ -96,8 +96,13 @@
         }
 
         async function claim_garden(){
-            var canvas = document.getElementById("output_canvas");
-            window.open(canvas.toDataURL('image/png'));
+            var new_window = window.open();
+            var image = new_window.document.createElement('img');
+            var instructions = new_window.document.createElement('p');
+            instructions.innerHTML = "Right-click the garden and save it, or copy the image to a host like Imgur or Discord";
+            image.src = document.getElementById("output_canvas").toDataURL();
+            new_window.document.body.appendChild(image);
+            new_window.document.body.appendChild(instructions);
         }
 
         async function place_plants(seed, ctx, x_pos){
