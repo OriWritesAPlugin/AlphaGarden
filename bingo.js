@@ -1,33 +1,3 @@
-<!DOCTYPE html>
-<!--This was created for Nature Dominance. Don't redistribute or reskin. Thank you!-->
-<html>
-    <meta charset="utf-8"/>
-    <head>
-        <title>Overgrowth Bingo</title>
-        <link rel="stylesheet" type="text/css"  href="nature.css" />
-    </head>
-    <body onload="do_setup()">
-        <div class='center-parent'>
-          <label id="smaller-title"><b>Overgrowth Bingo</b></label>
-          <br>
-          <div class='inline-flex-parent' style="text-align: center">
-               <input id="difficulty" type="radio" name="difficulty" value="Easy" onchange="generate_board()"> Easy
-               <input type="radio" name="difficulty" value='Medium' checked="checked" onchange="generate_board()"> Medium
-               <input type="radio" name="difficulty" value='Hard' onchange="generate_board()"> Hard
-               <input type="radio" name="difficulty" value='Pain' onchange="generate_board()"> Pain
-          </div>
-          <div class='inline-flex-parent' style="text-align: center">
-               <input id="size" type="radio" name="size" value="3" onchange="generate_board()"> 3x3
-               <input type="radio" name="size" value='5' checked="checked" onchange="generate_board()"> 5x5
-               <input type="radio" name="size" value='7' onchange="generate_board()"> 7x7
-          </div>
-          <p id="seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> earned yet!</p>
-        </div>
-        <div id="board_div" class='center-parent'></div>
-    </body>
-    <script src="gen_plant.js"></script>
-    <script type="text/javascript">
-
         var alt_background = "linear-gradient(to right, #134e5e, #71b280)";
 
         all_challenges = {"e": { 
@@ -83,12 +53,40 @@
             "l": {"description": "Swipp, Bald, or hibden fam", "points": 1600, "category": "coli"},
             "m": {"description": "Spend 30 min in coli", "points": 1200, "category": "coli"},
             "n": {"description": "3x openable at once", "points": 300, "category": "coli"}
+                  }, "s": {
+            "a": {"description": "Drink a glass of water", "points": 100, "category": "self-care"},
+            "b": {"description": "Head outside", "points": 100, "category": "self-care"},
+            "c": {"description": "Do something energetic", "points": 100, "category": "self-care"},
+            "d": {"description": "Socialize (online OK!)", "points": 100, "category": "self-care"},
+            "e": {"description": "Another glass of water!", "points": 100, "category": "self-care"},
+            "f": {"description": "Get 2+ proper meals", "points": 100, "category": "self-care"},
+            "g": {"description": "Say something nice about yourself", "points": 100, "category": "self-care"},
+            "h": {"description": "Look forward to something", "points": 100, "category": "self-care"},
+            "i": {"description": "Brush your teeth", "points": 100, "category": "self-care"},
+            "j": {"description": "Touch a live thing (plants OK!)", "points": 100, "category": "self-care"},
+            "k": {"description": "Finish a task", "points": 100, "category": "self-care"},
+            "l": {"description": "Get dressed", "points": 100, "category": "self-care"},
+            "m": {"description": "Free space!", "points": 100, "category": "neutral"},
+            "n": {"description": "Meditate, 5+ min", "points": 100, "category": "self-care"},
+            "o": {"description": "Put on some music", "points": 100, "category": "self-care"},
+            "p": {"description": "Do something with your hands", "points": 100, "category": "self-care"},
+            "q": {"description": "ANOTHER glass of water!", "points": 100, "category": "self-care"},
+            "r": {"description": "Release shoulder, back, jaw tension", "points": 100, "category": "self-care"},
+            "s": {"description": "Stretch!", "points": 100, "category": "self-care"},
+            "t": {"description": "Smell something nice", "points": 100, "category": "self-care"},
+            "u": {"description": "Create something", "points": 100, "category": "self-care"},
+            "v": {"description": "Do something pleasantly mindless", "points": 100, "category": "self-care"},
+            "w": {"description": "Learn something new", "points": 100, "category": "self-care"},
+            "x": {"description": "10 deep breaths", "points": 100, "category": "self-care"},
+            "y": {"description": "Work on a good habit", "points": 100, "category": "self-care"}
         }};
 
-        const difficulties = {"Easy": {"challenge_set": ["e","e","m"], "starting_rarity": 0},
-                              "Medium": {"challenge_set": ["e","m","m"], "starting_rarity": 3},
-                              "Hard": {"challenge_set":  ["e","m","h"], "starting_rarity": 6},
-                              "Pain": {"challenge_set":  ["m","h"], "starting_rarity": 8}};
+        // `fixed_rarity`: The rarity of plants doesn't grow as you uncover more squares
+        const difficulties = {"Easy": {"challenge_set": ["e","e","m"], "starting_rarity": 0, "fixed_rarity": false},
+                              "Medium": {"challenge_set": ["e","m","m"], "starting_rarity": 3, "fixed_rarity": false},
+                              "Hard": {"challenge_set":  ["e","m","h"], "starting_rarity": 6, "fixed_rarity": false},
+                              "Pain": {"challenge_set":  ["m","h"], "starting_rarity": 8, "fixed_rarity": false},
+                              "Self-Care": {"challenge_set":  ["s"], "starting_rarity": 7, "fixed_rarity": true}};
         all_difficulty_sets = assemble_difficulty_sets();
         const slot_max_retries = 15;  // how many times to retry having a non-duplicate challenge before allowing duplicates
 
@@ -117,11 +115,13 @@
         ]
 
 
+        var bingo_border_color = "#71b280";
         var num_squares_revealed = 0;
         var num_plants_revealed = 0;
         var current_board = [];
         var revealed_seeds = [];
         var current_difficulty;
+        var forced_random_seed = null;  // "Child" pages can overwrite with a fixed seed, ex: self_care uses the date as a seed.
 
         function randomFromArray(arr){return arr[Math.floor(Math.random()*arr.length)]}
 
@@ -132,6 +132,15 @@
             current_plant_num = 1;
             for(difficulty in difficulties){
                 lookup[difficulty] = {};
+                // Fixed_rarity difficulties don't follow the rarity "growth".
+                if(difficulties[difficulty]["fixed_rarity"]){
+                    // TODO: There's also probably a list comprehension-like construct.
+                    for(var i=1; i<36; i++){
+                        lookup[difficulty][i] = difficulties[difficulty]["starting_rarity"];
+                    }
+                    continue;
+                }
+                // Non-fixed rarity follows the pattern documented at `plant_rarity_lookup`   
                 var current_rarity = difficulties[difficulty]["starting_rarity"]
                 for(var i=1; i<num_rows; i++){
                     // The +1 here is because the pattern is 0, 0, 1, 1, 1...., not 0, 1, 1...
@@ -243,11 +252,9 @@
           return bingo;
         }
 
-        function generate_board() {
+        function generate_board(size, difficulty, rarity_override=null) {
             clear_board();
-            var size = parseInt(getRadioValue("size"));
-            var difficulty = getRadioValue("difficulty");
-            current_difficulty = difficulty;  // TODO: Clean this up, use current_difficulty/current_size everywhere.
+            current_difficulty = difficulty;  // Make it globally available (not huge on this)
             var board = document.getElementById("board_div");
             var challenges = assemble_challenge_list(size, difficulty);
             for(var i=0; i < size; i++){
@@ -257,15 +264,15 @@
               current_board.push([]);
               for(var j=0; j < size; j++){
                 var challenge_name = challenges[i*size+j];
-                add_bingo_square(new_row, i, j, challenge_name)
+                add_bingo_square(new_row, i, j, challenge_name, rarity_override=rarity_override);
                 current_board[i].push({"earned": false,
                                        "challenge": challenge_name,
                                        "icon": icons[Math.floor(Math.random() * icons.length)]});
               }
-            }
-          }
+           }
+        }
 
-      async function toggle_status(e){
+        async function toggle_status(e){
         var id = e.target.id;
         coords = id.split("_");
         var row = parseInt(coords[0]);
@@ -281,7 +288,11 @@
             // Time to reveal a plant!
             num_plants_revealed ++;
             rarity = plant_rarity_lookup[current_difficulty][num_plants_revealed];
-            plant_data = gen_plant_data(rarity);
+            if(forced_random_seed == null){
+                plant_data = gen_plant_data(rarity);
+            } else {
+                plant_data = gen_plant_data(rarity, forced_random_seed+String(num_plants_revealed));
+            }
             plant_canvas = await gen_plant(plant_data);
             // TODO: This next scaling bit seems incredibly silly
             var scale_canvas = document.createElement("canvas");
@@ -303,11 +314,11 @@
         if(has_bingo()){
           transition_all_bingo_borders("#ffffff", row, col);
         } else {
-          shimmer_bingo_borders("#71b280", "#b1f2c0", row, col);
+          shimmer_bingo_borders(bingo_border_color, "#b1f2c0", row, col);
         }
-      }
+        }
 
-      function transition_all_bingo_borders(color, origin_row, origin_column){
+        function transition_all_bingo_borders(color, origin_row, origin_column){
         var root_delay = 70;  // in milliseconds
         for(let i=0; i<current_board.length; i++){
             for(let j=0; j<current_board[i].length; j++){
@@ -319,9 +330,9 @@
               setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = color;}, delay);
             }
           }
-      }
+        }
 
-      function shimmer_bingo_borders(original_color, new_color, origin_row, origin_column) {
+        function shimmer_bingo_borders(original_color, new_color, origin_row, origin_column) {
         var root_delay = 100;  // in milliseconds
         for(let i=0; i<current_board.length; i++){
             for(let j=0; j<current_board[i].length; j++){
@@ -335,33 +346,25 @@
               setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = original_color;}, flip_delay);
             }
         }
-      }
+        }
 
-      function add_bingo_square(parent, column, row, challenge_name){
-        var id = column + "_" + row;
-        var bingo_square = document.createElement('div');
-        bingo_square.id = id;
-        bingo_square.className = 'bingo_box';
-        bingo_square.addEventListener("click", toggle_status);
-        bingo_square.addEventListener('touchend', function(e){
-                toggle_status(e);
-                e.preventDefault()
-            })
+        function add_bingo_square(parent, column, row, challenge_name){
+            var id = column + "_" + row;
+            var bingo_square = document.createElement('div');
+            bingo_square.id = id;
+            bingo_square.className = 'bingo_box';
+            bingo_square.addEventListener("click", toggle_status);
+            bingo_square.addEventListener('touchend', function(e){
+                    toggle_status(e);
+                    e.preventDefault()
+                })
 
-        var label = document.createElement('label')
-        var challenge = all_challenges[challenge_name[0]][challenge_name.slice(1)];
-        label.htmlFor = id;
-        label.className = 'bingo_label';
-        label.appendChild(document.createTextNode(challenge["description"]));
+            var label = document.createElement('label')
+            var challenge = all_challenges[challenge_name[0]][challenge_name.slice(1)];
+            label.htmlFor = id;
+            label.className = 'bingo_label';
+            label.appendChild(document.createTextNode(challenge["description"]));
 
-        bingo_square.appendChild(label);
-        parent.appendChild(bingo_square);
-      }
-
-    function do_setup(){
-        preload_all_images();
-        generate_board();
-    }
-
-    </script>
-</html>
+            bingo_square.appendChild(label);
+            parent.appendChild(bingo_square);
+        }

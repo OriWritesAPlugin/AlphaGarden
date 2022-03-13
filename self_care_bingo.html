@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!--This was created for Nature Dominance, then repurposed for "an endless garden". Don't redistribute or reskin. Thank you!-->
+<html>
+    <meta charset="utf-8"/>
+    <head>
+        <link rel="stylesheet" type="text/css"  href="nature.css" />
+        <style>
+        body {
+            background: #2f1847; /* fallback for old browsers */
+            background: linear-gradient(to right, #240f3a, #8d5185); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        }
+        .bingo_box {
+            border-color: #cfa8ca;
+        }
+        </style>
+        <title>Self-Care Bingo</title>
+    </head>
+    <body onload="do_setup()">
+        <div class='center-parent'>
+          <label id="smaller-title"><b>Self-Care Bingo</b></label>
+          <br>
+          <p id="seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> earned yet!</p>
+        </div>
+        <div id="board_div" class='center-parent'></div>
+    </body>
+    <script src="gen_plant.js"></script>
+    <script src="bingo.js"></script>
+    <script type="text/javascript">
+    const d = new Date();
+
+    var bingo_border_color = "#cfa8ca";
+    // Fun fact! Javascript apparently numbers days 1-31 but months 0-11. We toString so it doesn't matter, but it's interesting.
+    // Anyways, this (messily) ensures a fixed set of plants each day. I'd prefer something more OO come refactor time.
+    var forced_random_seed = d.getDate().toString()+d.getMonth().toString()+d.getFullYear().toString();
+
+    function do_setup(){
+        preload_all_images();
+        generate_board(5, "Self-Care", 7);
+    }
+    </script>
+</html>

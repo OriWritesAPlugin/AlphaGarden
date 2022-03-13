@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<!--This was created for Nature Dominance, then repurposed for "an endless garden". Don't redistribute or reskin. Thank you!-->
+<html>
+    <meta charset="utf-8"/>
+    <head>
+        <title>Overgrowth Bingo</title>
+        <link rel="stylesheet" type="text/css"  href="nature.css" />
+    </head>
+    <body onload="do_setup()">
+        <div class='center-parent'>
+          <label id="smaller-title"><b>Overgrowth Bingo</b></label>
+          <br>
+          <div class='inline-flex-parent' style="text-align: center">
+               <input id="difficulty" type="radio" name="difficulty" value="Easy" onchange="generate_overgrowth_board()"> Easy
+               <input type="radio" name="difficulty" value='Medium' checked="checked" onchange="generate_overgrowth_board()"> Medium
+               <input type="radio" name="difficulty" value='Hard' onchange="generate_overgrowth_board()"> Hard
+               <input type="radio" name="difficulty" value='Pain' onchange="generate_overgrowth_board()"> Pain
+          </div>
+          <div class='inline-flex-parent' style="text-align: center">
+               <input id="size" type="radio" name="size" value="3" onchange="generate_overgrowth_board()"> 3x3
+               <input type="radio" name="size" value='5' checked="checked" onchange="generate_overgrowth_board()"> 5x5
+               <input type="radio" name="size" value='7' onchange="generate_overgrowth_board()"> 7x7
+          </div>
+          <p id="seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> earned yet!</p>
+        </div>
+        <div id="board_div" class='center-parent'></div>
+    </body>
+    <script src="gen_plant.js"></script>
+    <script src="bingo.js"></script>
+    <script type="text/javascript">
+    function generate_overgrowth_board() {
+        var size = parseInt(getRadioValue("size"));
+        var difficulty = getRadioValue("difficulty");
+        current_difficulty = difficulty;  // TODO: Clean this up, use current_difficulty/current_size everywhere.
+        generate_board(size, difficulty);
+    }
+
+    function do_setup(){
+        preload_all_images();
+        generate_overgrowth_board();
+    }
+    </script>
+</html>
