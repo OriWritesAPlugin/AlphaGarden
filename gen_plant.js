@@ -42,7 +42,9 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/Wax3h14.png", "https://i.imgur.com/Ps4w9LV.png", "https://i.imgur.com/3RpiB9t.png",
                "https://i.imgur.com/LIicGxR.png", "https://i.imgur.com/6M8DI7u.png", "https://i.imgur.com/TOf1Cqu.png"];
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
-             "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png"};
+             "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
+             "bunbun": "https://i.imgur.com/Qn23rZb.png", "bunbun_black": "https://i.imgur.com/S6vpB9i.png",
+             "bunbun_white": "https://i.imgur.com/1xnwUWv.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
 common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48];

@@ -91,7 +91,7 @@
             var work_ctx=work_canvas.getContext("2d");
             work_canvas.width = work_canvas_size;
             work_canvas.height = work_canvas_size;
-            await place_image_at_coords_with_chance(all_named[name], [[Math.floor(work_canvas_size/2)-1, work_canvas_size-1]], work_ctx, 1, true);
+            await place_image_at_coords_with_chance(all_named[name], [[Math.floor(work_canvas_size/2), work_canvas_size-1]], work_ctx, 1, true);
             ctx.drawImage(work_canvas, x_pos, 4, 64, 64);
         }
 
