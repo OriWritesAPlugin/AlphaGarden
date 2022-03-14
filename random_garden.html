@@ -11,6 +11,8 @@
         </br>
         <label for="seed_list">Seed list (comma-separated):</label>
         <input type="text" id="seed_list" name="seed_list" size="4" placeholder="Click here and paste!">
+        <label for="use_smart_spacing">Use smart spacing:</label><input type="checkbox" id="use_smart_spacing" value="Use smart spacing" checked>
+        <label for="generate_grass">Generate grass:</label><input type="checkbox" id="generate_grass" value="Generate grass" checked>  
         <div id=content_div>
             </br></br>
             <input type="button" class="chunky" value="&gt;&gt; Generate a garden!&lt;&lt;" onClick="gen_randogarden()">
@@ -31,6 +33,9 @@
         var possible_grass_palettes = [];
         var grass_img = "https://i.imgur.com/yPNa3WB.png";
         var x_coords = [];
+        var smart_coords = {};
+        var garden_size = 450;
+        var current_x_coord;
 
         // Stolen from https://stackoverflow.com/questions/17386707/how-to-check-if-a-canvas-is-blank
         // returns true if every pixel's uint32 representation is 0 (or "blank")
@@ -42,7 +47,23 @@
           return !pixelBuffer.some(color => color !== 0);
         }
 
+        // Generate some spaced x-coordinates to assign plants to
+        function create_spaced_placement_queue(with_spacing=64){
+            x_coords = [];
+            // Random number between, by default, 0 and 16 (remember we already place ground-centered in a 64x area)
+            var range = Math.floor(with_spacing/4);
+            current_x = Math.floor(Math.random()*range);
+            while(current_x < (garden_size-64)){
+                x_coords.push(current_x);
+                current_x += with_spacing+Math.floor(Math.random()*range-range/2);
+            }
+            shuffleArray(x_coords);
+            return x_coords
+        }
+
         async function gen_randogarden(reuse_and_scramble_positions=false) {
+            use_smart_spacing = document.getElementById("use_smart_spacing").checked;
+            generate_grass = document.getElementById("generate_grass").checked;
             var canvas = document.getElementById("output_canvas");
             var ctx = canvas.getContext("2d");
             possible_grass_palettes = [];
@@ -52,24 +73,34 @@
             ctx.imageSmoothingEnabled = false;
             var promises = []
             if(!reuse_and_scramble_positions){
+                if(use_smart_spacing){
+                    smart_coords = {};
+                    smart_coords["short"] = create_spaced_placement_queue(with_spacing=32);
+                    smart_coords["medium"] = create_spaced_placement_queue(with_spacing=40);
+                    smart_coords["tall"] = create_spaced_placement_queue(with_spacing=64);
+                }
+                // Even when using smart spacing, we want these as a fallback.
                 x_coords = [];
                 for(var i=0; i<seeds.length; i++){
                     x_coords.push(Math.floor(Math.random()*(450-64)));
                 }
             } else {
+                    use_smart_spacing = false;  // Smart spacing is already represented in the coords
                     x_coords.sort(() => Math.random() - 0.5)
             }
             for(var i=0; i<seeds.length; i++){
+                // Named things ignore smart spacing (intentional choice, may recant)
                 if(seeds[i][0] == "!"){
                     promises.push(place_named_component(seeds[i].slice(1), ctx, x_coords[i]));
                 } else {
-                    promises.push(place_plants(seeds[i], ctx, x_coords[i]));
+                    // Smart_spacing logic goes inside here so we only have to draw the plant once. x_coords[i] acts as fallback.
+                    promises.push(place_plants(seeds[i], ctx, x_coords[i], use_smart_spacing));
                 }
             }
             for(var i=0; i<promises.length; i++){
                 await promises[i];
             }
-            place_grass()
+            if(generate_grass){place_grass();}
         }
 
         async function scramble_randogarden(){
@@ -105,8 +136,31 @@
             new_window.document.body.appendChild(instructions);
         }
 
-        async function place_plants(seed, ctx, x_pos){
+        // Returns true if there's a non-transparent pixel in `row` in ImageData `image_data`. Row is 0-indexed.
+        // Modified from https://stackoverflow.com/questions/11796554/automatically-crop-html5-canvas-to-contents
+        function has_pixel_in_row(image_data, row, width=32){
+            var index, x;
+            for (x = 0; x < width; x++) {
+                index = (row * width + x) * 4;
+                if (image_data.data[index+3] > 0) {
+                    return true
+                } 
+            }
+            return false;
+        }
+
+        async function place_plants(seed, ctx, x_pos, use_smart_spacing=false){
             plant_canvas = await gen_plant_from_seed(seed);
+            if(use_smart_spacing){
+                var smart_coord;
+                // We estimate the height by seeing if there's a pixel found at a specific row
+                // That does mean we think clouds are short...but those go behind everything else anyways.
+                var image_data = plant_canvas.getContext("2d").getImageData(0,0,plant_canvas.width,plant_canvas.height);
+                if(!has_pixel_in_row(image_data, 7, width=plant_canvas.width)){smart_coord = smart_coords["short"].pop();}
+                else if(!has_pixel_in_row(image_data, 19, width=plant_canvas.width)){smart_coord = smart_coords["medium"].pop();}
+                else {smart_coord = smart_coords["tall"].pop();}
+                if(smart_coord!=undefined){x_pos=smart_coord;}  // We need to make sure there's coords left
+            }
             ctx.drawImage(plant_canvas, x_pos, 4, 64, 64);
             return true
         }

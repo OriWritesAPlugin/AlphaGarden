@@ -513,3 +513,11 @@ function get_marker_coords(marker_hex, ctx) {
     ctx.putImageData(imageData,0,0);
     return ret_coords
   }
+
+// Same shuffle as bingo.js. TODO: I should add a baselib
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
