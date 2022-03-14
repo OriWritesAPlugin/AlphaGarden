@@ -43,8 +43,11 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/LIicGxR.png", "https://i.imgur.com/6M8DI7u.png", "https://i.imgur.com/TOf1Cqu.png"];
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
-             "bunbun": "https://i.imgur.com/Qn23rZb.png", "bunbun_black": "https://i.imgur.com/S6vpB9i.png",
-             "bunbun_white": "https://i.imgur.com/1xnwUWv.png"};
+             "bunbun": "https://i.imgur.com/Qn23rZb.png", "bunbun_black": "https://i.imgur.com/S6vpB9i.png", "bunbun_white": "https://i.imgur.com/1xnwUWv.png",
+             "grazing_goat": "https://i.imgur.com/6LsCzM6.png", "grazing_goatbrown": "https://i.imgur.com/ZbLlfdq.png",
+             "grazing_goatspotted": "https://i.imgur.com/wR92Own.png", "micro_goat": "https://i.imgur.com/0MN5MiP.png",
+             "pots'n_pans": "https://i.imgur.com/sbh42Qu.png",
+             "male_cardinal": "https://i.imgur.com/0WaJacd.png", "female_cardinal": "https://i.imgur.com/1RcilE0.png", "griffon_vulture": "https://i.imgur.com/a01VWAo.png", "turkey_vulture": "https://i.imgur.com/a6jGcCr.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
 common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48];

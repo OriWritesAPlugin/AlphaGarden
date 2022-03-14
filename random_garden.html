@@ -36,6 +36,8 @@
         var smart_coords = {};
         var garden_size = 450;
         var current_x_coord;
+        var used_smart_coords;
+        var used_fallback_coords;
 
         // Stolen from https://stackoverflow.com/questions/17386707/how-to-check-if-a-canvas-is-blank
         // returns true if every pixel's uint32 representation is 0 (or "blank")
@@ -85,13 +87,23 @@
                     x_coords.push(Math.floor(Math.random()*(450-64)));
                 }
             } else {
-                    use_smart_spacing = false;  // Smart spacing is already represented in the coords
-                    x_coords.sort(() => Math.random() - 0.5)
+                if(use_smart_spacing){
+                    smart_coords["short"] = used_smart_coords["short"].sort(() => Math.random() - 0.5);
+                    smart_coords["medium"] = used_smart_coords["medium"].sort(() => Math.random() - 0.5);
+                    smart_coords["tall"] = used_smart_coords["tall"].sort(() => Math.random() - 0.5);
+                    x_coords = used_fallback_coords.sort(() => Math.random() - 0.5);
+                } else {
+                    x_coords.sort(() => Math.random() - 0.5);
+                }
             }
+            used_smart_coords = {"short": [], "medium": [], "tall": []};  // Reset
+            used_fallback_coords = []  // Reset too
             for(var i=0; i<seeds.length; i++){
                 // Named things ignore smart spacing (intentional choice, may recant)
                 if(seeds[i][0] == "!"){
-                    promises.push(place_named_component(seeds[i].slice(1), ctx, x_coords[i]));
+                    current_x_coord = x_coords.pop();
+                    promises.push(place_named_component(seeds[i].slice(1), ctx, current_x_coord));
+                    used_fallback_coords.push(current_x_coord);
                 } else {
                     // Smart_spacing logic goes inside here so we only have to draw the plant once. x_coords[i] acts as fallback.
                     promises.push(place_plants(seeds[i], ctx, x_coords[i], use_smart_spacing));
@@ -156,10 +168,24 @@
                 // We estimate the height by seeing if there's a pixel found at a specific row
                 // That does mean we think clouds are short...but those go behind everything else anyways.
                 var image_data = plant_canvas.getContext("2d").getImageData(0,0,plant_canvas.width,plant_canvas.height);
-                if(!has_pixel_in_row(image_data, 7, width=plant_canvas.width)){smart_coord = smart_coords["short"].pop();}
-                else if(!has_pixel_in_row(image_data, 19, width=plant_canvas.width)){smart_coord = smart_coords["medium"].pop();}
-                else {smart_coord = smart_coords["tall"].pop();}
-                if(smart_coord!=undefined){x_pos=smart_coord;}  // We need to make sure there's coords left
+                if(!has_pixel_in_row(image_data, 7, width=plant_canvas.width)){
+                    smart_coord = smart_coords["short"].pop();
+                    used_smart_coords["short"].push(smart_coord);
+                }
+                else if(!has_pixel_in_row(image_data, 19, width=plant_canvas.width)){
+                    smart_coord = smart_coords["medium"].pop();
+                    used_smart_coords["medium"].push(smart_coord);
+                }
+                else {
+                    smart_coord = smart_coords["tall"].pop();
+                    used_smart_coords["tall"].push(smart_coord);
+                }
+                // We need to make sure there's coords left to take
+                if(smart_coord==undefined){
+                    used_fallback_coords.push(x_pos);
+                } else {
+                    x_pos=smart_coord;
+                }
             }
             ctx.drawImage(plant_canvas, x_pos, 4, 64, 64);
             return true
