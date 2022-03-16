@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <meta charset="utf-8"/>
     <head>
         <title>Endless Garden</title>
@@ -13,6 +13,7 @@
         <input type="text" id="seed_list" name="seed_list" size="4" placeholder="Click here and paste!">
         <label for="use_smart_spacing">Use smart spacing:</label><input type="checkbox" id="use_smart_spacing" value="Use smart spacing" checked>
         <label for="generate_grass">Generate grass:</label><input type="checkbox" id="generate_grass" value="Generate grass" checked>  
+        <label for="quantity">Garden width:</label> <input type="number" id="garden_width" name="quantity" min="64" value=450><br><br>
         <div id=content_div>
             </br></br>
             <input type="button" class="chunky" value="&gt;&gt; Generate a garden!&lt;&lt;" onClick="gen_randogarden()">
@@ -26,19 +27,16 @@
     </body>
     <script src="gen_plant.js"></script>
     <script type="text/javascript">
-        // Welcome to the source! Here's the seeds I used to finally get the garden generator working: 
-        // yhNA2ysxuY,xcitgz2Ku-,zWn82y+ZhK,+36P2ywfx3,y5Dm2y5HQq
-        // Those are the only seeds in the code (though the code itself is admittedly a bit seedy :))
         var img_loadup = [];
         var possible_grass_palettes = [];
         var grass_img = "https://i.imgur.com/yPNa3WB.png";
         var x_coords = [];
         var smart_coords = {};
-        var garden_size = 450;
+        var garden_width = 450;
         var current_x_coord;
         var used_smart_coords;
         var used_fallback_coords;
-
+        var use_smart_spacing = true;
         // Stolen from https://stackoverflow.com/questions/17386707/how-to-check-if-a-canvas-is-blank
         // returns true if every pixel's uint32 representation is 0 (or "blank")
         function isCanvasBlank(canvas) {
@@ -55,7 +53,7 @@
             // Random number between, by default, 0 and 16 (remember we already place ground-centered in a 64x area)
             var range = Math.floor(with_spacing/4);
             current_x = Math.floor(Math.random()*range);
-            while(current_x < (garden_size-64)){
+            while(current_x < (garden_width-64)){
                 x_coords.push(current_x);
                 current_x += with_spacing+Math.floor(Math.random()*range-range/2);
             }
@@ -64,16 +62,33 @@
         }
 
         async function gen_randogarden(reuse_and_scramble_positions=false) {
-            use_smart_spacing = document.getElementById("use_smart_spacing").checked;
-            generate_grass = document.getElementById("generate_grass").checked;
+            // canvases seem to be stranger than I thought. It's like...every time I call this, it's
+            // a "new" canvas. Even without clearRect, the old garden gets "replaced", instead of having more
+            // drawn onto it. Why? Am I calling something wrong someplace?
+            // Not re-creating ctx didn't help. I tried global and I'm still seeing the "replacement" behavior.
             var canvas = document.getElementById("output_canvas");
             var ctx = canvas.getContext("2d");
+            // I'm noticing that Firefox insists I'm in Quirks mode despite the doctype while working locally. Related?
+            // I'd really prefer not to have to push to test.
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // What does it mean if someone changes their option for smart spacing, then scrambles?
+            // Functionally it's nonsense --you're saying both "I want my coords to obey a different rule" and "I don't want my coords to change"
+            // We have to pick between nothing changing (confusing), everything getting wiped (alarming), and regenerating the garden (not a scramble)
+            // We go with that last case, if only because it seems the least unexpected. So we check against the use_smart_spacing from last time...
+            if(use_smart_spacing != document.getElementById("use_smart_spacing").checked && reuse_and_scramble_positions){
+                reuse_and_scramble_positions = false;
+            }
+            use_smart_spacing = document.getElementById("use_smart_spacing").checked;
+            generate_grass = document.getElementById("generate_grass").checked;
+            garden_width = Math.max(64, document.getElementById("garden_width").value);
+            document.getElementById("garden_width").value = garden_width;  // min in the HTML doesn't seem to enforce itself.
+            canvas.width = garden_width;
+            ctx.imageSmoothingEnabled = false;
             possible_grass_palettes = [];
             // Remove spaces and leading/trailing commas, then split on remaining commas
             var seeds = document.getElementById("seed_list").value.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.imageSmoothingEnabled = false;
             var promises = []
+            // Generate a set of coordinates to place items at
             if(!reuse_and_scramble_positions){
                 if(use_smart_spacing){
                     smart_coords = {};
@@ -84,8 +99,9 @@
                 // Even when using smart spacing, we want these as a fallback.
                 x_coords = [];
                 for(var i=0; i<seeds.length; i++){
-                    x_coords.push(Math.floor(Math.random()*(450-64)));
+                    x_coords.push(Math.floor(Math.random()*(garden_width-64)));
                 }
+            // Reuse the coordinates from last time
             } else {
                 if(use_smart_spacing){
                     smart_coords["short"] = used_smart_coords["short"].sort(() => Math.random() - 0.5);
@@ -93,6 +109,7 @@
                     smart_coords["tall"] = used_smart_coords["tall"].sort(() => Math.random() - 0.5);
                     x_coords = used_fallback_coords.sort(() => Math.random() - 0.5);
                 } else {
+                    x_coords.push(...used_fallback_coords);  // Recycle anything used for ex: named seeds
                     x_coords.sort(() => Math.random() - 0.5);
                 }
             }
@@ -101,6 +118,7 @@
             for(var i=0; i<seeds.length; i++){
                 // Named things ignore smart spacing (intentional choice, may recant)
                 if(seeds[i][0] == "!"){
+                    // We stay compatible with smart spacing by using its "fallback cooordinate" system
                     current_x_coord = x_coords.pop();
                     promises.push(place_named_component(seeds[i].slice(1), ctx, current_x_coord));
                     used_fallback_coords.push(current_x_coord);
@@ -123,9 +141,11 @@
             var canvas = document.getElementById("output_canvas");
             var ctx = canvas.getContext("2d");
             var recolored_grass = replace_color_palette_single_image(base_foliage_palette, all_palettes[random_from_list(possible_grass_palettes)], refs[grass_img]);
-            ctx.drawImage(recolored_grass, 0, 64, 200, 6);
-            ctx.drawImage(recolored_grass, 200, 64, 200, 6);
-            ctx.drawImage(recolored_grass, 400, 64, 200, 6);
+            var grass_x_pos = 0;
+            while(grass_x_pos < garden_width){
+                ctx.drawImage(recolored_grass, grass_x_pos, 64, 200, 6);
+                grass_x_pos += 200;
+            }
         }
 
         async function place_named_component(name, ctx, x_pos){
@@ -155,8 +175,8 @@
             for (x = 0; x < width; x++) {
                 index = (row * width + x) * 4;
                 if (image_data.data[index+3] > 0) {
-                    return true
-                } 
+                    return true;
+                }
             }
             return false;
         }
@@ -168,11 +188,11 @@
                 // We estimate the height by seeing if there's a pixel found at a specific row
                 // That does mean we think clouds are short...but those go behind everything else anyways.
                 var image_data = plant_canvas.getContext("2d").getImageData(0,0,plant_canvas.width,plant_canvas.height);
-                if(!has_pixel_in_row(image_data, 7, width=plant_canvas.width)){
+                if(!has_pixel_in_row(image_data, 32-7, width=plant_canvas.width)){
                     smart_coord = smart_coords["short"].pop();
                     used_smart_coords["short"].push(smart_coord);
                 }
-                else if(!has_pixel_in_row(image_data, 19, width=plant_canvas.width)){
+                else if(!has_pixel_in_row(image_data, 32-19, width=plant_canvas.width)){
                     smart_coord = smart_coords["medium"].pop();
                     used_smart_coords["medium"].push(smart_coord);
                 }
