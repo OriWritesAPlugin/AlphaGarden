@@ -107,18 +107,18 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
 // Accent: Think of the tertiary. Has bonus loud, bright colors that would look garish in a patch. Tone used for flowers (eventually)
 
 // Note that some common foliage colors are double-weighted because they're very nice greens :)
-/*var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 21, 21, 22, 23, 29, 41, 42, 43, 44, 45, 49];
+var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 21, 21, 22, 23, 29, 41, 42, 43, 44, 45, 49];
 common_foliage_palettes = common_foliage_palettes.concat(common_foliage_palettes);  // Cheap greenery boost
 var common_accent_palettes = [19, 20, 35, 36, 37, 38, 39, 40];
 var common_feature_palettes = [1, 20, 29, 32, 33, 34, 52];
 var uncommon_palettes = [9, 10, 11, 12, 13, 14, 24, 25, 38, 46, 47, 50];
-var rare_palettes = [15, 16,  17, 18, 26, 27, 28, 30, 31, 48, 51];*/
+var rare_palettes = [15, 16,  17, 18, 26, 27, 28, 30, 31, 48, 51];
 
-common_foliage_palettes = [49, 50, 51, 52];
+/*common_foliage_palettes = [49, 50, 51, 52];
 uncommon_palettes = [];
 rare_palettes = [];
 common_feature_palettes = [49, 50, 51, 52];
-common_accent_palettes = [52];
+common_accent_palettes = [52];*/
 
 var uncommon_foliage_palettes = common_foliage_palettes.concat(uncommon_palettes);
 var rare_foliage_palettes = uncommon_foliage_palettes.concat(rare_palettes);
