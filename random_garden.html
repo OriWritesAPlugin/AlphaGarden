@@ -119,9 +119,13 @@
                 // Named things ignore smart spacing (intentional choice, may recant)
                 if(seeds[i][0] == "!"){
                     // We stay compatible with smart spacing by using its "fallback cooordinate" system
-                    current_x_coord = x_coords.pop();
+                    if(use_smart_spacing){
+                        current_x_coord = x_coords.pop();
+                        used_fallback_coords.push(current_x_coord);
+                    } else {
+                        current_x_coord = x_coords[i];
+                    }
                     promises.push(place_named_component(seeds[i].slice(1), ctx, current_x_coord));
-                    used_fallback_coords.push(current_x_coord);
                 } else {
                     // Smart_spacing logic goes inside here so we only have to draw the plant once. x_coords[i] acts as fallback.
                     promises.push(place_plants(seeds[i], ctx, x_coords[i], use_smart_spacing));
