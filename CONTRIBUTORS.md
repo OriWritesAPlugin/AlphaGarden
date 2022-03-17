@@ -10,4 +10,5 @@ Named Items
 aprilofsnow: bunbuns and pots'n_pans
 TwoPuffins: grazing\_goats and micro_goat
 Lixue: male\_cardinal, female\_cardinal, griffon\_vulture, and turkey_vulture
+Ico: summer\_col, winter\_col, autumn\_col, spring\_col
 

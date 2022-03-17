@@ -50,7 +50,9 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "grazing_goat": "https://i.imgur.com/6LsCzM6.png", "grazing_goatbrown": "https://i.imgur.com/ZbLlfdq.png",
              "grazing_goatspotted": "https://i.imgur.com/wR92Own.png", "micro_goat": "https://i.imgur.com/0MN5MiP.png",
              "pots'n_pans": "https://i.imgur.com/sbh42Qu.png",
-             "male_cardinal": "https://i.imgur.com/0WaJacd.png", "female_cardinal": "https://i.imgur.com/1RcilE0.png", "griffon_vulture": "https://i.imgur.com/a01VWAo.png", "turkey_vulture": "https://i.imgur.com/a6jGcCr.png"};
+             "male_cardinal": "https://i.imgur.com/0WaJacd.png", "female_cardinal": "https://i.imgur.com/1RcilE0.png", "griffon_vulture": "https://i.imgur.com/a01VWAo.png", "turkey_vulture": "https://i.imgur.com/a6jGcCr.png",
+             "summer_col": "https://i.imgur.com/5hsYi2x.png", "winter_col": "https://i.imgur.com/PIvtEQp.png", "autumn_col": "https://i.imgur.com/SM9CLUW.png", "spring_col": "https://i.imgur.com/z22QWj1.png",
+             "stone_simple_bench": "https://i.imgur.com/CxUk9nb.png", "sandy_simple_bench": "https://i.imgur.com/PdgM5Dm.png", "ice_simple_bench": "https://i.imgur.com/Z9KDYr7.png", "growth_simple_bench": "https://i.imgur.com/uGxm8Pp.png", "onyx_simple_bench": "https://i.imgur.com/ZHHWzqf.png", "crystal_simple_bench": "https://i.imgur.com/LewbVev.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
 common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57];
