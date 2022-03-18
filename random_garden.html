@@ -55,7 +55,7 @@
             current_x = Math.floor(Math.random()*range);
             while(current_x < (garden_width-64)){
                 x_coords.push(current_x);
-                current_x += with_spacing+Math.floor(Math.random()*range-range/2);
+                current_x += with_spacing+Math.floor(Math.random()*range*2-range);
             }
             shuffleArray(x_coords);
             return x_coords
