@@ -116,16 +116,8 @@
             used_smart_coords = {"short": [], "medium": [], "tall": []};  // Reset
             used_fallback_coords = []  // Reset too
             for(var i=0; i<seeds.length; i++){
-                // Named things ignore smart spacing (intentional choice, may recant)
                 if(seeds[i][0] == "!"){
-                    // We stay compatible with smart spacing by using its "fallback cooordinate" system
-                    if(use_smart_spacing){
-                        current_x_coord = x_coords.pop();
-                        used_fallback_coords.push(current_x_coord);
-                    } else {
-                        current_x_coord = x_coords[i];
-                    }
-                    promises.push(place_named_component(seeds[i].slice(1), ctx, current_x_coord));
+                    promises.push(place_named_component(seeds[i].slice(1), ctx, x_coords[i], use_smart_spacing));
                 } else {
                     // Smart_spacing logic goes inside here so we only have to draw the plant once. x_coords[i] acts as fallback.
                     promises.push(place_plants(seeds[i], ctx, x_coords[i], use_smart_spacing));
@@ -152,16 +144,6 @@
             }
         }
 
-        async function place_named_component(name, ctx, x_pos){
-            // TODO: This is hideous and terrible but I am very tired and wanted to write something before bed
-            var work_canvas = document.createElement("canvas");
-            var work_ctx=work_canvas.getContext("2d");
-            work_canvas.width = work_canvas_size;
-            work_canvas.height = work_canvas_size;
-            await place_image_at_coords_with_chance(all_named[name], [[Math.floor(work_canvas_size/2), work_canvas_size-1]], work_ctx, 1, true);
-            ctx.drawImage(work_canvas, x_pos, 4, 64, 64);
-        }
-
         async function claim_garden(){
             var new_window = window.open();
             var image = new_window.document.createElement('img');
@@ -185,33 +167,43 @@
             return false;
         }
 
-        async function place_plants(seed, ctx, x_pos, use_smart_spacing=false){
-            plant_canvas = await gen_plant_from_seed(seed);
+        async function place_component(canvas, ctx, x_pos, use_smart_spacing=false){
             if(use_smart_spacing){
                 var smart_coord;
                 // We estimate the height by seeing if there's a pixel found at a specific row
                 // That does mean we think clouds are short...but those go behind everything else anyways.
-                var image_data = plant_canvas.getContext("2d").getImageData(0,0,plant_canvas.width,plant_canvas.height);
-                if(!has_pixel_in_row(image_data, 32-7, width=plant_canvas.width)){
-                    smart_coord = smart_coords["short"].pop();
-                    used_smart_coords["short"].push(smart_coord);
+                var image_data = canvas.getContext("2d").getImageData(0,0,canvas.width,canvas.height);
+                var height;
+                if(!has_pixel_in_row(image_data, 32-7, width=canvas.width)){
+                    height = "short";
                 }
-                else if(!has_pixel_in_row(image_data, 32-19, width=plant_canvas.width)){
-                    smart_coord = smart_coords["medium"].pop();
-                    used_smart_coords["medium"].push(smart_coord);
+                else if(!has_pixel_in_row(image_data, 32-19, width=canvas.width)){
+                    height = "medium";
                 }
                 else {
-                    smart_coord = smart_coords["tall"].pop();
-                    used_smart_coords["tall"].push(smart_coord);
+                    height = "tall";
                 }
                 // We need to make sure there's coords left to take
-                if(smart_coord==undefined){
-                    used_fallback_coords.push(x_pos);
-                } else {
-                    x_pos=smart_coord;
-                }
+                smart_coord = smart_coords[height].pop();
+                if(smart_coord!=undefined){x_pos = smart_coord;}
+                used_smart_coords[height].push(x_pos);
             }
-            ctx.drawImage(plant_canvas, x_pos, 4, 64, 64);
+            ctx.drawImage(canvas, x_pos, 4, 64, 64);
+        }
+
+        async function place_named_component(name, ctx, x_pos, use_smart_spacing=false){
+            // TODO: This is hideous and terrible but I am very tired and wanted to write something before bed
+            var work_canvas = document.createElement("canvas");
+            var work_ctx=work_canvas.getContext("2d");
+            work_canvas.width = work_canvas_size;
+            work_canvas.height = work_canvas_size;
+            await place_image_at_coords_with_chance(all_named[name], [[Math.floor(work_canvas_size/2), work_canvas_size-1]], work_ctx, 1, true);
+            place_component(work_canvas, ctx, x_pos, use_smart_spacing);
+        }
+
+        async function place_plants(seed, ctx, x_pos, use_smart_spacing=false){
+            plant_canvas = await gen_plant_from_seed(seed);
+            place_component(plant_canvas, ctx, x_pos, use_smart_spacing);
             return true
         }
 
