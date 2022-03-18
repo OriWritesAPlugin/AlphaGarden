@@ -92,9 +92,13 @@
             if(!reuse_and_scramble_positions){
                 if(use_smart_spacing){
                     smart_coords = {};
+                    // TODO: Surely I can simplify this
                     smart_coords["short"] = create_spaced_placement_queue(with_spacing=32);
                     smart_coords["medium"] = create_spaced_placement_queue(with_spacing=40);
                     smart_coords["tall"] = create_spaced_placement_queue(with_spacing=64);
+                    smart_coords["short_named"] = create_spaced_placement_queue(with_spacing=32);
+                    smart_coords["medium_named"] = create_spaced_placement_queue(with_spacing=40);
+                    smart_coords["tall_named"] = create_spaced_placement_queue(with_spacing=64);
                 }
                 // Even when using smart spacing, we want these as a fallback.
                 x_coords = [];
@@ -104,16 +108,21 @@
             // Reuse the coordinates from last time
             } else {
                 if(use_smart_spacing){
+                    // TODO: SURELY I CAN SIMPLIFY THIS
                     smart_coords["short"] = used_smart_coords["short"].sort(() => Math.random() - 0.5);
                     smart_coords["medium"] = used_smart_coords["medium"].sort(() => Math.random() - 0.5);
                     smart_coords["tall"] = used_smart_coords["tall"].sort(() => Math.random() - 0.5);
+                    smart_coords["short_named"] = used_smart_coords["short_named"].sort(() => Math.random() - 0.5);
+                    smart_coords["medium_named"] = used_smart_coords["medium_named"].sort(() => Math.random() - 0.5);
+                    smart_coords["tall_named"] = used_smart_coords["tall_named"].sort(() => Math.random() - 0.5);
                     x_coords = used_fallback_coords.sort(() => Math.random() - 0.5);
                 } else {
                     x_coords.push(...used_fallback_coords);  // Recycle anything used for ex: named seeds
                     x_coords.sort(() => Math.random() - 0.5);
                 }
             }
-            used_smart_coords = {"short": [], "medium": [], "tall": []};  // Reset
+            // TODO Seriously I am sure there's some list comprehension-like thing I could use to trim like 12 lines of tall_named nonsense.
+            used_smart_coords = {"short": [], "medium": [], "tall": [], "short_named": [], "medium_named": [], "tall_named": []};  // Reset
             used_fallback_coords = []  // Reset too
             for(var i=0; i<seeds.length; i++){
                 if(seeds[i][0] == "!"){
@@ -167,7 +176,7 @@
             return false;
         }
 
-        async function place_component(canvas, ctx, x_pos, use_smart_spacing=false){
+        async function place_component(canvas, ctx, x_pos, is_named, use_smart_spacing){
             if(use_smart_spacing){
                 var smart_coord;
                 // We estimate the height by seeing if there's a pixel found at a specific row
@@ -183,6 +192,7 @@
                 else {
                     height = "tall";
                 }
+                if(is_named){height+="_named";}  // TODO enum this
                 // We need to make sure there's coords left to take
                 smart_coord = smart_coords[height].pop();
                 if(smart_coord!=undefined){x_pos = smart_coord;}
@@ -198,12 +208,12 @@
             work_canvas.width = work_canvas_size;
             work_canvas.height = work_canvas_size;
             await place_image_at_coords_with_chance(all_named[name], [[Math.floor(work_canvas_size/2), work_canvas_size-1]], work_ctx, 1, true);
-            place_component(work_canvas, ctx, x_pos, use_smart_spacing);
+            place_component(work_canvas, ctx, x_pos, is_named=true, use_smart_spacing=use_smart_spacing);
         }
 
         async function place_plants(seed, ctx, x_pos, use_smart_spacing=false){
             plant_canvas = await gen_plant_from_seed(seed);
-            place_component(plant_canvas, ctx, x_pos, use_smart_spacing);
+            place_component(plant_canvas, ctx, x_pos, is_named=false, use_smart_spacing);
             return true
         }
 
