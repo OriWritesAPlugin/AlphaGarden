@@ -43,7 +43,9 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/LIicGxR.png", "https://i.imgur.com/2XeqnbE.png", "https://i.imgur.com/Zal2kLb.png",
                "https://i.imgur.com/thX8zVH.png", "https://i.imgur.com/YsmG4bZ.png", "https://i.imgur.com/iv73TrE.png",
                "https://i.imgur.com/E96bbUd.png", "https://i.imgur.com/7amn8lf.png", "https://i.imgur.com/EaOoji3.png",
-               "https://i.imgur.com/IvZmYJ0.png"];
+                // Row below is zero-indexed 60, 61, 62
+               "https://i.imgur.com/IvZmYJ0.png", "https://i.imgur.com/5CYK3pl.png", "https://i.imgur.com/JfQb93F.png",
+               "https://i.imgur.com/HaOVemI.png"];
 
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
@@ -58,8 +60,8 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "big_fountain": "https://i.imgur.com/Gb64tAf.png", "bunbun_grass": "https://i.imgur.com/dzonSfL.png", "bunbun_sakura": "https://i.imgur.com/tFsZkwX.png", "bunbun_snow": "https://i.imgur.com/w5HmhlH.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
-common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59];
-uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50, 51, 52, 54, 60]);
+common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62];
+uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50, 51, 52, 54, 60, 63]);
 rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58]);
 boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
@@ -84,8 +86,6 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
                     ["e4eaf3", "c0cfe7", "9ab3db", "7389ad"], ["b98838", "8c6526", "674426", "54401f"],
                     ["8f8090", "655666", "453946", "2a212b"], ["f5dbd7", "eec3c3", "d396a8", "c9829d"],
                     ["cdd1ff", "9fc0ff", "709ade", "4b5e95"], ["f6e9a4", "e8b78e", "d5737d", "c45088"],
-                    // alt for d1d2f9...: 
-                    // "d1d2f9", "a3bcf9", "7796cb", "576490"
                     ["e88c50", "d0653e", "af3629", "9b1f1f"], ["fef4cc", "fde47b", "ffd430", "ecb600"],
                     // next row is zero-indexed 20, 21                    
                     ["f3addd", "d87fbc", "c059a0", "aa3384"], ["3ac140", "1b9832", "116d22", "085c17"],
@@ -97,8 +97,7 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
                     ["b77e4e", "88572e", "674426", "543a24"], ["c5af7a", "a6905c", "806d40", "69582e"],
                     ["a6705a", "8b4e35", "6c2e1c", "571d0e"], ["fa9292", "f55757", "e32b2b", "ca0e18"],
                     ["93aaff", "5778f5", "3a5ad2", "233fa8"], ["ffcf80", "ffb63e", "ff9300", "da7500"],
-                    ["effeee", "def8dd", "cbf1c9", "b4d9b2"], ["cd41d9", "b309c0", "860d9e", "61067b"],
-                    // alt for effeee: "f5fff4", "dbf5d9", "bee1bb", "9fc99c"
+                    ["f5fff4", "dbf5d9", "bee1bb", "9fc99c"], ["cd41d9", "b309c0", "860d9e", "61067b"],
                     ["8cf5f8", "30e8ed", "18c9d4", "0798a6"], ["b5c085", "7b9b64", "47774a", "305540"],
                     ["9bcf4b", "719e34", "45681a", "274409"], ["4fb81d", "339324", "1d7628", "075a2d"],
                     ["6e7706", "465f14", "234d21", "033a34"], ["78a562", "4e875a", "2a6e53", "0c584d"],
@@ -116,18 +115,18 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
 // Accent: Think of the tertiary. Has bonus loud, bright colors that would look garish in a patch. Tone used for flowers (eventually)
 
 // Note that some common foliage colors are double-weighted because they're very nice greens :)
-var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 21, 21, 22, 23, 29, 30, 30, 41, 42, 43, 44, 45, 49];
+var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 18, 21, 21, 22, 23, 29, 30, 30, 41, 42, 43, 44, 45, 49];
 common_foliage_palettes = common_foliage_palettes.concat(common_foliage_palettes);  // Cheap greenery boost
 var common_accent_palettes = [19, 20, 35, 36, 37, 38, 39, 40];
 var common_feature_palettes = [1, 20, 29, 32, 33, 34, 52];
 var uncommon_palettes = [9, 10, 11, 12, 13, 14, 15, 18, 24, 25, 38, 46, 47, 50, 55];
 var rare_palettes = [16,  17, 26, 27, 28, 30, 31, 48, 51, 53, 54];
 
-/*common_foliage_palettes = [];
+/*common_foliage_palettes = [18, 21, 16];
 uncommon_palettes = [];
 rare_palettes = [];
-common_feature_palettes = [];
-common_accent_palettes = [];*/
+common_feature_palettes = [38, 16];
+common_accent_palettes = [38, 54];*/
 
 var uncommon_foliage_palettes = common_foliage_palettes.concat(uncommon_palettes);
 var rare_foliage_palettes = uncommon_foliage_palettes.concat(rare_palettes);
@@ -432,10 +431,10 @@ function hexToRgb(hex) {
 }
 
 
-function replace_color(old_rgb, new_rgb, ctx) {
+function replace_color(old_rgb, new_rgb, ctx, width=work_canvas_size, height=work_canvas_size) {
     // `old_rgb` and `new_rgb`: (r, g, b)
     // taken from https://stackoverflow.com/questions/16228048/replace-a-specific-color-by-another-in-an-image-sprite
-    var imageData = ctx.getImageData(0, 0, work_canvas_size, work_canvas_size);
+    var imageData = ctx.getImageData(0, 0, width, height);
     var oldRed, oldGreen, oldBlue;
     var newRed, newGreen, newBlue;
     [oldRed, oldGreen, oldBlue] = old_rgb;
