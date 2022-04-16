@@ -29,12 +29,35 @@
                     <canvas id="output_canvas" width="64" height="64"></canvas>
                     <div id="output_text"></div>
                 </div>
-                <div id=seed_collection_display_container class=garden_util_box style="width: 500px">
-                     <label for="seed_collection">Your seed collection:</label>
-                    <input type="text" id="seed_collection" name="seed_collection" size="4" placeholder="Click here and paste!">
+                <div id=seed_info_div class=garden_util_box>
+                    <label for="seed_to_read">Seed to analyze:</label>
+                    <input type="text" id="seed_to_read" name="seed_id" size="4" placeholder="Click here and paste!">
                     </br><br>
+                    <input type="button" class="chunky_wrap" value="Check colors" onClick="analyze_seed()">
+                    </br></br>
+                    <canvas id="analysis_preview_canvas" width="64" height="64"></canvas><br>
+                    <canvas id="analysis_output_canvas" width="64" height="64"></canvas>
+                    <span id="analysis_output_text"></span>
+                </div>
+            </div>
+            <div id="lower_attempt_at_organizing_div", class="collection_row">
+                <div id=seed_collection_display_container class=garden_util_box>
+                    <label for="seed_collection">Your seed collection:</label>
+                    <input type="text" id="seed_collection" name="seed_collection" size="4" placeholder="Click here and paste!", style="min-width: 292px;">
+                    <label for="sort_options">Sort order:</label>
+                    <input type="radio" id="none_opt" name="sort_order" value="None" checked>
+                    <label for="none_opt">None</label>
+                    <input type="radio" id="base" name="sort_order" value="foliage">
+                    <label for="base">Base</label>
+                    <input type="radio" id="foliage" name="sort_order" value="foliage_palette">
+                    <label for="foliage">Foliage</label>
+                    <input type="radio" id="feature" name="sort_order" value="feature_palette">
+                    <label for="feature">Feature</label>
+                    <input type="radio" id="accent" name="sort_order" value="accent_palette">
+                    <label for="accent">Accent</label>
+                    </br></br>
                     <input type="button" class="chunky_wrap" value="Display collection" onClick="display_collection()">
-                    <br>
+                    <br><br>
                     <div id="collection_display_div" width="450"></div>
                 </div>
             </div>
@@ -104,21 +127,67 @@
             document.getElementById("output_text").innerHTML = encode_plant_data(plant_data);
         }
 
+        async function analyze_seed() {
+            var seed_string = document.getElementById("seed_to_read").value.replace(/\s+/g, '');
+            var canvas = document.getElementById("analysis_output_canvas");
+            var ctx = canvas.getContext("2d");
+            var raw_plant_data = decode_plant_data(seed_string);
+            var plant_data = parse_plant_data(raw_plant_data);
+            var img=new Image();
+            img.src="https://i.imgur.com/rSLWUqw.png";  // palette preview image
+            img.crossOrigin = "anonymous"
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+                var new_overall_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);
+                replace_color_palette(overall_palette, new_overall_palette, ctx, 64, 64);
+            };
+            var plant_canvas = await gen_plant(raw_plant_data); // Maybe I should just scale the plants up in gen_plant...
+            var preview_canvas = document.getElementById("analysis_preview_canvas");
+            var preview_ctx = preview_canvas.getContext("2d");
+            preview_ctx.clearRect(0, 0, preview_canvas.width, preview_canvas.height);
+            preview_ctx.imageSmoothingEnabled = false;
+            preview_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
+            //var text_output = document.getElementById("analysis_output_text");
+            //text_output.innerText = `Base: ${raw_plant_data["foliage"]}`+"\n"+`Simple Feature: ${raw_plant_data["simple_feature"]}`+"\n"+`Complex Feature: ${raw_plant_data["complex_feature"]}`;
+        }
+
         function display_collection() {
             //clear what's already in there
             var collection_div = document.getElementById("collection_display_div")
             while (collection_div.lastChild) {collection_div.removeChild(collection_div.lastChild);}
             var collection = document.getElementById("seed_collection").value.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");
-            for(var i=0; i<collection.length; i+=5){
+            var sort_order_elem = document.getElementsByName('sort_order');
+            var sort_order = "None";
+            for(i = 0; i < sort_order_elem.length; i++) {
+                if(sort_order_elem[i].checked)
+                sort_order = sort_order_elem[i].value;
+            }
+            if(sort_order != "None"){
+                collection = get_seed_collection_sorted_by(collection, sort_order);
+            }
+            //var collection_width_elem = document.getElementsByName('collection_width');
+            var collection_width = 11;
+            for(var i=0; i<collection.length; i+=collection_width){
               var new_row = document.createElement('div');
               new_row.className = "collection_row";
               collection_div.appendChild(new_row);
-              for(var j=0; j < 5; j++){
+              for(var j=0; j < collection_width; j++){
                 if(!collection[i+j]){return;}
                 add_collection_entry(new_row, i, j, collection[i+j])
               }
            }
        }
+
+      // Take a list of seeds, return them in the order specified (ex: sort by the base "plant")
+      function get_seed_collection_sorted_by(collection, sort_key) {
+        parsed_seeds = {};
+        for(let i=0; i<collection.length; i++){
+            parsed_seeds[collection[i]] = decode_plant_data(collection[i])
+        }
+        return collection.sort(function(a, b) {
+          return parsed_seeds[a][sort_key] - parsed_seeds[b][sort_key];
+        });
+      }
 
       async function add_collection_entry(parent, column, row, seed){
         var id = column + "_" + row;
