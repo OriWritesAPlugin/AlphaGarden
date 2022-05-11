@@ -21,13 +21,19 @@
                <input type="radio" name="size" value='5' checked="checked" onchange="generate_overgrowth_board()"> 5x5
                <input type="radio" name="size" value='7' onchange="generate_overgrowth_board()"> 7x7
           </div>
+          <div class='inline-flex-parent' style="text-align: center">
+               <input id="extra_icons" type="checkbox" name="extra_icons" value="3" onchange="toggle_extra_icons()" checked> Use extra icons
+          </div>
           <p id="seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> earned yet!</p>
         </div>
         <div id="board_div" class='center-parent'></div>
+        <div id="bingo_plant_container_div" class='center-parent'><div id=bingo_plant_div class=bingo_plant_box></div>Congratulations!</div>
     </body>
     <script src="gen_plant.js"></script>
     <script src="bingo.js"></script>
     <script type="text/javascript">
+    var use_extra_icons = document.getElementById("extra_icons").checked;
+
     function generate_overgrowth_board() {
         var size = parseInt(getRadioValue("size"));
         var difficulty = getRadioValue("difficulty");
@@ -38,6 +44,11 @@
     function do_setup(){
         preload_all_images();
         generate_overgrowth_board();
+    }
+
+    function toggle_extra_icons() {
+        use_extra_icons = document.getElementById("extra_icons").checked;
+        toggleExtraIcons(use_extra_icons);
     }
     </script>
 </html>

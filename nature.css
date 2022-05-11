@@ -35,7 +35,7 @@ a {
    align-content: center;
 }
 
-.bingo_box {
+.bingo_box, .bingo_plant_box {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -48,6 +48,11 @@ a {
     border-width: thin;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+.bingo_plant_box {
+    border-style: none;
+    margin: 0 auto;
 }
 
 .bingo_label {

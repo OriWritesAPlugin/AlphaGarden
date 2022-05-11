@@ -121,7 +121,9 @@
         var current_board = [];
         var revealed_seeds = [];
         var current_difficulty;
+        var bingo_plant_generated = false;  // Used to track whether the bonus bingo seed has been revealed. We don't re-hide seeds.
         var forced_random_seed = null;  // "Child" pages can overwrite with a fixed seed, ex: self_care uses the date as a seed.
+        var use_extra_icons = true;  // "Child" pages can use ex: a checkbox to prevent the non-seeded-plant icons from showing up (they might be distracting)
 
         function randomFromArray(arr){return arr[Math.floor(Math.random()*arr.length)]}
 
@@ -208,6 +210,8 @@
           current_board = [];
           num_squares_revealed = 0;
           num_plants_revealed = 0;
+          bingo_plant_generated = false;
+          setBingoPlantVisibility(false);
         }
 
         function has_bingo() {
@@ -272,21 +276,10 @@
            }
         }
 
-        async function toggle_status(e){
-        var id = e.target.id;
-        coords = id.split("_");
-        var row = parseInt(coords[0]);
-        var col = parseInt(coords[1]);
-        var square_info = current_board[row][col];
-        var bingo_square = document.getElementById(id);
-        square_info["earned"] = !square_info["earned"];
-        bingo_square.lastChild.style.opacity = 0.3;  // Make label translucent
-        if(square_info["earned"]){
-          num_squares_revealed ++;
-          // Null is treated as 0...Javascript!
-          if(num_plants_revealed < plants_revealed_at[num_squares_revealed]){
-            // Time to reveal a plant!
-            num_plants_revealed ++;
+        // Reveal a plant in a square (either within the board or the "bonus bingo plant"
+        // Handles the work of generating the plant itself and adding the seed to the pile.
+        // Returns a dataURL to set as an image someplace.
+        async function genPlantInSquare(){
             rarity = plant_rarity_lookup[current_difficulty][num_plants_revealed];
             if(forced_random_seed == null){
                 plant_data = gen_plant_data(rarity);
@@ -296,22 +289,45 @@
             plant_canvas = await gen_plant(plant_data);
             // TODO: This next scaling bit seems incredibly silly
             var scale_canvas = document.createElement("canvas");
-            scale_canvas.width = 64;
-            scale_canvas.height = 64;
+            scale_canvas.width = 96;
+            scale_canvas.height = 96;
             var scale_ctx = scale_canvas.getContext("2d");
             scale_ctx.imageSmoothingEnabled = false;
-            scale_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
-            square_info['icon'] = scale_canvas.toDataURL();
+            scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
             revealed_seeds.push(encode_plant_data(plant_data));
             document.getElementById("seed_list").innerHTML = revealed_seeds.join(", ");
+            return scale_canvas.toDataURL();
+        }
+
+        async function toggle_status(e){
+        var id = e.target.id;
+        coords = id.split("_");
+        var row = parseInt(coords[0]);
+        var col = parseInt(coords[1]);
+        var square_info = current_board[row][col];
+        var bingo_square = document.getElementById(id);
+        square_info["earned"] = !square_info["earned"];
+        bingo_square.lastChild.style.opacity = 0.2;  // Make label translucent
+        if(square_info["earned"]){
+          num_squares_revealed ++;
+          // Null is treated as 0...Javascript!
+          if(num_plants_revealed < plants_revealed_at[num_squares_revealed]){
+            // Time to reveal a plant!
+            num_plants_revealed ++;
+            square_info['icon'] = await genPlantInSquare();
           }
-          bingo_square.style.background = 'url(' + square_info["icon"] + ')  no-repeat center center';
+          if(use_extra_icons || !square_info['icon'].startsWith("https://")){
+            bingo_square.style.background = 'url(' + square_info["icon"] + ')  no-repeat center center';
+          } else {bingo_square.style.background = "none";}
         } else {
           num_squares_revealed --;
           bingo_square.style.background = "none";
+          bingo_square.lastChild.style.opacity = 1;
         }
         var body = document.getElementsByTagName("BODY")[0];
-        if(has_bingo()){
+        now_has_bingo = has_bingo();
+        setBingoPlantVisibility(now_has_bingo);
+        if(now_has_bingo){
           transition_all_bingo_borders("#ffffff", row, col);
         } else {
           shimmer_bingo_borders(bingo_border_color, "#b1f2c0", row, col);
@@ -332,20 +348,50 @@
           }
         }
 
-        function shimmer_bingo_borders(original_color, new_color, origin_row, origin_column) {
-        var root_delay = 100;  // in milliseconds
-        for(let i=0; i<current_board.length; i++){
-            for(let j=0; j<current_board[i].length; j++){
-              // Yes these lets are necessary
-              let mapped_row = origin_row;
-              let mapped_column = origin_column;
-              // Delay proportional to distance from origin
-              let delay = root_delay*(((mapped_column-j)**2+(mapped_row-i)**2)**(1/2));
-              let flip_delay = delay + 200;
-              setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = new_color;}, delay);
-              setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = original_color;}, flip_delay);
+        async function setBingoPlantVisibility(show_plant){
+            parent_div = document.getElementById("bingo_plant_container_div");
+            if(!show_plant){
+                parent_div.style.display = "none";
+            } else {
+                if(!bingo_plant_generated){
+                    data_url = await genPlantInSquare();
+                    target_div = document.getElementById("bingo_plant_div");
+                    target_div.style.background = 'url(' + data_url + ')  no-repeat center center';
+                    bingo_plant_generated = true;  // Once gained, is only lost when board is reset (to avoid regenerating the bingo plant)
+                }
+                target_div = document.getElementById("bingo_plant_div");
+                parent_div.style.display = "block";
             }
         }
+
+        // Go through and either hide or show all non-generated-plant icons
+        function toggleExtraIcons(show_icons){
+        for(let i=0; i<current_board.length; i++){
+            for(let j=0; j<current_board[i].length; j++){
+              bingo_square = document.getElementById(i+"_"+j);
+              bingo_square_info = current_board[i][j];
+              if(bingo_square_info["earned"] && bingo_square_info['icon'].startsWith("https://")){  // This feels unsafe, somehow
+                if(show_icons){bingo_square.style.background = 'url(' + bingo_square_info["icon"] + ')  no-repeat center center';}
+                else{bingo_square.style.background = "none";}
+              }
+            }
+          }
+        }
+
+        function shimmer_bingo_borders(original_color, new_color, origin_row, origin_column) {
+            var root_delay = 100;  // in milliseconds
+            for(let i=0; i<current_board.length; i++){
+                for(let j=0; j<current_board[i].length; j++){
+                  // Yes these lets are necessary
+                  let mapped_row = origin_row;
+                  let mapped_column = origin_column;
+                  // Delay proportional to distance from origin
+                  let delay = root_delay*(((mapped_column-j)**2+(mapped_row-i)**2)**(1/2));
+                  let flip_delay = delay + 200;
+                  setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = new_color;}, delay);
+                  setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = original_color;}, flip_delay);
+                }
+            }
         }
 
         function add_bingo_square(parent, column, row, challenge_name){
