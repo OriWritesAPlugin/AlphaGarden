@@ -279,12 +279,13 @@
         // Reveal a plant in a square (either within the board or the "bonus bingo plant"
         // Handles the work of generating the plant itself and adding the seed to the pile.
         // Returns a dataURL to set as an image someplace.
-        async function genPlantInSquare(){
+        async function genPlantInSquare(forced_random_offset=0){
             rarity = plant_rarity_lookup[current_difficulty][num_plants_revealed];
             if(forced_random_seed == null){
                 plant_data = gen_plant_data(rarity);
             } else {
-                plant_data = gen_plant_data(rarity, forced_random_seed+String(num_plants_revealed));
+                // ONLY for forced_random seed generation, the bingo seed needs to increment num_plants_revealed
+                plant_data = gen_plant_data(rarity, forced_random_seed+String(num_plants_revealed + bingo_plant_generated));
             }
             plant_canvas = await gen_plant(plant_data);
             // TODO: This next scaling bit seems incredibly silly
@@ -354,10 +355,11 @@
                 parent_div.style.display = "none";
             } else {
                 if(!bingo_plant_generated){
+                    // We need this true BEFORE generating the plant (weird I know) in case of a forced random seed. It's how we know to increment.
+                    bingo_plant_generated = true;  // Once gained, is only lost when board is reset (to avoid regenerating the bingo plant)
                     data_url = await genPlantInSquare();
                     target_div = document.getElementById("bingo_plant_div");
                     target_div.style.background = 'url(' + data_url + ')  no-repeat center center';
-                    bingo_plant_generated = true;  // Once gained, is only lost when board is reset (to avoid regenerating the bingo plant)
                 }
                 target_div = document.getElementById("bingo_plant_div");
                 parent_div.style.display = "block";
