@@ -155,7 +155,7 @@
             //clear what's already in there
             var collection_div = document.getElementById("collection_display_div")
             while (collection_div.lastChild) {collection_div.removeChild(collection_div.lastChild);}
-            var collection = document.getElementById("seed_collection").value.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");
+            var collection = document.getElementById("seed_collection").value.split(" ").join("").replace(/(^,)|(,$)|"/g, '').split(",");
             var sort_order_elem = document.getElementsByName('sort_order');
             var sort_order = "None";
             for(i = 0; i < sort_order_elem.length; i++) {

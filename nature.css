@@ -14,6 +14,9 @@ a {
     color: #71b280
 }
 
+@media screen and (max-height: 600px){ body {font-size: 0.9em}}
+
+
 .center-parent{
     text-align: center;
     width: 95%;
@@ -43,6 +46,8 @@ a {
     text-align:center;
     width: 12vh;
     height: 12vh;
+    min-width: 75px;
+    min-height: 75px;
     border-color: #71b280;
     border-style: dashed;
     border-width: thin;
