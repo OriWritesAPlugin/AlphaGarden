@@ -16,6 +16,6 @@ You could tune this to any purpose by changing the bingo board goals and the lab
 
 
 
-That said, I'm giving it to a community to start, and allowing/welcoming art contributions, so it'll initially be CC BY-NC-ND 4.0 to protect that art (of course check the LICENSE itself, it takes precedence). Note that "appropriate credit" includes displaying CONTRIBUTORS.md!
+That said, I'm giving it to a community to start, and allowing/welcoming art contributions, so it'll initially be CC BY-NC-ND 4.0 to protect that art/context (of course check the LICENSE itself). Note that "appropriate credit" includes displaying CONTRIBUTORS.md! All art belongs to its creator as cited in the CONTRIBUTORS file, it's simply used here with permission.
 
-After I have a nice stable version, I'll fork and scrub content from any contributor that doesn't opt in to a more permissive license. Maybe MIT? If you really want to use this code ASAP, contact me, I'm not averse to maintaining a "dev art only" branch if there's a need.
+If you want to slice and dice this code ASAP, contact me, I'm not averse to maintaining a "dev art only" branch if there's a need.
