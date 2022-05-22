@@ -151,7 +151,7 @@
             //text_output.innerText = `Base: ${raw_plant_data["foliage"]}`+"\n"+`Simple Feature: ${raw_plant_data["simple_feature"]}`+"\n"+`Complex Feature: ${raw_plant_data["complex_feature"]}`;
         }
 
-        function display_collection() {
+        async function display_collection() {
             //clear what's already in there
             var collection_div = document.getElementById("collection_display_div")
             while (collection_div.lastChild) {collection_div.removeChild(collection_div.lastChild);}
@@ -173,7 +173,7 @@
               collection_div.appendChild(new_row);
               for(var j=0; j < collection_width; j++){
                 if(!collection[i+j]){return;}
-                add_collection_entry(new_row, i, j, collection[i+j])
+                await add_collection_entry(new_row, i, j, collection[i+j])
               }
            }
        }
@@ -181,8 +181,13 @@
       // Take a list of seeds, return them in the order specified (ex: sort by the base "plant")
       function get_seed_collection_sorted_by(collection, sort_key) {
         parsed_seeds = {};
+        let named_seed_data = {"foliage": 999, "foliage_palette": 999, "feature_palette": 999, "accent_palette": 999}
         for(let i=0; i<collection.length; i++){
-            parsed_seeds[collection[i]] = decode_plant_data(collection[i])
+            if(collection[i].startsWith("!")){
+              parsed_seeds[collection[i]] = named_seed_data;
+            } else {
+              parsed_seeds[collection[i]] = decode_plant_data(collection[i]);
+            }
         }
         return collection.sort(function(a, b) {
           return parsed_seeds[a][sort_key] - parsed_seeds[b][sort_key];
@@ -195,13 +200,28 @@
         entry.id = id;
         entry.className = 'collection_box';
         var label = document.createElement('label');
-        var plant_canvas = await gen_plant(decode_plant_data(seed)); // Maybe I should just scale the plants up in gen_plant...
         var scale_canvas = document.createElement("canvas");
         scale_canvas.width = 66;
         scale_canvas.height = 66;
         var scale_ctx = scale_canvas.getContext("2d");
         scale_ctx.imageSmoothingEnabled = false;
+        if(seed.startsWith("!")){
+          normalization_canvas = document.createElement("canvas");
+          normalization_canvas.width = 32;
+          normalization_canvas.height = 32;
+          var normalization_ctx = normalization_canvas.getContext("2d");
+          normalization_ctx.imageSmoothingEnabled = false;
+          let ref_img = refs[all_named[seed.slice(1)]];
+          normalization_ctx.drawImage(ref_img, 16-ref_img.width/2, 32-ref_img.height);
+          scale_ctx.drawImage(normalization_canvas, 0, 0, 64, 64);
+          seed = seed.slice(1);
+          if(seed.length > 12){
+            seed = seed.slice(0,9)+"...";
+          }
+        } else {
+        var plant_canvas = await gen_plant(decode_plant_data(seed)); // Maybe I should just scale the plants up in gen_plant...
         scale_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
+        }
         label.htmlFor = id;
         label.className = 'collection_label';
         label.appendChild(document.createTextNode(seed));
