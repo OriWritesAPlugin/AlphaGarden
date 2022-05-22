@@ -45,7 +45,8 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/E96bbUd.png", "https://i.imgur.com/7amn8lf.png", "https://i.imgur.com/EaOoji3.png",
                 // Row below is zero-indexed 60, 61, 62
                "https://i.imgur.com/IvZmYJ0.png", "https://i.imgur.com/5CYK3pl.png", "https://i.imgur.com/JfQb93F.png",
-               "https://i.imgur.com/HaOVemI.png"];
+               "https://i.imgur.com/HaOVemI.png", "https://i.imgur.com/FSFBSlo.png", "https://i.imgur.com/cgkP5B6.png",
+               "https://i.imgur.com/DynbJCl.png", "https://i.imgur.com/k9w5afZ.png"];
 
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
@@ -57,19 +58,30 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "summer_col": "https://i.imgur.com/5hsYi2x.png", "winter_col": "https://i.imgur.com/PIvtEQp.png", "autumn_col": "https://i.imgur.com/SM9CLUW.png", "spring_col": "https://i.imgur.com/z22QWj1.png",
              "stone_simple_bench": "https://i.imgur.com/CxUk9nb.png", "sandy_simple_bench": "https://i.imgur.com/PdgM5Dm.png", "ice_simple_bench": "https://i.imgur.com/Z9KDYr7.png", "growth_simple_bench": "https://i.imgur.com/uGxm8Pp.png", "onyx_simple_bench": "https://i.imgur.com/ZHHWzqf.png", "crystal_simple_bench": "https://i.imgur.com/LewbVev.png",
              "light_uni": "https://i.imgur.com/h25jofW.png", "dark_uni": "https://i.imgur.com/wZDto2T.png",
-             "big_fountain": "https://i.imgur.com/Gb64tAf.png", "bunbun_grass": "https://i.imgur.com/dzonSfL.png", "bunbun_sakura": "https://i.imgur.com/tFsZkwX.png", "bunbun_snow": "https://i.imgur.com/w5HmhlH.png"};
+             "big_fountain": "https://i.imgur.com/Gb64tAf.png", "bunbun_grass": "https://i.imgur.com/dzonSfL.png", "bunbun_sakura": "https://i.imgur.com/tFsZkwX.png", "bunbun_snow": "https://i.imgur.com/w5HmhlH.png",
+             "plain_big_bone": "https://i.imgur.com/7uVtIgT.png", "mossy_big_bone": "https://i.imgur.com/TCwHxZY.png", "bloody_big_bone": "https://i.imgur.com/Ra1hOOE.png", "misty_big_bone": "https://i.imgur.com/Pj6BCRJ.png",
+             "shaded_big_bone": "https://i.imgur.com/ZTR99ug.png",
+             "giant_gold": "https://i.imgur.com/BJt4LwQ.png", "giant_rosegold": "https://i.imgur.com/mswDGRW.png", "giant_silver": "https://i.imgur.com/I4cluBv.png", "giant_copper": "https://i.imgur.com/0Ymk8oM.png", "giant_copperhalf": "https://i.imgur.com/kU4sPSw.png",
+             "giant_copperfull": "https://i.imgur.com/JXyQeXD.png", "giant_copperblended": "https://i.imgur.com/DDqoxuB.png", "giant_cobalt": "https://i.imgur.com/r8tfKle.png", "giant_iron": "https://i.imgur.com/dQy3aKl.png",
+             // Conservation set
+             "shale_rock_1": "https://i.imgur.com/kWy5LYK.png", "shale_rock_2": "https://i.imgur.com/FvM0af4.png", "shale_rock_3": "https://i.imgur.com/gOI3GWA.png", "shale_rock_4": "https://i.imgur.com/rdHtEmf.png",
+             "limestone_rock_1": "https://i.imgur.com/e8WGNIX.png", "limestone_rock_2": "https://i.imgur.com/z9G8xUz.png", "limestone_rock_3": "https://i.imgur.com/4eS8voG.png", "limestone_rock_4": "https://i.imgur.com/zisb1Sm.png",
+             "obsidian_rock_1": "https://i.imgur.com/VJbGsNP.png", "obsidian_rock_2": "https://i.imgur.com/QD7qunp.png", "obsidian_rock_3": "https://i.imgur.com/wVqYlpE.png", "obsidian_rock_4": "https://i.imgur.com/G3YixT4.png",
+             "aventurine_rock_1": "https://i.imgur.com/x8PAyAR.png", "aventurine_rock_2": "https://i.imgur.com/FAuYH6y.png", "aventurine_rock_3": "https://i.imgur.com/SiOomwa.png", "aventurine_rock_4": "https://i.imgur.com/XBTiOM1.png",
+             "shale_cairn": "https://i.imgur.com/mPCJ6xK.png", "limestone_cairn": "https://i.imgur.com/YY3aAhM.png", "obsidian_cairn": "https://i.imgur.com/z85y3DB.png", "aventurine_cairn": "https://i.imgur.com/xfoVNh6.png",
+             "shale_spring": "https://i.imgur.com/SS5wlwB.png", "limestone_spring": "https://i.imgur.com/YvFBGtb.png", "obsidian_spring": "https://i.imgur.com/HDguTqn.png","aventurine_spring": "https://i.imgur.com/aqWObIl.png", 
+             "simple_fence": "https://i.imgur.com/WE4YzQb.png", "simple_fence_broken": "https://i.imgur.com/E1E1q3w.png", "simple_signpost": "https://i.imgur.com/LrdkTBi.png", "shale_birdbath": "https://i.imgur.com/7P7OqPQ.png",
+             "bleached_skull": "https://i.imgur.com/kIgNges.png", "bleached_ribs": "https://i.imgur.com/gb5h2ct.png", "burnt_skull": "https://i.imgur.com/swmqdOf.png", "burnt_ribs": "https://i.imgur.com/yCHsvce.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
-common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62];
-uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50, 51, 52, 54, 60, 63]);
-rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58]);
+common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64];
+uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50, 51, 52, 54, 60, 63, 66, 67]);
+rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65]);
 boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
 override_foliage = [];
 
 
-// bingo difficulty could be difficulty*size_rating+1. so an easy*small is (1*1+1=2), easy*medium is (1*2+1), hard*big is (3*3+1=10), pain*medium is (2*4+1=9)
-// maybe you sometimes get a free max(1,difficulty-2) plant as a bonus so that that level 1 is somewhat relevant. or something.
 
 all_features = ["https://i.imgur.com/G4h84Ht.png", "https://i.imgur.com/vXQYMkL.png", "https://i.imgur.com/p1ipMdS.png", "https://i.imgur.com/UUFJO7h.png"]
 var simple_features = [0, 1];
@@ -122,11 +134,14 @@ var common_feature_palettes = [1, 20, 29, 32, 33, 34, 52];
 var uncommon_palettes = [9, 10, 11, 12, 13, 14, 15, 18, 24, 25, 38, 46, 47, 50, 55];
 var rare_palettes = [16,  17, 26, 27, 28, 30, 31, 48, 51, 53, 54];
 
-/*common_foliage_palettes = [18, 21, 16];
+/*common_foliage_palettes = [10];
 uncommon_palettes = [];
 rare_palettes = [];
-common_feature_palettes = [38, 16];
+common_feature_palettes = [10];
 common_accent_palettes = [38, 54];*/
+
+//common_foliage_palettes = common_foliage_palettes.concat([50, 54, 54, 54, 27, 27, 27, 31, 31, 31, 53, 15, 15, 15])
+
 
 var uncommon_foliage_palettes = common_foliage_palettes.concat(uncommon_palettes);
 var rare_foliage_palettes = uncommon_foliage_palettes.concat(rare_palettes);
@@ -147,7 +162,7 @@ async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, c
     // Wondering if the shared ctx save/reload and use of async-await is giving me the "floating flowers" issue in here.
     // I may revisit (and mirror the final canvas instead), but it feels like overkill for now.
     img = refs[img_url];
-    var w_offset = Math.floor(img.width/2);
+    var w_offset = Math.floor(img.width/2)-1;
     if(!anchor_to_bottom){
       var h_offset = Math.floor(img.height/2)-1;
     } else {

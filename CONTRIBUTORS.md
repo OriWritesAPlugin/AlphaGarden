@@ -11,4 +11,16 @@ aprilofsnow: bunbuns, big_fountain, and pots'n_pans
 TwoPuffins: unicorns, grazing\_goats, and micro_goat
 Lixue: male\_cardinal, female\_cardinal, griffon\_vulture, and turkey_vulture
 Ico: summer\_col, winter\_col, autumn\_col, spring\_col
+RedRevival: Giant metal trees (!giant_copper, etc.)
+WynnDawnstrider: big_bones (plain, shaded, mossy, etc.)
 
+
+Plants
+------
+Note: plant numbers are 0-indexed to correspond to encoded plant info
+
+Xaotician: Tall cactus (64)
+RedRevival: Giant gem tree (65) and Giant tree (67) 
+
+
+Anything not credited here is almost definitely dev art by the repo creator. 
