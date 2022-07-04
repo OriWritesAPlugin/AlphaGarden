@@ -19,7 +19,8 @@
             "p": {"description": "3x 1 item", "points": 200, "category": "coli"},
             "q": {"description": "Free space", "points": 0, "category": "neutral"},
             "r": {"description": "Spend 5 min in coli", "points": 200, "category": "coli"},
-            "s": {"description": "Get something brown", "points": 100, "category": "coli"}
+            "s": {"description": "Get something brown", "points": 100, "category": "coli"},
+            "t": {"description": "5+ items", "points": 100, "category": "coli"}
                       }, "m": {
             "a": {"description": "Any apparel", "points": 350, "category": "coli"},
             "b": {"description": "Boss fight", "points": 250, "category": "coli"},
@@ -37,7 +38,9 @@
             "n": {"description": "Do square left or right", "points": 200, "category": "neutral"},
             "o": {"description": "Do 2 corner squares", "points": 200, "category": "neutral"},
             "p": {"description": "Spend 15 min in coli", "points": 600, "category": "coli"},
-            "q": {"description": "Exactly 6 different items", "points": 550, "category": "coli"}
+            "q": {"description": "Exactly 6 different items", "points": 550, "category": "coli"},
+            "r": {"description": "4-enemy pack", "points": 250, "category": "coli"},
+            "s": {"description": "7+ items", "points": 500, "category": "coli"}
                     }, "h": {
             "a": {"description": "Boss familiar", "points": 3000, "category": "coli"},
             "b": {"description": "Wing apparel", "points": 2500, "category": "coli"},
@@ -52,7 +55,7 @@
             "k": {"description": "Eliminate", "points": 3000, "category": "coli"},
             "l": {"description": "Swipp, Bald, or hibden fam", "points": 1600, "category": "coli"},
             "m": {"description": "Spend 30 min in coli", "points": 1200, "category": "coli"},
-            "n": {"description": "3x openable at once", "points": 300, "category": "coli"}
+            "n": {"description": "2x openable at once", "points": 300, "category": "coli"}
                   }, "s": {
             "a": {"description": "Drink a glass of water", "points": 100, "category": "self-care"},
             "b": {"description": "Head outside", "points": 100, "category": "self-care"},
@@ -295,7 +298,7 @@
             var scale_ctx = scale_canvas.getContext("2d");
             scale_ctx.imageSmoothingEnabled = false;
             scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
-            revealed_seeds.push(encode_plant_data(plant_data));
+            revealed_seeds.push(encode_plant_data_v2(plant_data));
             document.getElementById("seed_list").innerHTML = revealed_seeds.join(", ");
             return scale_canvas.toDataURL();
         }

@@ -21,7 +21,6 @@ var refs = {};
 
 // Javascript can't access images by path.
 // This workaround is hideous, but what can ya do :) (while hosting to github and not using ajax, I mean)
-//0-indexed count: 60
 all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.png", "https://i.imgur.com/wsC3ifp.png",
                "https://i.imgur.com/NFM09J5.png", "https://i.imgur.com/urBlTiV.png", "https://i.imgur.com/kyfs2Yl.png",
                "https://i.imgur.com/nMW2bBb.png", "https://i.imgur.com/tBQb6yy.png", "https://i.imgur.com/5j6u58a.png",
@@ -46,7 +45,8 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                 // Row below is zero-indexed 60, 61, 62
                "https://i.imgur.com/IvZmYJ0.png", "https://i.imgur.com/5CYK3pl.png", "https://i.imgur.com/JfQb93F.png",
                "https://i.imgur.com/HaOVemI.png", "https://i.imgur.com/FSFBSlo.png", "https://i.imgur.com/cgkP5B6.png",
-               "https://i.imgur.com/DynbJCl.png", "https://i.imgur.com/k9w5afZ.png"];
+               "https://i.imgur.com/DynbJCl.png", "https://i.imgur.com/k9w5afZ.png", "https://i.imgur.com/CGp6xFF.png",
+               "https://i.imgur.com/tASn4zC.png", "https://i.imgur.com/Muj9pgt.png"];
 
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
@@ -162,7 +162,7 @@ async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, c
     // Wondering if the shared ctx save/reload and use of async-await is giving me the "floating flowers" issue in here.
     // I may revisit (and mirror the final canvas instead), but it feels like overkill for now.
     img = refs[img_url];
-    var w_offset = Math.floor(img.width/2)-1;
+    var w_offset = Math.floor(img.width/2);
     if(!anchor_to_bottom){
       var h_offset = Math.floor(img.height/2)-1;
     } else {
@@ -330,18 +330,41 @@ function encode_plant_data(plant_data) {
     return Base64.fromInt(part_one)+Base64.fromInt(part_two);
 }
 
+function encode_plant_data_v2(plant_data) {
+    function to_padstr(entry){
+        return String(plant_data[entry]).padStart(3, '0');
+    }
+    function to_lesser_padstr(entry){
+        return String(plant_data[entry]).padStart(2, '0');
+    }
+    var part_one = parseInt("2"+to_padstr("foliage")+to_padstr("foliage_palette")+to_lesser_padstr("simple_feature"));
+    var part_two = parseInt("2"+to_padstr("feature_palette")+to_padstr("accent_palette")+to_lesser_padstr("complex_feature"));
+    return Base64.fromInt(part_one)+Base64.fromInt(part_two);
+}
+
 
 function decode_plant_data(plant_data) {
     // Conversion city baybeee
     // Might be able to do something clever with mods instead, but we'll check performance first
     var part_one = String(Base64.toInt(plant_data.slice(0,5)));
     var part_two = String(Base64.toInt(plant_data.slice(5)));
+    // alert("Part one"+part_one+" Part two: "+part_two);
+    if(parseInt(part_one.slice(0,1))==2){
     return {"foliage": parseInt(part_one.slice(1,4)),
+            "foliage_palette": parseInt(part_one.slice(4,7)),
+            "simple_feature": parseInt(part_one.slice(7,9)),
+            "feature_palette": parseInt(part_two.slice(1,4)),
+            "accent_palette": parseInt(part_two.slice(4,7)),
+            "complex_feature": parseInt(part_two.slice(7,9))
+           }
+    } else {
+     return {"foliage": parseInt(part_one.slice(1,4)),
             "simple_feature": parseInt(part_one.slice(4,7)),
             "complex_feature": parseInt(part_one.slice(7,10)),
             "foliage_palette": parseInt(part_two.slice(1,4)),
             "feature_palette": parseInt(part_two.slice(4,7)),
             "accent_palette": parseInt(part_two.slice(7,10))}
+    }
 }
 
 // Stolen from https://stackoverflow.com/questions/6213227/fastest-way-to-convert-a-number-to-radix-64-in-javascript

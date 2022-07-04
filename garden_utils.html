@@ -92,7 +92,7 @@
                 if(Math.random() >= 0.5){child_data[keyname] = plant_1[keyname];}
                 else {child_data[keyname] = plant_2[keyname];}
             }
-            last_child_seed = encode_plant_data(child_data);
+            last_child_seed = encode_plant_data_v2(child_data);
             last_child_canvas = await gen_plant(child_data);
             ctx.drawImage(last_child_canvas, 0, 0, 64, 64);
         }
@@ -124,7 +124,7 @@
                 ret_canvas = await gen_plant(plant_data);
             }
             ctx.drawImage(ret_canvas, 0, 0, 64, 64);
-            document.getElementById("output_text").innerHTML = encode_plant_data(plant_data);
+            document.getElementById("output_text").innerHTML = encode_plant_data_v2(plant_data);
         }
 
         async function analyze_seed() {
@@ -219,9 +219,13 @@
             seed = seed.slice(0,9)+"...";
           }
         } else {
-        var plant_canvas = await gen_plant(decode_plant_data(seed)); // Maybe I should just scale the plants up in gen_plant...
-        scale_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
+        if(seed.length != 10){
+          alert("You seem to have a malformed seed! Seeds are 10 characters long, but got \""+seed+"\". Skipping!");
         }
+        else {
+          var plant_canvas = await gen_plant(decode_plant_data(seed)); // Maybe I should just scale the plants up in gen_plant...
+          scale_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
+        }}
         label.htmlFor = id;
         label.className = 'collection_label';
         label.appendChild(document.createTextNode(seed));
