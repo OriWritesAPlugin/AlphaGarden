@@ -20,7 +20,10 @@
             "q": {"description": "Free space", "points": 0, "category": "neutral"},
             "r": {"description": "Spend 5 min in coli", "points": 200, "category": "coli"},
             "s": {"description": "Get something brown", "points": 100, "category": "coli"},
-            "t": {"description": "5+ items", "points": 100, "category": "coli"}
+            "t": {"description": "5+ items", "points": 100, "category": "coli"},
+            "u": {"description": "Battle enemy + palette swap", "points": 100, "category": "coli"},
+            "v": {"description": "Get something red", "points": 100, "category": "coli"},
+            "w": {"description": "Item + its recolor", "points": 100, "category": "coli"},
                       }, "m": {
             "a": {"description": "Any apparel", "points": 350, "category": "coli"},
             "b": {"description": "Boss fight", "points": 250, "category": "coli"},
@@ -40,10 +43,13 @@
             "p": {"description": "Spend 15 min in coli", "points": 600, "category": "coli"},
             "q": {"description": "Exactly 6 different items", "points": 550, "category": "coli"},
             "r": {"description": "4-enemy pack", "points": 250, "category": "coli"},
-            "s": {"description": "7+ items", "points": 500, "category": "coli"}
+            "s": {"description": "7+ TOTAL items", "points": 500, "category": "coli"},
+            "t": {"description": "Max breath on all attackers", "points": 300, "category": "coli"},
+            "u": {"description": "Get a rock", "points": 200, "category": "coli"},
+            //"v": {"description": "15 of any item", "points": 500, "category": "coli"},
                     }, "h": {
             "a": {"description": "Boss familiar", "points": 3000, "category": "coli"},
-            "b": {"description": "Wing apparel", "points": 2500, "category": "coli"},
+            "b": {"description": "Wing or body apparel", "points": 2500, "category": "coli"},
             "c": {"description": "Runestone", "points": 2500, "category": "coli"},
             "d": {"description": "Deity doll", "points": 2500, "category": "coli"},
             "e": {"description": "Ambush or rally stone", "points": 1000, "category": "coli"},
@@ -55,7 +61,16 @@
             "k": {"description": "Eliminate", "points": 3000, "category": "coli"},
             "l": {"description": "Swipp, Bald, or hibden fam", "points": 1600, "category": "coli"},
             "m": {"description": "Spend 30 min in coli", "points": 1200, "category": "coli"},
-            "n": {"description": "2x openable at once", "points": 300, "category": "coli"}
+            "n": {"description": "2x openable at once", "points": 800, "category": "coli"},
+            "o": {"description": "2 crits in a row", "points": 800, "category": "coli"},
+            "p": {"description": "Head, limb, or tail apparel", "points": 1200, "category": "coli"},
+            "q": {"description": "Clan element familiar", "points": 1200, "category": "coli"},
+            "r": {"description": "7+ DISTINCT items", "points": 800, "category": "coli"},
+            "s": {"description": "3+ different food types", "points": 800, "category": "coli"},
+            "t": {"description": "5+ items of different colors", "points": 800, "category": "coli"},
+            "u": {"description": "Clan elem battle stone", "points": 1000, "category": "coli"},
+            "w": {"description": "Familiar of favorite color", "points": 500, "category": "coli"},
+            "x": {"description": "Neutral elem battle stone", "points": 500, "category": "coli"},
                   }, "s": {
             "a": {"description": "Drink a glass of water", "points": 100, "category": "self-care"},
             "b": {"description": "Head outside", "points": 100, "category": "self-care"},
