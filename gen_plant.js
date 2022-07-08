@@ -46,7 +46,9 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/IvZmYJ0.png", "https://i.imgur.com/5CYK3pl.png", "https://i.imgur.com/JfQb93F.png",
                "https://i.imgur.com/HaOVemI.png", "https://i.imgur.com/FSFBSlo.png", "https://i.imgur.com/cgkP5B6.png",
                "https://i.imgur.com/DynbJCl.png", "https://i.imgur.com/k9w5afZ.png", "https://i.imgur.com/CGp6xFF.png",
-               "https://i.imgur.com/tASn4zC.png", "https://i.imgur.com/Muj9pgt.png"];
+               "https://i.imgur.com/tASn4zC.png", "https://i.imgur.com/Muj9pgt.png", "https://i.imgur.com/FL4BAHX.png",
+               "https://i.imgur.com/qqUgOYg.png", "https://i.imgur.com/LAQZ4s7.png", "https://i.imgur.com/9NyqPmf.png",
+               "https://i.imgur.com/dbS96tA.png", "https://i.imgur.com/1Y5ls06.png"];
 
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
@@ -74,8 +76,8 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "bleached_skull": "https://i.imgur.com/kIgNges.png", "bleached_ribs": "https://i.imgur.com/gb5h2ct.png", "burnt_skull": "https://i.imgur.com/swmqdOf.png", "burnt_ribs": "https://i.imgur.com/yCHsvce.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
-common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69];
-uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50, 51, 52, 54, 60, 63, 66, 67]);
+common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76];
+uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72]);
 rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65, 70]);
 boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
@@ -87,8 +89,6 @@ all_features = ["https://i.imgur.com/G4h84Ht.png", "https://i.imgur.com/vXQYMkL.
 var simple_features = [0, 1];
 var complex_features = [2, 3];
 
-
-// zero-indexed count: 55
 var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a", "66732a", "4b692f"],
                     ["7ad8b7", "5eb995", "3e946d", "277b50"], ["9dbb86", "679465", "476f58", "2f4d47"],
                     ["8fbe99", "679465", "3f7252", "215a3f"], ["fdff07", "b9d50f", "669914", "34670b"],
@@ -118,7 +118,8 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
                     // next row is zero-indexed 50, 51
                     ["f6cfec", "eca9ee", "cd86e6", "ab6ce0"], ["ffd2c6", "ffb39c", "ff8e69", "f87e4a"],
                     ["684e39", "513522", "391e10", "1f0c03"], ["fce382", "ebab8a", "dc5890", "b027a1"],
-                    ["71f4a3", "68dbba", "4cb1c4", "3c7fb2"], ["c5e9fc", "b5c1fa", "a494f8", "9163f5"]];
+                    ["71f4a3", "68dbba", "4cb1c4", "3c7fb2"], ["c5e9fc", "b5c1fa", "a494f8", "9163f5"],
+                    ["f83234", "c92637", "841732", "560e27"]];
                     
 
 // There's three types of palette:
@@ -127,21 +128,19 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
 // Accent: Think of the tertiary. Has bonus loud, bright colors that would look garish in a patch. Tone used for flowers (eventually)
 
 // Note that some common foliage colors are double-weighted because they're very nice greens :)
-var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 18, 21, 21, 22, 23, 29, 30, 30, 41, 42, 43, 44, 45, 49];
+var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 18, 21, 21, 22, 23, 29, 30, 30, 41, 42, 43, 44, 45, 49, 56, 11];
 common_foliage_palettes = common_foliage_palettes.concat(common_foliage_palettes);  // Cheap greenery boost
 var common_accent_palettes = [19, 20, 35, 36, 37, 38, 39, 40];
 var common_feature_palettes = [1, 20, 29, 32, 33, 34, 52];
 var uncommon_palettes = [9, 10, 11, 12, 13, 14, 15, 18, 24, 25, 38, 46, 47, 50, 55];
 var rare_palettes = [16,  17, 26, 27, 28, 30, 31, 48, 51, 53, 54];
 
-/*common_foliage_palettes = [10];
+// Used for entirely overwriting the pools to force certain plants
+/*common_foliage_palettes = [56, 11];
 uncommon_palettes = [];
 rare_palettes = [];
 common_feature_palettes = [10];
 common_accent_palettes = [38, 54];*/
-
-//common_foliage_palettes = common_foliage_palettes.concat([50, 54, 54, 54, 27, 27, 27, 31, 31, 31, 53, 15, 15, 15])
-
 
 var uncommon_foliage_palettes = common_foliage_palettes.concat(uncommon_palettes);
 var rare_foliage_palettes = uncommon_foliage_palettes.concat(rare_palettes);
@@ -154,6 +153,12 @@ var rare_accent_palettes = uncommon_accent_palettes.concat(rare_palettes);
 
 // Universal use, removes chance of getting common palettes
 var boosted_rare_palettes = uncommon_palettes.concat(rare_palettes);
+
+// Used for boosting rates when I'm generating lots of plants
+/*var boost_with = [46, 46, 46, 46, 46, 46, 50, 50, 50, 50, 50, 50, 51, 51, 51, 51, 51, 17, 17, 17, 17, 17, 56, 56, 56, 56, 11, 11, 11, 56, 56, 56, 56, 11, 11, 11, 56, 56, 30, 30, 30, 30, 30, 54, 54, 54, 54]
+rare_foliage_palettes.concat(boost_with);
+rare_feature_palettes.concat(boost_with);
+rare_accent_palettes.concat(boost_with);*/
 
 
 async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, chance, anchor_to_bottom=false){
@@ -437,18 +442,15 @@ async function gen_plant(plant_data) {
 
     // Place the features
     if(simple_feature_coords.length > 0){
-        var place_simple = place_image_at_coords_with_chance(plant_data["simple_feature"], simple_feature_coords, work_ctx, 0.5);
+        var place_simple = await place_image_at_coords_with_chance(plant_data["simple_feature"], simple_feature_coords, work_ctx, 0.5);
     }
     if(complex_feature_coords.length > 0){
         /* Chance that if there's already simple flowers, we keep using that flower
         if(simple_flower_coords.length == 0 || Math.random()>0.5){
             flower_url = complex_flowers[Math.floor(Math.random()*complex_flowers.length)];
         } else {*/
-        var place_complex = place_image_at_coords_with_chance(plant_data["complex_feature"], complex_feature_coords, work_ctx, 0.8, true);
+        var place_complex = await place_image_at_coords_with_chance(plant_data["complex_feature"], complex_feature_coords, work_ctx, 0.8, true);
     }
-
-    await place_simple
-    await place_complex
 
     // We do all the recolors at once because Speed?(TM)?
     var new_overall_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);

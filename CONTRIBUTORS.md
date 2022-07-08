@@ -19,8 +19,8 @@ Plants
 ------
 Note: plant numbers are 0-indexed to correspond to encoded plant info
 
-Xaotician: Tall cactus (64)
-RedRevival: Giant gem tree (65) and Giant tree (67) 
+Xaotician: Tall cactus (64), baobab (72), acacia (73), mini acacia (74), giant echinacea (75)
+RedRevival: Giant gem tree (65), giant tree (67), berry bush (76)
 
 
 Anything not credited here is almost definitely dev art by the repo creator. 
