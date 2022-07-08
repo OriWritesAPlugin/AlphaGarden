@@ -57,6 +57,8 @@
                     <label for="accent">Accent</label>
                     </br></br>
                     <input type="button" class="chunky_wrap" value="Display collection" onClick="display_collection()">
+                    <input id="hide_seeds" type="checkbox" class="chunky_wrap" value="Hide seeds">
+                    <label for="hide_seeds">Number Seeds</label>
                     <br><br>
                     <div id="collection_display_div" width="450"></div>
                 </div>
@@ -154,6 +156,7 @@
         async function display_collection() {
             //clear what's already in there
             var collection_div = document.getElementById("collection_display_div")
+            var hide_seeds = document.getElementById("hide_seeds").checked
             while (collection_div.lastChild) {collection_div.removeChild(collection_div.lastChild);}
             var collection = document.getElementById("seed_collection").value.split(" ").join("").replace(/(^,)|(,$)|"/g, '').split(",");
             var sort_order_elem = document.getElementsByName('sort_order');
@@ -173,7 +176,7 @@
               collection_div.appendChild(new_row);
               for(var j=0; j < collection_width; j++){
                 if(!collection[i+j]){return;}
-                await add_collection_entry(new_row, i, j, collection[i+j])
+                await add_collection_entry(new_row, i, j, collection[i+j], hide_seeds)
               }
            }
        }
@@ -194,7 +197,7 @@
         });
       }
 
-      async function add_collection_entry(parent, column, row, seed){
+      async function add_collection_entry(parent, column, row, seed, hide_seed){
         var id = column + "_" + row;
         var entry = document.createElement('div');
         entry.id = id;
@@ -228,7 +231,8 @@
         }}
         label.htmlFor = id;
         label.className = 'collection_label';
-        label.appendChild(document.createTextNode(seed));
+        if(hide_seed){text_content = column+row+1;} else {text_content = seed;}
+        label.appendChild(document.createTextNode(text_content));
         entry.appendChild(label);
         entry.appendChild(scale_canvas);
         parent.appendChild(entry);
