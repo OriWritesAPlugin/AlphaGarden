@@ -159,6 +159,8 @@ var boosted_rare_palettes = uncommon_palettes.concat(rare_palettes);
 rare_foliage_palettes.concat(boost_with);
 rare_feature_palettes.concat(boost_with);
 rare_accent_palettes.concat(boost_with);*/
+// Used for replacing ALL foliage colors...
+//rare_foliage_palettes = [56];
 
 
 async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, chance, anchor_to_bottom=false){
@@ -198,11 +200,9 @@ async function preload_all_images()
 
 // Sound of me not being 100% confident in my async usage yet
 async function preload_single_image(url){
-    var img=new Image();
-    img.src=url;
-    img.crossOrigin = "anonymous"
-    var loaded_img = img.decode();  // To throw it in mem without blocking?
-    return img
+    return fetch(url)
+           .then(response => response.blob())
+           .then(blob => createImageBitmap(blob));
 }
 
 // We have things like foliage, colors, and features that exist in "master lists"
