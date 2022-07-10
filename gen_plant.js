@@ -73,7 +73,8 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "shale_cairn": "https://i.imgur.com/mPCJ6xK.png", "limestone_cairn": "https://i.imgur.com/YY3aAhM.png", "obsidian_cairn": "https://i.imgur.com/z85y3DB.png", "aventurine_cairn": "https://i.imgur.com/xfoVNh6.png",
              "shale_spring": "https://i.imgur.com/SS5wlwB.png", "limestone_spring": "https://i.imgur.com/YvFBGtb.png", "obsidian_spring": "https://i.imgur.com/HDguTqn.png","aventurine_spring": "https://i.imgur.com/aqWObIl.png", 
              "simple_fence": "https://i.imgur.com/WE4YzQb.png", "simple_fence_broken": "https://i.imgur.com/E1E1q3w.png", "simple_signpost": "https://i.imgur.com/LrdkTBi.png", "shale_birdbath": "https://i.imgur.com/7P7OqPQ.png",
-             "bleached_skull": "https://i.imgur.com/kIgNges.png", "bleached_ribs": "https://i.imgur.com/gb5h2ct.png", "burnt_skull": "https://i.imgur.com/swmqdOf.png", "burnt_ribs": "https://i.imgur.com/yCHsvce.png"};
+             "bleached_skull": "https://i.imgur.com/kIgNges.png", "bleached_ribs": "https://i.imgur.com/gb5h2ct.png", "burnt_skull": "https://i.imgur.com/swmqdOf.png", "burnt_ribs": "https://i.imgur.com/yCHsvce.png",
+             "lawn_deco": "https://i.imgur.com/A5SsKVL.png", "lawn_sin": "https://i.imgur.com/hAqeR7Z.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
 common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76];

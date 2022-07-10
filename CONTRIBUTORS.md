@@ -13,6 +13,7 @@ Lixue: male\_cardinal, female\_cardinal, griffon\_vulture, and turkey_vulture
 Ico: summer\_col, winter\_col, autumn\_col, spring\_col
 RedRevival: Giant metal trees (!giant_copper, etc.)
 WynnDawnstrider: big_bones (plain, shaded, mossy, etc.)
+Xaotician: lawn\_deco, lawn\_sin
 
 
 Plants
