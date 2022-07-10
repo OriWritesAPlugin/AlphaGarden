@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<!--This was created for Nature Dominance, then repurposed for "an endless garden". Don't redistribute or reskin. Thank you!-->
+<html>
+    <meta charset="utf-8"/>
+    <head>
+        <link rel="stylesheet" type="text/css"  href="nature.css" />
+        <style>
+        body {
+            background: #2f1847; /* fallback for old browsers */
+            background: linear-gradient(to right, #240f3a, #8d5185); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        }
+        .bingo_box {
+            border-color: #cfa8ca;
+        }
+        </style>
+        <title>To-Do List</title>
+    </head>
+    <body onload="do_setup()">
+        <div class='center-parent' style="display: flex">
+        <div id="plant_div_1" class='bingo_row' style="width: 10%; flex-direction: column"></div>
+        <div>
+          <label id="smaller-title"><b>To-Do:</b></label>
+          <p id="seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> earned yet!</p>
+        <div id="task_div_1"><ul class="ul_no_bullets">
+            <li>
+                    <input type="checkbox" class="todo_checkbox" id="task_1" /> 
+                    <span class="dotted-fill-in" contenteditable=true> </span>
+                    <select id="task_1_reward">
+                      <option value=1 selected>1</option>
+                      <option value=2>2</option>
+                      <option value=3>3</option>
+                      <option value=4>4</option>
+                      <option value=5>5</option>
+                      <option value=6>6</option>
+                      <option value=7>7</option>
+                      <option value=8>8</option>
+                    </select>
+            </li>
+            <li>
+                    <input type="checkbox" class="todo_checkbox" id="task_2" />
+                    <label class="dotted-fill-in" contenteditable=true></label>
+                    <select id="task_2_reward">
+                      <option value=1>1</option>
+                      <option value=2 selected>2</option>
+                      <option value=3>3</option>
+                      <option value=4>4</option>
+                      <option value=5>5</option>
+                      <option value=6>6</option>
+                      <option value=7>7</option>
+                      <option value=8>8</option>
+                    </select>
+            </li>
+            <li>
+                    <input type="checkbox" class="todo_checkbox" id="task_3" />
+                    <label class="dotted-fill-in" contenteditable=true></label>
+                    <select id="task_3_reward">
+                      <option value=1>1</option>
+                      <option value=2>2</option>
+                      <option value=3 selected>3</option>
+                      <option value=4>4</option>
+                      <option value=5>5</option>
+                      <option value=6>6</option>
+                      <option value=7>7</option>
+                      <option value=8>8</option>
+                    </select>
+            </li>
+            <li>
+                    <input type="checkbox" class="todo_checkbox" id="task_4" />
+                    <label class="dotted-fill-in" contenteditable=true></label>
+                    <select id="task_4_reward">
+                      <option value=1>1</option>
+                      <option value=2>2</option>
+                      <option value=3>3</option>
+                      <option value=4 selected>4</option>
+                      <option value=5>5</option>
+                      <option value=6>6</option>
+                      <option value=7>7</option>
+                      <option value=8>8</option>
+                    </select>
+            </li>
+            <li>
+                    <input type="checkbox" class="todo_checkbox" id="task_5" />
+                    <label class="dotted-fill-in" contenteditable=true></label>
+                    <select id="task_5_reward">
+                      <option value=1>1</option>
+                      <option value=2>2</option>
+                      <option value=3>3</option>
+                      <option value=4>4</option>
+                      <option value=5 selected>5</option>
+                      <option value=6>6</option>
+                      <option value=7>7</option>
+                      <option value=8>8</option>
+                    </select>
+            </li>
+          </ul></div>
+        <div id="task_div_2"><ul class="ul_no_bullets">
+            <li>
+                    <input type="checkbox" class="todo_checkbox" id="task_6" />
+                    <label class="dotted-fill-in" contenteditable=true></label>
+                    <select id="task_6_reward">
+                      <option value=9 selected>9</option>
+                      <option value=10>10</option>
+                      <option value=11>11</option>
+                      <option value=12>12</option>
+                      <option value=13>13</option>
+                      <option value=14>14</option>
+                      <option value=15>15</option>
+                      <option value=16>16</option>
+                    </select>
+            </li>
+            <li>
+                    <input type="checkbox" class="todo_checkbox" id="task_7" />
+                    <label class="dotted-fill-in" contenteditable=true></label>
+                    <select id="task_7_reward">
+                      <option value=9>9</option>
+                      <option value=10 selected>10</option>
+                      <option value=11>11</option>
+                      <option value=12>12</option>
+                      <option value=13>13</option>
+                      <option value=14>14</option>
+                      <option value=15>15</option>
+                      <option value=16>16</option>
+                    </select>
+            </li>
+            <li>
+                    <input type="checkbox" class="todo_checkbox" id="task_8" />
+                    <label class="dotted-fill-in" contenteditable=true></label>
+                    <select id="task_8_reward">
+                      <option value=9>9</option>
+                      <option value=10>10</option>
+                      <option value=11 selected>11</option>
+                      <option value=12>12</option>
+                      <option value=13>13</option>
+                      <option value=14>14</option>
+                      <option value=15>15</option>
+                      <option value=16>16</option>
+                    </select>
+            </li>
+            <li>
+                    <input type="checkbox" class="todo_checkbox" id="task_9" />
+                    <label class="dotted-fill-in" contenteditable=true></label>
+                    <select id="task_9_reward">
+                      <option value=9>9</option>
+                      <option value=10>10</option>
+                      <option value=11>11</option>
+                      <option value=12 selected>12</option>
+                      <option value=13>13</option>
+                      <option value=14>14</option>
+                      <option value=15>15</option>
+                      <option value=16>16</option>
+                    </select>
+            </li>
+            <li>
+                    <input type="checkbox" class="todo_checkbox" id="task_10" />
+                    <label class="dotted-fill-in" contenteditable=true></label>
+                    <select id="task_10_reward">
+                      <option value=9>9</option>
+                      <option value=10>10</option>
+                      <option value=11>11</option>
+                      <option value=12>12</option>
+                      <option value=13 selected>13</option>
+                      <option value=14>14</option>
+                      <option value=15>15</option>
+                      <option value=16>16</option>
+                    </select>
+            </li>
+          </ul></div></div>
+        <div id="plant_div_2" class='bingo_row' style="width: 10%; flex-direction: column"></div>
+    </body>
+    <script src="gen_plant.js"></script>
+    <script src="bingo.js"></script>
+    <script type="text/javascript">
+
+    // This piece only adds animations if the browser supports it. We need it for the "bubble up" animation.
+    if (document.body.animate) {
+      const nodeList = document.querySelectorAll('.todo_checkbox')
+      for (let i = 0; i < nodeList.length; i++) {
+        nodeList[i].addEventListener('change', bubble_up);
+      }
+    }
+
+    const d = new Date();
+
+    var forced_random_seed = d.getDate().toString()+d.getMonth().toString()+d.getFullYear().toString()+"salt";  // Nyehehehh
+    var current_difficulty = "Self-Care";  // Reusing a lot of code to get this done in time.
+    var num_plants_revealed = 0;
+    var seeds_generated = [];
+    var seeds_earned = [];
+    var second_set_revealed = false;
+
+    async function do_setup(){
+        await preload_all_images();
+        await generate_list(1);
+        generate_list(2);
+    }
+
+    // Despite any sane person's reasoning, this does not actually generate the checkbox list.
+    // It's intended to but it's very late and the siren song of copy-paste got me.
+    // TODO: fix this.
+    async function generate_list(list_num){
+        let num_plants = 8;
+        let num_tasks = 5;
+        var container = document.getElementById("task_div_"+list_num);
+        var plant_container = document.getElementById("plant_div_"+list_num);
+        // Generate the plants
+        let initial_num_plants_revealed = num_plants_revealed;
+        for(var i=initial_num_plants_revealed; i < initial_num_plants_revealed+num_plants; i++){
+          let new_plant_box = document.createElement('div');
+          let new_plant_box_id = "plant_box_"+list_num+"_"+i;
+          new_plant_box.className = "bingo_plant_box";
+          new_plant_box.id = new_plant_box_id;
+          let data_url = await genToDoPlant();
+          new_plant_box.style.background = 'url(' + data_url + ')  no-repeat center center';
+          let label = document.createElement('label')
+          label.htmlFor = new_plant_box_id;
+          label.className = 'bingo_label';
+          label.appendChild(document.createTextNode(i+1));
+          new_plant_box.appendChild(label);
+          plant_container.appendChild(new_plant_box);
+          num_plants_revealed ++;
+        }    
+    }
+
+    // This next bit was shamelessly stolen from https://css-tricks.com/playing-with-particles-using-the-web-animations-api/
+    // Genuinely learning a lot here...maybe I'll even learn Javascript some day? :)
+    // But really, it's a fantastic tutorial. I should (TODO) revisit when I have more time.
+    function bubble_up(e) {
+      // NO GOIN' BACK
+      if(!e.target.checked){
+        e.target.checked = true;
+        return;
+      }
+      // Add the reward seed
+      chosen_reward = document.getElementById(e.target.id+"_reward").value-1;  // Account for 1-idx
+      seeds_earned.push(seeds_generated[chosen_reward]);
+      document.getElementById("seed_list").innerHTML = seeds_earned.join(", ");
+      // Loop to generate the particles
+      for (let i = 0; i < 90; i++) {
+        // We root them to a random location slightly below the bottom of the window
+        createParticle(Math.random() * window.innerWidth, window.scrollY + window.innerHeight + 10);
+      }
+    }
+    function createParticle(x, y) {
+      // Create a custom particle element
+      const particle = document.createElement('particle');
+      // Append the element into the body
+      document.body.appendChild(particle);
+      // Calculate a random size from 10px to 40px
+      const size = Math.floor(Math.random() * 30 + 10);
+      // Apply the size on each particle
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      // Generate a random color in a purple/pink palette
+      // TODO: would be cute to pull from the reward plant's palette
+      particle.style.background = `hsl(${Math.random() * 90 + 240}, 50%, 80%)`;
+      // Generate a random y destination within a distance of 300px from the bottom of the screen
+      const destinationX = x;  // TODO: dumb
+      const destinationY = y - Math.random() * 250 - 50;
+
+      // Store the animation in a variable because we will need it later
+      const animation = particle.animate([
+        {
+          // Set the origin position of the particle
+          // We offset the particle with half its size to center it
+          transform: `translate(${x - (size / 2)}px, ${y - (size / 2)}px)`,
+          opacity: 1
+        },
+        {
+          // We define the final coordinates as the second keyframe
+          transform: `translate(${destinationX}px, ${destinationY}px)`,
+          opacity: 0
+        }
+      ], {
+        // Set a random duration from 2000 to 4000ms
+        duration: 2000 + Math.random() * 2000,
+        easing: 'cubic-bezier(0, .9, .57, 1)',
+        // Delay every particle with a random value from 0ms to 200ms
+        delay: Math.random() * 200
+      });
+      animation.onfinish = () => {
+        particle.remove();
+      };
+    }
+
+    // TODO: Almost identical to genPlantInSquare from bingo.js. I could use a common.js
+    async function genToDoPlant(){
+        plant_data = gen_plant_data(7, forced_random_seed+String(num_plants_revealed));
+        seeds_generated.push(encode_plant_data_v2(plant_data));
+        plant_canvas = await gen_plant(plant_data);
+        // TODO: This next scaling bit (still) seems incredibly silly
+        var scale_canvas = document.createElement("canvas");
+        scale_canvas.width = 96;
+        scale_canvas.height = 96;
+        var scale_ctx = scale_canvas.getContext("2d");
+        scale_ctx.imageSmoothingEnabled = false;
+        scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
+        return scale_canvas.toDataURL();
+    }
+
+    </script>
+</html>

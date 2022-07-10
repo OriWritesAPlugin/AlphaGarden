@@ -40,7 +40,7 @@ a {
    align-content: center;
 }
 
-.bingo_box, .bingo_plant_box {
+.bingo_box, .bingo_plant_box, .to_do_plant_box {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -62,6 +62,10 @@ a {
     margin: 0 auto;
 }
 
+.to_do_plant_box {
+    flex-direction: column;
+}
+
 .bingo_label {
   word-wrap: break-word;
   pointer-events: none;
@@ -72,6 +76,43 @@ a {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.dotted-fill-in {
+    border-bottom-color: #ffffff;
+    border-bottom-style: dashed;
+    border-bottom-width: thin;
+    display: inline-block;
+    padding-top: 4vh;
+    min-width: 40vw;
+    vertical-align: middle;
+}
+
+.todo_checkbox {
+  accent-color: #81309c;
+  transform: scale(3);
+}
+
+.ul_no_bullets {
+  list-style-type: none;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+}
+
+particle {
+  border-radius: 50%;
+  left: 0;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  opacity: 0;
 }
 
 .name_div {padding: 5px 4px 3px 0px; width: 200px; text-align: right; border: none; color:white; margin: 0px; height: 100%; background: #272127;}
