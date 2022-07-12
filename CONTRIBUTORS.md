@@ -24,4 +24,11 @@ Xaotician: Tall cactus (64), baobab (72), acacia (73), mini acacia (74), giant e
 RedRevival: Giant gem tree (65), giant tree (67), berry bush (76)
 
 
-Anything not credited here is almost definitely dev art by the repo creator. 
+Anything not credited here is almost definitely dev art by the repo creator.
+
+
+
+Non-Art Assets
+--------------
+
+The noises on the to-do list were generated using JummBox (https://jummbus.bitbucket.io), developed by Jummbus

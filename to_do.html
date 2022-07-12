@@ -7,7 +7,7 @@
         <style>
         body {
             background: #2f1847; /* fallback for old browsers */
-            background: linear-gradient(to right, #240f3a, #8d5185); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            background: linear-gradient(to right, #240f3a, #572f5f); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
         }
         .bingo_box {
             border-color: #cfa8ca;
@@ -16,243 +16,163 @@
         <title>To-Do List</title>
     </head>
     <body onload="do_setup()">
-        <div class='center-parent' style="display: flex">
-        <div id="plant_div_1" class='bingo_row' style="width: 10%; flex-direction: column"></div>
+        <div class='center-parent'>
+          <p id="seed_list" style="margin: 0">Thanks for using the To-Do List! More <a href="https://www1.flightrising.com/forums/adopt/3112071">plants</a> appear as you go. The "hint" prompts are 100% optional. Good luck! :D</p>
+        </div>
+        <div class='center-parent' style="display: flex; justify-content: center">
+        <div id="plant_div_1" class='bingo_row' style="width: 10%; flex-direction: column; display:inline-block; vertical-align: top;"></div>
         <div>
-          <label id="smaller-title"><b>To-Do:</b></label>
-          <p id="seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> earned yet!</p>
-        <div id="task_div_1"><ul class="ul_no_bullets">
-            <li>
-                    <input type="checkbox" class="todo_checkbox" id="task_1" /> 
-                    <span class="dotted-fill-in" contenteditable=true> </span>
-                    <select id="task_1_reward">
-                      <option value=1 selected>1</option>
-                      <option value=2>2</option>
-                      <option value=3>3</option>
-                      <option value=4>4</option>
-                      <option value=5>5</option>
-                      <option value=6>6</option>
-                      <option value=7>7</option>
-                      <option value=8>8</option>
-                    </select>
-            </li>
-            <li>
-                    <input type="checkbox" class="todo_checkbox" id="task_2" />
-                    <label class="dotted-fill-in" contenteditable=true></label>
-                    <select id="task_2_reward">
-                      <option value=1>1</option>
-                      <option value=2 selected>2</option>
-                      <option value=3>3</option>
-                      <option value=4>4</option>
-                      <option value=5>5</option>
-                      <option value=6>6</option>
-                      <option value=7>7</option>
-                      <option value=8>8</option>
-                    </select>
-            </li>
-            <li>
-                    <input type="checkbox" class="todo_checkbox" id="task_3" />
-                    <label class="dotted-fill-in" contenteditable=true></label>
-                    <select id="task_3_reward">
-                      <option value=1>1</option>
-                      <option value=2>2</option>
-                      <option value=3 selected>3</option>
-                      <option value=4>4</option>
-                      <option value=5>5</option>
-                      <option value=6>6</option>
-                      <option value=7>7</option>
-                      <option value=8>8</option>
-                    </select>
-            </li>
-            <li>
-                    <input type="checkbox" class="todo_checkbox" id="task_4" />
-                    <label class="dotted-fill-in" contenteditable=true></label>
-                    <select id="task_4_reward">
-                      <option value=1>1</option>
-                      <option value=2>2</option>
-                      <option value=3>3</option>
-                      <option value=4 selected>4</option>
-                      <option value=5>5</option>
-                      <option value=6>6</option>
-                      <option value=7>7</option>
-                      <option value=8>8</option>
-                    </select>
-            </li>
-            <li>
-                    <input type="checkbox" class="todo_checkbox" id="task_5" />
-                    <label class="dotted-fill-in" contenteditable=true></label>
-                    <select id="task_5_reward">
-                      <option value=1>1</option>
-                      <option value=2>2</option>
-                      <option value=3>3</option>
-                      <option value=4>4</option>
-                      <option value=5 selected>5</option>
-                      <option value=6>6</option>
-                      <option value=7>7</option>
-                      <option value=8>8</option>
-                    </select>
-            </li>
-          </ul></div>
-        <div id="task_div_2"><ul class="ul_no_bullets">
-            <li>
-                    <input type="checkbox" class="todo_checkbox" id="task_6" />
-                    <label class="dotted-fill-in" contenteditable=true></label>
-                    <select id="task_6_reward">
-                      <option value=9 selected>9</option>
-                      <option value=10>10</option>
-                      <option value=11>11</option>
-                      <option value=12>12</option>
-                      <option value=13>13</option>
-                      <option value=14>14</option>
-                      <option value=15>15</option>
-                      <option value=16>16</option>
-                    </select>
-            </li>
-            <li>
-                    <input type="checkbox" class="todo_checkbox" id="task_7" />
-                    <label class="dotted-fill-in" contenteditable=true></label>
-                    <select id="task_7_reward">
-                      <option value=9>9</option>
-                      <option value=10 selected>10</option>
-                      <option value=11>11</option>
-                      <option value=12>12</option>
-                      <option value=13>13</option>
-                      <option value=14>14</option>
-                      <option value=15>15</option>
-                      <option value=16>16</option>
-                    </select>
-            </li>
-            <li>
-                    <input type="checkbox" class="todo_checkbox" id="task_8" />
-                    <label class="dotted-fill-in" contenteditable=true></label>
-                    <select id="task_8_reward">
-                      <option value=9>9</option>
-                      <option value=10>10</option>
-                      <option value=11 selected>11</option>
-                      <option value=12>12</option>
-                      <option value=13>13</option>
-                      <option value=14>14</option>
-                      <option value=15>15</option>
-                      <option value=16>16</option>
-                    </select>
-            </li>
-            <li>
-                    <input type="checkbox" class="todo_checkbox" id="task_9" />
-                    <label class="dotted-fill-in" contenteditable=true></label>
-                    <select id="task_9_reward">
-                      <option value=9>9</option>
-                      <option value=10>10</option>
-                      <option value=11>11</option>
-                      <option value=12 selected>12</option>
-                      <option value=13>13</option>
-                      <option value=14>14</option>
-                      <option value=15>15</option>
-                      <option value=16>16</option>
-                    </select>
-            </li>
-            <li>
-                    <input type="checkbox" class="todo_checkbox" id="task_10" />
-                    <label class="dotted-fill-in" contenteditable=true></label>
-                    <select id="task_10_reward">
-                      <option value=9>9</option>
-                      <option value=10>10</option>
-                      <option value=11>11</option>
-                      <option value=12>12</option>
-                      <option value=13 selected>13</option>
-                      <option value=14>14</option>
-                      <option value=15>15</option>
-                      <option value=16>16</option>
-                    </select>
-            </li>
-          </ul></div></div>
-        <div id="plant_div_2" class='bingo_row' style="width: 10%; flex-direction: column"></div>
+        <div id="task_div"><ul id="task_ul" class="ul_no_bullets"></ul></div></div>
+        <div id="plant_div_2" class='bingo_row' style="width: 10%; flex-direction: column; display:inline-block; vertical-align: top;"></div>
     </body>
     <script src="gen_plant.js"></script>
     <script src="bingo.js"></script>
     <script type="text/javascript">
 
-    // This piece only adds animations if the browser supports it. We need it for the "bubble up" animation.
-    if (document.body.animate) {
-      const nodeList = document.querySelectorAll('.todo_checkbox')
-      for (let i = 0; i < nodeList.length; i++) {
-        nodeList[i].addEventListener('change', bubble_up);
-      }
-    }
-
     const d = new Date();
+    const available_sounds = [new Audio("sounds/fsharp_3_bell.mp3"), new Audio("sounds/asharp_bell.mp3"),
+                              new Audio("sounds/csharp_bell.mp3"), new Audio("sounds/fsharp_4_bell.mp3")];
 
+    const num_tasks = 5;  // Number of tasks per task set
+    const fallback_colors = [[255, 102, 99], [254, 177, 68], [253, 253, 151], [158, 224, 158], [158, 193, 207], [204, 153, 201]];  // RGB colors to use if the plant sampler fails to find any
     var forced_random_seed = d.getDate().toString()+d.getMonth().toString()+d.getFullYear().toString()+"salt";  // Nyehehehh
     var current_difficulty = "Self-Care";  // Reusing a lot of code to get this done in time.
-    var num_plants_revealed = 0;
+    var task_sets_generated = 0;
     var seeds_generated = [];
-    var seeds_earned = [];
+    var plant_canvases = [];
     var second_set_revealed = false;
+    var resting_num_plants_revealed = 0;  // we need to do it this way since less plants are generated as time goes on.
+    const task_hints = Array("Done anything nice for yourself lately?", "Anyone you've been meaning to respond to?",
+                             "How are you doing on food?", "How go the hobbies as of late?", "Any meals you're excited for?",
+                             "Got anything coming up you'd want to prep for?", "How are you doing on deadlines, anything coming up?",
+                             "Anything you need picked up from the store?", "Ooh, how go the longterm projects?",
+                             "Any paperwork you have to get through?", "What're you're looking forward to?",
+                             "How's school/work going?", "Is there anything you've been meaning to tidy up?",
+                             "What're you thinking for the future? Any plans you're excited about?");
 
     async function do_setup(){
         await preload_all_images();
-        await generate_list(1);
-        generate_list(2);
+        generate_list();
     }
 
     // Despite any sane person's reasoning, this does not actually generate the checkbox list.
     // It's intended to but it's very late and the siren song of copy-paste got me.
     // TODO: fix this.
-    async function generate_list(list_num){
-        let num_plants = 8;
-        let num_tasks = 5;
-        var container = document.getElementById("task_div_"+list_num);
-        var plant_container = document.getElementById("plant_div_"+list_num);
+    async function generate_list(){
+        let num_plants = (task_sets_generated < 2 ? 8 : 5);
+        let rarity = (task_sets_generated < 2 ? 7 : 3);
+        let plant_div_num = 1;
+        if(task_sets_generated % 2 == 1){plant_div_num = 2};
+        var task_container = document.getElementById("task_ul");
+        var plant_container = document.getElementById("plant_div_"+plant_div_num);
         // Generate the plants
-        let initial_num_plants_revealed = num_plants_revealed;
-        for(var i=initial_num_plants_revealed; i < initial_num_plants_revealed+num_plants; i++){
+        for(let i=resting_num_plants_revealed; i < resting_num_plants_revealed+num_plants; i++){
           let new_plant_box = document.createElement('div');
-          let new_plant_box_id = "plant_box_"+list_num+"_"+i;
+          let new_plant_box_id = "plant_box_"+plant_div_num+"_"+i;
           new_plant_box.className = "bingo_plant_box";
           new_plant_box.id = new_plant_box_id;
-          let data_url = await genToDoPlant();
+          let data_url = await genToDoPlant(i, rarity);
           new_plant_box.style.background = 'url(' + data_url + ')  no-repeat center center';
           let label = document.createElement('label')
           label.htmlFor = new_plant_box_id;
-          label.className = 'bingo_label';
+          label.className = 'todo_plant_label';
           label.appendChild(document.createTextNode(i+1));
           new_plant_box.appendChild(label);
           plant_container.appendChild(new_plant_box);
-          num_plants_revealed ++;
-        }    
+        }   
+        // Generate the task box
+        let initial_num_tasks = task_sets_generated * num_tasks;
+        for(let i=initial_num_tasks; i < initial_num_tasks + num_tasks; i++){
+          let list_item = document.createElement("li");
+          let checkbox = document.createElement("input");
+          checkbox.type="checkbox";
+          checkbox.className = "todo_checkbox";
+          checkbox.id = "task_"+i;
+          if(document.body.animate) {checkbox.addEventListener('change', bubble_up);}
+          list_item.appendChild(checkbox);
+          let textbox = document.createElement("input");
+          textbox.className = "dotted-fill-in";
+          textbox.placeholder = task_hints[Math.floor(Math.random() * task_hints.length)];
+          list_item.appendChild(textbox);
+          let selectbox = document.createElement("select");
+          selectbox.id="task_"+i+"_reward";
+          selectbox.className = "fixed-width-selectbox";
+          let selectbox_selection = i-initial_num_tasks+resting_num_plants_revealed+1;  // The ith plant in the set, more or less.
+          if(task_sets_generated<2){
+              for(let j=resting_num_plants_revealed; j<resting_num_plants_revealed+num_plants; j++){
+                let opt = document.createElement('option');
+                opt.value = j+1;  // Human-friendly numbering.
+                opt.innerHTML = j+1;
+                selectbox.appendChild(opt);
+              }
+          } else {
+            let opt = document.createElement('option');
+            opt.value = selectbox_selection;
+            opt.innerHTML = selectbox_selection;
+            selectbox.appendChild(opt);
+            selectbox.disabled = true;
+          }
+          selectbox.value = selectbox_selection;
+          list_item.appendChild(selectbox);
+          task_container.appendChild(list_item);
+        }
+        resting_num_plants_revealed += num_plants;
+        task_sets_generated += 1;
     }
 
     // This next bit was shamelessly stolen from https://css-tricks.com/playing-with-particles-using-the-web-animations-api/
     // Genuinely learning a lot here...maybe I'll even learn Javascript some day? :)
     // But really, it's a fantastic tutorial. I should (TODO) revisit when I have more time.
     function bubble_up(e) {
-      // NO GOIN' BACK
+      do_update_check();
+      // no sparkle for you
       if(!e.target.checked){
-        e.target.checked = true;
+        available_sounds[Math.floor(Math.random() * available_sounds.length)].play();
         return;
       }
-      // Add the reward seed
-      chosen_reward = document.getElementById(e.target.id+"_reward").value-1;  // Account for 1-idx
-      seeds_earned.push(seeds_generated[chosen_reward]);
-      document.getElementById("seed_list").innerHTML = seeds_earned.join(", ");
-      // Loop to generate the particles
-      for (let i = 0; i < 90; i++) {
+      
+      let base_palette = samplePlantColor(parseInt(e.target.id.slice(5)));
+      for (let i = 0; i < 75; i++) {
         // We root them to a random location slightly below the bottom of the window
-        createParticle(Math.random() * window.innerWidth, window.scrollY + window.innerHeight + 10);
+        createPlantParticle(Math.random() * window.innerWidth, window.innerHeight + 10, base_palette);
       }
     }
-    function createParticle(x, y) {
+
+    // Update our list of earned seeds and add a new set of to-dos if necessary.
+    function do_update_check() {
+      let total_tasks = task_sets_generated * num_tasks;
+      let checkboxes_checked = 0;
+      let seeds_earned = [];
+      for(let i=0; i<total_tasks; i++){
+        checkbox = document.getElementById("task_"+i);
+        if(checkbox.checked){
+          checkboxes_checked ++;
+          seeds_earned.push(seeds_generated[document.getElementById("task_"+i+"_reward").value]);
+        }         
+      }
+      let msg = "Oh no! The seeds D:";
+      if(checkboxes_checked > 0){
+        msg = seeds_earned.join(", ");
+      }
+      document.getElementById("seed_list").innerHTML = msg;
+      if(checkboxes_checked == total_tasks){
+        generate_list();
+      }
+    }
+
+    function createPlantParticle(x, y, base_palette) {
       // Create a custom particle element
       const particle = document.createElement('particle');
       // Append the element into the body
       document.body.appendChild(particle);
-      // Calculate a random size from 10px to 40px
-      const size = Math.floor(Math.random() * 30 + 10);
+      // Calculate a random size from 10px to 50px
+      const size = Math.floor(Math.random() * 40 + 10);
       // Apply the size on each particle
       particle.style.width = `${size}px`;
       particle.style.height = `${size}px`;
       // Generate a random color in a purple/pink palette
       // TODO: would be cute to pull from the reward plant's palette
-      particle.style.background = `hsl(${Math.random() * 90 + 240}, 50%, 80%)`;
+      particle.style.background = getRandomizedColorFrom(base_palette);
       // Generate a random y destination within a distance of 300px from the bottom of the screen
       const destinationX = x;  // TODO: dumb
       const destinationY = y - Math.random() * 250 - 50;
@@ -271,8 +191,8 @@
           opacity: 0
         }
       ], {
-        // Set a random duration from 2000 to 4000ms
-        duration: 2000 + Math.random() * 2000,
+        // Set a random duration from 1500 to 3000ms
+        duration: 1500 + Math.random() * 1500,
         easing: 'cubic-bezier(0, .9, .57, 1)',
         // Delay every particle with a random value from 0ms to 200ms
         delay: Math.random() * 200
@@ -283,18 +203,47 @@
     }
 
     // TODO: Almost identical to genPlantInSquare from bingo.js. I could use a common.js
-    async function genToDoPlant(){
-        plant_data = gen_plant_data(7, forced_random_seed+String(num_plants_revealed));
+    async function genToDoPlant(num_plants_generated, rarity){
+        let plant_data = gen_plant_data(rarity, forced_random_seed+String(num_plants_generated));
         seeds_generated.push(encode_plant_data_v2(plant_data));
-        plant_canvas = await gen_plant(plant_data);
+        const plant_canvas = await gen_plant(plant_data);
         // TODO: This next scaling bit (still) seems incredibly silly
         var scale_canvas = document.createElement("canvas");
         scale_canvas.width = 96;
         scale_canvas.height = 96;
-        var scale_ctx = scale_canvas.getContext("2d");
+        let scale_ctx = scale_canvas.getContext("2d");
         scale_ctx.imageSmoothingEnabled = false;
         scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
+        plant_canvases.push(scale_canvas);
         return scale_canvas.toDataURL();
+    }
+
+    // Take a bunch of random samples of the plant's color
+    // Return as RGB for mathing. Ignore transparent pixels.
+    function samplePlantColor(i){
+        let sample_canvas = plant_canvases[i];
+        let sample_ctx = sample_canvas.getContext("2d");
+        let min_desired_samples = 4;  // We want at least this many colors
+        let max_attempted_samples = 100;  // If we fail to get any samples in n, we fallback.
+        var found_colors = [];
+        let samples_attempted = 0;
+        while(found_colors.length < min_desired_samples || samples_attempted < max_attempted_samples){
+            let x = Math.floor(Math.random()*(sample_canvas.width-1));
+            let y = Math.floor(Math.random()*(sample_canvas.width-1));
+            let color_data = sample_ctx.getImageData(x, y, 1, 1).data
+            if(color_data[3] != 0){
+              found_colors.push(color_data.slice(0,3));
+            }
+            samples_attempted ++;
+        }
+        if(found_colors.length < 3){return fallback_colors};
+        return found_colors;
+    }
+
+    // picks a random color, makes it more pastel and varies it a bit.
+    function getRandomizedColorFrom(palette){
+      const rgb_color = palette[Math.floor(Math.random()*palette.length)];
+      return `rgb(${rgb_color[0] + 50}, ${rgb_color[1] + 50}, ${rgb_color[2] + 50})`;
     }
 
     </script>

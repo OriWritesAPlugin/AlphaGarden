@@ -63,10 +63,11 @@ a {
 }
 
 .to_do_plant_box {
+    vertical-align: top;
     flex-direction: column;
 }
 
-.bingo_label {
+.bingo_label, .todo_plant_label {
   word-wrap: break-word;
   pointer-events: none;
   padding: 0.6vh;
@@ -78,19 +79,51 @@ a {
   user-select: none;
 }
 
+.todo_plant_label {
+    text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
+}
+
 .dotted-fill-in {
+    border: none;
+    outline: none;
     border-bottom-color: #ffffff;
     border-bottom-style: dashed;
     border-bottom-width: thin;
     display: inline-block;
-    padding-top: 4vh;
+    margin-top: 1vh;
+    padding-top: 1.5vh;
+    padding-bottom: 1.5vh;
     min-width: 40vw;
+    color: #ffffff;
+    margin-left: 20px;
     vertical-align: middle;
+    background-color: transparent;
+    font-size: 2.5vh;
+}
+
+.dotted-fill-in:focus {
+    border-bottom-color: #ffaaff;
+}
+
+.dotted-fill-in::placeholder {
+    color: transparent;
+}
+
+.dotted-fill-in:hover::placeholder {
+    color: #999999;
+}
+
+.fixed-width-selectbox {
+    width: 2.2vw;
 }
 
 .todo_checkbox {
   accent-color: #81309c;
-  transform: scale(3);
+  transform: scale(3.2);
 }
 
 .ul_no_bullets {
