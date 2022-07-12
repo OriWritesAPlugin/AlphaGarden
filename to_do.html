@@ -131,10 +131,10 @@
         return;
       }
       
-      let base_palette = samplePlantColor(parseInt(e.target.id.slice(5)));
+      let checkbox_reward_plant_id = document.getElementById(e.target.id+"_reward").value - 1;
       for (let i = 0; i < 75; i++) {
         // We root them to a random location slightly below the bottom of the window
-        createPlantParticle(Math.random() * window.innerWidth, window.innerHeight + 10, base_palette);
+        createPlantParticle(Math.random() * window.innerWidth, window.innerHeight + 10, samplePlantColor(checkbox_reward_plant_id));
       }
     }
 
