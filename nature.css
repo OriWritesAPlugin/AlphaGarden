@@ -60,11 +60,8 @@ a {
 .bingo_plant_box {
     border-style: none;
     margin: 0 auto;
-}
-
-.to_do_plant_box {
-    vertical-align: top;
-    flex-direction: column;
+    min-width: 96px;
+    min-height: 96px;
 }
 
 .bingo_label, .todo_plant_label {
@@ -119,6 +116,7 @@ a {
 
 .fixed-width-selectbox {
     width: 2.2vw;
+    min-width: 45px;
 }
 
 .todo_checkbox {
