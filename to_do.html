@@ -147,7 +147,7 @@
         checkbox = document.getElementById("task_"+i);
         if(checkbox.checked){
           checkboxes_checked ++;
-          seeds_earned.push(seeds_generated[document.getElementById("task_"+i+"_reward").value]);
+          seeds_earned.push(seeds_generated[document.getElementById("task_"+i+"_reward").value-1]);
         }         
       }
       let msg = "Oh no! The seeds D:";
