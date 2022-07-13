@@ -41,6 +41,7 @@
     var seeds_generated = [];
     var plant_canvases = [];
     var second_set_revealed = false;
+    // TODO: rename resting_num_plants_revealed once I'm done reworking the way tasks are revealed. 
     var resting_num_plants_revealed = 0;  // we need to do it this way since less plants are generated as time goes on.
     const task_hints = Array("Done anything nice for yourself lately?", "Anyone you've been meaning to respond to?",
                              "How are you doing on food?", "How go the hobbies as of late?", "Any meals you're excited for?",
@@ -48,10 +49,13 @@
                              "Anything you need picked up from the store?", "Ooh, how go the longterm projects?",
                              "Any paperwork you have to get through?", "What're you're looking forward to?",
                              "How's school/work going?", "Is there anything you've been meaning to tidy up?",
-                             "What're you thinking for the future? Any plans you're excited about?");
+                             "What're you thinking for the future? Any plans you're excited about?",
+                             "Have you got any birthdays or anniversaries coming up?");
 
     async function do_setup(){
         await preload_all_images();
+        await generate_list();
+        activateList();
         generate_list();
     }
 
@@ -68,11 +72,11 @@
         // Generate the plants
         for(let i=resting_num_plants_revealed; i < resting_num_plants_revealed+num_plants; i++){
           let new_plant_box = document.createElement('div');
-          let new_plant_box_id = "plant_box_"+plant_div_num+"_"+i;
+          let new_plant_box_id = "plant_box_"+i;
           new_plant_box.className = "bingo_plant_box";
           new_plant_box.id = new_plant_box_id;
           let data_url = await genToDoPlant(i, rarity);
-          new_plant_box.style.background = 'url(' + data_url + ')  no-repeat center center';
+          new_plant_box.style.background = 'url(https://i.imgur.com/QhY0vOF.png)  no-repeat center center';
           let label = document.createElement('label')
           label.htmlFor = new_plant_box_id;
           label.className = 'todo_plant_label';
@@ -88,6 +92,7 @@
           checkbox.type="checkbox";
           checkbox.className = "todo_checkbox";
           checkbox.id = "task_"+i;
+          checkbox.disabled = true;
           if(document.body.animate) {checkbox.addEventListener('change', bubble_up);}
           list_item.appendChild(checkbox);
           let textbox = document.createElement("input");
@@ -104,6 +109,7 @@
                 opt.value = j+1;  // Human-friendly numbering.
                 opt.innerHTML = j+1;
                 selectbox.appendChild(opt);
+                selectbox.disabled = true;
               }
           } else {
             let opt = document.createElement('option');
@@ -155,7 +161,9 @@
         msg = seeds_earned.join(", ");
       }
       document.getElementById("seed_list").innerHTML = msg;
-      if(checkboxes_checked == total_tasks){
+      // We generate an extra set out so people can notetake
+      if(checkboxes_checked == total_tasks-num_tasks){
+        activateList();
         generate_list();
       }
     }
@@ -203,6 +211,7 @@
     }
 
     // TODO: Almost identical to genPlantInSquare from bingo.js. I could use a common.js
+    // Notably, due to how things are "activated", this doesn't return anything, just preps and pushes the canvas.
     async function genToDoPlant(num_plants_generated, rarity){
         let plant_data = gen_plant_data(rarity, forced_random_seed+String(num_plants_generated));
         seeds_generated.push(encode_plant_data_v2(plant_data));
@@ -215,7 +224,26 @@
         scale_ctx.imageSmoothingEnabled = false;
         scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
         plant_canvases.push(scale_canvas);
-        return scale_canvas.toDataURL();
+    }
+
+    // The slightly cursed companion to generate_list
+    // Activates the most recently generated list
+    function activateList(){
+        // Activating the list elements
+        const num_tasks_active = task_sets_generated*num_tasks;
+        for(let i=num_tasks_active-num_tasks; i<num_tasks_active; i++){
+          document.getElementById("task_" + i).disabled = false;
+          if(task_sets_generated<3){
+            document.getElementById("task_" + i + "_reward").disabled = false;
+          }
+        }
+        // revealing the plants
+        // cursed math to account for having 8 plants to start with
+        let to_reveal = (task_sets_generated < 3 ? 8 : 5);
+        for(let i=resting_num_plants_revealed - to_reveal; i < resting_num_plants_revealed; i++){
+          let data_url = plant_canvases[i].toDataURL();
+          document.getElementById("plant_box_" + i).style.background = 'url(' + data_url + ')  no-repeat center center';
+        }
     }
 
     // Take a bunch of random samples of the plant's color
