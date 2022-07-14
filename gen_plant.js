@@ -169,7 +169,7 @@ async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, c
     // 50% chance to horizontally mirror each one? (TODO)
     // Wondering if the shared ctx save/reload and use of async-await is giving me the "floating flowers" issue in here.
     // I may revisit (and mirror the final canvas instead), but it feels like overkill for now.
-    img = refs[img_url];
+    img = await refs[img_url];
     var w_offset = Math.floor(img.width/2);
     if(!anchor_to_bottom){
       var h_offset = Math.floor(img.height/2)-1;
@@ -193,9 +193,6 @@ async function preload_all_images()
         var promise = preload_single_image(lists_to_load[i][j]);
         refs[lists_to_load[i][j]] = promise;
       }
-  }
-  for(const key in refs){
-      refs[key] = await refs[key];
   }
 }
 
