@@ -204,7 +204,7 @@ async function preload_single_image(url){
 
     return fetch(url)
            .then(response => response.blob())
-           .then(blob => createImageBitmap(blob, {colorSpaceConversion: "none"}));
+           .then(blob => createImageBitmap(blob));
 }
 
 // We have things like foliage, colors, and features that exist in "master lists"
