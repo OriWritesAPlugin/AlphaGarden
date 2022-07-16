@@ -214,10 +214,9 @@
           normalization_canvas.height = 32;
           var normalization_ctx = normalization_canvas.getContext("2d");
           normalization_ctx.imageSmoothingEnabled = false;
-          let ref_img = refs[all_named[seed.slice(1)]];
+          let ref_img = await refs[all_named[seed.slice(1)]];
           normalization_ctx.drawImage(ref_img, 16-ref_img.width/2, 32-ref_img.height);
           scale_ctx.drawImage(normalization_canvas, 0, 0, 64, 64);
-          seed = seed.slice(1);
           if(seed.length > 12){
             seed = seed.slice(0,9)+"...";
           }
