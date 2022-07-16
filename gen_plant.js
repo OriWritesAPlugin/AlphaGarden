@@ -48,7 +48,8 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/DynbJCl.png", "https://i.imgur.com/k9w5afZ.png", "https://i.imgur.com/CGp6xFF.png",
                "https://i.imgur.com/tASn4zC.png", "https://i.imgur.com/Muj9pgt.png", "https://i.imgur.com/FL4BAHX.png",
                "https://i.imgur.com/qqUgOYg.png", "https://i.imgur.com/LAQZ4s7.png", "https://i.imgur.com/9NyqPmf.png",
-               "https://i.imgur.com/dbS96tA.png", "https://i.imgur.com/1Y5ls06.png"];
+               "https://i.imgur.com/dbS96tA.png", "https://i.imgur.com/1Y5ls06.png", "https://i.imgur.com/EhMFu9B.png",
+               "https://i.imgur.com/qgJ3827.png", "https://i.imgur.com/XyaY9kF.png"];
 
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
@@ -77,8 +78,8 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "lawn_deco": "https://i.imgur.com/A5SsKVL.png", "lawn_sin": "https://i.imgur.com/hAqeR7Z.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
-common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76];
-uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72]);
+common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78];
+uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79]);
 rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65, 70]);
 boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
@@ -86,9 +87,9 @@ override_foliage = [];
 
 
 
-all_features = ["https://i.imgur.com/G4h84Ht.png", "https://i.imgur.com/vXQYMkL.png", "https://i.imgur.com/p1ipMdS.png", "https://i.imgur.com/UUFJO7h.png"]
+all_features = ["https://i.imgur.com/G4h84Ht.png", "https://i.imgur.com/vXQYMkL.png", "https://i.imgur.com/p1ipMdS.png", "https://i.imgur.com/UUFJO7h.png", "https://i.imgur.com/IyaeNvt.png", "https://i.imgur.com/NXRWexZ.png", "https://i.imgur.com/VwMnyDB.png", "https://i.imgur.com/mLfzmM8.png", "https://i.imgur.com/zcXm5Op.png", "https://i.imgur.com/Osvq1V0.png", "https://i.imgur.com/iPK9aJ7.png", "https://i.imgur.com/3SpYgDN.png", "https://i.imgur.com/6MRuqb7.png", "https://i.imgur.com/jrYQjIW.png"]
 var simple_features = [0, 1];
-var complex_features = [2, 3];
+var complex_features = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
 var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a", "66732a", "4b692f"],
                     ["7ad8b7", "5eb995", "3e946d", "277b50"], ["9dbb86", "679465", "476f58", "2f4d47"],
@@ -161,7 +162,7 @@ rare_foliage_palettes.concat(boost_with);
 rare_feature_palettes.concat(boost_with);
 rare_accent_palettes.concat(boost_with);*/
 // Used for replacing ALL foliage colors...
-//rare_foliage_palettes = [56];
+//rare_foliage_palettes = [25, 49, 30, 31, 6];
 
 
 async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, chance, anchor_to_bottom=false){
