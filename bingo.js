@@ -24,6 +24,7 @@
             "u": {"description": "Battle enemy + palette swap", "points": 100, "category": "coli"},
             "v": {"description": "Get something red", "points": 100, "category": "coli"},
             "w": {"description": "Item + its recolor", "points": 100, "category": "coli"},
+            "x": {"description": "Get a flower", "points": 100, "category": "coli"},
                       }, "m": {
             "a": {"description": "Any apparel", "points": 350, "category": "coli"},
             "b": {"description": "Boss fight", "points": 250, "category": "coli"},
@@ -46,6 +47,12 @@
             "s": {"description": "7+ TOTAL items", "points": 500, "category": "coli"},
             "t": {"description": "Max breath on all attackers", "points": 300, "category": "coli"},
             "u": {"description": "Get a rock", "points": 200, "category": "coli"},
+            "v": {"description": "5 fights w/o trainer dmg'd", "points": 200, "category": "coli"},
+            "w": {"description": "Win w/o using elim", "points": 200, "category": "coli"},
+            "x": {"description": "Miss an eliminate", "points": 200, "category": "coli"},
+            "y": {"description": "All drops are food", "points": 200, "category": "coli"},
+            "z": {"description": "Clear a + shape", "points": 200, "category": "coli"},
+            "aa": {"description": "Every enemy drops food", "points": 200, "category": "coli"},
             //"v": {"description": "15 of any item", "points": 500, "category": "coli"},
                     }, "h": {
             "a": {"description": "Boss familiar", "points": 3000, "category": "coli"},
@@ -71,6 +78,10 @@
             "u": {"description": "Clan elem battle stone", "points": 1000, "category": "coli"},
             "w": {"description": "Familiar of favorite color", "points": 500, "category": "coli"},
             "x": {"description": "Neutral elem battle stone", "points": 500, "category": "coli"},
+            "y": {"description": "Same dragon hit 2x in row", "points": 500, "category": "coli"},
+            "z": {"description": "Get the captcha EXP buff", "points": 500, "category": "coli"},
+            "aa": {"description": "Dodge a boss attack", "points": 500, "category": "coli"},
+            "ab": {"description": "Same pack 2x in a row", "points": 500, "category": "coli"},
                   }, "s": {
             "a": {"description": "Drink a glass of water", "points": 100, "category": "self-care"},
             "b": {"description": "Head outside", "points": 100, "category": "self-care"},
