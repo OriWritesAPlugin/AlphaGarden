@@ -49,7 +49,8 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/tASn4zC.png", "https://i.imgur.com/Muj9pgt.png", "https://i.imgur.com/FL4BAHX.png",
                "https://i.imgur.com/qqUgOYg.png", "https://i.imgur.com/LAQZ4s7.png", "https://i.imgur.com/9NyqPmf.png",
                "https://i.imgur.com/dbS96tA.png", "https://i.imgur.com/1Y5ls06.png", "https://i.imgur.com/EhMFu9B.png",
-               "https://i.imgur.com/qgJ3827.png", "https://i.imgur.com/XyaY9kF.png"];
+               "https://i.imgur.com/qgJ3827.png", "https://i.imgur.com/XyaY9kF.png", "https://i.imgur.com/BhMMhrn.png",
+               "https://i.imgur.com/RNv63mA.png", "https://i.imgur.com/t5T7Vb7.png", "https://i.imgur.com/Ox6ArQN.png"];
 
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
@@ -78,8 +79,8 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "lawn_deco": "https://i.imgur.com/A5SsKVL.png", "lawn_sin": "https://i.imgur.com/hAqeR7Z.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
-common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78];
-uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79]);
+common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78, 80, 81, 82];
+uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79, 83]);
 rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65, 70]);
 boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
@@ -198,15 +199,15 @@ async function preload_all_images()
 
 // Sound of me not being 100% confident in my async usage yet
 async function preload_single_image(url){
-    var img=new Image();
+/*    var img=new Image();
     img.src=url;
     img.crossOrigin = "anonymous"
     var loaded_img = img.decode();  // To throw it in mem without blocking?
-    return img
+    return img*/
     // Not yet supported in common versions of Safari
-    /*return fetch(url)
+    return fetch(url)
            .then(response => response.blob())
-           .then(blob => createImageBitmap(blob));*/
+           .then(blob => createImageBitmap(blob));
 }
 
 // We have things like foliage, colors, and features that exist in "master lists"

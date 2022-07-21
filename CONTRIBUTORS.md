@@ -20,7 +20,7 @@ Plants
 ------
 Note: plant numbers are 0-indexed to correspond to encoded plant info
 
-Xaotician: Tall cactus (64), baobab (72), acacia (73), mini acacia (74), giant echinacea (75)
+Xaotician: Tall cactus (64), baobab (72), acacia (73), mini acacia (74), giant echinacea (75), summon chaos groundcover (81), branching flower shrub (82), tilted spotted mushroom (83)
 RedRevival: Giant gem tree (65), giant tree (67), berry bush (76)
 
 
