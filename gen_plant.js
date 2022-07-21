@@ -86,7 +86,6 @@ boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 override_foliage = [];
 
 
-
 all_features = ["https://i.imgur.com/G4h84Ht.png", "https://i.imgur.com/vXQYMkL.png", "https://i.imgur.com/p1ipMdS.png", "https://i.imgur.com/UUFJO7h.png", "https://i.imgur.com/IyaeNvt.png", "https://i.imgur.com/NXRWexZ.png", "https://i.imgur.com/VwMnyDB.png", "https://i.imgur.com/mLfzmM8.png", "https://i.imgur.com/zcXm5Op.png", "https://i.imgur.com/Osvq1V0.png", "https://i.imgur.com/iPK9aJ7.png", "https://i.imgur.com/3SpYgDN.png", "https://i.imgur.com/6MRuqb7.png", "https://i.imgur.com/jrYQjIW.png"]
 var simple_features = [0, 1];
 var complex_features = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
@@ -162,7 +161,7 @@ rare_foliage_palettes.concat(boost_with);
 rare_feature_palettes.concat(boost_with);
 rare_accent_palettes.concat(boost_with);*/
 // Used for replacing ALL foliage colors...
-//rare_foliage_palettes = [25, 49, 30, 31, 6];
+//rare_foliage_palettes = [56];
 
 
 async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, chance, anchor_to_bottom=false){
@@ -199,10 +198,15 @@ async function preload_all_images()
 
 // Sound of me not being 100% confident in my async usage yet
 async function preload_single_image(url){
-
-    return fetch(url)
+    var img=new Image();
+    img.src=url;
+    img.crossOrigin = "anonymous"
+    var loaded_img = img.decode();  // To throw it in mem without blocking?
+    return img
+    // Not yet supported in common versions of Safari
+    /*return fetch(url)
            .then(response => response.blob())
-           .then(blob => createImageBitmap(blob));
+           .then(blob => createImageBitmap(blob));*/
 }
 
 // We have things like foliage, colors, and features that exist in "master lists"
@@ -437,8 +441,8 @@ async function gen_plant(plant_data) {
     await place_image_at_coords_with_chance(plant_data["foliage"], [[Math.floor(work_canvas_size/2)-1, work_canvas_size-1]], work_ctx, 1, true);
 
     // Figure out where to put each kind of feature, replacing marker pixels as we go
-    simple_feature_coords = get_marker_coords(place_simple_feature, work_ctx);
-    complex_feature_coords = get_marker_coords(place_complex_feature, work_ctx);
+    let simple_feature_coords = get_marker_coords(place_simple_feature, work_ctx);
+    let complex_feature_coords = get_marker_coords(place_complex_feature, work_ctx);
 
     // Place the features
     if(simple_feature_coords.length > 0){
