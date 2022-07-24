@@ -97,6 +97,17 @@ input.chunky_wrap {
     width: 80%;
 }
 
+.garden_dropdown {
+    width: auto;
+    padding: 8px 8px;
+    margin: 0;
+    display: inline-block;
+    border: 0px;
+    color: #DFC48C;
+    background-color: #2F252D;
+    font-size: 12px;
+}
+
 #inline-spacer-div {
     width: 3%;
 }

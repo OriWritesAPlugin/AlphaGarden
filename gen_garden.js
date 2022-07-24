@@ -1,6 +1,8 @@
 var img_loadup = [];
-var possible_grass_palettes = [];
-var grass_img = "https://i.imgur.com/yPNa3WB.png";
+var current_ground = "grass [palette]";
+const available_ground = {"grass [palette]": "https://i.imgur.com/yPNa3WB.png", "sand": "https://i.imgur.com/Ejupy26.png",
+                          "sand [palette]": "https://i.imgur.com/Rzr07Ev.png", "none": "https://i.imgur.com/Hq3VDgi.png",
+                          "snow": "https://i.imgur.com/ljWMvBo.png"};
 var x_coords = [];
 var smart_coords = {};
 var garden_width = 450;
@@ -8,7 +10,8 @@ var current_x_coord;
 var used_smart_coords;
 var used_fallback_coords;
 var use_smart_spacing = true;
-var grass_palette = null;
+var ground_palette = {"foliage": null, "feature": null, "accent": null}
+var possible_ground_palettes = {"foliage": [], "feature": [], "accent": []};
 var components_to_place = [];  // Format: {"x_pos": , "seed": , "canvas": }. Note idx 0=placed first, 1=placed second, ...n=placed last (topmost)
 
 
@@ -31,12 +34,11 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
         reuse_and_scramble_positions = false;
     }
     use_smart_spacing = document.getElementById("use_smart_spacing").checked;
-    generate_grass = document.getElementById("generate_grass").checked;
     garden_width = Math.max(64, document.getElementById("garden_width").value);
     document.getElementById("garden_width").value = garden_width;  // min in the HTML doesn't seem to enforce itself.
     canvas.width = garden_width;
     ctx.imageSmoothingEnabled = false;
-    possible_grass_palettes = [];
+    possible_ground_palettes = {"foliage": [], "feature": [], "accent": []};
     // Remove spaces and leading/trailing commas, then split on remaining commas
     var seeds = document.getElementById("seed_list").value.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");
     var promises = []
@@ -92,33 +94,38 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
         await place_component(ctx, component);
     }
     
-    if(generate_grass){place_grass();}
+    place_ground();
 }
 
 async function scramble_randogarden(){
     gen_randogarden(reuse_and_scramble_positions=true);
 }
 
-async function place_grass(scramble_grass=false){
+async function place_ground(scramble_ground=false){
     var canvas = document.getElementById("output_canvas");
     var ctx = canvas.getContext("2d");
-    if(grass_palette==null){
-      grass_palette = all_palettes[random_from_list(possible_grass_palettes)];
-    } else if(scramble_grass){
-      // Try to avoid scrambling to the same grass twice in a row
-      for(let allowed_attempts=20; allowed_attempts>0; allowed_attempts--){
-        let temp_palette = all_palettes[random_from_list(possible_grass_palettes)];
-        if(JSON.stringify(temp_palette) != JSON.stringify(grass_palette)){
-          grass_palette = temp_palette;
-          break;
+    for (const palette_type of Object.keys(ground_palette)) {
+        let palette = ground_palette[palette_type];
+        if(palette==null){
+          ground_palette[palette_type] = all_palettes[random_from_list(possible_ground_palettes[palette_type])];
+        } else if(scramble_ground){
+          // Try to avoid picking the same one twice
+          for(let allowed_attempts=20; allowed_attempts>0; allowed_attempts--){
+            let temp_palette = all_palettes[random_from_list(possible_ground_palettes[palette_type])];
+            if(JSON.stringify(temp_palette) != JSON.stringify(palette)){
+              ground_palette[palette_type] = temp_palette;
+              break;
+            }
+          }
         }
-      }
     }
-    var recolored_grass = replace_color_palette_single_image(base_foliage_palette, grass_palette, refs[grass_img]);
-    var grass_x_pos = 0;
-    while(grass_x_pos < garden_width){
-        ctx.drawImage(recolored_grass, grass_x_pos, 64, 200, 6);
-        grass_x_pos += 200;
+    // Order is important, so we have to hardcode our keys
+    let new_palette = ground_palette["foliage"].concat(ground_palette["accent"]).concat(ground_palette["feature"]);
+    var recolored_ground = replace_color_palette_single_image(overall_palette, new_palette, refs[available_ground[current_ground]]);
+    var ground_x_pos = 0;
+    while(ground_x_pos < garden_width){
+        ctx.drawImage(recolored_ground, ground_x_pos, 64, 200, 6);
+        ground_x_pos += 200;
     }
 }
 
@@ -159,6 +166,19 @@ async function place_component(ctx, component){
     ctx.drawImage(component["canvas"], component["x_pos"], 4, 64, 64);
 }
 
+
+// Gets a dropdown by ID and sets its content to be the ground names
+function gen_ground_selection(dropdown_id){
+    select = document.getElementById(dropdown_id);
+    for(key in available_ground){
+        select.options[select.options.length] = (new Option(key, key));
+    }
+}
+
+function set_ground_selection(opt){
+    current_ground = opt;  
+}
+
 async function assign_named_component(name, ctx, x_pos, use_smart_spacing=false){
     // TODO: This is hideous and terrible but I am very tired and wanted to write something before bed
     var work_canvas = document.createElement("canvas");
@@ -176,13 +196,18 @@ async function assign_plants(seed, ctx, x_pos, use_smart_spacing=false){
 
 async function gen_plant_from_seed(seed) {
     var plant_data = decode_plant_data(seed);
-    possible_grass_palettes.push(plant_data["foliage_palette"]);
+    for (const palette_type of Object.keys(possible_ground_palettes)){
+        possible_ground_palettes[palette_type].push(plant_data[palette_type+"_palette"]);
+    }
     var ret_canvas = await gen_plant(plant_data);
     return ret_canvas;
 }
 
 
 async function do_preload() {
-    refs[grass_img] = await preload_single_image(grass_img);
+    for (const key in available_ground){
+      refs[available_ground[key]] = await preload_single_image(available_ground[key]);
+    }
     await preload_all_images();
+    gen_ground_selection("pick_ground");
 }
