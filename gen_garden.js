@@ -96,7 +96,7 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
             components_to_place.push(assign_named_component(seeds[i].slice(1), ctx, x_coords[i], use_smart_spacing));
             last_non_overlay_component_idx = i;
         } else if(seeds[i][0] == "#"){
-            components_to_place.push(assign_overlay_canvas(seeds[i].slice(1), ctx));
+            components_to_place.push({"IOU": true, "color": seeds[i].slice(1)});
             if(i==0){
                 background_overlay = components_to_place[0];
             }
@@ -113,13 +113,15 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
         await place_component(ctx, component);
     }
     place_ground();
-    purge_transparency(canvas);
     if(background_overlay != null){
         let underlay_canvas = document.createElement("canvas");
         let underlay_ctx = underlay_canvas.getContext("2d");
         underlay_canvas.width = garden_width;
         underlay_canvas.height = garden_height;
-        place_component(underlay_ctx, await background_overlay);
+        rgb_code = get_rgb_from_overlay_name(background_overlay["color"]);
+        rgb_code[3] = rgb_code[3]/255.0  // we need to convert to fillStyle's form 
+        underlay_ctx.fillStyle = 'rgba('+rgb_code.toString()+')';
+        underlay_ctx.fillRect(0, 0, underlay_canvas.width, underlay_canvas.height);
         underlay_ctx.drawImage(canvas, 0, 0);
         // There HAS to be a better way
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -221,6 +223,10 @@ async function assign_component(canvas, ctx, x_pos, seed, is_named, use_smart_sp
 }
 
 async function place_component(ctx, component){
+    if(component.hasOwnProperty("IOU")){
+        // Is reliant on other seeds going first. Really only applies to overlays, so...
+        component = await assign_overlay_canvas(component["color"], ctx);
+    }
     ctx.drawImage(component["canvas"], component["x_pos"], component["y_pos"], component["width"], component["height"]);
 }
 
@@ -247,12 +253,7 @@ async function assign_named_component(name, ctx, x_pos, use_smart_spacing=false)
     return assign_component(work_canvas, ctx, x_pos, name, is_named=true, use_smart_spacing=use_smart_spacing);
 }
 
-async function assign_overlay_canvas(color, ctx){
-    let output_canvas = document.getElementById("output_canvas");
-    let color_canvas = document.createElement("canvas");
-    let color_ctx=color_canvas.getContext("2d");
-    color_canvas.width = output_canvas.width;
-    color_canvas.height = output_canvas.height;
+function get_rgb_from_overlay_name(color){
     let color_cutoff = color.indexOf("%");
     let alpha = 25  // percent to match the user input, we convert it later
     let hex_code = color
@@ -263,9 +264,31 @@ async function assign_overlay_canvas(color, ctx){
     // We also let folks input the names of colors as shortcuts
     if(available_overlay_colors.hasOwnProperty(hex_code)){ hex_code = available_overlay_colors[hex_code]; }
     let rgb_code = hexToRgb(hex_code)
-    rgb_code.push(alpha/100.0)
-    color_ctx.fillStyle = 'rgba('+rgb_code.toString()+')';
-    color_ctx.fillRect(0, 0, color_canvas.width, color_canvas.height);
+    rgb_code.push(255*(alpha/100.0))
+    return rgb_code;
+}
+
+async function assign_overlay_canvas(color, ctx){
+    let output_canvas = document.getElementById("output_canvas");
+    let color_canvas = document.createElement("canvas");
+    let color_ctx=color_canvas.getContext("2d");
+    color_canvas.width = output_canvas.width;
+    color_canvas.height = output_canvas.height;
+    let rgb_code = get_rgb_from_overlay_name(color);
+
+    // With our color info loaded, we apply the color itself to its own canvas
+    let main_imgData = ctx.getImageData(0, 0, color_canvas.width, color_canvas.height).data;
+    let color_img = color_ctx.getImageData(0, 0, color_canvas.width, color_canvas.height);
+    let color_imgData = color_img.data;
+    // Loops through bytes and only place color if the area below is opaque.
+    for ( var i = 0; i < main_imgData.length; i += 4 ) {
+        if ( main_imgData[i + 3] > 0 ) {
+            color_imgData[i] = rgb_code[0];
+            color_imgData[i+1] = rgb_code[1];
+            color_imgData[i+2] = rgb_code[2];
+            color_imgData[i+3] = rgb_code[3];
+        }}
+    color_ctx.putImageData(color_img, 0, 0);
     return({"canvas": color_canvas, "x_pos": 0, "y_pos": 0, "width": color_canvas.width, "height": color_canvas.height});
 }
 
