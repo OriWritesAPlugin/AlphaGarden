@@ -2,7 +2,9 @@ var img_loadup = [];
 var current_ground = "grass [palette]";
 const available_ground = {"grass [palette]": "https://i.imgur.com/yPNa3WB.png", "sand": "https://i.imgur.com/Ejupy26.png",
                           "sand [palette]": "https://i.imgur.com/Rzr07Ev.png", "none": "https://i.imgur.com/Hq3VDgi.png",
-                          "snow": "https://i.imgur.com/ljWMvBo.png"};
+                          "snow": "https://i.imgur.com/ljWMvBo.png", "dirt": "https://i.imgur.com/CqQDCgC.png"};
+const available_overlay_colors = {"blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
+                                  "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2"}
 var x_coords = [];
 var smart_coords = {};
 var garden_width = 450;
@@ -10,6 +12,8 @@ var current_x_coord;
 var used_smart_coords;
 var used_fallback_coords;
 var use_smart_spacing = true;
+var last_non_overlay_component_idx = 0; // Used for adding overlays to the ground
+var height_offset = 0; // How far down to draw everything in case someone changes the height.
 var ground_palette = {"foliage": null, "feature": null, "accent": null}
 var possible_ground_palettes = {"foliage": [], "feature": [], "accent": []};
 var components_to_place = [];  // Format: {"x_pos": , "seed": , "canvas": }. Note idx 0=placed first, 1=placed second, ...n=placed last (topmost)
@@ -22,6 +26,7 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
     // Not re-creating ctx didn't help. I tried global and I'm still seeing the "replacement" behavior.
     var canvas = document.getElementById("output_canvas");
     var ctx = canvas.getContext("2d");
+    possible_ground_palettes = {"foliage": [], "feature": [], "accent": []};
     // I'm noticing that Firefox insists I'm in Quirks mode despite the doctype while working locally. Related?
     // I'd really prefer not to have to push to test.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -35,10 +40,13 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
     }
     use_smart_spacing = document.getElementById("use_smart_spacing").checked;
     garden_width = Math.max(64, document.getElementById("garden_width").value);
+    garden_height = Math.max(70, document.getElementById("garden_height").value);
     document.getElementById("garden_width").value = garden_width;  // min in the HTML doesn't seem to enforce itself.
+    document.getElementById("garden_height").value = garden_height;
     canvas.width = garden_width;
+    canvas.height = garden_height;
+    height_offset = garden_height - 70;
     ctx.imageSmoothingEnabled = false;
-    possible_ground_palettes = {"foliage": [], "feature": [], "accent": []};
     // Remove spaces and leading/trailing commas, then split on remaining commas
     var seeds = document.getElementById("seed_list").value.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");
     var promises = []
@@ -79,31 +87,80 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
     used_smart_coords = {"short": [], "medium": [], "tall": [], "short_named": [], "medium_named": [], "tall_named": []};  // Reset
     used_fallback_coords = []  // Reset too
 
+    // Keep track of whether we'll have to add overlays to the grass
+    last_non_overlay_component_idx = 0;
+    let background_overlay = null;
     // Dispatch logic for figuring out where everything goes
     for(var i=0; i<seeds.length; i++){
         if(seeds[i][0] == "!"){
             components_to_place.push(assign_named_component(seeds[i].slice(1), ctx, x_coords[i], use_smart_spacing));
+            last_non_overlay_component_idx = i;
+        } else if(seeds[i][0] == "#"){
+            components_to_place.push(assign_overlay_canvas(seeds[i].slice(1), ctx));
+            if(i==0){
+                background_overlay = components_to_place[0];
+            }
         } else {
             // Smart_spacing logic goes inside here so we only have to draw the plant once. x_coords[i] acts as fallback.
             components_to_place.push(assign_plants(seeds[i], ctx, x_coords[i], use_smart_spacing));
+            last_non_overlay_component_idx = i;
         }
     }
     // Wait for logic to complete and place (this is how we maintain a layering order)
     for(var i=0; i<components_to_place.length; i++){
+        if(i==0 && background_overlay != null){continue;}
         component = await components_to_place[i];
         await place_component(ctx, component);
     }
-    
     place_ground();
+    purge_transparency(canvas);
+    if(background_overlay != null){
+        let underlay_canvas = document.createElement("canvas");
+        let underlay_ctx = underlay_canvas.getContext("2d");
+        underlay_canvas.width = garden_width;
+        underlay_canvas.height = garden_height;
+        place_component(underlay_ctx, await background_overlay);
+        underlay_ctx.drawImage(canvas, 0, 0);
+        // There HAS to be a better way
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(underlay_canvas, 0, 0);
+    }
+}
+
+async function place_ground(scramble_ground=false){
+    let canvas = document.getElementById("output_canvas");
+    let ctx = canvas.getContext("2d");
+    let ground_ctx = await draw_ground_canvas(scramble_ground);
+    for(let i=last_non_overlay_component_idx+1; i<components_to_place.length; i++){
+        component = await components_to_place[i];
+        await place_component(ground_ctx, component);
+    }
+    purge_transparency(ground_ctx.canvas);
+    ctx.drawImage(ground_ctx.canvas, 0, height_offset);
 }
 
 async function scramble_randogarden(){
     gen_randogarden(reuse_and_scramble_positions=true);
 }
 
-async function place_ground(scramble_ground=false){
-    var canvas = document.getElementById("output_canvas");
-    var ctx = canvas.getContext("2d");
+function purge_transparency(canvas){
+    let ctx = canvas.getContext("2d");
+    let img = ctx.getImageData(0, 0, canvas.width, canvas.height),
+    imgData = img.data;
+    // Loops through bytes and change pixel to white if alpha is not zero.
+    for ( var i = 0; i < imgData.length; i += 4 ) {
+        if ( imgData[i + 3] < 255 ) {
+            imgData[i + 3] = 0;
+        }}
+    // Draw the results
+    ctx.putImageData(img, 0, 0);
+}
+
+async function draw_ground_canvas(scramble_ground=false){
+    let canvas = document.createElement("canvas");
+    let ctx = canvas.getContext("2d");
+    canvas.width = garden_width;
+    ctx.imageSmoothingEnabled = false;
     for (const palette_type of Object.keys(ground_palette)) {
         let palette = ground_palette[palette_type];
         if(palette==null){
@@ -127,6 +184,7 @@ async function place_ground(scramble_ground=false){
         ctx.drawImage(recolored_ground, ground_x_pos, 64, 200, 6);
         ground_x_pos += 200;
     }
+    return ctx;
 }
 
 function claim_garden(){
@@ -135,7 +193,7 @@ function claim_garden(){
 
 // Assign a position to a component depending on its type, height, and use of smart spacing.
 async function assign_component(canvas, ctx, x_pos, seed, is_named, use_smart_spacing){
-    var component_info = {"canvas": canvas, "seed": seed};
+    var component_info = {"canvas": canvas, "seed": seed, "y_pos": height_offset + 4, "width": 64, "height": 64};
     if(use_smart_spacing){
         var smart_coord;
         // We estimate the height by seeing if there's a pixel found at a specific row
@@ -163,7 +221,7 @@ async function assign_component(canvas, ctx, x_pos, seed, is_named, use_smart_sp
 }
 
 async function place_component(ctx, component){
-    ctx.drawImage(component["canvas"], component["x_pos"], 4, 64, 64);
+    ctx.drawImage(component["canvas"], component["x_pos"], component["y_pos"], component["width"], component["height"]);
 }
 
 
@@ -187,6 +245,28 @@ async function assign_named_component(name, ctx, x_pos, use_smart_spacing=false)
     work_canvas.height = work_canvas_size;
     await place_image_at_coords_with_chance(all_named[name], [[Math.floor(work_canvas_size/2), work_canvas_size-1]], work_ctx, 1, true);
     return assign_component(work_canvas, ctx, x_pos, name, is_named=true, use_smart_spacing=use_smart_spacing);
+}
+
+async function assign_overlay_canvas(color, ctx){
+    let output_canvas = document.getElementById("output_canvas");
+    let color_canvas = document.createElement("canvas");
+    let color_ctx=color_canvas.getContext("2d");
+    color_canvas.width = output_canvas.width;
+    color_canvas.height = output_canvas.height;
+    let color_cutoff = color.indexOf("%");
+    let alpha = 25  // percent to match the user input, we convert it later
+    let hex_code = color
+    if(color_cutoff != -1){
+      alpha = parseInt(color.slice(color_cutoff+1));
+      hex_code = color.slice(0,color_cutoff);
+    }
+    // We also let folks input the names of colors as shortcuts
+    if(available_overlay_colors.hasOwnProperty(hex_code)){ hex_code = available_overlay_colors[hex_code]; }
+    let rgb_code = hexToRgb(hex_code)
+    rgb_code.push(alpha/100.0)
+    color_ctx.fillStyle = 'rgba('+rgb_code.toString()+')';
+    color_ctx.fillRect(0, 0, color_canvas.width, color_canvas.height);
+    return({"canvas": color_canvas, "x_pos": 0, "y_pos": 0, "width": color_canvas.width, "height": color_canvas.height});
 }
 
 async function assign_plants(seed, ctx, x_pos, use_smart_spacing=false){

@@ -112,6 +112,14 @@ input.chunky_wrap {
     width: 3%;
 }
 
+.garden-dim-bar {
+    text-align: left;
+    color: #DFC48C;
+    background-color: #2F252D;
+    width: 5vw;
+    min-width: 70px;
+}
+
 .form-container {
     text-align: left;
     padding: 15px;
