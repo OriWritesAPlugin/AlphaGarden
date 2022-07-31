@@ -100,6 +100,11 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
             if(i==0){
                 background_overlay = components_to_place[0];
             }
+        } else if(seeds[i].length == 0){
+            continue;
+        } else if(seeds[i].length != 10){
+            alert("You seem to have a malformed seed! Seeds are 10 characters long, but got \""+seeds[i]+"\". Skipping!")
+            continue;
         } else {
             // Smart_spacing logic goes inside here so we only have to draw the plant once. x_coords[i] acts as fallback.
             components_to_place.push(assign_plants(seeds[i], ctx, x_coords[i], use_smart_spacing));
