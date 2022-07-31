@@ -2,8 +2,9 @@
 <html>
     <meta charset="utf-8"/>
     <head>
-        <title>Endless Garden Utilities</title>
+        <title>Utilities [EG]</title>
         <link rel="stylesheet" type="text/css"  href="shared.css" />
+        <link rel="icon" href="https://i.imgur.com/13AXCvH.png">
     </head>
     <body onload="do_preload()">
         <h1 id="title">Garden Utilities</h1>
@@ -175,7 +176,7 @@
               new_row.className = "collection_row";
               collection_div.appendChild(new_row);
               for(var j=0; j < collection_width; j++){
-                if(!collection[i+j]){return;}
+                if(!collection[i+j]){continue;}
                 await add_collection_entry(new_row, i, j, collection[i+j], hide_seeds)
               }
            }
@@ -217,9 +218,6 @@
           let ref_img = await refs[all_named[seed.slice(1)]];
           normalization_ctx.drawImage(ref_img, 16-ref_img.width/2, 32-ref_img.height);
           scale_ctx.drawImage(normalization_canvas, 0, 0, 64, 64);
-          if(seed.length > 12){
-            seed = seed.slice(0,9)+"...";
-          }
         } else {
         if(seed.length != 10){
           alert("You seem to have a malformed seed! Seeds are 10 characters long, but got \""+seed+"\". Skipping!");
@@ -232,8 +230,13 @@
         label.className = 'collection_label';
         if(hide_seed){text_content = column+row+1;} else {text_content = seed;}
         label.appendChild(document.createTextNode(text_content));
+        let separator = document.createElement("span");
+        separator.style.color = "transparent";
+        separator.appendChild(document.createTextNode(", "));
+        label.appendChild(separator);
+        label.style.maxWidth = "86px";
         entry.appendChild(label);
-        entry.appendChild(scale_canvas);
+        entry.style.background = 'url(' + scale_canvas.toDataURL() + ')  no-repeat bottom center';
         parent.appendChild(entry);
       }
 

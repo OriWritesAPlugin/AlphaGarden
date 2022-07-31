@@ -3,7 +3,9 @@
 <html>
     <meta charset="utf-8"/>
     <head>
+        <title>To-Do [EG]</title>
         <link rel="stylesheet" type="text/css"  href="nature.css" />
+        <link rel="icon" href="https://i.imgur.com/SIQJ3U0.png">
         <style>
         body {
             background: #2f1847; /* fallback for old browsers */
@@ -39,6 +41,7 @@
     var current_difficulty = "Self-Care";  // Reusing a lot of code to get this done in time.
     var task_sets_generated = 0;
     var seeds_generated = [];
+    var seeds_earned = [];
     var plant_canvases = [];
     var second_set_revealed = false;
     // TODO: rename resting_num_plants_revealed once I'm done reworking the way tasks are revealed. 
@@ -55,7 +58,7 @@
     async function do_setup(){
         await preload_all_images();
         await generate_list();
-        activateList();
+        await activateList();
         generate_list();
     }
 
@@ -130,7 +133,7 @@
     // Genuinely learning a lot here...maybe I'll even learn Javascript some day? :)
     // But really, it's a fantastic tutorial. I should (TODO) revisit when I have more time.
     function bubble_up(e) {
-      do_update_check();
+      do_update_check(e);
       // no sparkle for you
       if(!e.target.checked){
         available_sounds[Math.floor(Math.random() * available_sounds.length)].play();
@@ -145,24 +148,20 @@
     }
 
     // Update our list of earned seeds and add a new set of to-dos if necessary.
-    function do_update_check() {
+    function do_update_check(e) {
       let total_tasks = task_sets_generated * num_tasks;
-      let checkboxes_checked = 0;
-      let seeds_earned = [];
-      for(let i=0; i<total_tasks; i++){
-        checkbox = document.getElementById("task_"+i);
-        if(checkbox.checked){
-          checkboxes_checked ++;
-          seeds_earned.push(seeds_generated[document.getElementById("task_"+i+"_reward").value-1]);
-        }         
+      if(e.target.checked){
+        seeds_earned.push([e.target.id, seeds_generated[document.getElementById(e.target.id+"_reward").value-1]])
+      } else {
+        seeds_earned = seeds_earned.filter(function(v){ return v[0] != e.target.id; });
       }
       let msg = "Oh no! The seeds D:";
-      if(checkboxes_checked > 0){
-        msg = seeds_earned.join(", ");
+      if(seeds_earned.length > 0){
+        msg = seeds_earned.map(earned => earned[1]).join(", ");
       }
       document.getElementById("seed_list").innerHTML = msg;
       // We generate an extra set out so people can notetake
-      if(checkboxes_checked == total_tasks-num_tasks){
+      if(seeds_earned.length == total_tasks-num_tasks){
         activateList();
         generate_list();
       }
@@ -228,7 +227,7 @@
 
     // The slightly cursed companion to generate_list
     // Activates the most recently generated list
-    function activateList(){
+    async function activateList(){
         // Activating the list elements
         const num_tasks_active = task_sets_generated*num_tasks;
         for(let i=num_tasks_active-num_tasks; i<num_tasks_active; i++){
@@ -241,6 +240,7 @@
         // cursed math to account for having 8 plants to start with
         let to_reveal = (task_sets_generated < 3 ? 8 : 5);
         for(let i=resting_num_plants_revealed - to_reveal; i < resting_num_plants_revealed; i++){
+          plant_canvases[i] = await plant_canvases[i];
           let data_url = plant_canvases[i].toDataURL();
           document.getElementById("plant_box_" + i).style.background = 'url(' + data_url + ')  no-repeat center center';
         }

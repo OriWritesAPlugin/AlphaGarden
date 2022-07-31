@@ -280,7 +280,7 @@ input.chunky_wrap {
 .collection_box {
     display: flex;
     align-items: center;
-    justify-content: center;
+    /*justify-content: center;  we're gonna try anchoring to the top and letting things wrap...*/
     flex-direction:column;
     text-align:center;
     width: 90px;

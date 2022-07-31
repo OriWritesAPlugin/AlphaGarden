@@ -3,8 +3,9 @@
 <html>
     <meta charset="utf-8"/>
     <head>
-        <title>Overgrowth Bingo</title>
+        <title>Coli Bingo [EG]</title>
         <link rel="stylesheet" type="text/css"  href="nature.css" />
+        <link rel="icon" href="https://i.imgur.com/zevR9Uz.png">
     </head>
     <body onload="do_setup()">
         <div class='center-parent'>
@@ -22,17 +23,22 @@
                <input type="radio" name="size" value='7' onchange="generate_overgrowth_board()"> 7x7
           </div>
           <div class='inline-flex-parent' style="text-align: center">
-               <input id="extra_icons" type="checkbox" name="extra_icons" value="3" onchange="toggle_extra_icons()" checked> Use extra icons
+               <input id="extra_icons" type="checkbox" name="extra_icons" onchange="toggle_extra_icons()" checked> Use extra icons
+               <input id="display_hints" type="checkbox" name="display_hints" onchange="toggle_hints()" style="margin-left: 10px;" checked> Display hints
+               <input id="dark_mode" type="checkbox" name="dark_mode" onchange="toggle_dark_mode()" style="margin-left: 10px;"> Dark mode
           </div>
           <p id="seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> earned yet!</p>
         </div>
-        <div id="board_div" class='center-parent'></div>
+        <div id="board_div" class='center-parent'"></div>
+        <div class='center-parent'><br><span id="bingo_hint" style="margin: 10px;"></span></div>
         <div id="bingo_plant_container_div" class='center-parent'><div id=bingo_plant_div class=bingo_plant_box></div>Congratulations!</div>
     </body>
     <script src="gen_plant.js"></script>
     <script src="bingo.js"></script>
     <script type="text/javascript">
     var use_extra_icons = document.getElementById("extra_icons").checked;
+    var display_hints = document.getElementById("display_hints").checked;
+    var dark_mode = document.getElementById("dark_mode").checked;
 
     function generate_overgrowth_board() {
         var size = parseInt(getRadioValue("size"));
@@ -44,11 +50,20 @@
     function do_setup(){
         preload_all_images();
         generate_overgrowth_board();
+        toggle_extra_icons();
+        toggle_hints();
+        toggle_dark_mode();
     }
 
-    function toggle_extra_icons() {
-        use_extra_icons = document.getElementById("extra_icons").checked;
-        toggleExtraIcons(use_extra_icons);
+    function toggle_dark_mode(color) {
+       dark_mode = document.getElementById("dark_mode").checked;
+       if(dark_mode){
+           document.body.style.background = "#201920";
+           document.body.style.color = "#DFC48C";
+       } else {
+           document.body.style.background = "linear-gradient(to right, #093028, #227251)";
+           document.body.style.color = "#FFFFFF";
+       }
     }
     </script>
 </html>

@@ -9,7 +9,7 @@ body {
     background-color: #441100;
     min-width: 550px;
     background-attachment: fixed;
-    transition: background 0.5s linear;
+    /* transition: background 0.5s linear; // horrible white flash of death, why*/ 
 }
 
 a {
