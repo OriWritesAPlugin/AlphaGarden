@@ -19,6 +19,11 @@ var place_simple_feature = "e900ff";
 // Holder for all the images we'll need
 var refs = {};
 
+// old spotted mushroom: https://i.imgur.com/MyF1tCA.png
+// old medium tree with the wonky trunk: https://i.imgur.com/ZMe5J0j.png
+// old medium tree with wonky trunk #2 (49 0-idx) https://i.imgur.com/Ps4w9LV.png
+
+
 // Javascript can't access images by path.
 // This workaround is hideous, but what can ya do :) (while hosting to github and not using ajax, I mean)
 all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.png", "https://i.imgur.com/wsC3ifp.png",
@@ -26,10 +31,10 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/nMW2bBb.png", "https://i.imgur.com/tBQb6yy.png", "https://i.imgur.com/5j6u58a.png",
                "https://i.imgur.com/Mb1wqi1.png", "https://i.imgur.com/Rk7vvo3.png", "https://i.imgur.com/DdEYVYA.png",
                "https://i.imgur.com/IF5MQWY.png", "https://i.imgur.com/Z6njdmV.png", "https://i.imgur.com/cDAqt4U.png",
-               "https://i.imgur.com/117aiCY.png", "https://i.imgur.com/7ZrX05Y.png", "https://i.imgur.com/ZMe5J0j.png",
+               "https://i.imgur.com/117aiCY.png", "https://i.imgur.com/7ZrX05Y.png", "https://i.imgur.com/ccBvzqU.png",
                "https://i.imgur.com/wLsuJSX.png", "https://i.imgur.com/dxJbfgi.png", "https://i.imgur.com/l1MK3yJ.png",
                "https://i.imgur.com/kTbrzeL.png", "https://i.imgur.com/s4Uav2q.png", "https://i.imgur.com/6GPgZzr.png",
-               "https://i.imgur.com/E6ikrq8.png", "https://i.imgur.com/MyF1tCA.png", "https://i.imgur.com/5y1UeDM.png",
+               "https://i.imgur.com/E6ikrq8.png", "https://i.imgur.com/VvrBOM2.png", "https://i.imgur.com/5y1UeDM.png",
                "https://i.imgur.com/uYswz0s.png", "https://i.imgur.com/qGczjJf.png", "https://i.imgur.com/PaWgGAq.png",
                // Row below is zero-indexed 30, 31, 32
                "https://i.imgur.com/0fBhPPY.png", "https://i.imgur.com/NzGJLcK.png", "https://i.imgur.com/62lbxgE.png",
@@ -38,7 +43,7 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/65fD3Wt.png", "https://i.imgur.com/GhHUZAm.png", "https://i.imgur.com/Wtmyg00.png",
                "https://i.imgur.com/k7FDQzk.png", "https://i.imgur.com/hnTjsH8.png", "https://i.imgur.com/yIZJ19G.png",
                "https://i.imgur.com/mQaUMgT.png", "https://i.imgur.com/t2NAP7b.png", "https://i.imgur.com/abzacy8.png",
-               "https://i.imgur.com/Wax3h14.png", "https://i.imgur.com/Ps4w9LV.png", "https://i.imgur.com/3RpiB9t.png",
+               "https://i.imgur.com/Wax3h14.png", "https://i.imgur.com/LXwHQjn.png", "https://i.imgur.com/3RpiB9t.png",
                "https://i.imgur.com/LIicGxR.png", "https://i.imgur.com/2XeqnbE.png", "https://i.imgur.com/Zal2kLb.png",
                "https://i.imgur.com/thX8zVH.png", "https://i.imgur.com/YsmG4bZ.png", "https://i.imgur.com/iv73TrE.png",
                "https://i.imgur.com/E96bbUd.png", "https://i.imgur.com/7amn8lf.png", "https://i.imgur.com/EaOoji3.png",
@@ -52,10 +57,13 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                 // 78, 79, 80
                "https://i.imgur.com/qgJ3827.png", "https://i.imgur.com/XyaY9kF.png", "https://i.imgur.com/BhMMhrn.png",
                "https://i.imgur.com/RNv63mA.png", "https://i.imgur.com/t5T7Vb7.png", "https://i.imgur.com/Ox6ArQN.png",
-               "https://i.imgur.com/WKvhSXz.png",
-               "https://i.imgur.com/Fz6ldEU.png", "https://i.imgur.com/XDenv4L.png", "https://i.imgur.com/qT4F8Wh.png",
-               "https://i.imgur.com/0j5Khpm.png",
-               "https://i.imgur.com/NhefjfV.png", "https://i.imgur.com/C95Je1X.png"];
+               "https://i.imgur.com/WKvhSXz.png", "https://i.imgur.com/Fz6ldEU.png", "https://i.imgur.com/XDenv4L.png",
+               "https://i.imgur.com/qT4F8Wh.png", "https://i.imgur.com/0j5Khpm.png", "https://i.imgur.com/NhefjfV.png",
+               "https://i.imgur.com/C95Je1X.png", "https://i.imgur.com/UkOY96i.png", "https://i.imgur.com/0Fml1MI.png",
+               "https://i.imgur.com/N8Blg9w.png", "https://i.imgur.com/0m281Dt.png", "https://i.imgur.com/gic1Bgj.png",
+               // 95, 97, 98
+               "https://i.imgur.com/NDnKMrY.png", "https://i.imgur.com/MmN2A17.png", "https://i.imgur.com/HNkWjgK.png",
+               "https://i.imgur.com/aoTsd6a.png", "https://i.imgur.com/1NZlHPp.png", "https://i.imgur.com/ShUbORE.png"];
 
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
@@ -86,13 +94,11 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "ginger_cat": "https://i.imgur.com/XMZSI4u.png", "tuxedo_cat": "https://i.imgur.com/H93FT89.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
-common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78, 80, 81, 82, 84, 88];
+common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78, 80, 81, 82, 84, 88, 91, 92, 97, 98, 99, 101];
 
-// TODO: TEMPORARY!! boost for arid drop rates
-common_foliage = common_foliage.concat([84, 84, 85, 85, 86, 86, 87, 87, 88, 88, 89, 89, 90, 90]);
-
-uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43, 46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79, 83, 85, 86, 90]);
-rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65, 70, 87, 89]);
+uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43,
+                                          46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79, 83, 85, 86, 90, 93, 94, 95, 96]);
+rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65, 70, 87, 89, 100]);
 boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
 override_foliage = [];
@@ -133,21 +139,26 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
                     ["684e39", "513522", "391e10", "1f0c03"], ["fce382", "ebab8a", "dc5890", "b027a1"],
                     ["71f4a3", "68dbba", "4cb1c4", "3c7fb2"], ["c5e9fc", "b5c1fa", "a494f8", "9163f5"],
                     ["f83234", "c92637", "841732", "560e27"], ["fbeba5", "c6b05f", "929564", "527259"],
-                    ["fff7cf", "ece2b1", "ddcea1", "ccb78e"]];
-                    
+                    ["fff7cf", "ece2b1", "ddcea1", "ccb78e"], ["fb8dc2", "d75dd0", "a44abf", "7c3fae"], // "e0dfff", "a9a7bf", "7b798a", "4d4c54"
+                    ["e1e0ff", "aaa8c1", "7c7a8f", "4c4b53"], ["a6a190", "938a7d", "74685a", "5a5144"], //["ba85df", "7f5bae", "5f4690", "433373"]];
+                    ["2e7747", "175143", "143841", "12253e"], ["7dc9d2", "4e85b1", "325689", "312f70"],
+                    ["405251", "2b393a", "1e252a", "14151e"], ["666fa9", "424071", "2c1f4c", "240539"],
+                    ["cc3a77", "942162", "5d1354", "2f0e4d"]];
 
 // There's three types of palette:
 // Foliage: Generally the bulk of a plant. Greens and browns are most common
-// Feature: Think of the secondary on a dragon. Structures like trunks, flower brachts
-// Accent: Think of the tertiary. Has bonus loud, bright colors that would look garish in a patch. Tone used for flowers (eventually)
+// Feature: Think of the secondary on a dragon. Structures like trunks, flower brachts, and stone
+// Accent: Think of the tertiary. Has bonus loud, bright colors that would look garish in a patch. Tone used for most flowers
 
 // Note that some common foliage colors are double-weighted because they're very nice greens :)
-var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 18, 21, 21, 22, 23, 29, 30, 30, 41, 42, 43, 44, 45, 49, 56, 11];
+var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 18, 21, 21, 22, 23, 29, 30, 30, 41, 42, 43, 44, 45, 49, 56, 11, 62, 65];
 common_foliage_palettes = common_foliage_palettes.concat(common_foliage_palettes);  // Cheap greenery boost
 var common_accent_palettes = [19, 20, 35, 36, 37, 38, 39, 40];
-var common_feature_palettes = [1, 20, 29, 32, 33, 34, 52, 58];
-var uncommon_palettes = [9, 10, 11, 12, 13, 14, 15, 18, 24, 25, 38, 46, 47, 50, 55, 57];
-var rare_palettes = [16,  17, 26, 27, 28, 30, 31, 48, 51, 53, 54];
+var common_feature_palettes = [1, 20, 29, 32, 33, 34, 52, 58, 61, 64];
+var common_feature_palettes = common_feature_palettes.concat(common_feature_palettes);  // Cheap wood/stone boost
+var uncommon_palettes = [9, 10, 11, 12, 13, 14, 15, 18, 24, 25, 38, 46, 47, 50, 55, 57, 60, 63, 66];
+var rare_palettes = [16,  17, 26, 27, 28, 30, 31, 48, 51, 53, 54, 59, 64];
+
 
 // Used for entirely overwriting the pools to force certain plants
 /*common_foliage_palettes = [56, 11];
@@ -169,21 +180,18 @@ var rare_accent_palettes = uncommon_accent_palettes.concat(rare_palettes);
 var boosted_rare_palettes = uncommon_palettes.concat(rare_palettes);
 
 // Used for boosting rates when I'm generating lots of plants
-/*var boost_with = [46, 46, 46, 46, 46, 46, 50, 50, 50, 50, 50, 50, 51, 51, 51, 51, 51, 17, 17, 17, 17, 17, 56, 56, 56, 56, 11, 11, 11, 56, 56, 56, 56, 11, 11, 11, 56, 56, 30, 30, 30, 30, 30, 54, 54, 54, 54]
-rare_foliage_palettes.concat(boost_with);
-rare_feature_palettes.concat(boost_with);
-rare_accent_palettes.concat(boost_with);*/
+/*var boost_with = [50, 50, 50, 50, 54, 54, 54, 54, 55, 55, 55, 55, 46, 46, 46, 46, 50, 50, 50, 50, 54, 54, 54, 54, 55, 55, 55, 55]
+rare_foliage_palettes = rare_foliage_palettes.concat(boost_with);
+rare_feature_palettes = rare_feature_palettes.concat(boost_with);
+rare_accent_palettes = rare_accent_palettes.concat(boost_with);*/
 // Used for replacing ALL colors...
-//rare_foliage_palettes = [57];
-//rare_feature_palettes = [58];
-//rare_accent_palettes = [58];
+//rare_foliage_palettes = [27, 54];
+//rare_feature_palettes = [61];
+//rare_accent_palettes = [60, 61, 62, 63, 64, 65, 66];
 
 
 async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, chance, anchor_to_bottom=false){
     // In canvas context ctx, place image at img_path "centered" at each (x,y) in list_of_coords with chance odds (ex 0.66 for 66%)
-    // 50% chance to horizontally mirror each one? (TODO)
-    // Wondering if the shared ctx save/reload and use of async-await is giving me the "floating flowers" issue in here.
-    // I may revisit (and mirror the final canvas instead), but it feels like overkill for now.
     img = await refs[img_url];
     var w_offset = Math.floor(img.width/2);
     if(!anchor_to_bottom){
@@ -213,15 +221,19 @@ async function preload_all_images()
 
 // Sound of me not being 100% confident in my async usage yet
 async function preload_single_image(url){
-/*    var img=new Image();
-    img.src=url;
-    img.crossOrigin = "anonymous"
-    var loaded_img = img.decode();  // To throw it in mem without blocking?
-    return img*/
+    let img;
+    imageLoadPromise = new Promise(resolve => {
+            img = new Image();
+            img.src=url;
+            img.crossOrigin = "anonymous"
+            img.onload = resolve;
+        });
+    await imageLoadPromise;
+    return img;
     // Not yet supported in common versions of Safari
-    return fetch(url)
+    /*return fetch(url)
            .then(response => response.blob())
-           .then(blob => createImageBitmap(blob));
+           .then(blob => createImageBitmap(blob));*/
 }
 
 // We have things like foliage, colors, and features that exist in "master lists"
