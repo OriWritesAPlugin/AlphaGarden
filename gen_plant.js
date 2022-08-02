@@ -61,8 +61,8 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/qT4F8Wh.png", "https://i.imgur.com/0j5Khpm.png", "https://i.imgur.com/NhefjfV.png",
                "https://i.imgur.com/C95Je1X.png", "https://i.imgur.com/UkOY96i.png", "https://i.imgur.com/0Fml1MI.png",
                "https://i.imgur.com/N8Blg9w.png", "https://i.imgur.com/0m281Dt.png", "https://i.imgur.com/gic1Bgj.png",
-               // 95, 97, 98
-               "https://i.imgur.com/NDnKMrY.png", "https://i.imgur.com/MmN2A17.png", "https://i.imgur.com/HNkWjgK.png",
+               // 96, 97, 98
+               "https://i.imgur.com/xNwcdSt.png", "https://i.imgur.com/MmN2A17.png", "https://i.imgur.com/HNkWjgK.png",
                "https://i.imgur.com/aoTsd6a.png", "https://i.imgur.com/1NZlHPp.png", "https://i.imgur.com/ShUbORE.png"];
 
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
@@ -99,6 +99,14 @@ common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62
 uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43,
                                           46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79, 83, 85, 86, 90, 93, 94, 95, 96]);
 rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65, 70, 87, 89, 100]);
+// The ENTIRE special_foliage group has a rare chance to be selected instead of a standard base, then one's chosen from within at random.
+// I need to figure out math such that any given special base has ~20% of the chance of being chosen vs. any other seed
+// chance of any seed: 1/#total_bases
+// target chance: 1/#total_bases * 0.2
+// chance of a given special: 1/#specials * x, where x is the chance of the special pool being selected instead of a standard base
+// formula: x = 1/#total_bases * 0.2 * #specials
+special_foliage = []
+const special_foliage_chance = 1/all_foliage.length * 0.2 * special_foliage.length
 boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
 override_foliage = [];
@@ -159,7 +167,6 @@ var common_feature_palettes = common_feature_palettes.concat(common_feature_pale
 var uncommon_palettes = [9, 10, 11, 12, 13, 14, 15, 18, 24, 25, 38, 46, 47, 50, 55, 57, 60, 63, 66];
 var rare_palettes = [16,  17, 26, 27, 28, 30, 31, 48, 51, 53, 54, 59, 64];
 
-
 // Used for entirely overwriting the pools to force certain plants
 /*common_foliage_palettes = [56, 11];
 uncommon_palettes = [];
@@ -180,10 +187,11 @@ var rare_accent_palettes = uncommon_accent_palettes.concat(rare_palettes);
 var boosted_rare_palettes = uncommon_palettes.concat(rare_palettes);
 
 // Used for boosting rates when I'm generating lots of plants
-/*var boost_with = [50, 50, 50, 50, 54, 54, 54, 54, 55, 55, 55, 55, 46, 46, 46, 46, 50, 50, 50, 50, 54, 54, 54, 54, 55, 55, 55, 55]
+/*var boost_with = [12, 12, 12, 12, 12, 12, 12, 63, 63, 63, 63, 63, 63, 66, 66, 66, 66, 66, 64, 64, 64, 64, 64, 60, 60]
 rare_foliage_palettes = rare_foliage_palettes.concat(boost_with);
 rare_feature_palettes = rare_feature_palettes.concat(boost_with);
-rare_accent_palettes = rare_accent_palettes.concat(boost_with);*/
+rare_accent_palettes = rare_accent_palettes.concat(boost_with);
+rare_foliage_palettes = rare_foliage_palettes.concat([65, 65, 65, 65, 65]);
 // Used for replacing ALL colors...
 //rare_foliage_palettes = [27, 54];
 //rare_feature_palettes = [61];
