@@ -184,6 +184,8 @@
         var bingo_plant_generated = false;  // Used to track whether the bonus bingo seed has been revealed. We don't re-hide seeds.
         var forced_random_seed = null;  // "Child" pages can overwrite with a fixed seed, ex: self_care uses the date as a seed.
         var use_extra_icons = true;  // "Child" pages can use ex: a checkbox to prevent the non-seeded-plant icons from showing up (they might be distracting)
+        var rewards = {};  // the seeds to be rewarded, excepting the special bingo seed
+        var bingo_reward;  // the special bingo seed reward
 
         function randomFromArray(arr){return arr[Math.floor(Math.random()*arr.length)]}
 
@@ -262,6 +264,35 @@
             return challenges;
         }
 
+        function assemble_reward_list(num_squares){
+            let rewards = {};
+            let reward_list = [];
+            let num_to_reward = 0;
+            for(let i=1; i<num_squares; i++){
+                if(i in plants_revealed_at){
+                    num_to_reward ++;
+                }
+            }
+            // The +1 is for the bingo seed
+            for(let j=0; j<=num_to_reward+1; j++){
+                rarity = plant_rarity_lookup[current_difficulty][j];
+                if(forced_random_seed == null){
+                    plant_data = gen_plant_data(rarity);
+                } else {
+                    // ONLY for forced_random seed generation, the bingo seed needs to increment num_plants_revealed
+                    plant_data = gen_plant_data(rarity, forced_random_seed+String(num_plants_revealed + bingo_plant_generated));
+                }
+                reward_list.push(encode_plant_data_v2(plant_data));
+            }
+
+            for(let i=num_squares; i>0; i--){
+                if(i in plants_revealed_at){
+                    rewards[i] = reward_list.pop();
+                }
+            }
+            return [rewards, reward_list.pop()];    
+         }
+
         function clear_board() {
           var board = document.getElementById("board_div")
           while (board.lastChild) {
@@ -316,22 +347,32 @@
           return bingo;
         }
 
+        function generate_board_info(size, difficulty, rarity_override=null) {
+            var current_difficulty = difficulty;  // Make it globally available (not huge on this)
+            var challenges = assemble_challenge_list(size, difficulty);
+            [rewards, bingo_reward] = assemble_reward_list(size*size);
+            for(var i=0; i < size; i++){
+              current_board.push([]);
+              for(var j=0; j < size; j++){
+                var challenge_name = challenges[i*size+j];
+                current_board[i].push({"earned": false,
+                                       "challenge": challenge_name,
+                                       "icon": icons[Math.floor(Math.random() * icons.length)]});
+              }
+           }
+        }
+
         function generate_board(size, difficulty, rarity_override=null) {
             clear_board();
-            current_difficulty = difficulty;  // Make it globally available (not huge on this)
+            generate_board_info(size, difficulty);
             var board = document.getElementById("board_div");
-            var challenges = assemble_challenge_list(size, difficulty);
             for(var i=0; i < size; i++){
               var new_row = document.createElement('div');
               new_row.className = "bingo_row";
               board.appendChild(new_row);
-              current_board.push([]);
               for(var j=0; j < size; j++){
-                var challenge_name = challenges[i*size+j];
-                add_bingo_square(new_row, i, j, challenge_name, rarity_override=rarity_override);
-                current_board[i].push({"earned": false,
-                                       "challenge": challenge_name,
-                                       "icon": icons[Math.floor(Math.random() * icons.length)]});
+                let current_square = current_board[i][j];
+                add_bingo_square(new_row, i, j, current_board[i][j]["challenge"]);
               }
            }
         }
@@ -476,6 +517,41 @@
 
             bingo_square.appendChild(label);
             parent.appendChild(bingo_square);
+        }
+
+        function export_bingo(){
+            let bingo_board = {"reward_mode": "numbered"};
+            bingo_board["squares"] = current_board;
+            bingo_board["rewards"] = rewards;
+            bingo_board["bingo_reward"] = bingo_reward;
+            return JSON.stringify(bingo_board);
+        }
+
+        function export_bingo_onclick() {
+            var textArea = document.createElement("textarea");
+            textArea.style.width = '2em';
+            textArea.style.height = '2em';
+            textArea.style.background = 'transparent';
+            textArea.value = export_bingo();
+            document.body.appendChild(textArea);
+            //textArea.focus();
+            textArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textArea);
+            document.execCommand("copy");
+            let clicked = document.getElementById("Export");
+            clicked.textContent = "[Copied!]"
+            setTimeout(function(){ clicked.textContent = "[Export]"; }, 1000);
+        }
+
+        function import_bingo_onclick() {  
+           let bingo_board = JSON.parse(prompt("Paste in your board:"));
+           clear_board();
+           current_board = bingo_board["squares"];
+           rewards = bingo_board["rewards"];
+           bingo_reward = bingo_board["bingo_reward"];
+           size = bingo_board["squares"].length;
+           draw_board();
         }
 
         function toggle_extra_icons() {
