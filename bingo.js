@@ -479,13 +479,11 @@
         }
 
         function toggle_extra_icons() {
-            use_extra_icons = document.getElementById("extra_icons").checked;
-            toggleExtraIcons(use_extra_icons);
+            toggleExtraIcons(current_icons);
         }
 
         function toggle_hints() {
-            display_hints = document.getElementById("display_hints").checked;
-            if(display_hints){
+            if(current_hints){
                 document.getElementById("bingo_hint").style.visibility = "visible";
             } else {
                 document.getElementById("bingo_hint").style.visibility = "hidden";

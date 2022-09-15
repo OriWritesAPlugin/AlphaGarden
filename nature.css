@@ -17,6 +17,7 @@ a {
 }
 
 @media screen and (max-height: 600px){ body {font-size: 0.9em}}
+@media screen and (max-width: 600px){ body {font-size: 0.9em}}
 
 
 .center-parent{
@@ -40,7 +41,7 @@ a {
    align-content: center;
 }
 
-.bingo_box, .bingo_plant_box, .to_do_plant_box {
+.bingo_box, .bingo_plant_box, .to_do_plant_box, .bingo_button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -62,6 +63,20 @@ a {
     margin: 0 auto;
     min-width: 96px;
     min-height: 96px;
+}
+
+.bingo_button {
+    background-color: transparent;
+    width: auto;
+    min-width: 60px;
+    height: auto;
+    min-height: 40px;
+    margin-left: 1.5vw;
+    border-style: none;
+}
+
+.bingo_button:hover {
+  color:#71b280;
 }
 
 .bingo_label, .todo_plant_label {

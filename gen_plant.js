@@ -107,7 +107,7 @@ rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 3
 // formula: x = 1/#total_bases * 0.2 * #specials
 //special_foliage = []
 //const special_foliage_chance = 1/all_foliage.length * 0.2 * special_foliage.length
-//boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
+boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
 override_foliage = [];
 
@@ -187,14 +187,14 @@ var rare_accent_palettes = uncommon_accent_palettes.concat(rare_palettes);
 var boosted_rare_palettes = uncommon_palettes.concat(rare_palettes);
 
 // Used for boosting rates when I'm generating lots of plants
-/*var boost_with = [12, 12, 12, 12, 12, 12, 12, 63, 63, 63, 63, 63, 63, 66, 66, 66, 66, 66, 64, 64, 64, 64, 64, 60, 60]
+var boost_with = [12, 12, 12, 12, 12, 12, 12, 63, 63, 63, 63, 63, 63, 66, 66, 66, 66, 66, 64, 64, 64, 64, 64, 60, 60]
 rare_foliage_palettes = rare_foliage_palettes.concat(boost_with);
 rare_feature_palettes = rare_feature_palettes.concat(boost_with);
 rare_accent_palettes = rare_accent_palettes.concat(boost_with);
-rare_foliage_palettes = rare_foliage_palettes.concat([65, 65, 65, 65, 65]);*/
+rare_foliage_palettes = rare_foliage_palettes.concat([65, 65, 65, 65, 65]);
 // Used for replacing ALL colors...
-//rare_foliage_palettes = [27, 54];
-//rare_feature_palettes = [61];
+rare_foliage_palettes = [44];
+rare_feature_palettes = [13];
 //rare_accent_palettes = [60, 61, 62, 63, 64, 65, 66];
 
 
