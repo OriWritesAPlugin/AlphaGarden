@@ -44,7 +44,7 @@
             "p": {"description": "Spend 15 min in coli", "points": 600, "category": "coli", "full": "Spend 15 minutes coli-ing; doesn't \"stack\" with other time squares (5+15=20 minutes total)"},
             "q": {"description": "Exactly 6 DISTINCT items", "points": 550, "category": "coli", "full": "Get exactly 6 DIFFERENT items (counted as 6 squares in the post-battle loot screen) from a single battle"},
             "r": {"description": "4-enemy pack", "points": 250, "category": "coli", "full": "Fight four enemies at once. You don't have to win!"},
-            "s": {"description": "7+ TOTAL items", "points": 500, "category": "coli", "full": "Get 7+ TOTAl items (so if you add up the item counts in the post-battle loot screen, you get at least 7)"},
+            "s": {"description": "7+ TOTAL items", "points": 500, "category": "coli", "full": "Get 7+ TOTAL items (so if you add up the item counts in the post-battle loot screen, you get at least 7)"},
             "t": {"description": "Max breath on all attackers", "points": 300, "category": "coli", "full": "Get any of your actively-fighting dragons to full breath! If you're training fodder, only your trainer(s) are required"},
             "u": {"description": "Get a rock", "points": 200, "category": "coli",  "full": "Get any item that could be considered a rock, be it a crystal, a battle stone depicting a rock (fragments), etc."},
             "v": {"description": "5 fights w/o trainer dmg'd", "points": 200, "category": "coli", "full": "Win 5 fights in a row without your trainer(s) (or farmer(s)) taking damage. Fodder can be damaged!"},
@@ -183,9 +183,11 @@
         var current_difficulty;
         var bingo_plant_generated = false;  // Used to track whether the bonus bingo seed has been revealed. We don't re-hide seeds.
         var forced_random_seed = null;  // "Child" pages can overwrite with a fixed seed, ex: self_care uses the date as a seed.
-        var use_extra_icons = true;  // "Child" pages can use ex: a checkbox to prevent the non-seeded-plant icons from showing up (they might be distracting)
+        var current_icons = false;  // "Child" pages can use ex: a checkbox to prevent the non-seeded-plant icons from showing up (they might be distracting)
         var rewards = {};  // the seeds to be rewarded, excepting the special bingo seed
         var bingo_reward;  // the special bingo seed reward
+        var had_bingo_last_turn = false;  // used to skip re-running bingo display code if our status hasn't changed
+        var bingo_plant_data_url = null;  // used both to store the bingo plant and check if we've had bingo in the past
 
         function randomFromArray(arr){return arr[Math.floor(Math.random()*arr.length)]}
 
@@ -301,7 +303,8 @@
           current_board = [];
           num_squares_revealed = 0;
           num_plants_revealed = 0;
-          bingo_plant_generated = false;
+          had_bingo_last_turn = false;
+          bingo_plant_data_url = null;
           setBingoPlantVisibility(false);
         }
 
@@ -357,30 +360,45 @@
                 var challenge_name = challenges[i*size+j];
                 current_board[i].push({"earned": false,
                                        "challenge": challenge_name,
-                                       "icon": icons[Math.floor(Math.random() * icons.length)]});
+                                       "reward": {"type": "none"}
+                                     });
               }
+           }
+        }
+
+        function draw_board(){
+            var board = document.getElementById("board_div");
+            for(var i=0; i < current_board.length; i++){
+              var new_row = document.createElement('div');
+              new_row.className = "bingo_row";
+              board.appendChild(new_row);
+              for(var j=0; j < current_board[i].length; j++){
+                let current_square = current_board[i][j];
+                id = add_bingo_square(new_row, i, j, current_square["challenge"]);
+                if(current_square["earned"]){
+                    current_square["earned"] = false;  // we're about to fake a click
+                    toggle_status({"target": {"id": id}}, false);
+                    if(current_square["reward"]["type"] == "seed"){
+                        revealed_seeds.push(current_square['reward']["value"]);
+                    }
+                }
+              }
+           }
+           if(revealed_seeds.length > 0){
+               document.getElementById("seed_list").innerHTML = revealed_seeds.join(", ");
            }
         }
 
         function generate_board(size, difficulty, rarity_override=null) {
             clear_board();
             generate_board_info(size, difficulty);
-            var board = document.getElementById("board_div");
-            for(var i=0; i < size; i++){
-              var new_row = document.createElement('div');
-              new_row.className = "bingo_row";
-              board.appendChild(new_row);
-              for(var j=0; j < size; j++){
-                let current_square = current_board[i][j];
-                add_bingo_square(new_row, i, j, current_board[i][j]["challenge"]);
-              }
-           }
+            draw_board();
         }
 
         // Reveal a plant in a square (either within the board or the "bonus bingo plant"
         // Handles the work of generating the plant itself and adding the seed to the pile.
         // Returns a dataURL to set as an image someplace.
-        async function genPlantInSquare(forced_random_offset=0){
+        async function genSeedForSquare(forced_random_offset=0){
             rarity = plant_rarity_lookup[current_difficulty][num_plants_revealed];
             if(forced_random_seed == null){
                 plant_data = gen_plant_data(rarity);
@@ -388,7 +406,12 @@
                 // ONLY for forced_random seed generation, the bingo seed needs to increment num_plants_revealed
                 plant_data = gen_plant_data(rarity, forced_random_seed+String(num_plants_revealed + bingo_plant_generated));
             }
-            plant_canvas = await gen_plant(plant_data);
+            return encode_plant_data_v2(plant_data);
+        }
+
+        // Looking quite a bit like quite a bit other code, takes a seed and draws the plant, but here in a bingo square.
+        async function drawPlantForSquare(seed){
+            plant_canvas = await gen_plant(decode_plant_data(seed));
             // TODO: This next scaling bit seems incredibly silly
             var scale_canvas = document.createElement("canvas");
             scale_canvas.width = 96;
@@ -396,58 +419,72 @@
             var scale_ctx = scale_canvas.getContext("2d");
             scale_ctx.imageSmoothingEnabled = false;
             scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
-            revealed_seeds.push(encode_plant_data_v2(plant_data));
-            document.getElementById("seed_list").innerHTML = revealed_seeds.join(", ");
             return scale_canvas.toDataURL();
         }
 
-        async function toggle_status(e){
-        var id = e.target.id;
-        coords = id.split("_");
-        var row = parseInt(coords[0]);
-        var col = parseInt(coords[1]);
-        var square_info = current_board[row][col];
-        var bingo_square = document.getElementById(id);
-        square_info["earned"] = !square_info["earned"];
-        bingo_square.lastChild.style.opacity = 0.2;  // Make label translucent
-        if(square_info["earned"]){
-          num_squares_revealed ++;
-          // Null is treated as 0...Javascript!
-          if(num_plants_revealed < plants_revealed_at[num_squares_revealed]){
-            // Time to reveal a plant!
-            num_plants_revealed ++;
-            square_info['icon'] = await genPlantInSquare();
-          }
-          if(use_extra_icons || !square_info['icon'].startsWith("https://")){
-            bingo_square.style.background = 'url(' + square_info["icon"] + ')  no-repeat center center';
-          } else {bingo_square.style.background = "none";}
-        } else {
-          num_squares_revealed --;
-          bingo_square.style.background = "none";
-          bingo_square.lastChild.style.opacity = 1;
-        }
-        var body = document.getElementsByTagName("BODY")[0];
-        now_has_bingo = has_bingo();
-        setBingoPlantVisibility(now_has_bingo);
-        if(now_has_bingo){
-          transition_all_bingo_borders("#ffffff", row, col);
-        } else {
-          shimmer_bingo_borders(bingo_border_color, "#b1f2c0", row, col);
-        }
+        async function toggle_status(e, generate_rewards=true){
+            var id = e.target.id;
+            coords = id.split("_");
+            var row = parseInt(coords[0]);
+            var col = parseInt(coords[1]);
+            var square_info = current_board[row][col];
+            var bingo_square = document.getElementById(id);
+            square_info["earned"] = !square_info["earned"];
+            bingo_square.lastChild.style.opacity = 0.2;  // Make label translucent
+            if(square_info["earned"]){
+              num_squares_revealed ++;
+              // Null is treated as 0...Javascript!
+              if(num_plants_revealed < plants_revealed_at[num_squares_revealed]){
+                // Time to reveal a plant!
+                num_plants_revealed ++;
+                // If we're loading a pre-generated bingo board, rewards are already in place
+                if(generate_rewards){
+                  square_info['reward'] = {"type": "seed", "value": await genSeedForSquare()};
+                  revealed_seeds.push(square_info['reward']["value"]);
+                  document.getElementById("seed_list").innerHTML = revealed_seeds.join(", ");
+                }
+              }
+              if(current_icons && generate_rewards && square_info["reward"]["type"] == "none"){
+                square_info["reward"] = {"type": "icon", "value": icons[Math.floor(Math.random() * icons.length)]};
+              }
+              if(current_icons && square_info["reward"]["type"] == "icon"){
+                bingo_square.style.background = 'url(' + square_info["reward"]["value"] + ')  no-repeat center center';
+              } else if(square_info["reward"]["type"] == "seed"){
+                let data_url = await drawPlantForSquare(square_info["reward"]["value"]);
+                bingo_square.style.background = 'url(' + data_url + ')  no-repeat center center';
+              } else {bingo_square.style.background = "none";}
+            } else {
+              num_squares_revealed --;
+              bingo_square.style.background = "none";
+              bingo_square.lastChild.style.opacity = 1;
+            }
+            var body = document.getElementsByTagName("BODY")[0];
+            now_has_bingo = has_bingo();
+            if(now_has_bingo != had_bingo_last_turn){  // our bingo state has changed
+                had_bingo_last_turn = now_has_bingo;
+                await setBingoPlantVisibility(now_has_bingo);
+                if(now_has_bingo){
+                  transition_all_bingo_borders("#ffffff", row, col);
+                } else {
+                  shimmer_bingo_borders(bingo_border_color, "#b1f2c0", row, col);
+                }
+            } else if(!now_has_bingo){
+              shimmer_bingo_borders(bingo_border_color, "#b1f2c0", row, col);
+            }
         }
 
         function transition_all_bingo_borders(color, origin_row, origin_column){
-        var root_delay = 70;  // in milliseconds
-        for(let i=0; i<current_board.length; i++){
-            for(let j=0; j<current_board[i].length; j++){
-              // Yes these lets are necessary
-              let mapped_row = origin_row;
-              let mapped_column = origin_column;
-              // Delay proportional to distance from origin
-              let delay = root_delay*(((mapped_column-j)**2+(mapped_row-i)**2)**(1/2))
-              setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = color;}, delay);
-            }
-          }
+            var root_delay = 70;  // in milliseconds
+            for(let i=0; i<current_board.length; i++){
+                for(let j=0; j<current_board[i].length; j++){
+                  // Yes these lets are necessary
+                  let mapped_row = origin_row;
+                  let mapped_column = origin_column;
+                  // Delay proportional to distance from origin
+                  let delay = root_delay*(((mapped_column-j)**2+(mapped_row-i)**2)**(1/2))
+                  setTimeout( function() {document.getElementById(i+"_"+j).style.borderColor = color;}, delay);
+                }
+              }
         }
 
         async function setBingoPlantVisibility(show_plant){
@@ -455,14 +492,13 @@
             if(!show_plant){
                 parent_div.style.display = "none";
             } else {
-                if(!bingo_plant_generated){
-                    // We need this true BEFORE generating the plant (weird I know) in case of a forced random seed. It's how we know to increment.
-                    bingo_plant_generated = true;  // Once gained, is only lost when board is reset (to avoid regenerating the bingo plant)
-                    data_url = await genPlantInSquare();
-                    target_div = document.getElementById("bingo_plant_div");
-                    target_div.style.background = 'url(' + data_url + ')  no-repeat center center';
-                }
                 target_div = document.getElementById("bingo_plant_div");
+                if(bingo_plant_data_url == null){
+                    bingo_plant_data_url = await drawPlantForSquare(bingo_reward);
+                    revealed_seeds.push(bingo_reward);
+                    document.getElementById("seed_list").innerHTML = revealed_seeds.join(", ");
+                }
+                target_div.style.background = 'url(' + bingo_plant_data_url + ')  no-repeat center center';
                 parent_div.style.display = "block";
             }
         }
@@ -473,8 +509,13 @@
             for(let j=0; j<current_board[i].length; j++){
               bingo_square = document.getElementById(i+"_"+j);
               bingo_square_info = current_board[i][j];
-              if(bingo_square_info["earned"] && bingo_square_info['icon'].startsWith("https://")){  // This feels unsafe, somehow
-                if(show_icons){bingo_square.style.background = 'url(' + bingo_square_info["icon"] + ')  no-repeat center center';}
+              // Update any square that doesn't have icons, but could
+              if(show_icons && bingo_square_info["earned"] && bingo_square_info['reward']["type"] == "none"){
+                  bingo_square_info["reward"] = {"type": "icon", "value": icons[Math.floor(Math.random() * icons.length)]};
+              }
+              // Toggle the icon
+              if(bingo_square_info["earned"] && bingo_square_info['reward']["type"] == "icon"){
+                if(show_icons){bingo_square.style.background = 'url(' + bingo_square_info["reward"]["value"] + ')  no-repeat center center';}
                 else{bingo_square.style.background = "none";}
               }
             }
@@ -510,18 +551,24 @@
                 })
 
             var label = document.createElement('label')
-            var challenge = all_challenges[challenge_name[0]][challenge_name.slice(1)];
+            var challenge;
+            try {
+                challenge = all_challenges[challenge_name[0]][challenge_name.slice(1)];
+            } catch (error) {
+                challenge = {"description": challenge_name};  // For custom challenges
+            }
             label.htmlFor = id;
             label.className = 'bingo_label';
             label.appendChild(document.createTextNode(challenge["description"]));
 
             bingo_square.appendChild(label);
             parent.appendChild(bingo_square);
+            return id;
         }
 
         function export_bingo(){
             let bingo_board = {"reward_mode": "numbered"};
-            bingo_board["squares"] = current_board;
+            bingo_board["squares"] = minify_squares(current_board);
             bingo_board["rewards"] = rewards;
             bingo_board["bingo_reward"] = bingo_reward;
             return JSON.stringify(bingo_board);
@@ -547,7 +594,7 @@
         function import_bingo_onclick() {  
            let bingo_board = JSON.parse(prompt("Paste in your board:"));
            clear_board();
-           current_board = bingo_board["squares"];
+           current_board = deminify_squares(bingo_board["squares"]);
            rewards = bingo_board["rewards"];
            bingo_reward = bingo_board["bingo_reward"];
            size = bingo_board["squares"].length;
@@ -564,4 +611,42 @@
             } else {
                 document.getElementById("bingo_hint").style.visibility = "hidden";
             }
+        }
+
+        // Attempts to make the save data more copy-pasteable 
+        function minify_squares(to_minify){
+           minified_board = []
+           for(let i=0; i<to_minify.length; i++){
+               let minified_row = [];
+               for(let j=0; j<to_minify[i].length; j++){
+                   let minned = [to_minify[i][j]["earned"], to_minify[i][j]["challenge"]];
+                   if(to_minify[i][j]["reward"]["type"] != "none"){
+                       minned.push(to_minify[i][j]["reward"]["type"]);
+                       minned.push(to_minify[i][j]["reward"]["value"]);
+                   }
+                   minified_row.push(minned);
+               }
+               minified_board.push(minified_row);
+           }
+           return minified_board
+        }
+
+        function deminify_squares(to_deminify){
+           deminified_board = []
+           for(let i=0; i<to_deminify.length; i++){
+               let deminified_row = [];
+               for(let j=0; j<to_deminify[i].length; j++){
+               let deminned = {"earned": to_deminify[i][j][0],
+                               "challenge": to_deminify[i][j][1]};
+                   if(to_deminify[i][j].length > 2){
+                       deminned["reward"] = {"type":to_deminify[i][j][2],
+                                             "value": to_deminify[i][j][3]};
+                   } else {
+                       deminned["reward"] = {"type": "none"};
+                   }
+                   deminified_row.push(deminned);
+               }
+               deminified_board.push(deminified_row);
+           }
+           return deminified_board;
         }
