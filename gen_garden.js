@@ -318,10 +318,10 @@ async function draw_outline(color, ctx){
        // Note: because our "pixels" are 2x2, this shouldn't cause troubles at the corners...I think
        if(last_was_background && !this_is_background){
            points_to_color.push(i-4);
-           points_to_color.push(i-8);
+           //points_to_color.push(i-8);
        } else if (this_is_background && !last_was_background){
            points_to_color.push(i);
-           points_to_color.push(i+4);
+           //points_to_color.push(i+4);
        }
        last_was_background = this_is_background;
    }
@@ -343,10 +343,10 @@ async function draw_outline(color, ctx){
            // Second verse, same as the first. TODO: func it up.
            if(last_was_background && !this_is_background){
                points_to_color.push(i-output_canvas.width*4);
-               points_to_color.push(i-output_canvas.width*2*4);
+               //points_to_color.push(i-output_canvas.width*2*4);
            } else if (this_is_background && !last_was_background){
                points_to_color.push(i);
-               points_to_color.push(i+output_canvas.width*4);
+               //points_to_color.push(i+output_canvas.width*4);
            }
            last_was_background = this_is_background;
        }
