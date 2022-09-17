@@ -120,22 +120,22 @@
             "i": {"description": "Solve any logic puzzle", "points": 100, "category": "self-care", "full": "Sudoku, grid logic puzzles, etc. Try to do one that isn't easy for you!"},
             "j": {"description": "Use your jaw muscles", "points": 100, "category": "self-care", "full": "Tip: frozen gummy bears work well for this. Grab one for the left molars, one for the right. Jerky and gum, too!"},
             "k": {"description": "Reassuring self-talk", "points": 100, "category": "self-care", "full": "ex: \"it's normal to say something a little awkwardly, everyone does and no one remembers anyone else's, too busy thinking about their own\""},
-            "l": {"description": "Prep for breakfast", "points": 100, "category": "self-care", "full": "Make sure you have what you need to start tomorrow with a filling (and easy, if it helps!) meal"},
+            "l": {"description": "Pre-prepare for breakfast", "points": 100, "category": "self-care", "full": "Make sure you have what you need to start tomorrow with a filling (and easy, if it helps!) meal"},
             "m": {"description": "Notice 10 things around you", "points": 100, "category": "self-care", "full": "Let your eyes flick to something, mentally \"name\" that thing (ex: \"potted plant\"), and repeat"},
             "n": {"description": "Check for understimulation", "points": 100, "category": "self-care", "full": "Understimulation can show itself as \"brain static\", restlessness, distractability, etc. Give yourself some enrichment! PSA: if you're seemingly immune to caffeine otherwise, try some when understimulated"},
             "o": {"description": "Look deeply at something pleasant", "points": 100, "category": "self-care", "full": "For example, an mp4 of a cute dog. Try to focus on only that for at least a few seconds"},
             "p": {"description": "Tire out a non-cardiac muscle", "points": 100, "category": "self-care", "full": "Squats are great for engaging a lot of muscles at once"},
             "q": {"description": "Do something you've put off", "points": 100, "category": "self-care", "full": "Put in even minutes of work on something you've been putting off"},
             "r": {"description": "Jot down how you're feeling", "points": 100, "category": "self-care", "full": "Write a few sentences on how you're doing right now. You can delete/destroy them when you're done, if you like"},
-            "s": {"description": "Name 3 things you've accomplished today", "points": 100, "category": "self-care", "full": "Meet yourself where you are--if it's a step for you (like eating a full meal), it's an accomplishment, period!"},
-            "t": {"description": "", "points": 100, "category": "self-care", "full": ""},
-            "u": {"description": "", "points": 100, "category": "self-care", "full": ""},
-            "v": {"description": "", "points": 100, "category": "self-care", "full": ""},
-            "w": {"description": "", "points": 100, "category": "self-care", "full": ""},
-            "x": {"description": "", "points": 100, "category": "self-care", "full": ""},
-            "y": {"description": "", "points": 100, "category": "self-care", "full": ""},
-            "z": {"description": "", "points": 100, "category": "self-care", "full": ""},
-            "aa": {"description": "", "points": 100, "category": "self-care", "full": ""},
+            "s": {"description": "Name 3 accomplishments today", "points": 100, "category": "self-care", "full": "Meet yourself where you are--if it's a step for you (like eating a full meal), it's an accomplishment, period!"},
+            "t": {"description": "Try a new flavor", "points": 100, "category": "self-care", "full": "New ingredient, eating 2 things together, new dish, drink, anything!"},
+            "u": {"description": "Hear a new song", "points": 100, "category": "self-care", "full": "Sea shanties? Folk music? Metal? Try a little of anything!"},
+            "v": {"description": "Get comfy", "points": 100, "category": "self-care", "full": "Nestle down in something soft. Exhale slowly and release tension."},
+            "w": {"description": "Find some silence", "points": 100, "category": "self-care", "full": "Focus on any white noise present. Try to minimize it for a moment by ex: moving"},
+            "x": {"description": "Positive physical contact", "points": 100, "category": "self-care", "full": "Pet your cat, hug your friend, feed a bird, whatever!"},
+            "y": {"description": "Wear something that feels good", "points": 100, "category": "self-care", "full": "Any clothes, accessories, etc. that make you feel good to see yourself in"},
+            "z": {"description": "Check your emotional state", "points": 100, "category": "self-care", "full": "Ask yourself how you're feeling. Name any emotions present and where you think they're coming from"},
+            "aa": {"description": "Assure safety", "points": 100, "category": "self-care", "full": "Take stock of where you are. Reassure yourself that it's safe and secure"},
             "ab": {"description": "", "points": 100, "category": "self-care", "full": ""},
             "ac": {"description": "", "points": 100, "category": "self-care", "full": ""},
             "ad": {"description": "", "points": 100, "category": "self-care", "full": ""},
@@ -439,7 +439,11 @@
                 num_plants_revealed ++;
                 // If we're loading a pre-generated bingo board, rewards are already in place
                 if(generate_rewards){
-                  square_info['reward'] = {"type": "seed", "value": await genSeedForSquare()};
+                  if (rewards.hasOwnProperty(num_squares_revealed)){
+                      square_info['reward'] = {"type": "seed", "value": rewards[num_squares_revealed]};
+                  } else {
+                      square_info['reward'] = {"type": "seed", "value": await genSeedForSquare()};
+                  }
                   revealed_seeds.push(square_info['reward']["value"]);
                   document.getElementById("seed_list").innerHTML = revealed_seeds.join(", ");
                 }
