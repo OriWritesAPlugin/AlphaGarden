@@ -351,7 +351,7 @@
         }
 
         function generate_board_info(size, difficulty, rarity_override=null) {
-            var current_difficulty = difficulty;  // Make it globally available (not huge on this)
+            current_difficulty = difficulty;  // Make it globally available (not huge on this)
             var challenges = assemble_challenge_list(size, difficulty);
             [rewards, bingo_reward] = assemble_reward_list(size*size);
             for(var i=0; i < size; i++){
