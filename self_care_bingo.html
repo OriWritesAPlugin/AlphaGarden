@@ -59,5 +59,13 @@
            document.body.style.color = "#FFFFFF";
        }
     }
+
+        function toggle_hints() {
+            if(document.getElementById("display_hints").checked){
+                document.getElementById("bingo_hint").style.visibility = "visible";
+            } else {
+                document.getElementById("bingo_hint").style.visibility = "hidden";
+            }
+        }
     </script>
 </html>

@@ -281,8 +281,7 @@
                 if(forced_random_seed == null){
                     plant_data = gen_plant_data(rarity);
                 } else {
-                    // ONLY for forced_random seed generation, the bingo seed needs to increment num_plants_revealed
-                    plant_data = gen_plant_data(rarity, forced_random_seed+String(num_plants_revealed + bingo_plant_generated));
+                    plant_data = gen_plant_data(rarity, forced_random_seed+String(j + bingo_plant_generated));
                 }
                 reward_list.push(encode_plant_data_v2(plant_data));
             }
