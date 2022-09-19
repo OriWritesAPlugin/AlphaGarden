@@ -319,17 +319,17 @@ async function draw_outline(color, ctx){
        // Note: because our "pixels" are 2x2, this shouldn't cause troubles at the corners...I think
        if(last_was_background && !this_is_background){
            points_to_color.push(i-4);
-           points_to_color.push(i-8);
+           //points_to_color.push(i-8);
            // NOTE: push twice due to double-thickness
            // TODO: could we do this before the resize? Easy 4x efficiency
-           colors_to_use.push(most_recent_color);
+           //colors_to_use.push(most_recent_color);
            colors_to_use.push(most_recent_color);
            
        } else if (this_is_background && !last_was_background){
            points_to_color.push(i);
            colors_to_use.push(most_recent_color);
-           points_to_color.push(i+4);
-           colors_to_use.push(most_recent_color);
+           //points_to_color.push(i+4);
+           //colors_to_use.push(most_recent_color);
        }
        last_was_background = this_is_background;
    }
@@ -352,14 +352,14 @@ async function draw_outline(color, ctx){
            }
            if(last_was_background && !this_is_background){
                points_to_color.push(i-output_canvas.width*4);
-               points_to_color.push(i-output_canvas.width*2*4);
+               //points_to_color.push(i-output_canvas.width*2*4);
                colors_to_use.push(most_recent_color);
-               colors_to_use.push(most_recent_color);
+               //colors_to_use.push(most_recent_color);
            } else if (this_is_background && !last_was_background){
                points_to_color.push(i);
-               points_to_color.push(i+output_canvas.width*4);
+               //points_to_color.push(i+output_canvas.width*4);
                colors_to_use.push(most_recent_color);
-               colors_to_use.push(most_recent_color);
+               //colors_to_use.push(most_recent_color);
            }
            last_was_background = this_is_background;
        }
