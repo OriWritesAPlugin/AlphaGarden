@@ -36,6 +36,7 @@ function claimCanvas(canvas){
   image.src = canvas.toDataURL();
   new_window.document.body.appendChild(image);
   new_window.document.body.appendChild(instructions);
+  return new_window;
 }
 
 

@@ -5,18 +5,22 @@ const available_ground = {"grass [palette]": "https://i.imgur.com/yPNa3WB.png", 
                           "snow": "https://i.imgur.com/ljWMvBo.png", "dirt": "https://i.imgur.com/CqQDCgC.png"};
 const available_overlay_colors = {"blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
                                   "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2"}
+
+const scaled_seed_width = 64;  // not used everywhere, being refactored in.
 var x_coords = [];
 var smart_coords = {};
 var garden_width = 450;
 var current_x_coord;
-var used_smart_coords;
 var used_fallback_coords;
 var use_smart_spacing = true;
 var last_non_overlay_component_idx = 0; // Used for adding overlays to the ground
 var height_offset = 0; // How far down to draw everything in case someone changes the height.
 var ground_palette = {"foliage": null, "feature": null, "accent": null}
 var possible_ground_palettes = {"foliage": [], "feature": [], "accent": []};
-var components_to_place = [];  // Format: {"x_pos": , "seed": , "canvas": }. Note idx 0=placed first, 1=placed second, ...n=placed last (topmost)
+// components_to_place functionally "saves" the garden state.
+// Note idx 0=placed first, 1=placed second, ...n=placed last (topmost)
+var components_to_place = [];  // Format: {"x_pos": , "seed": , "canvas": , "height_category":, "do_not_scramble_pos": }
+var background_overlay = null;
 
 
 async function gen_randogarden(reuse_and_scramble_positions=false) {
@@ -27,14 +31,9 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
     var canvas = document.getElementById("output_canvas");
     var ctx = canvas.getContext("2d");
     possible_ground_palettes = {"foliage": [], "feature": [], "accent": []};
-    // I'm noticing that Firefox insists I'm in Quirks mode despite the doctype while working locally. Related?
-    // I'd really prefer not to have to push to test.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    components_to_place = [];
     // What does it mean if someone changes their option for smart spacing, then scrambles?
-    // Functionally it's nonsense --you're saying both "I want my coords to obey a different rule" and "I don't want my coords to change"
-    // We have to pick between nothing changing (confusing), everything getting wiped (alarming), and regenerating the garden (not a scramble)
-    // We go with that last case, if only because it seems the least unexpected. So we check against the use_smart_spacing from last time...
+    // Functionally it's nonsense, and no one toggles smart spacing off, so we just scramble.
     if(use_smart_spacing != document.getElementById("use_smart_spacing").checked && reuse_and_scramble_positions){
         reuse_and_scramble_positions = false;
     }
@@ -47,75 +46,115 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
     canvas.height = garden_height;
     height_offset = garden_height - 70;
     ctx.imageSmoothingEnabled = false;
-    // Remove spaces and leading/trailing commas, then split on remaining commas
-    var seeds = document.getElementById("seed_list").value.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");
-    var promises = []
-    // Generate a set of coordinates to place items at
+
+    // Next, we generate the x positions for everything in the garden
+
+    // We have two cases. One, we're generating a fresh garden. Two, we're operating on an existing one.
+    // Our fresh garden case:   ////////////////////////////////////////////////////////////////////////////
     if(!reuse_and_scramble_positions){
+        components_to_place = [];
+        // Remove spaces and leading/trailing commas, then split on remaining commas
+        var seeds = document.getElementById("seed_list").value.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");
+        var promises = []
+        // Generate a set of coordinates to place items at
         if(use_smart_spacing){
             smart_coords = {};
             // TODO: Surely I can simplify this
             smart_coords["short"] = createSpacedPlacementQueue(garden_width, with_spacing=32);
             smart_coords["medium"] = createSpacedPlacementQueue(garden_width, with_spacing=40);
             smart_coords["tall"] = createSpacedPlacementQueue(garden_width, with_spacing=64);
-            smart_coords["short_named"] = createSpacedPlacementQueue(garden_width, with_spacing=32);
-            smart_coords["medium_named"] = createSpacedPlacementQueue(garden_width, with_spacing=40);
-            smart_coords["tall_named"] = createSpacedPlacementQueue(garden_width, with_spacing=64);
         }
-        // Even when using smart spacing, we want these as a fallback.
+        // Even when using smart spacing, we want these as a fallback, in case we have more seeds than smart spaces
         x_coords = [];
         for(var i=0; i<seeds.length; i++){
             x_coords.push(Math.floor(Math.random()*(garden_width-64)));
         }
-    // Reuse the coordinates from last time
+
+        // Keep track of whether we'll have to add overlays to the grass
+        last_non_overlay_component_idx = 0;
+        background_overlay = null;
+
+        // Build up our components from the list of seeds
+        for(let i=0; i<seeds.length; i++){
+            if(seeds[i][0] == "#"){
+                // Note: we only store the """seed""" so we can more easily garden_to_string().
+                components_to_place.push({"IOU": true, "color": seeds[i].slice(1), "do_not_scramble_pos": true, "seed": seeds[i]});
+                if(i==0){
+                    background_overlay = components_to_place[0];
+                }
+            } else {
+                last_non_overlay_component_idx = i;
+                // Check for a forced position
+                let canvas;
+                let force_pos = seeds[i].indexOf('%');
+                if(force_pos > -1) {
+                    x_coords[i] = garden_width*(parseFloat(seeds[i].slice(force_pos+1))/100) - scaled_seed_width/2;
+                    seeds[i] = seeds[i].slice(0, force_pos);
+                }
+                if(seeds[i][0] == "!"){
+                    seeds[i] = seeds[i].slice(1);
+                    canvas = get_canvas_for_named_component(seeds[i]);
+                } else if(seeds[i].length == 0){
+                    continue;
+                } else if(seeds[i].length != 10){
+                    alert("You seem to have a malformed seed! Seeds are 10 characters long, but got \""+seeds[i]+"\". Skipping!")
+                    continue;
+                } else {
+                    canvas = get_canvas_for_plant(seeds[i]);
+                }
+                components_to_place.push(assign_component(canvas, x_coords[i], seeds[i], use_smart_spacing && !(force_pos > -1)));
+            }
+        }
+
+    // Our existing garden case:   ////////////////////////////////////////////////////////////////////////////
     } else {
         if(use_smart_spacing){
-            // TODO: SURELY I CAN SIMPLIFY THIS
-            smart_coords["short"] = used_smart_coords["short"].sort(() => Math.random() - 0.5);
-            smart_coords["medium"] = used_smart_coords["medium"].sort(() => Math.random() - 0.5);
-            smart_coords["tall"] = used_smart_coords["tall"].sort(() => Math.random() - 0.5);
-            smart_coords["short_named"] = used_smart_coords["short_named"].sort(() => Math.random() - 0.5);
-            smart_coords["medium_named"] = used_smart_coords["medium_named"].sort(() => Math.random() - 0.5);
-            smart_coords["tall_named"] = used_smart_coords["tall_named"].sort(() => Math.random() - 0.5);
-            x_coords = used_fallback_coords.sort(() => Math.random() - 0.5);
-        } else {
-            x_coords.push(...used_fallback_coords);  // Recycle anything used for ex: named seeds
-            x_coords.sort(() => Math.random() - 0.5);
-        }
-    }
-    // TODO Seriously I am sure there's some list comprehension-like thing I could use to trim like 12 lines of tall_named nonsense.
-    used_smart_coords = {"short": [], "medium": [], "tall": [], "short_named": [], "medium_named": [], "tall_named": []};  // Reset
-    used_fallback_coords = []  // Reset too
-
-    // Keep track of whether we'll have to add overlays to the grass
-    last_non_overlay_component_idx = 0;
-    let background_overlay = null;
-    // Dispatch logic for figuring out where everything goes
-    for(var i=0; i<seeds.length; i++){
-        if(seeds[i][0] == "!"){
-            components_to_place.push(assign_named_component(seeds[i].slice(1), ctx, x_coords[i], use_smart_spacing));
-            last_non_overlay_component_idx = i;
-        } else if(seeds[i][0] == "#"){
-            components_to_place.push({"IOU": true, "color": seeds[i].slice(1)});
-            if(i==0){
-                background_overlay = components_to_place[0];
+            smart_coords = {"short": [], "medium": [], "tall": []};
+            for(let i=0; i<components_to_place.length; i++){
+                component = components_to_place[i];
+                if(component.do_not_scramble_pos){ 
+                    continue;
+                } else {
+                    smart_coords[component.height_category].push(component.x_pos);
+                }
             }
-        } else if(seeds[i].length == 0){
-            continue;
-        } else if(seeds[i].length != 10){
-            alert("You seem to have a malformed seed! Seeds are 10 characters long, but got \""+seeds[i]+"\". Skipping!")
-            continue;
+            smart_coords["short"] = smart_coords["short"].sort(() => Math.random() - 0.5);
+            smart_coords["medium"] = smart_coords["medium"].sort(() => Math.random() - 0.5);
+            smart_coords["tall"] = smart_coords["tall"].sort(() => Math.random() - 0.5);
+            for(let i=0; i<components_to_place.length; i++){
+                let component = components_to_place[i];
+                if(component.do_not_scramble_pos){ 
+                    continue;
+                } else {
+                    component.x_pos = smart_coords[component.height_category].pop();
+                }
+            }
         } else {
-            // Smart_spacing logic goes inside here so we only have to draw the plant once. x_coords[i] acts as fallback.
-            components_to_place.push(assign_plants(seeds[i], ctx, x_coords[i], use_smart_spacing));
-            last_non_overlay_component_idx = i;
+            let available_coords = [];
+            for(let i=0; i<components_to_place.length; i++){
+                if(components_to_place[i].do_not_scramble_pos){ 
+                    continue;
+                } else {
+                    available_coords.push(components_to_place[i].x_pos);
+                }
+            }
+            available_coords.sort(() => Math.random() - 0.5);
+            for(let i=0; i<components_to_place.length; i++){
+                let component = components_to_place[i];
+                if(component.do_not_scramble_pos){ 
+                    continue;
+                } else {
+                    component.x_pos = available_coords.pop();
+                }
+            }
         }
     }
+
     // Wait for logic to complete and place (this is how we maintain a layering order)
     for(var i=0; i<components_to_place.length; i++){
         if(i==0 && background_overlay != null){continue;}
-        component = await components_to_place[i];
-        await place_component(ctx, component);
+        components_to_place[i] = await components_to_place[i];
+        await place_component(ctx, components_to_place[i]);
     }
     place_ground();
     let do_draw_outline = document.getElementById("draw_outline").checked;
@@ -203,12 +242,20 @@ async function draw_ground_canvas(scramble_ground=false){
 }
 
 function claim_garden(){
-    claimCanvas(document.getElementById("output_canvas"));
+    let new_window = claimCanvas(document.getElementById("output_canvas"));
+    let garden_code_info = new_window.document.createElement('p');
+    garden_code_info.innerHTML = "Garden code (beta): "
+    let garden_code = new_window.document.createElement('p');
+    garden_code.innerHTML = garden_to_string();
+    new_window.document.body.appendChild(garden_code_info);
+    new_window.document.body.appendChild(garden_code);
 }
 
 // Assign a position to a component depending on its type, height, and use of smart spacing.
-async function assign_component(canvas, ctx, x_pos, seed, is_named, use_smart_spacing){
-    var component_info = {"canvas": canvas, "seed": seed, "y_pos": height_offset + 4, "width": 64, "height": 64};
+async function assign_component(canvas, x_pos, seed, use_smart_spacing){
+    // We'll get the canvas in a sec
+    canvas = await canvas;
+    let component_info = {"canvas": canvas, "seed": seed, "y_pos": height_offset + 4, "width": 64, "height": 64};
     if(use_smart_spacing){
         var smart_coord;
         // We estimate the height by seeing if there's a pixel found at a specific row
@@ -224,15 +271,13 @@ async function assign_component(canvas, ctx, x_pos, seed, is_named, use_smart_sp
         else {
             height = "tall";
         }
-        if(is_named){height+="_named";}  // TODO enum this
         // We need to make sure there's coords left to take
         smart_coord = smart_coords[height].pop();
         if(smart_coord!=undefined){x_pos = smart_coord;}
-        used_smart_coords[height].push(x_pos);
     }
     component_info["x_pos"]=x_pos;
-    return component_info;
-    
+    component_info["height_category"]=height;
+    return component_info; 
 }
 
 async function place_component(ctx, component){
@@ -256,14 +301,14 @@ function set_ground_selection(opt){
     current_ground = opt;  
 }
 
-async function assign_named_component(name, ctx, x_pos, use_smart_spacing=false){
+async function get_canvas_for_named_component(name){
     // TODO: This is hideous and terrible but I am very tired and wanted to write something before bed
     var work_canvas = document.createElement("canvas");
     var work_ctx=work_canvas.getContext("2d");
     work_canvas.width = work_canvas_size;
     work_canvas.height = work_canvas_size;
-    await place_image_at_coords_with_chance(all_named[name], [[Math.floor(work_canvas_size/2), work_canvas_size-1]], work_ctx, 1, true);
-    return assign_component(work_canvas, ctx, x_pos, name, is_named=true, use_smart_spacing=use_smart_spacing);
+    place_image_at_coords_with_chance(all_named[name], [[Math.floor(work_canvas_size/2), work_canvas_size-1]], work_ctx, 1, true);
+    return work_canvas;
 }
 
 function get_rgb_from_overlay_name(color){
@@ -322,8 +367,8 @@ async function draw_outline(color, ctx){
            //points_to_color.push(i-8);
            // NOTE: push twice due to double-thickness
            // TODO: could we do this before the resize? Easy 4x efficiency
-           //colors_to_use.push(most_recent_color);
            colors_to_use.push(most_recent_color);
+           //colors_to_use.push(most_recent_color);
            
        } else if (this_is_background && !last_was_background){
            points_to_color.push(i);
@@ -404,9 +449,8 @@ async function assign_overlay_canvas(color, ctx){
     return({"canvas": color_canvas, "x_pos": 0, "y_pos": 0, "width": color_canvas.width, "height": color_canvas.height});
 }
 
-async function assign_plants(seed, ctx, x_pos, use_smart_spacing=false){
-    plant_canvas = await gen_plant_from_seed(seed);
-    return assign_component(plant_canvas, ctx, x_pos, seed, is_named=false, use_smart_spacing);
+async function get_canvas_for_plant(seed){
+    return await gen_plant_from_seed(seed);
 }
 
 async function gen_plant_from_seed(seed) {
@@ -416,6 +460,24 @@ async function gen_plant_from_seed(seed) {
     }
     var ret_canvas = await gen_plant(plant_data);
     return ret_canvas;
+}
+
+// Mmm, scuff.
+function garden_to_string() {
+    outstring = "";
+    for(let i=0; i<components_to_place.length; i++){
+        let component = components_to_place[i];
+        if(!component.seed.startsWith("#")){
+            if(Object.hasOwnProperty(all_named, component.seed)){
+                outstring += "!"
+            }
+            outstring += component.seed + "%" + (((component.x_pos+scaled_seed_width/2)/garden_width)*100).toFixed(2);
+        } else {
+            outstring += component.seed;
+        }
+        outstring += ", ";
+    }
+    return outstring;
 }
 
 
