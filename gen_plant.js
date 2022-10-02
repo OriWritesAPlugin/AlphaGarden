@@ -99,7 +99,7 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
 common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78, 80, 81, 82, 84, 88, 91, 92, 97, 98, 99, 101, 102, 107];
 
 uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43,
-                                          46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79, 83, 85, 86, 90, 93, 94, 95, 103, 106]);
+                                          46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79, 83, 85, 86, 90, 93, 94, 95, 103, 105, 106]);
 rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65, 70, 87, 89]);
 // The ENTIRE special_foliage group has a rare chance to be selected instead of a standard base, then one's chosen from within at random.
 // I need to figure out math such that any given special base has ~20% of the chance of being chosen vs. any other seed
@@ -107,13 +107,13 @@ rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 3
 // target chance: 1/#total_bases * 0.2
 // chance of a given special: 1/#specials * x, where x is the chance of the special pool being selected instead of a standard base
 // formula: x = 1/#total_bases * 0.2 * #specials
-special_foliage = [96, 100, 104, 105]
+special_foliage = [96, 100, 104]
 const special_foliage_chance = 1/all_foliage.length * 0.2 * special_foliage.length
 
 
 boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
-override_foliage = [104, 105];
+override_foliage = [];
 
 
 all_features = ["https://i.imgur.com/G4h84Ht.png", "https://i.imgur.com/vXQYMkL.png", "https://i.imgur.com/p1ipMdS.png", "https://i.imgur.com/UUFJO7h.png", "https://i.imgur.com/IyaeNvt.png", "https://i.imgur.com/NXRWexZ.png", "https://i.imgur.com/VwMnyDB.png", "https://i.imgur.com/mLfzmM8.png", "https://i.imgur.com/zcXm5Op.png", "https://i.imgur.com/Osvq1V0.png", "https://i.imgur.com/iPK9aJ7.png", "https://i.imgur.com/3SpYgDN.png", "https://i.imgur.com/6MRuqb7.png", "https://i.imgur.com/jrYQjIW.png"]
