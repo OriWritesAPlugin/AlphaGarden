@@ -64,7 +64,8 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                // 96, 97, 98
                "https://i.imgur.com/NDnKMrY.png", "https://i.imgur.com/MmN2A17.png", "https://i.imgur.com/HNkWjgK.png",
                "https://i.imgur.com/aoTsd6a.png", "https://i.imgur.com/1NZlHPp.png", "https://i.imgur.com/ShUbORE.png",
-               "https://i.imgur.com/qLIC1dw.png", "https://i.imgur.com/KbqDATE.png"];
+               "https://i.imgur.com/qLIC1dw.png", "https://i.imgur.com/KbqDATE.png", "https://i.imgur.com/jDtvMDk.png",
+               "https://i.imgur.com/BFJa2xX.png", "https://i.imgur.com/C0Elhph.png", "https://i.imgur.com/4yp3rQR.png"];
 
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
@@ -92,26 +93,27 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "bleached_skull": "https://i.imgur.com/kIgNges.png", "bleached_ribs": "https://i.imgur.com/gb5h2ct.png", "burnt_skull": "https://i.imgur.com/swmqdOf.png", "burnt_ribs": "https://i.imgur.com/yCHsvce.png",
              "lawn_deco": "https://i.imgur.com/A5SsKVL.png", "lawn_sin": "https://i.imgur.com/hAqeR7Z.png", "peacock": "https://i.imgur.com/AqGytLV.png",
              "brown_cat": "https://i.imgur.com/has3IZH.png", "colorpoint_cat": "https://i.imgur.com/alQoAKw.png", "grey_cat": "https://i.imgur.com/IGjw0kH.png",
-             "ginger_cat": "https://i.imgur.com/XMZSI4u.png", "tuxedo_cat": "https://i.imgur.com/H93FT89.png"};
+             "ginger_cat": "https://i.imgur.com/XMZSI4u.png", "tuxedo_cat": "https://i.imgur.com/H93FT89.png", "robin": "https://i.imgur.com/jtY79vc.png", "bluebird": "https://i.imgur.com/MMdnP2E.png", "gardeneel": "https://i.imgur.com/P5j7JGs.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
-common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78, 80, 81, 82, 84, 88, 91, 92, 97, 98, 99, 101, 102];
+common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78, 80, 81, 82, 84, 88, 91, 92, 97, 98, 99, 101, 102, 107];
 
 uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43,
-                                          46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79, 83, 85, 86, 90, 93, 94, 95, 96, 103]);
-rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65, 70, 87, 89, 100]);
+                                          46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79, 83, 85, 86, 90, 93, 94, 95, 103, 106]);
+rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65, 70, 87, 89]);
 // The ENTIRE special_foliage group has a rare chance to be selected instead of a standard base, then one's chosen from within at random.
 // I need to figure out math such that any given special base has ~20% of the chance of being chosen vs. any other seed
 // chance of any seed: 1/#total_bases
 // target chance: 1/#total_bases * 0.2
 // chance of a given special: 1/#specials * x, where x is the chance of the special pool being selected instead of a standard base
 // formula: x = 1/#total_bases * 0.2 * #specials
-// 
-//special_foliage = []
-//const special_foliage_chance = 1/all_foliage.length * 0.2 * special_foliage.length
+special_foliage = [96, 100, 104, 105]
+const special_foliage_chance = 1/all_foliage.length * 0.2 * special_foliage.length
+
+
 boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
-override_foliage = [];
+override_foliage = [104, 105];
 
 
 all_features = ["https://i.imgur.com/G4h84Ht.png", "https://i.imgur.com/vXQYMkL.png", "https://i.imgur.com/p1ipMdS.png", "https://i.imgur.com/UUFJO7h.png", "https://i.imgur.com/IyaeNvt.png", "https://i.imgur.com/NXRWexZ.png", "https://i.imgur.com/VwMnyDB.png", "https://i.imgur.com/mLfzmM8.png", "https://i.imgur.com/zcXm5Op.png", "https://i.imgur.com/Osvq1V0.png", "https://i.imgur.com/iPK9aJ7.png", "https://i.imgur.com/3SpYgDN.png", "https://i.imgur.com/6MRuqb7.png", "https://i.imgur.com/jrYQjIW.png"]
@@ -197,7 +199,7 @@ rare_feature_palettes = rare_feature_palettes.concat(boost_with);
 rare_accent_palettes = rare_accent_palettes.concat(boost_with);
 rare_foliage_palettes = rare_foliage_palettes.concat([65, 65, 65, 65, 65]);*/
 // Used for replacing ALL colors...
-//rare_foliage_palettes = [67, 68, 69, 70];
+//rare_foliage_palettes = [44];
 //rare_feature_palettes = [13];
 //rare_accent_palettes = [70];
 
@@ -262,6 +264,18 @@ function old_random_by_rarity(rarity_list, master_list) {
 function random_from_list(list, prng=null) {
     if(prng==null){return list[Math.floor(Math.random()*list.length)]};
     return list[Math.floor(prng()*list.length)];
+}
+
+function random_from_foliage(list, prng=null) {
+    let diceroll;
+    if(prng==null){ diceroll = Math.random(); }
+    else { diceroll = prng(); }
+
+    if(diceroll < special_foliage_chance){
+        return random_from_list(special_foliage);
+    } else {
+        return random_from_list(list, prng);
+    }
 }
 
 
@@ -354,7 +368,7 @@ function gen_plant_data(rarity, seed_string=null) {
     if(seed_string == null){prng = null;}
     else{prng = mulberry32(xmur3(seed_string)());}
 
-    return {"foliage": random_from_list(available_foliage, prng),
+    return {"foliage": random_from_foliage(available_foliage, prng),
             "simple_feature": random_from_list(simple_features, prng),
             "complex_feature": random_from_list(available_complex_features, prng),
             "foliage_palette": random_from_list(available_foliage_palettes, prng),
