@@ -19,7 +19,7 @@ RedRevival: Giant metal trees (!giant_copper, etc.)
 
 WynnDawnstrider: big_bones (plain, shaded, mossy, etc.)
 
-Xaotician: lawn\_deco, lawn\_sin, peacock
+Xaotician: lawn\_deco, lawn\_sin, peacock, spoop\_one, spoop\_two, spoop\_three, ghost\_one, ghost\_two, ghost\_three 
 
 CrystalDragon14: tuxedo\_cat, brown\_cat, ginger\_cat, colorpoint\_cat, grey\_cat
 

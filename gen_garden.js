@@ -101,6 +101,7 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
                         wildcard_canvas.width = 32;
                         wildcard_canvas.height = 32;
                         let wildcard_ctx = wildcard_canvas.getContext("2d");
+                        wildcard_ctx.imageSmoothingEnabled = false;
                         wildcard_ctx.drawImage(temp_img, 0, 0, 32, 32);
                         refs[url] = await preload_single_image(wildcard_canvas.toDataURL(temp_img.type));
                     }
