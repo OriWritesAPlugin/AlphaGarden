@@ -102,7 +102,9 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "punkle": "https://i.imgur.com/mGu0QXM.png", "grummi": "https://i.imgur.com/XZqToAL.png", "pip": "https://i.imgur.com/5PRAPj7.png",
              "tlik": "https://i.imgur.com/MaDQORq.png", "the_council": "https://i.imgur.com/P7eG6uq.png", "rupert": "https://i.imgur.com/CnfSm6K.png",
              "rupert_ascendant": "https://i.imgur.com/Na1gT9v.png",
-             "oriole": "https://i.imgur.com/KTdWhYB.png", "blackbird": "https://i.imgur.com/GvnkSA7.png", "cardinal": "https://i.imgur.com/Zu9xxP5.png"};
+             "oriole": "https://i.imgur.com/KTdWhYB.png", "blackbird": "https://i.imgur.com/GvnkSA7.png", "cardinal": "https://i.imgur.com/Zu9xxP5.png",
+             "spoop_one": "https://i.imgur.com/2BYYsbd.png", "spoop_two": "https://i.imgur.com/iUxGYsi.png", "spoop_three": "https://i.imgur.com/mQRx5sJ.png",
+             "ghost_one": "https://i.imgur.com/KrLlzh3.png","ghost_two": "https://i.imgur.com/ppt6svW.png", "ghost_three": "https://i.imgur.com/6gjzp4g.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
 common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78, 80, 81, 82, 84, 88, 91, 92, 97, 98, 99, 101, 102, 107, 111];
@@ -281,7 +283,7 @@ function random_from_foliage(list, prng=null) {
     else { diceroll = prng(); }
 
     if(diceroll < special_foliage_chance){
-        return random_from_list(special_foliage);
+        return random_from_list(special_foliage, prng);
     } else {
         return random_from_list(list, prng);
     }
