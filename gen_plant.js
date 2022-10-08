@@ -65,7 +65,10 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/NDnKMrY.png", "https://i.imgur.com/MmN2A17.png", "https://i.imgur.com/HNkWjgK.png",
                "https://i.imgur.com/aoTsd6a.png", "https://i.imgur.com/1NZlHPp.png", "https://i.imgur.com/ShUbORE.png",
                "https://i.imgur.com/qLIC1dw.png", "https://i.imgur.com/KbqDATE.png", "https://i.imgur.com/jDtvMDk.png",
-               "https://i.imgur.com/BFJa2xX.png", "https://i.imgur.com/C0Elhph.png", "https://i.imgur.com/4yp3rQR.png"];
+               "https://i.imgur.com/BFJa2xX.png", "https://i.imgur.com/C0Elhph.png", "https://i.imgur.com/4yp3rQR.png",
+               // 108, 109, 110
+               "https://i.imgur.com/AmgtEol.png", "https://i.imgur.com/Oc9hXis.png", "https://i.imgur.com/QEXAoEh.png",
+               "https://i.imgur.com/oSwzqLT.png"];
 
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
@@ -93,21 +96,27 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "bleached_skull": "https://i.imgur.com/kIgNges.png", "bleached_ribs": "https://i.imgur.com/gb5h2ct.png", "burnt_skull": "https://i.imgur.com/swmqdOf.png", "burnt_ribs": "https://i.imgur.com/yCHsvce.png",
              "lawn_deco": "https://i.imgur.com/A5SsKVL.png", "lawn_sin": "https://i.imgur.com/hAqeR7Z.png", "peacock": "https://i.imgur.com/AqGytLV.png",
              "brown_cat": "https://i.imgur.com/has3IZH.png", "colorpoint_cat": "https://i.imgur.com/alQoAKw.png", "grey_cat": "https://i.imgur.com/IGjw0kH.png",
-             "ginger_cat": "https://i.imgur.com/XMZSI4u.png", "tuxedo_cat": "https://i.imgur.com/H93FT89.png", "robin": "https://i.imgur.com/jtY79vc.png", "bluebird": "https://i.imgur.com/MMdnP2E.png", "gardeneel": "https://i.imgur.com/P5j7JGs.png"};
+             "ginger_cat": "https://i.imgur.com/XMZSI4u.png", "tuxedo_cat": "https://i.imgur.com/H93FT89.png",
+             "robin": "https://i.imgur.com/jtY79vc.png", "bluebird": "https://i.imgur.com/MMdnP2E.png", "gardeneel": "https://i.imgur.com/P5j7JGs.png",
+             "bubble_column": "https://i.imgur.com/iDCiNK0.png", "bubble_cloud": "https://i.imgur.com/WbUJsff.png",
+             "punkle": "https://i.imgur.com/mGu0QXM.png", "grummi": "https://i.imgur.com/XZqToAL.png", "pip": "https://i.imgur.com/5PRAPj7.png",
+             "tlik": "https://i.imgur.com/MaDQORq.png", "the_council": "https://i.imgur.com/P7eG6uq.png", "rupert": "https://i.imgur.com/CnfSm6K.png",
+             "rupert_ascendant": "https://i.imgur.com/Na1gT9v.png",
+             "oriole": "https://i.imgur.com/KTdWhYB.png", "blackbird": "https://i.imgur.com/GvnkSA7.png", "cardinal": "https://i.imgur.com/Zu9xxP5.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
-common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78, 80, 81, 82, 84, 88, 91, 92, 97, 98, 99, 101, 102, 107];
+common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78, 80, 81, 82, 84, 88, 91, 92, 97, 98, 99, 101, 102, 107, 111];
 
 uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43,
-                                          46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79, 83, 85, 86, 90, 93, 94, 95, 103, 105, 106]);
-rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65, 70, 87, 89]);
+                                          46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79, 83, 85, 86, 90, 93, 94, 95, 103, 105, 106, 108]);
+rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65, 70, 87, 89, 109]);
 // The ENTIRE special_foliage group has a rare chance to be selected instead of a standard base, then one's chosen from within at random.
 // I need to figure out math such that any given special base has ~20% of the chance of being chosen vs. any other seed
 // chance of any seed: 1/#total_bases
 // target chance: 1/#total_bases * 0.2
 // chance of a given special: 1/#specials * x, where x is the chance of the special pool being selected instead of a standard base
 // formula: x = 1/#total_bases * 0.2 * #specials
-special_foliage = [96, 100, 104]
+special_foliage = [96, 100, 104, 110]
 const special_foliage_chance = 1/all_foliage.length * 0.2 * special_foliage.length
 
 
@@ -157,7 +166,7 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
                     ["405251", "2b393a", "1e252a", "14151e"], ["666fa9", "424071", "2c1f4c", "240539"],
                     ["cc3a77", "942162", "5d1354", "2f0e4d"], ["59a89f", "325354", "2b262e", "2e0d19"],
                     ["899571", "545a4a", "40463a", "2d302e"], ["99ad57", "54623c", "37422c", "151d1d"],
-                    ["c25a4a", "8f2e21", "711612", "4d0606"]];
+                    ["c25a4a", "8f2e21", "711612", "4d0606"], ["9c0900", "6a0b00", "3e0600", "180200"]];
 
 // There's three types of palette:
 // Foliage: Generally the bulk of a plant. Greens and browns are most common
@@ -165,12 +174,12 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
 // Accent: Think of the tertiary. Has bonus loud, bright colors that would look garish in a patch. Tone used for most flowers
 
 // Note that some common foliage colors are double-weighted because they're very nice greens :)
-var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 18, 21, 21, 22, 23, 29, 30, 30, 41, 42, 43, 44, 45, 49, 56, 11, 62, 65, 68, 69];
+var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 18, 21, 21, 22, 23, 29, 30, 30, 41, 42, 43, 44, 45, 49, 56, 11, 62, 65, 68, 69, 71];
 common_foliage_palettes = common_foliage_palettes.concat(common_foliage_palettes);  // Cheap greenery boost
 var common_accent_palettes = [19, 20, 35, 36, 37, 38, 39, 40];
 var common_feature_palettes = [1, 20, 29, 32, 33, 34, 52, 58, 61, 64];
 var common_feature_palettes = common_feature_palettes.concat(common_feature_palettes);  // Cheap wood/stone boost
-var uncommon_palettes = [9, 10, 11, 12, 13, 14, 15, 18, 24, 25, 38, 46, 47, 50, 55, 57, 60, 63, 66, 67, 70];
+var uncommon_palettes = [9, 10, 11, 12, 13, 14, 15, 18, 24, 25, 38, 46, 47, 50, 55, 57, 60, 63, 66, 67, 70, 71];
 var rare_palettes = [16,  17, 26, 27, 28, 30, 31, 48, 51, 53, 54, 59, 64];
 
 // Used for entirely overwriting the pools to force certain plants
@@ -199,7 +208,7 @@ rare_feature_palettes = rare_feature_palettes.concat(boost_with);
 rare_accent_palettes = rare_accent_palettes.concat(boost_with);
 rare_foliage_palettes = rare_foliage_palettes.concat([65, 65, 65, 65, 65]);*/
 // Used for replacing ALL colors...
-//rare_foliage_palettes = [44];
+//rare_foliage_palettes = [71];
 //rare_feature_palettes = [13];
 //rare_accent_palettes = [70];
 
@@ -361,6 +370,8 @@ function gen_plant_data(rarity, seed_string=null) {
     if(rarity>=8){available_feature_palettes = boosted_rare_palettes;}
     if(rarity>=9){available_foliage_palettes = boosted_rare_palettes;}
     if(rarity>=10){available_foliage = boosted_rare_foliage;}
+    // Special rarity
+    if(rarity==99){available_foliage = special_foliage;}
 
     if(override_foliage.length > 0){available_foliage = override_foliage};
 
@@ -469,28 +480,6 @@ async function gen_plant(plant_data) {
     plant_data = parse_plant_data(plant_data);
     work_canvas.width = work_canvas_size;
     work_canvas.height = work_canvas_size;
-    /* How much base foliage to combine
-    var foliage_amount;
-    const foliage_roll = Math.random();
-    if(foliage_roll < two_foliage_roll){
-        foliage_amount = 1;
-    } else {
-        foliage_amount = 2;
-    }
-    // https://stackoverflow.com/questions/19269545/how-to-get-a-number-of-random-elements-from-an-array
-    // TODO look up =>...probably not a cursed GTE :)
-    var imgs = foliage.sort(() => .5 - Math.random()).slice(0,foliage_amount);
-    var do_flip = false;
-    for(var i=0;i<imgs.length;i++){
-      if(Math.random() < 0.5){
-        do_flip=true;
-        work_ctx.save();
-        //work_ctx.translate(work_canvas_size, 0);
-        //work_ctx.scale(-1, 1);
-      } else {do_flip=false};
-      await place_image_at_coords_with_chance(imgs[i], [[Math.floor(work_canvas_size/2)-1, work_canvas_size-1]], work_ctx, 1, true);
-    if(do_flip){work_ctx.restore();}
-    }*/
     await place_image_at_coords_with_chance(plant_data["foliage"], [[Math.floor(work_canvas_size/2)-1, work_canvas_size-1]], work_ctx, 1, true);
 
     // Figure out where to put each kind of feature, replacing marker pixels as we go
