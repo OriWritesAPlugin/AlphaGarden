@@ -91,7 +91,22 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
                     x_coords[i] = garden_width*(parseFloat(seeds[i].slice(force_pos+1))/100) - scaled_seed_width/2;
                     seeds[i] = seeds[i].slice(0, force_pos);
                 }
-                if(seeds[i][0] == "!"){
+                if(seeds[i][0] == "*"){
+                    if(!all_named.hasOwnProperty(seeds[i])){
+                        let url = prompt("Enter URL for image you want to use for "+seeds[i]+" (if it's from FR, you'll have to host it someplace like Imgur or Discord due to FR's settings):");
+                        all_named[seeds[i]] = url;
+                        let temp_img = await preload_single_image(url);
+                        // Forcibly resize to 32x32
+                        let wildcard_canvas = document.createElement("canvas");
+                        wildcard_canvas.width = 32;
+                        wildcard_canvas.height = 32;
+                        let wildcard_ctx = wildcard_canvas.getContext("2d");
+                        wildcard_ctx.drawImage(temp_img, 0, 0, 32, 32);
+                        refs[url] = await preload_single_image(wildcard_canvas.toDataURL(temp_img.type));
+                    }
+                    canvas = get_canvas_for_named_component(seeds[i]);
+                }
+                else if(seeds[i][0] == "!"){
                     seeds[i] = seeds[i].slice(1);
                     canvas = get_canvas_for_named_component(seeds[i]);
                 } else if(seeds[i].length == 0){
@@ -468,7 +483,7 @@ function garden_to_string() {
     for(let i=0; i<components_to_place.length; i++){
         let component = components_to_place[i];
         if(!component.seed.startsWith("#")){
-            if(Object.hasOwnProperty(all_named, component.seed)){
+            if(all_named.hasOwnProperty(component.seed) && !component.seed.startsWith("*")){
                 outstring += "!"
             }
             outstring += component.seed + "%" + (((component.x_pos+scaled_seed_width/2)/garden_width)*100).toFixed(2);
