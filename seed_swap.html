@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="utf-8"/>
+    <head>
+        <title>Seed Swap</title>
+        <link rel="stylesheet" type="text/css"  href="nature.css" />
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
+        <link rel="icon" href="https://i.imgur.com/ufm0hIO.png">
+    </head>
+    <body onload="do_preload()" style="background: #201920; display:flex; flex-direction:column; justify-content:center;">
+        <h1 id="title">Seed Swap</h1>
+        <h2 id="subtitle">Trade (discard) unwanted seeds to earn new ones! New seeds every day!</h2>
+          <div id="content_div" class='center-parent' style="text-align: center">
+          <p id="seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> claimed yet<br></p>
+          </div>
+    </body>
+    <script src="gen_plant.js"></script>
+    <script src="bingo.js"></script>
+    <script type="text/javascript">
+
+        const days_to_gen = 3;
+        const prices = [1, 3, 3, 5, 3, 3, 1];
+        const d = new Date();
+        const initial_random_seed = d.getDate().toString()+d.getMonth().toString()+d.getFullYear().toString() + "_shopsalt";
+        var swappable_seeds = {};
+        const text = {3: "Today's offerings:", 2: "Yesterday's offerings:", 1: "Offerings from 2 days ago (disappear tomorrow)"};
+        var swapped_seeds = [];
+
+
+        async function gen_divs() {
+            let parent = document.getElementById("content_div");
+            for(let i=days_to_gen; i>0; i--){
+                let new_text = document.createElement('h3');
+                new_text.innerHTML = text[i];
+                let new_row = document.createElement('div');
+                new_row.className = "bingo_row";
+                parent.appendChild(new_text);
+                parent.appendChild(new_row);
+                for(let j=0; j<prices.length; j++){
+                    let id = i + "_" + j;
+                    await add_swap_square(new_row, id, prices[j]);
+                }
+            }
+        }
+
+        // Largely similar to bingo squares
+        async function add_swap_square(parent, id, price){
+            let swap_square = document.createElement('div');
+            swap_square.id = id;
+            swap_square.className = 'bingo_box';
+            swap_square.addEventListener("click", claim_swap);
+            swap_square.addEventListener('touchend', function(e){
+                    claim_swap(e);
+                    e.preventDefault();
+                })
+            swap_square.style.display = "inline";  // to align the label
+            let rarity;
+            if(price==1){rarity=7;}
+            else if(price==3){rarity=10;}
+            else if(price==5){rarity=99;}
+            else{alert("Price "+price+" has no assigned rarity")};
+            let plant_data = gen_plant_data(rarity, initial_random_seed+String(id));
+            let seed = encode_plant_data_v2(plant_data);
+            let data_url = await drawPlantForSquare(seed);
+            swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
+            swappable_seeds[id] = seed;
+
+            let label = document.createElement('label')
+            label.htmlFor = id;
+            label.className = 'todo_plant_label';
+            let label_text = price.toString()+" Seed";
+            if(price>1){label_text += "s"};
+            label.appendChild(document.createTextNode(label_text));
+            label.style.verticalAlign = "top";
+            swap_square.appendChild(label);
+            parent.appendChild(swap_square);
+            return id;
+        }
+
+        async function claim_swap(e){
+            var id = e.target.id;
+            var bingo_square = document.getElementById(id);
+            bingo_square.lastChild.style.opacity = 0.2;  // Make label translucent
+            bingo_square.lastChild.innerHTML = "Claimed!";
+            if(swapped_seeds.indexOf(swappable_seeds[id]) == -1){
+              swapped_seeds.push(swappable_seeds[id]);
+            }
+            document.getElementById("seed_list").innerHTML = swapped_seeds.join(", ");
+        }
+
+
+        async function do_preload() {
+            await preload_all_images();
+            await gen_divs();
+        }
+    </script>
+    </body>
+</html>
