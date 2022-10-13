@@ -68,7 +68,7 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/BFJa2xX.png", "https://i.imgur.com/C0Elhph.png", "https://i.imgur.com/4yp3rQR.png",
                // 108, 109, 110
                "https://i.imgur.com/AmgtEol.png", "https://i.imgur.com/Oc9hXis.png", "https://i.imgur.com/QEXAoEh.png",
-               "https://i.imgur.com/oSwzqLT.png"];
+               "https://i.imgur.com/oSwzqLT.png", "https://i.imgur.com/3bHuLad.png"];
 
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
@@ -118,7 +118,7 @@ rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 3
 // target chance: 1/#total_bases * 0.2
 // chance of a given special: 1/#specials * x, where x is the chance of the special pool being selected instead of a standard base
 // formula: x = 1/#total_bases * 0.2 * #specials
-special_foliage = [96, 100, 104, 110]
+special_foliage = [96, 100, 104, 110, 112]
 const special_foliage_chance = 1/all_foliage.length * 0.2 * special_foliage.length
 
 
