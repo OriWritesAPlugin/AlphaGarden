@@ -5,6 +5,21 @@ const available_ground = {"grass [palette]": "https://i.imgur.com/yPNa3WB.png", 
                           "snow": "https://i.imgur.com/ljWMvBo.png", "dirt": "https://i.imgur.com/CqQDCgC.png"};
 const available_overlay_colors = {"blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
                                   "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2"}
+// REMEMBER: TOP DOWN
+const available_backgrounds = {"none": [],
+                               "custom": [],
+                               "magically charged": ["#3c085c", "#571170", "#66167a", "#85238f", "#a2319e", "#c550a9", "#f487bc"],
+                               "midday": ["#74a3c7", "#91c2e7", "#a8def6", "#b7e6fb", "#d5f2f8", "#ecfdfd"],
+                               "night": ["#000304", "#000407", "#00070c", "#000910", "#010c14", "#02111d"],
+                               "overcast": ["#c2c7c7", "#c9c8c7","#d1cec9", "#d9d1c4", "#e1d6ca", "#e9ddc7", "#e7d7b5"],
+                               "predawn": ["#071b24", "#0a2630", "#0e3241", "#0e3e49", "#114b51", "#1a5a5b", "#226763", "#358375"],
+                               "purple night": ["#0a0618", "#0c071c", "#110823", "#150a29", "#1d0b32", "#290d3e", "#370f4b", "#561160"],
+                               "shallow water": ["#29abbe", "#237d99", "#1b6380", "#145a70", "#0f5061", "#0c4b5a", "#09434e"],
+                               "soft sunset": ["#eb8d7c", "#ed9489", "#efa38f", "#f1b296", "#f5c8a3", "#f7d2a9", "#fae0b2", "#fff5c2",],
+                               "sunrise": ["#ffd0db", "#ffc7cd", "#fdc3bb", "#fcc8ae", "#fbcda8"]}
+
+var custom_background_colors = [];
+const star_colors = ["ffbbff", "bbffff", "ffffbb", "ffdddd", "ddffdd", "ffdddd", "dddddd"];
 
 const scaled_seed_width = 64;  // not used everywhere, being refactored in.
 var x_coords = [];
@@ -21,6 +36,8 @@ var possible_ground_palettes = {"foliage": [], "feature": [], "accent": []};
 // Note idx 0=placed first, 1=placed second, ...n=placed last (topmost)
 var components_to_place = [];  // Format: {"x_pos": , "seed": , "canvas": , "height_category":, "do_not_scramble_pos": }
 var background_overlay = null;
+var background_color = "none";
+var background_style = "gradient";
 
 
 async function gen_randogarden(reuse_and_scramble_positions=false) {
@@ -195,6 +212,56 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(underlay_canvas, 0, 0);
     }
+    // Background elements are cleanest on their own canvas. Includes colors, stars, etc.
+    let background_canvas = document.createElement("canvas");
+    let background_ctx = background_canvas.getContext("2d");
+    background_canvas.width = garden_width;
+    background_canvas.height = garden_height;
+    // Custom colors only remain set while custom is selected.
+    if(background_color != "custom"){
+        custom_background_colors = [];
+    }
+    if(background_color != "none"){
+        let colors = [];
+        if(background_color == "from overlays (all)"){
+            for(let i=0; i<components_to_place.length; i++){
+                if(components_to_place[i].hasOwnProperty("color")){ 
+                    colors.push("#"+get_hex_from_overlay_name(components_to_place[i]["color"]));
+                }
+            }
+        }
+        else if(background_color == "custom"){
+            if(custom_background_colors.length == 0){
+                let custom_colors_str = prompt("Enter your custom gradient (in the form #topmost_hex_color,#second_hex_color,#third...)");
+                custom_background_colors = custom_colors_str.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");;
+            }
+            colors = custom_background_colors;
+        } else {
+            colors = available_backgrounds[background_color];
+        }
+        if(background_style == "gradient"){
+            let grad =  background_ctx.createLinearGradient(0, 0, 0, garden_height);
+            let step = 1/(colors.length);
+            for(let i=0; i<colors.length-1; i++){
+                grad.addColorStop(i*step, colors[i]);
+            } 
+            grad.addColorStop(1, colors[colors.length-1]);
+            background_ctx.fillStyle = grad;
+            background_ctx.fillRect(0, 0, garden_width, garden_height);
+        }
+        if(background_style == "chunks"){
+            let step = 1/(colors.length);
+            for(let i=colors.length-1; i>=0; i--){
+                background_ctx.fillStyle = colors[i];
+                background_ctx.fillRect(0, 0, garden_width, garden_height*step*(i+1));
+            } 
+        }
+    }
+    let do_draw_starfield = document.getElementById("draw_starfield").checked;
+    if(do_draw_starfield){generate_starfield(background_canvas, background_ctx);}
+    background_ctx.drawImage(canvas, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(background_canvas, 0, 0);
 }
 
 async function place_ground(scramble_ground=false){
@@ -224,6 +291,59 @@ function purge_transparency(canvas){
         }}
     // Draw the results
     ctx.putImageData(img, 0, 0);
+}
+
+// Draw a field of stars onto an existing canvas, with a specified color for star trails/distant stars
+function generate_starfield(star_canvas, star_ctx){
+    let star_work_canvas = document.createElement("canvas");
+    let star_work_ctx = star_work_canvas.getContext("2d");
+    star_work_canvas.width = star_canvas.width;
+    star_work_canvas.height = star_canvas.height;
+    // First we need to decide how many stars to make relative to pixels in the canvas, at max
+    // There's essentially 3 levels: [1, 2, 3] in a thousand
+    let star_ratio = (Math.random() * 3 + 1)/1000;
+    let pixel_indices = star_canvas.width * star_canvas.height - 1 // Let's get that 0 index out of the way
+    // Now we pick our potential star positions
+    let dim_pixel_pos = [];
+    let bright_pixel_pos = [];
+    for(let i=0; i<(pixel_indices*star_ratio); i++){
+      let star_roll = Math.random()*1000;
+      // To give some variation in the star count, there's a 30% chance that any given star gets cut.
+      if(star_roll < 300){continue;}
+      // Now small, dim stars...
+      if(star_roll < 800){
+          dim_pixel_pos.push(Math.round(Math.random()*pixel_indices));
+      } else if(star_roll < 870){
+          bright_pixel_pos.push(Math.round(Math.random()*pixel_indices));
+      } else {
+          // Math out the large, cross-shaped stars
+          let star_core = Math.round(Math.random()*pixel_indices);
+          bright_pixel_pos.push(star_core);
+          if(star_core > 0){dim_pixel_pos.push(star_core - 1);}
+          if(star_core < pixel_indices){dim_pixel_pos.push(star_core + 1);}
+          if(star_core > star_canvas.width){dim_pixel_pos.push(star_core-star_canvas.width);}
+          if(star_core < pixel_indices-star_canvas.width){dim_pixel_pos.push(star_core+star_canvas.width);}
+      } // Might add shooting stars and the like later
+    }
+    let main_img = star_work_ctx.getImageData(0, 0, star_canvas.width, star_canvas.height);
+    let main_imgData = main_img.data;
+    let rgb_to_use = get_rgb_from_overlay_name(star_colors[Math.floor(Math.random() * star_colors.length)]);
+    for(let i=0; i<bright_pixel_pos.length; i++){
+        let pos = bright_pixel_pos[i]*4;
+        main_imgData[pos] = 255;
+        main_imgData[pos+1] = 255;
+        main_imgData[pos+2] = 255;
+        main_imgData[pos+3] = 255;
+    }
+    for(let i=0; i<dim_pixel_pos.length; i++){
+        let pos = dim_pixel_pos[i]*4;
+        main_imgData[pos] = rgb_to_use[0];
+        main_imgData[pos+1] = rgb_to_use[1];
+        main_imgData[pos+2] = rgb_to_use[2];
+        main_imgData[pos+3] = 100+Math.random()*155;
+    }
+    star_work_ctx.putImageData(main_img, 0, 0);
+    star_ctx.drawImage(star_work_canvas, 0, 0);
 }
 
 async function draw_ground_canvas(scramble_ground=false){
@@ -313,6 +433,23 @@ function gen_ground_selection(dropdown_id){
     }
 }
 
+// Gets a dropdown by ID and sets its content to be the background colors
+function gen_background_color_selection(dropdown_id){
+    select = document.getElementById(dropdown_id);
+    for(key in available_backgrounds){
+        select.options[select.options.length] = (new Option(key, key));
+    }
+    select.value = "none";
+}
+
+// Gets a dropdown by ID and sets its content to be the background styles
+function gen_background_style_selection(dropdown_id){
+    let styles=["gradient", "chunks"];
+    select = document.getElementById(dropdown_id);
+    select.options[0] = (new Option("gradient", "gradient"));
+    select.options[1] = (new Option("chunks", "chunks"));
+}
+
 function set_ground_selection(opt){
     current_ground = opt;  
 }
@@ -330,16 +467,23 @@ async function get_canvas_for_named_component(name){
 function get_rgb_from_overlay_name(color){
     let color_cutoff = color.indexOf("%");
     let alpha = 25  // percent to match the user input, we convert it later
-    let hex_code = color
     if(color_cutoff != -1){
       alpha = parseInt(color.slice(color_cutoff+1));
+    }
+    let rgb_code = hexToRgb(get_hex_from_overlay_name(color))
+    rgb_code.push(255*(alpha/100.0))
+    return rgb_code;
+}
+
+function get_hex_from_overlay_name(color){
+    let color_cutoff = color.indexOf("%");
+    let hex_code = color
+    if(color_cutoff != -1){
       hex_code = color.slice(0,color_cutoff);
     }
     // We also let folks input the names of colors as shortcuts
     if(available_overlay_colors.hasOwnProperty(hex_code)){ hex_code = available_overlay_colors[hex_code]; }
-    let rgb_code = hexToRgb(hex_code)
-    rgb_code.push(255*(alpha/100.0))
-    return rgb_code;
+    return hex_code;
 }
 
 // TODO: this was hastily-written. Really needs some cleanup
@@ -353,25 +497,25 @@ async function draw_outline(color, ctx){
    let points_to_color = [];
    // If no color is specified, we'll use the nearest (more or less) and darken it
    let colors_to_use = [];
-   var background_color;
+   var outline_color;
    // We try to be smart with transparent overlays; we search for a background color.
    // We expect this loop to either die early or let us leave early
    for (let i=0; i < main_imgData.length; i += 4) {
        if ( main_imgData[i + 3] < 255 ) {
-           background_color = [main_imgData[i], main_imgData[i+1], main_imgData[i+2], main_imgData[i+3]];
+           outline_color = [main_imgData[i], main_imgData[i+1], main_imgData[i+2], main_imgData[i+3]];
            break;
        }
    }
    // If we didn't find any non-opaque pixels, we have nothing to outline.
-   if(background_color == undefined){return;}
+   if(outline_color == undefined){return;}
    // Otherwise, we start the first proper loop, left to right.
-   let last_was_background = (main_imgData.slice(0,4).toString() == background_color.toString());
+   let last_was_background = (main_imgData.slice(0,4).toString() == outline_color.toString());
    let this_is_background;
    let most_recent_color = [0, 0, 0];
    for (let i=4; i < main_imgData.length; i += 4) {
        // Preemptive optimization is the enemy of progress, and yet. And yet.
-       if ( main_imgData[i + 3] < 200 || (main_imgData[i + 3] == background_color[3] && main_imgData[i + 0] == background_color[0] &&
-                main_imgData[i + 1] == background_color[1] &&  main_imgData[i + 2] == background_color[2])) {
+       if ( main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] &&
+                main_imgData[i + 1] == outline_color[1] &&  main_imgData[i + 2] == outline_color[2])) {
            this_is_background = true;
        } else {
            this_is_background = false;
@@ -395,7 +539,7 @@ async function draw_outline(color, ctx){
        last_was_background = this_is_background;
    }
    // Now we repeat, drawing our lines top to bottom.
-   last_was_background = (main_imgData.slice(0,4).toString() == background_color.toString());
+   last_was_background = (main_imgData.slice(0,4).toString() == outline_color.toString());
    this_is_background = undefined;
    for (let j=0; j < output_canvas.width; j ++) {
        for (let k=0; k < output_canvas.height; k++){
@@ -404,8 +548,8 @@ async function draw_outline(color, ctx){
            // We use our loops to format us up so we look like the prior inner loop for easier troubleshooting.
            // TODO: At this point, I think the remainder could be refactored into a function. Would be a lot cleaner.
            let i = (j + k*output_canvas.width)*4;
-           if ( main_imgData[i + 3] < 200 || (main_imgData[i + 3] == background_color[3] && main_imgData[i + 0] == background_color[0] &&
-                main_imgData[i + 1] == background_color[1] &&  main_imgData[i + 2] == background_color[2])) {
+           if ( main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] &&
+                main_imgData[i + 1] == outline_color[1] &&  main_imgData[i + 2] == outline_color[2])) {
                this_is_background = true;
            } else {
                this_is_background = false;
@@ -503,4 +647,6 @@ async function do_preload() {
     }
     await preload_all_images();
     gen_ground_selection("pick_ground");
+    gen_background_color_selection("pick_background_color");
+    gen_background_style_selection("pick_background_style");
 }
