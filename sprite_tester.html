@@ -7,8 +7,9 @@
         <link rel="icon" href="https://i.imgur.com/fRqhbd7.png">
     </head>
     <body onload="do_preload()">
+        <a href="index.html" class="index_link"><--Home</a>
         <h1 id="title">Sprite Tester</h1>
-        <h2 id="subtitle">Test plants and catalog items to see how they look.</h2>
+        <h2 id="subtitle">Test plant bases and catalog items to see how they'll look.</h2>
         </br>
         <label for="image_injector">URL of image (Imgur works well) (Only one at a time for now!):</label>
         <input type="text" id="image_injector" name="image_injector" size="4" placeholder="make sure it ends in .png!">
@@ -23,7 +24,11 @@
         <label for="use_smart_spacing">Use smart spacing:</label><input type="checkbox" id="use_smart_spacing" value="Use smart spacing" checked>
         <label for="pick_ground">Pick ground:</label><select type="select" id="pick_ground" class="garden_dropdown" value="Pick Ground" onChange="current_ground=pick_ground.value"></select>  
         <label for="quantity">Garden width:</label> <input class="garden-dim-bar" type="number" id="garden_width" name="quantity" min="64" value=450>
-        <label for="garden_height">Garden height:</label> <input class="garden-dim-bar" type="number" id="garden_height" name="garden_height" min="70" value=70><br><br>
+        <label for="garden_height">Garden height:</label> <input class="garden-dim-bar" type="number" id="garden_height" name="garden_height" min="70" value=70>
+        <label for="draw_outline" style="margin-left: 10px">Draw outline:</label><input type="checkbox" id="draw_outline" value="Draw outline">
+        <label for="pick_background_color">Sky:</label><select type="select" id="pick_background_color" class="garden_dropdown" value="none" onChange="background_color=pick_background_color.value"></select>
+        <label for="pick_background_style">Sky style:</label><select type="select" id="pick_background_style" class="garden_dropdown" value="gradient" onChange="background_style=pick_background_style.value"></select>
+        <label for="draw_starfield" style="margin-left: 10px">Stars:</label><input type="checkbox" id="draw_starfield">
         <div id=content_div>
             </br></br>
             <input type="button" class="chunky" value="&gt;&gt; Generate a (test) garden!&lt;&lt;" onClick="genTestGarden()">

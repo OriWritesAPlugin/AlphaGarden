@@ -163,3 +163,9 @@ particle {
 }
 
 .name_div {padding: 5px 4px 3px 0px; width: 200px; text-align: right; border: none; color:white; margin: 0px; height: 100%; background: #272127;}
+
+.directory_link, .index_link {font-size: 18px; line-height:1.4; text-decoration:none; margin-left: 5px;}
+
+.directory_link:hover, .index_link:hover {text-decoration:underline}
+
+.index_link { position: fixed; top: 0; left: 0;}
