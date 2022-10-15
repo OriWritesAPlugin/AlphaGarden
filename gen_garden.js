@@ -2,12 +2,14 @@ var img_loadup = [];
 var current_ground = "grass [palette]";
 const available_ground = {"grass [palette]": "https://i.imgur.com/yPNa3WB.png", "sand": "https://i.imgur.com/Ejupy26.png",
                           "sand [palette]": "https://i.imgur.com/Rzr07Ev.png", "none": "https://i.imgur.com/Hq3VDgi.png",
+                          "riverbed": "https://i.imgur.com/68dUehJ.png",
                           "snow": "https://i.imgur.com/ljWMvBo.png", "dirt": "https://i.imgur.com/CqQDCgC.png"};
 const available_overlay_colors = {"blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
                                   "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2"}
 // REMEMBER: TOP DOWN
 const available_backgrounds = {"none": [],
                                "custom": [],
+                               "dusk": ["#424270", "#4c4a73", "#5b5577", "#6f617f", "#7f6d82", "#8f7887", "#a2828a", "#b7938e", "#c29b8d"],
                                "magically charged": ["#3c085c", "#571170", "#66167a", "#85238f", "#a2319e", "#c550a9", "#f487bc"],
                                "midday": ["#74a3c7", "#91c2e7", "#a8def6", "#b7e6fb", "#d5f2f8", "#ecfdfd"],
                                "night": ["#000304", "#000407", "#00070c", "#000910", "#010c14", "#02111d"],
@@ -110,7 +112,7 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
                 }
                 if(seeds[i][0] == "*"){
                     if(!all_named.hasOwnProperty(seeds[i])){
-                        let url = prompt("Enter URL for image you want to use for "+seeds[i]+" (if it's from FR, you'll have to host it someplace like Imgur or Discord due to FR's settings):");
+                        let url = prompt("Enter URL for image you want to use for "+seeds[i]+" (if it's from FR, you'll need to host it someplace like Imgur due to FR's CORS settings):");
                         all_named[seeds[i]] = url;
                         let temp_img = await preload_single_image(url);
                         // Forcibly resize to 32x32
@@ -272,7 +274,7 @@ async function place_ground(scramble_ground=false){
         component = await components_to_place[i];
         await place_component(ground_ctx, component);
     }
-    purge_transparency(ground_ctx.canvas);
+    //purge_transparency(ground_ctx.canvas);
     ctx.drawImage(ground_ctx.canvas, 0, height_offset);
 }
 
@@ -354,7 +356,13 @@ async function draw_ground_canvas(scramble_ground=false){
     for (const palette_type of Object.keys(ground_palette)) {
         let palette = ground_palette[palette_type];
         if(palette==null){
-          ground_palette[palette_type] = all_palettes[random_from_list(possible_ground_palettes[palette_type])];
+          if(possible_ground_palettes[palette_type].length == 0){
+              // No seeds, use default grass color.
+              // Of course, this gives you bright green sand...but it -is- essentially an error state.
+              ground_palette[palette_type] = base_foliage_palette;
+          } else {
+              ground_palette[palette_type] = all_palettes[possible_ground_palettes[palette_type][0]];
+          }
         } else if(scramble_ground){
           // Try to avoid picking the same one twice
           for(let allowed_attempts=20; allowed_attempts>0; allowed_attempts--){
@@ -597,7 +605,7 @@ async function assign_overlay_canvas(color, ctx){
     let main_imgData = ctx.getImageData(0, 0, color_canvas.width, color_canvas.height).data;
     let color_img = color_ctx.getImageData(0, 0, color_canvas.width, color_canvas.height);
     let color_imgData = color_img.data;
-    // Loops through bytes and only place color if the area below is opaque.
+    // Loops through bytes and only place color if the area below has some alpha.
     for ( var i = 0; i < main_imgData.length; i += 4 ) {
         if ( main_imgData[i + 3] > 0 ) {
             color_imgData[i] = rgb_code[0];
