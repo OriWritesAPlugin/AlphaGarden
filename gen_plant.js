@@ -68,7 +68,7 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/BFJa2xX.png", "https://i.imgur.com/C0Elhph.png", "https://i.imgur.com/4yp3rQR.png",
                // 108, 109, 110
                "https://i.imgur.com/AmgtEol.png", "https://i.imgur.com/Oc9hXis.png", "https://i.imgur.com/QEXAoEh.png",
-               "https://i.imgur.com/oSwzqLT.png", "https://i.imgur.com/3bHuLad.png"];
+               "https://i.imgur.com/oSwzqLT.png", "https://i.imgur.com/Fqj9xcu.png"];
 
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
@@ -104,7 +104,8 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "rupert_ascendant": "https://i.imgur.com/Na1gT9v.png",
              "oriole": "https://i.imgur.com/KTdWhYB.png", "blackbird": "https://i.imgur.com/GvnkSA7.png", "cardinal": "https://i.imgur.com/Zu9xxP5.png",
              "spoop_one": "https://i.imgur.com/2BYYsbd.png", "spoop_two": "https://i.imgur.com/iUxGYsi.png", "spoop_three": "https://i.imgur.com/mQRx5sJ.png",
-             "ghost_one": "https://i.imgur.com/KrLlzh3.png","ghost_two": "https://i.imgur.com/ppt6svW.png", "ghost_three": "https://i.imgur.com/6gjzp4g.png"};
+             "ghost_one": "https://i.imgur.com/KrLlzh3.png","ghost_two": "https://i.imgur.com/ppt6svW.png", "ghost_three": "https://i.imgur.com/6gjzp4g.png",
+             "lamppost_glow": "https://i.imgur.com/cOcM3OH.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
 common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78, 80, 81, 82, 84, 88, 91, 92, 97, 98, 99, 101, 102, 107, 111];
@@ -210,7 +211,7 @@ rare_feature_palettes = rare_feature_palettes.concat(boost_with);
 rare_accent_palettes = rare_accent_palettes.concat(boost_with);
 rare_foliage_palettes = rare_foliage_palettes.concat([65, 65, 65, 65, 65]);*/
 // Used for replacing ALL colors...
-//rare_foliage_palettes = [71];
+//rare_foliage_palettes = [44];
 //rare_feature_palettes = [13];
 //rare_accent_palettes = [70];
 
