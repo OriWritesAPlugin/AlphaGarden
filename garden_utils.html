@@ -7,6 +7,7 @@
         <link rel="icon" href="https://i.imgur.com/13AXCvH.png">
     </head>
     <body onload="do_preload()">
+        <a href="index.html" class="index_link"><--Home</a>
         <h1 id="title">Garden Utilities</h1>
         <h2 id="subtitle">Various tools for working with the plants</h2>
         <div id=content_div>
@@ -70,6 +71,69 @@
     <script type="text/javascript">
         var img_loadup = []
         var last_child_seed;
+
+        // Used for the prompt generator
+        const prompts = ["Hopes for the future are no substitute for acts in the present", "Kindness doesn't always come easily", "There is an end to this",
+                         "None but you can see it through", "Your light is a beacon", "Dreams may become reality, even the weird ones", "You are not broken", "Rest a little",
+                         "You did your best", "You reap what you sow", "Welcome peace while it lasts", "Forgiveness does not entitle forgetfulness",
+                         "You did good!", "Your confidence is earned", "This was a long time coming", "Are you tired?", "You're an inspiration", "They'll remember you",
+                         "You'll meet a mysterious stranger", "Discovery awaits", "All is not as it seems", "Your acts have been witnessed",
+                         "Good things come to those who act", "There is a lightness in the air", "Shadows waver", "All is not lost", "Are you forgetting anything?",
+                         "Are you fit to rule?", "Are we obligated to act?", "The weak meet the strong", "Pack extra socks", "The road stretches ahead",
+                         "The wind brings fresh news", "You hold the key", "A lull in the storm", "The storm is building", "The storm breaks", "The woods may help",
+                         "Better safe than sorry", "An ounce of prevention's worth a pound of cure", "There is a delicate balance to things", "Hello, friend!",
+                         "You've been here before", "Older and wiser", "It's not the end of the world", "You will endure", "Here we go again...", "Try, try again",
+                         "Is wisdom your ally?", "How did you meet?", "It's okay to not have all the answers", "Where did you go?", "Some adventures are better together",
+                         "Some adventures are better alone", "We walk the valley", "Keep your eyes on the skies", "A fell wind blows", "Day dawns again",
+                         "The longer the frost, the brighter the bloom", "Seek flowers", "What ails you?", "They work well together", "They did what they could",
+                         "Don't mistake stupidity for malice", "Don't mistake malice for stupidity", "The future is uncertain", "How clever are they?",
+                         "Strength in numbers", "Is their strength enough?", "They remember what others forget", "Always look on the bright side of life",
+                         "If hope's a folly, then I'm its fool", "A night to remember", "The sea rises", "Seek higher ground", "Don't wait up",
+                         "They read between the lines", "They'll know what they're about", "They're a little lost", "Who'd you first think of this morning?",
+                         "Songs unsung", "Will they recognize you?", "There's a music in it", "Always room for creativity", "I'm not so sure", "It's waiting",
+                         "Have their dreams changed?", "A change for the better", "New challenges ahead", "It's a learning experience", "It builds character",
+                         "Just about had it with this nonsense", "Patience isn't endless", "At my signal", "Let loose", "Keep trying", "Bittersweet",
+                         "Each morning dawns anew", "Some mysteries remain", "A wolf in wolf's clothing", "Mist parts", "The river runs deep", "By moonlight",
+                         "Just in time", "A little too late", "They were wrong", "Times are a-changin'", "How did they get there", "Letting the days go by",
+                         "It was all a blur", "Silence", "Eyes on the prize", "It's not over 'til it's over", "Stand up", "Never better", "Near miss", "Tomorrow",
+                         "I didn't forget", "Seems a little colder", "Don't leave without me", "Worth a shot", "Chin up!", "And remember: never, ever, ev-",
+                         "Lost in translation", "Hide and seek", "A beautiful day in the neighborhood", "Learn something new", "As you are, so must I be",
+                         "Prepare to follow", "Gentle days", "Not for lack of trying", "There's joy in it", "They pass a stranger on the road", "Two roads diverge",
+                         "Crossroads", "Trailblazer", "Paths unmarked, paths untaken", "On your mark", "Check the map", "Seasons change", "Permafrost", "New growth",
+                         "Putting down roots", "Like the wind", "Watch for sickness", "Decay is a form of life", "Rot and rebirth", "Oozing forwards",
+                         "Seek truth", "Tyrants beware", "Turning tides", "Miasma", "The rocks remember", "Buried truths", "Descent", "Ascent", "Buried no longer",
+                         "Brilliance", "A rare treasure", "Cleansing flame", "Forge anew", "Go with the flow", "Forged in fire", "Smokescreen", "Ashes and embers",
+                         "From the ashes", "Strike true", "Armored", "Are they a monster?", "Chilling", "As things thaw", "Tip of the tongue", "Keep it safe",
+                         "Well-guarded", "Among the bones", "Keep the beat", "Tides and tidings", "Flotsam and jetsam", "Welcome aboard", "Abyssal", "Can you tell?",
+                         "Sunken things", "Industrious", "A workplace incident", "Ties that bind", "Current events", "Static", "Journeyman", "Union", "At what cost?",
+                         "Caution: unstable footing", "Be vigilant", "Elsewhere", "In another life", "Illusions", "Shadows lengthen", "Beneath the trees",
+                         "The rules have changed", "Same as it ever was", "What master do they serve?", "Are they free?", "Knock knock", "Unexpected company",
+                         "Tea for two", "How have you been?", "All's well", "Thank you", "Same to you", "Refreshed", "Reminded why they fight", "Worth it",
+                         "End of the road", "Is this what you want?", "Newly remembered", "We are gathered here today", "For a worthy cause", "Only you",
+                         "A quiet moment", "Kin and kind", "Take this with you", "I am as I am", "Spring cleaning", "Summer nights", "Harvest season", "Winter chill",
+                         "Goal-setting", "Branching out", "Some things stay the same", "A cool new trick", "Hunger", "Found family", "What have they forgotten?",
+                         "Who's their favorite?", "A welcome surprise", "Good luck", "Love you!", "In your own hour", "Tangled webs", "Where are they off to?",
+                         "No harm in asking", "A new possibility", "Against best advice", "Unfamiliar territory", "Try again later", "Cleansing", "Colorless",
+                         "Welcome the storm", "Here once more", "Round and round it goes", "Happy memories", "Everything is not as it seems", "Could do with a break",
+                         "Variety is the spice of life", "When it rains, it pours", "We all lift together", "A bit of humor", "A story to tell at a party",
+                         "A friend in need", "At your peril", "As you wish", "Good luck with that", "Not in their wildest dreams", "Haven't seen that in awhile",
+                         "What lies beneath", "Subtle infection", "That was you, wasn't it?", "Saw something they shouldn't've", "Get ready to fight", "Race you!",
+                         "Masked for a reason", "It's the little things", "Do they have any artistic talents?", "What do they eat?", "What's wrong?",
+                         "Find your peace", "Put it to a vote", "The way things change", "Training", "How have they changed?", "Chiaroscuro", "Metamorphosis",
+                         "Nemesis", "Coming home", "Homewards bound", "Memories of home", "What does \"home\" mean to them?", "Whispered woods", "Is comfort familiar?",
+                         "Recuperation", "Can there be justice?", "Have a little class", "Hard-won lessons", "The road goes ever on and on", "Why are they here?",
+                         "Been awhile, hasn't it?", "A refreshing change of pace", "Stuck inside", "After all's said and done", "What do they want their legacy to be?",
+                         "First of many", "Last of a kind", "Somewhere in the middle", "It may not be a coincidence", "Penpal" ,"Little secrets", "A plague descends",
+                         "It'll all be alright", "Old friends", "New enemies", "Ghost stories", "Deeper depths", "How do they affect their surroundings?",
+                         "Where do they sleep?", "Half-seen creature", "Is everything ok?", "Breakthrough", "A breath of fresh air", "Who are they friends with?",
+                         "Where will they go?", "Are they honest?", "Be honest", "What were they like as a child?", "What's the fastest way to befriend them?",
+                         "What makes them genuinely angry?", "Something left claw marks", "Which senses do they most rely on?", "What's their sense of humor like?",
+                         "How did they expect their life to go?", "What do they do for fun?", "Are you listening?", "On to the next place", "Message in a bottle",
+                         "Missing evidence", "Emptiness", "Fullness", "Joy", "Field day", "The outskirts", "The depths", "Ruins", "Stay for dinner", "Shared meal",
+                         "What changed their outlook?", "Half-remembered nightmare", "Dreamlike", "Advice to a younger self", "Washed up on the shore",
+                         "Along the ocean", "Beneath the waves", "The sea is calling", "The whispers of the jungle", "Tangled roots", "Little fears",
+                         "Who do they count as family?", "Comfort food", "I have an announcement to make", "Turn back", "They became what they had to", "Pact",
+                         "How do they fight?", "Do they use magic? What kind?"]
 
         // Stolen from https://stackoverflow.com/questions/17386707/how-to-check-if-a-canvas-is-blank
         // returns true if every pixel's uint32 representation is 0 (or "blank")
