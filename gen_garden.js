@@ -43,10 +43,23 @@ var background_style = "gradient";
 
 
 async function gen_randogarden(reuse_and_scramble_positions=false) {
-    // canvases seem to be stranger than I thought. It's like...every time I call this, it's
-    // a "new" canvas. Even without clearRect, the old garden gets "replaced", instead of having more
-    // drawn onto it. Why? Am I calling something wrong someplace?
-    // Not re-creating ctx didn't help. I tried global and I'm still seeing the "replacement" behavior.
+    // Because Javascript doesn't have a way of cleanly pausing execution besides prompt() and the like, we
+    // have to produce the dialogues for adding in wildcard seeds first. Basically, each time we encounter
+    // a wildcard, we cancel our attempt at making a garden, hand control to the wildcard assigner, and trust it
+    // to retry making the garden.
+    if(!reuse_and_scramble_positions){
+        // Remove spaces and leading/trailing commas, then split on remaining commas
+        var seeds = document.getElementById("seed_list").value.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");
+        for(let i=0; i<seeds.length; i++){
+           if(seeds[i][0] == "*"){
+               if(!all_named.hasOwnProperty(seeds[i])){
+                   imageFromPopup(document.body, seeds[i])
+                   return;
+               }
+           }
+        }
+    }
+    // With all the wildcards handled, proceed to drawing the actual garden.
     var canvas = document.getElementById("output_canvas");
     var ctx = canvas.getContext("2d");
     possible_ground_palettes = {"foliage": [], "feature": [], "accent": []};
@@ -110,24 +123,11 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
                     x_coords[i] = garden_width*(parseFloat(seeds[i].slice(force_pos+1))/100) - scaled_seed_width/2;
                     seeds[i] = seeds[i].slice(0, force_pos);
                 }
-                if(seeds[i][0] == "*"){
-                    if(!all_named.hasOwnProperty(seeds[i])){
-                        let url = prompt("Enter URL for image you want to use for "+seeds[i]+" (if it's from FR, you'll need to host it someplace like Imgur due to FR's CORS settings):");
-                        all_named[seeds[i]] = url;
-                        let temp_img = await preload_single_image(url);
-                        // Forcibly resize to 32x32
-                        let wildcard_canvas = document.createElement("canvas");
-                        wildcard_canvas.width = 32;
-                        wildcard_canvas.height = 32;
-                        let wildcard_ctx = wildcard_canvas.getContext("2d");
-                        wildcard_ctx.imageSmoothingEnabled = false;
-                        wildcard_ctx.drawImage(temp_img, 0, 0, 32, 32);
-                        refs[url] = await preload_single_image(wildcard_canvas.toDataURL(temp_img.type));
-                    }
-                    canvas = get_canvas_for_named_component(seeds[i]);
-                }
-                else if(seeds[i][0] == "!"){
+                if(seeds[i][0] == "!"){
                     seeds[i] = seeds[i].slice(1);
+                    canvas = get_canvas_for_named_component(seeds[i]);
+                } else if(seeds[i][0] == "*"){
+                    // Note we don't do the slice here, that's in case of ex: someone having *crate and then I add !crate.
                     canvas = get_canvas_for_named_component(seeds[i]);
                 } else if(seeds[i].length == 0){
                     continue;
@@ -647,6 +647,118 @@ function garden_to_string() {
     }
     return outstring;
 }
+
+// Flexibly take input (URL, drag-and-drop, paste, or file upload) for a wildcard by creating a popup box
+// attached to some parent. Load whatever we find into all_named
+// This is far jankier than it needs to be since Javascript only pauses for prompt, alert, and confirm
+// Largely taken from https://soshace.com/the-ultimate-guide-to-drag-and-drop-image-uploading-with-pure-javascript/
+async function imageFromPopup(parent, name_of_image){
+    var form = document.createElement("div");
+    form.className = "popup";
+    let helptext = document.createElement("div");
+    helptext.innerHTML = "<h3>"+name_of_image+"</h3>Paste an image (or image URL), or drag-and-drop one from your files:";
+    helptext.style.padding = "1vw";
+    helptext.style.textAlign = "center";
+    let urlTaker = document.createElement("input");
+    urlTaker.style.min_height = "3vh";
+    var preview = document.createElement("img");
+    let preview_container = document.createElement("div");
+    preview_container.className = "scaled_preview_container";
+    preview_container.appendChild(preview);
+    let confirm_button = document.createElement("input");
+    confirm_button.type = "button";
+    confirm_button.value = "Confirm";
+    confirm_button.style.width = "auto";
+    urlTaker.addEventListener("input", async function() {
+        if(urlTaker.files == null){
+            preview.src = await resize_for_garden(name_of_image, urlTaker.value);
+        } else {
+            handleImage(urlTaker.files, name_of_image, preview);
+        }
+    })
+    urlTaker.addEventListener("paste", function(event) {
+      var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+      for (index in items) {
+        var item = items[index];
+        if (item.kind === 'file') {
+          var blob = item.getAsFile();
+          handleImage([blob], name_of_image, preview);
+        }
+      }
+    })
+    confirm_button.addEventListener("click", function() {
+        parent.removeChild(form);
+        // we got here by interrupting initial garden generation; restart it
+        gen_randogarden(false);
+    })
+    function preventDefault(e) { e.preventDefault(); e.stopPropagation;}
+    function handleDrop(e) {handleImage(e.dataTransfer.files, name_of_image, preview);}
+    form.addEventListener("dragenter", preventDefault, false);
+    form.addEventListener("dragleave", preventDefault, false);
+    form.addEventListener("dragover", preventDefault, false);
+    form.addEventListener("drop", preventDefault, false);
+    form.addEventListener("drop", handleDrop, false);
+    form.appendChild(helptext);
+    form.appendChild(urlTaker);
+    form.appendChild(preview_container);
+    form.appendChild(confirm_button);
+    parent.appendChild(form);
+    urlTaker.focus();
+}
+
+
+// Helper for imageFromPopup, handles image file validation
+async function handleImage(files, name_of_image, preview_img) {
+    if(files.length > 1){
+        alert("Multiple uploads detected, only the first will be used");
+    }
+    let file = files[0];
+    let validTypes = ["image/jpeg", "image/png", "image/gif"];
+    if (validTypes.indexOf( file.type ) == -1){
+        alert("Bad file type, please use a png, gif, or jpeg");
+    } else {
+        let dataURL = await getBase64(file)
+        preview_img.src = await resize_for_garden(name_of_image, dataURL);
+    }
+}
+
+// Shrinks an image at a URL down to 32, then up to 64, then loads it into our refs
+async function resize_for_garden(name_of_image, sourceURL){
+    let refURL = name_of_image+"_wildcard_data_url"
+    all_named[name_of_image] = refURL;
+    let temp_img = await preload_single_image(sourceURL);
+    // Forcibly resize to 32x32
+    let wildcard_canvas = document.createElement("canvas");
+    wildcard_canvas.width = 32;
+    wildcard_canvas.height = 32;
+    let max_side = Math.max(temp_img.naturalHeight, temp_img.naturalWidth);
+    let wildcard_ctx = wildcard_canvas.getContext("2d");
+    wildcard_ctx.imageSmoothingEnabled = false;
+    // Do a bit of math so that, if the image isn't a perfect square, we don't squash it.
+    wildcard_ctx.drawImage(temp_img, 0, 32-temp_img.naturalHeight*(32/max_side),
+                           temp_img.naturalWidth*(32/max_side),
+                           temp_img.naturalHeight*(32/max_side));
+    let resized_dataURL = wildcard_canvas.toDataURL(temp_img.type);
+    refs[refURL] = await preload_single_image(resized_dataURL);
+    let preview_canvas = document.createElement("canvas");
+    let preview_context = preview_canvas.getContext("2d");
+    preview_canvas.width = 64;
+    preview_canvas.height = 64;
+    preview_context.imageSmoothingEnabled = false;
+    preview_context.drawImage(refs[refURL], 0, 0, 64, 64);
+    return preview_canvas.toDataURL(temp_img.type);
+}
+
+
+function getBase64(file) {
+    return new Promise(function(resolve) {
+      var reader = new FileReader();
+      reader.onloadend = function() {
+        resolve(reader.result)
+      }
+      reader.readAsDataURL(file);
+    })
+  }
 
 
 async function do_preload() {

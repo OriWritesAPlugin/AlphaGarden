@@ -19,6 +19,9 @@ var place_simple_feature = "e900ff";
 // Holder for all the images we'll need
 var refs = {};
 
+// In case of error (probably CORS)
+const BAD_IMG_URL = "https://i.imgur.com/kxStIJE.png";
+
 // old spotted mushroom: https://i.imgur.com/MyF1tCA.png
 // old medium tree with the wonky trunk: https://i.imgur.com/ZMe5J0j.png
 // old medium tree with wonky trunk #2 (49 0-idx) https://i.imgur.com/Ps4w9LV.png
@@ -212,7 +215,7 @@ rare_accent_palettes = rare_accent_palettes.concat(boost_with);
 rare_foliage_palettes = rare_foliage_palettes.concat([65, 65, 65, 65, 65]);*/
 // Used for replacing ALL colors...
 //rare_foliage_palettes = [44];
-//rare_feature_palettes = [13];
+//rare_feature_palettes = [71];
 //rare_accent_palettes = [70];
 
 
@@ -253,6 +256,7 @@ async function preload_single_image(url){
             img.src=url;
             img.crossOrigin = "anonymous"
             img.onload = resolve;
+            img.onerror = function() { img.src = BAD_IMG_URL;};
         });
     await imageLoadPromise;
     return img;

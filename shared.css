@@ -313,3 +313,27 @@ input[type="text"].position_div {
 .directory_link:hover, .index_link:hover {text-decoration:underline}
 
 .index_link { position: fixed; top: 0; left: 0;}
+
+.popup {
+  position: fixed;
+  border-radius:20px;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.2);
+  border-color: #DFC48C;
+  border-width: thin;
+  border-style: solid;
+  width: 20%;
+  top: 20%;
+  left: 40%;
+  background-color: #201920;
+  min-height: 20vh; 
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.scaled_preview_container{
+  min-width: 70px;
+  min-height: 70px;
+  margin: 5px;
+}
