@@ -142,9 +142,10 @@
       }
       
       let checkbox_reward_plant_id = document.getElementById(e.target.id+"_reward").value - 1;
+      let bubble_palette = samplePlantColor(checkbox_reward_plant_id);
       for (let i = 0; i < 75; i++) {
         // We root them to a random location slightly below the bottom of the window
-        createPlantParticle(Math.random() * window.innerWidth, window.innerHeight + 10, samplePlantColor(checkbox_reward_plant_id));
+        createPlantParticle(Math.random() * window.innerWidth, window.innerHeight + 10, bubble_palette);
       }
     }
 
@@ -252,11 +253,11 @@
     function samplePlantColor(i){
         let sample_canvas = plant_canvases[i];
         let sample_ctx = sample_canvas.getContext("2d");
-        let min_desired_samples = 4;  // We want at least this many colors
-        let max_attempted_samples = 100;  // If we fail to get any samples in n, we fallback.
+        // We take X samples from the plant image. If we don't get any colors in this many, we use a fallback.
+        let sample_attempts = 128;
         var found_colors = [];
         let samples_attempted = 0;
-        while(found_colors.length < min_desired_samples || samples_attempted < max_attempted_samples){
+        while(samples_attempted < sample_attempts){
             let x = Math.floor(Math.random()*(sample_canvas.width-1));
             let y = Math.floor(Math.random()*(sample_canvas.width-1));
             let color_data = sample_ctx.getImageData(x, y, 1, 1).data
