@@ -20,7 +20,7 @@
     <script type="text/javascript">
 
         const days_to_gen = 3;
-        const prices = [2, 3, 3, 5, 3, 3, 2];
+        const prices = [2, 3, 3, 4, 4, 5, 4, 4, 3, 3, 2];
         const d = new Date();
         var random_seed;
         var swappable_seeds = {};
@@ -61,9 +61,13 @@
             let rarity;
             if(price==2){rarity=7;}
             else if(price==3){rarity=10;}
+            else if(price==4){rarity=7;}  // Using this for release seeds
             else if(price==5){rarity=99;}
             else{alert("Price "+price+" has no assigned rarity")};
             let plant_data = gen_plant_data(rarity, random_seed+String(column_offset));
+            if(price==4){
+                let recent_release_prng = mulberry32(xmur3(random_seed+String(column_offset))());
+                plant_data["foliage"] = random_from_foliage(temp_boost_foliage, recent_release_prng);}
             let seed = encode_plant_data_v2(plant_data);
             let data_url = await drawPlantForSquare(seed);
             swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';

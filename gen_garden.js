@@ -10,6 +10,7 @@ const available_overlay_colors = {"blue": "0000FF", "red": "FF0000", "green": "0
 const available_backgrounds = {"none": [],
                                "custom": [],
                                "dusk": ["#424270", "#4c4a73", "#5b5577", "#6f617f", "#7f6d82", "#8f7887", "#a2828a", "#b7938e", "#c29b8d"],
+                               "early evening":  ["#4f6f94", "#5a839e", "#6da3ad", "#7eb9b8", "#9ccdbd", "#afdac4", "#c1e4cc", "#d0edd5", "#e0f6e1"],
                                "magically charged": ["#3c085c", "#571170", "#66167a", "#85238f", "#a2319e", "#c550a9", "#f487bc"],
                                "midday": ["#74a3c7", "#91c2e7", "#a8def6", "#b7e6fb", "#d5f2f8", "#ecfdfd"],
                                "night": ["#000304", "#000407", "#00070c", "#000910", "#010c14", "#02111d"],
