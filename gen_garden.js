@@ -49,8 +49,9 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
     // a wildcard, we cancel our attempt at making a garden, hand control to the wildcard assigner, and trust it
     // to retry making the garden.
     if(!reuse_and_scramble_positions){
-        // Remove spaces and leading/trailing commas, then split on remaining commas
-        var seeds = document.getElementById("seed_list").value.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");
+        // Remove spaces and leading/trailing commas and newlines, then split on remaining commas
+        // Couldn't regex strip the whitespace? TODO: check in on that.
+        var seeds = document.getElementById("seed_list").value.split(" ").join("").replace(/[\r\n]+/gm,'').replace(/(^,)|(,$)/g, '').split(",");
         for(let i=0; i<seeds.length; i++){
            if(seeds[i][0] == "*"){
                if(!all_named.hasOwnProperty(seeds[i])){
@@ -86,8 +87,9 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
     // Our fresh garden case:   ////////////////////////////////////////////////////////////////////////////
     if(!reuse_and_scramble_positions){
         components_to_place = [];
-        // Remove spaces and leading/trailing commas, then split on remaining commas
-        var seeds = document.getElementById("seed_list").value.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");
+        // Remove spaces and leading/trailing commas and newlines, then split on remaining commas
+        // Fun fact: we have to do two replaces so that newline commas don't get flagged as trailing ones. Smarter regex might fix this...
+        var seeds = document.getElementById("seed_list").value.split(" ").join("").replace(/[\r\n]+/gm,'').replace(/(^,)|(,$)/g, '').split(",");
         var promises = []
         // Generate a set of coordinates to place items at
         if(use_smart_spacing){

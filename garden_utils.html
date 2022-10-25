@@ -133,7 +133,8 @@
                          "What changed their outlook?", "Half-remembered nightmare", "Dreamlike", "Advice to a younger self", "Washed up on the shore",
                          "Along the ocean", "Beneath the waves", "The sea is calling", "The whispers of the jungle", "Tangled roots", "Little fears",
                          "Who do they count as family?", "Comfort food", "I have an announcement to make", "Turn back", "They became what they had to", "Pact",
-                         "How do they fight?", "Do they use magic? What kind?"]
+                         "How do they fight?", "Do they use magic? What kind?", "How long has this stood?", "Where does the food come from?", "What do they believe in?",
+                         "Trade"]
 
         // Stolen from https://stackoverflow.com/questions/17386707/how-to-check-if-a-canvas-is-blank
         // returns true if every pixel's uint32 representation is 0 (or "blank")
@@ -273,6 +274,8 @@
         scale_canvas.height = 66;
         var scale_ctx = scale_canvas.getContext("2d");
         scale_ctx.imageSmoothingEnabled = false;
+        // Strip any positional info
+        seed = seed.replace(/%[\d .]*/g,'');
         if(seed.startsWith("!")){
           normalization_canvas = document.createElement("canvas");
           normalization_canvas.width = 32;

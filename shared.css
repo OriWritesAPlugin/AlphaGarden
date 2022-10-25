@@ -1,5 +1,5 @@
 @charset "utf-8";
-body {
+body, textarea {
     font-family: monospace, Verdana, sans-serif;
     font-size: 14px;
     color: #DFC48C;
@@ -336,4 +336,16 @@ input[type="text"].position_div {
   min-width: 70px;
   min-height: 70px;
   margin: 5px;
+}
+
+#seed_list{
+  border-style: solid;
+  border-color: #DFC48CA0;
+  width: 98%;
+  height: 12vh;
+}
+
+#seed_list:focus {
+  border-color: #DFC48C;
+  outline: none;
 }
