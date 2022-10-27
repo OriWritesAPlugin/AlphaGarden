@@ -55,8 +55,9 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
         var seeds = document.getElementById("seed_list").value.split(" ").join("").replace(/[\r\n]+/gm,'').replace(/(^,)|(,$)/g, '').split(",");
         for(let i=0; i<seeds.length; i++){
            if(seeds[i][0] == "*"){
-               if(!all_named.hasOwnProperty(seeds[i])){
-                   imageFromPopup(document.body, seeds[i])
+               let cleaned_seed = seeds[i].split("%")[0];
+               if(!all_named.hasOwnProperty(cleaned_seed)){
+                   imageFromPopup(document.body, cleaned_seed)
                    return;
                }
            }
