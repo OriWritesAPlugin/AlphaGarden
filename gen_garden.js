@@ -3,7 +3,8 @@ var current_ground = "grass [palette]";
 const available_ground = {"grass [palette]": "https://i.imgur.com/yPNa3WB.png", "sand": "https://i.imgur.com/Ejupy26.png",
                           "sand [palette]": "https://i.imgur.com/Rzr07Ev.png", "none": "https://i.imgur.com/Hq3VDgi.png",
                           "riverbed": "https://i.imgur.com/68dUehJ.png",
-                          "snow": "https://i.imgur.com/ljWMvBo.png", "dirt": "https://i.imgur.com/CqQDCgC.png"};
+                          "snow": "https://i.imgur.com/ljWMvBo.png", "dirt": "https://i.imgur.com/CqQDCgC.png",
+                          "eyeball": "https://i.imgur.com/aoPg4Wa.png"};
 const available_overlay_colors = {"blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
                                   "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2"}
 // REMEMBER: TOP DOWN
@@ -382,6 +383,8 @@ async function draw_ground_canvas(scramble_ground=false){
     var recolored_ground = replace_color_palette_single_image(overall_palette, new_palette, refs[available_ground[current_ground]]);
     var ground_x_pos = 0;
     while(ground_x_pos < garden_width){
+        // the world isn't ready for this truth:
+        //ctx.drawImage(recolored_ground, ground_x_pos, 70-recolored_ground.height*2, 200, recolored_ground.height*2);
         ctx.drawImage(recolored_ground, ground_x_pos, 64, 200, 6);
         ground_x_pos += 200;
     }

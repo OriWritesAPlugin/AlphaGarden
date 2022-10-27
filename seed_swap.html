@@ -12,7 +12,7 @@
         <h1 id="title">Seed Swap</h1>
         <h2 id="subtitle">Trade (discard) unwanted seeds to earn new ones! New seeds every day!</h2>
           <div id="content_div" class='center-parent' style="text-align: center">
-          <p id="seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> claimed yet<br></p>
+          <p id="seeds_earned">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> claimed yet<br></p>
           </div>
     </body>
     <script src="gen_plant.js"></script>
@@ -93,7 +93,7 @@
             if(swapped_seeds.indexOf(swappable_seeds[id]) == -1){
               swapped_seeds.push(swappable_seeds[id]);
             }
-            document.getElementById("seed_list").innerHTML = swapped_seeds.join(", ");
+            document.getElementById("seeds_earned").innerHTML = swapped_seeds.join(", ");
         }
 
 
