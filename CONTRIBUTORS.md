@@ -29,6 +29,8 @@ Frigate: pumpkin
 
 Natron: tamarix\_g, rhizophora\_m, capparis, vachellia\_n, haloxylon, !silphium
 
+Semisketched: pink\_jellies, blue\_jellies, whales
+
 
 Plants
 ------
@@ -37,11 +39,13 @@ Note: plant numbers are 0-indexed to correspond to encoded plant info
 Xaotician: Tall cactus (64), baobab (72), acacia (73), mini acacia (74), giant echinacea (75), summon chaos groundcover (81), branching flower shrub (82), tilted spotted mushroom (83), desert rose (86), desert rose (wild) (87), barrel cactus (88), dracaena cinnibari (89), Australian grass tree (90), feathery ferns (91, 92), venus flytrap (93), fallen log (94), trellis (95), planting bench (96), giant candle (100), giant ink cap (106),
 potted plant with summoned flowers (107)
 
-RedRevival: Giant gem tree (65), giant tree (67), berry bush (76), prickly pears (84, 85),bluebell (99)
+RedRevival: Giant gem tree (65), giant tree (67), berry bush (76), prickly pears (84, 85), bluebell (99), showy oxytropis (139)
 
 FoxyCipher: Bleeding heart (101)
 
 Natron: North Africa set, 113-129: rhizophora m. (113), cypress (114), tamarix g. (115), papyrus (116), Hyphaene thebaica (117), (118), Pistacia khinjuk (119), wild Mediterranean cypress (120), salam tree (121), caper bush (122), (123), (124), (125), haloxylon (126), vachellia m (127), (128), silphium (129)
+
+Semisketched: butterfly fish (135), jellyfish (136), fish school (137), angelfish (138)
 
 
 Other Assets
