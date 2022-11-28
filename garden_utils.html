@@ -153,8 +153,9 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.imageSmoothingEnabled = false;
             
-            var plant_1 = decode_plant_data(document.getElementById("plant_1_text").value.split(" ").join(""));
-            var plant_2 = decode_plant_data(document.getElementById("plant_2_text").value.split(" ").join(""));
+            // TODO: the split/join/replace construct should be simplified and turned into a function.
+            var plant_1 = decode_plant_data(document.getElementById("plant_1_text").value.split(" ").join("").replace(/(^,)|(,$)|"/g, ''));
+            var plant_2 = decode_plant_data(document.getElementById("plant_2_text").value.split(" ").join("").replace(/(^,)|(,$)|"/g, ''));
             var child_data = {};
             for(keyname in plant_1){
                 if(Math.random() >= 0.5){child_data[keyname] = plant_1[keyname];}
@@ -196,7 +197,7 @@
         }
 
         async function analyze_seed() {
-            var seed_string = document.getElementById("seed_to_read").value.replace(/\s+/g, '');
+            var seed_string = document.getElementById("seed_to_read").value.split(" ").join("").replace(/(^,)|(,$)|"/g, '');
             var canvas = document.getElementById("analysis_output_canvas");
             var ctx = canvas.getContext("2d");
             var raw_plant_data = decode_plant_data(seed_string);

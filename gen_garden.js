@@ -23,6 +23,18 @@ const available_backgrounds = {"none": [],
                                "soft sunset": ["#eb8d7c", "#ed9489", "#efa38f", "#f1b296", "#f5c8a3", "#f7d2a9", "#fae0b2", "#fff5c2",],
                                "sunrise": ["#ffd0db", "#ffc7cd", "#fdc3bb", "#fcc8ae", "#fbcda8"]}
 
+// "bottom" is tiled along the bottom of the image. If the height's less than the image height and a "middle"'s provided,
+// "middle" will be tiled up the rest of the way. "top", of course, goes along the top.
+// NOTE: you can only have a "middle" if you also have a base. Otherwise, where would middle start?
+const available_midgrounds = {"none": {},
+                              "tall_trunks": {"bottom": "https://i.imgur.com/zAN3vHZ.png", "middle": "https://i.imgur.com/zAN3vHZ.png"},
+                              "cavern": {"bottom": "https://i.imgur.com/7SArM0E.png", "top": "https://i.imgur.com/goBTb7l.png"},
+                              "hills": {"bottom": "https://i.imgur.com/AQrEUqZ.png"},
+                              "mountains": {"bottom": "https://i.imgur.com/gD89HDc.png"}};
+
+// TODO: merge available_ground into this once I do the UI refactor.
+const available_tileables = available_midgrounds;
+
 var custom_background_colors = [];
 const star_colors = ["ffbbff", "bbffff", "ffffbb", "ffdddd", "ddffdd", "ffdddd", "dddddd"];
 
@@ -32,6 +44,7 @@ var smart_coords = {};
 var garden_width = 450;
 var current_x_coord;
 var used_fallback_coords;
+var midground;
 var use_smart_spacing = true;
 var last_non_overlay_component_idx = 0; // Used for adding overlays to the ground
 var height_offset = 0; // How far down to draw everything in case someone changes the height.
@@ -116,7 +129,7 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
         for(let i=0; i<seeds.length; i++){
             if(seeds[i][0] == "#"){
                 // Note: we only store the """seed""" so we can more easily garden_to_string().
-                components_to_place.push({"IOU": true, "color": seeds[i].slice(1), "do_not_scramble_pos": true, "seed": seeds[i]});
+                components_to_place.push({"IOU": true, "color": seeds[i].slice(1), "do_not_scramble_pos": true, "seed": seeds[i], "width": canvas.width, "height": canvas.height});
                 if(i==0){
                     background_overlay = components_to_place[0];
                 }
@@ -190,8 +203,13 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
             }
         }
     }
+    // Place any midground elements (we want them to be affected by any overlays)
+    // This is also (temporarily) where we'll need to ensure we have ground palettes chosen
+    // In the future, midgrounds will be able to roll their color independently.
+    if(ground_palette["foliage"] == null){ scramble_tileable_palette(); }
+    place_tileable(midground);
 
-    // Wait for logic to complete and place (this is how we maintain a layering order)
+    // Wait for logic to complete and place plants and etc. (this is how we maintain a layering order)
     for(var i=0; i<components_to_place.length; i++){
         if(i==0 && background_overlay != null){continue;}
         components_to_place[i] = await components_to_place[i];
@@ -272,7 +290,56 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
     ctx.drawImage(background_canvas, 0, 0);
 }
 
+async function place_tileable(tileable_name){
+    let tile_canvas = document.getElementById("output_canvas");
+    let tile_ctx = tile_canvas.getContext("2d");
+    if(available_tileables[tileable_name].hasOwnProperty("bottom")){
+        const bottom_canvas = await get_recolored_with_ground_palette(refs[available_tileables[tileable_name]["bottom"]]);
+        tile_along_y(bottom_canvas, tile_ctx, tile_canvas.height-bottom_canvas.height*2);
+        // "middle" only has any meaning if there's also a bottom
+        if(available_tileables[tileable_name].hasOwnProperty("middle")){
+          const middle_canvas = await get_recolored_with_ground_palette(refs[available_tileables[tileable_name]["middle"]]);
+          const bottom_img_height = refs[available_tileables[tileable_name]["bottom"]].height*2;
+          const middle_img_height = refs[available_tileables[tileable_name]["middle"]].height*2;
+          let current_y = tile_canvas.height - bottom_img_height - middle_img_height;
+          while(current_y > -middle_img_height){
+            tile_along_y(middle_canvas, tile_ctx, current_y);
+            current_y -= middle_img_height;
+          }
+        }
+    }
+    if(available_tileables[tileable_name].hasOwnProperty("top")){
+      const top_canvas = await get_recolored_with_ground_palette(refs[available_tileables[tileable_name]["top"]]);
+      const top_img_height = refs[available_tileables[tileable_name]["top"]].height*2;
+      tile_along_y(top_canvas, tile_ctx, 0);
+    }
+}
+
+// tile an image left to right across the main canvas at some y
+// optionally, offset them all to the left (or right, if you prefer) to
+// make the tileables look somewhat different from garden to garden
+async function tile_along_y(img, tile_ctx, y_pos, x_offset=0){
+    let ground_x_pos = x_offset;
+    while(ground_x_pos < garden_width){
+        tile_ctx.drawImage(img, ground_x_pos, y_pos, img.width*2, img.height*2);
+        ground_x_pos += img.width*2;
+    }
+}
+
+
+// palette swap using the ground palettes
+// this is largely a temporary function, since I expect midground tileables
+// to be individually re-rollable eventually
+async function get_recolored_with_ground_palette(img){
+    // Order is important, so we have to hardcode our keys
+    img = await img;
+    let new_palette = ground_palette["foliage"].concat(ground_palette["accent"]).concat(ground_palette["feature"]);
+    return replace_color_palette_single_image(overall_palette, new_palette, img);
+}
+
+
 async function place_ground(scramble_ground=false){
+    if(scramble_ground){scramble_tileable_palette()};
     let canvas = document.getElementById("output_canvas");
     let ctx = canvas.getContext("2d");
     let ground_ctx = await draw_ground_canvas(scramble_ground);
@@ -284,9 +351,38 @@ async function place_ground(scramble_ground=false){
     ctx.drawImage(ground_ctx.canvas, 0, height_offset);
 }
 
+
 async function scramble_randogarden(){
     gen_randogarden(reuse_and_scramble_positions=true);
 }
+
+
+// Replace the current palette with another from the image, trying to avoid
+// picking the same one twice
+async function scramble_tileable_palette(){
+    for (const palette_type of Object.keys(ground_palette)) {
+        let palette = ground_palette[palette_type];
+        if(palette==null){
+          if(possible_ground_palettes[palette_type].length == 0){
+              // No seeds, use default grass color.
+              // Of course, this gives you bright green sand...but it -is- essentially an error state.
+              ground_palette[palette_type] = base_foliage_palette;
+          } else {
+              ground_palette[palette_type] = all_palettes[possible_ground_palettes[palette_type][0]];
+          }
+        } else {
+          // Try to avoid picking the same one twice
+          for(let allowed_attempts=20; allowed_attempts>0; allowed_attempts--){
+            let temp_palette = all_palettes[random_from_list(possible_ground_palettes[palette_type])];
+            if(JSON.stringify(temp_palette) != JSON.stringify(palette)){
+              ground_palette[palette_type] = temp_palette;
+              break;
+            }
+          }
+        }
+    }
+}
+
 
 function purge_transparency(canvas){
     let ctx = canvas.getContext("2d");
@@ -354,32 +450,16 @@ function generate_starfield(star_canvas, star_ctx){
     star_ctx.drawImage(star_work_canvas, 0, 0);
 }
 
+// Draw the groundcover...and ONLY the groundcover.
+// Why doesn't it use the tileable function, which is almost exactly identical?
+// Simple: my pixel art is trash. The original version of this function contained a bug that slightly squashes
+// the art vertically, which somehow makes it look much, *much* better, especially the riverbed and meat ones.
+// Until I can make something that looks equally good, this "bug" is promoted to feature
 async function draw_ground_canvas(scramble_ground=false){
     let canvas = document.createElement("canvas");
     let ctx = canvas.getContext("2d");
     canvas.width = garden_width;
     ctx.imageSmoothingEnabled = false;
-    for (const palette_type of Object.keys(ground_palette)) {
-        let palette = ground_palette[palette_type];
-        if(palette==null){
-          if(possible_ground_palettes[palette_type].length == 0){
-              // No seeds, use default grass color.
-              // Of course, this gives you bright green sand...but it -is- essentially an error state.
-              ground_palette[palette_type] = base_foliage_palette;
-          } else {
-              ground_palette[palette_type] = all_palettes[possible_ground_palettes[palette_type][0]];
-          }
-        } else if(scramble_ground){
-          // Try to avoid picking the same one twice
-          for(let allowed_attempts=20; allowed_attempts>0; allowed_attempts--){
-            let temp_palette = all_palettes[random_from_list(possible_ground_palettes[palette_type])];
-            if(JSON.stringify(temp_palette) != JSON.stringify(palette)){
-              ground_palette[palette_type] = temp_palette;
-              break;
-            }
-          }
-        }
-    }
     // Order is important, so we have to hardcode our keys
     let new_palette = ground_palette["foliage"].concat(ground_palette["accent"]).concat(ground_palette["feature"]);
     var recolored_ground = replace_color_palette_single_image(overall_palette, new_palette, refs[available_ground[current_ground]]);
@@ -453,6 +533,15 @@ function gen_ground_selection(dropdown_id){
 function gen_background_color_selection(dropdown_id){
     select = document.getElementById(dropdown_id);
     for(key in available_backgrounds){
+        select.options[select.options.length] = (new Option(key, key));
+    }
+    select.value = "none";
+}
+
+// Gets a dropdown by ID and sets its content to be the available midgrounds
+function gen_midground_selection(dropdown_id){
+    select = document.getElementById(dropdown_id);
+    for(key in available_midgrounds){
         select.options[select.options.length] = (new Option(key, key));
     }
     select.value = "none";
@@ -770,11 +859,23 @@ function getBase64(file) {
 
 
 async function do_preload() {
+    // Get all the tileable images. We use a set because some tileables have the same bottom and middle (like tree trunks)
+    tileables = new Set();
     for (const key in available_ground){
-      refs[available_ground[key]] = await preload_single_image(available_ground[key]);
+      tileables.add(available_ground[key]);
+    }
+    for (const key in available_midgrounds){
+      for (const subkey in available_midgrounds[key]){
+        tileables.add(available_midgrounds[key][subkey]);
+      }
+    }
+    // const...of works, const...in does not
+    for (const img of tileables){
+      refs[img] = await preload_single_image(img);
     }
     await preload_all_images();
     gen_ground_selection("pick_ground");
     gen_background_color_selection("pick_background_color");
     gen_background_style_selection("pick_background_style");
+    gen_midground_selection("pick_midground");
 }
