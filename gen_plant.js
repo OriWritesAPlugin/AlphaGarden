@@ -9,8 +9,6 @@ var base_feature_palette = ["f3addd", "d87fbc", "c059a0", "aa3384"];
 var overall_palette = base_foliage_palette.concat(base_accent_palette).concat(base_feature_palette);
 
 var work_canvas_size = 32;  // in pixels
-// Roll more than this out of 1 to have two pieces of base foliage.
-var two_foliage_roll = 0.95;
 
 // A pixel of these colors indicates we should place the corresponding feature type
 var place_complex_feature = "ff943a";
@@ -83,7 +81,9 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/RRCQvhA.png", "https://i.imgur.com/08TmImE.png", "https://i.imgur.com/gDYO9gF.png",
                "https://i.imgur.com/wORUHzS.png", "https://i.imgur.com/tqiMbgP.png", "https://i.imgur.com/6dYyYt1.png",
                // 141
-               "https://i.imgur.com/S01WpzA.png", "https://i.imgur.com/BKrhChN.png", "https://i.imgur.com/g07biTg.png"];
+               "https://i.imgur.com/S01WpzA.png", "https://i.imgur.com/BKrhChN.png", "https://i.imgur.com/g07biTg.png",
+               "https://i.imgur.com/ieCLRr4.png", "https://i.imgur.com/vrsojTx.png", "https://i.imgur.com/JdBQXD9.png",
+               "https://i.imgur.com/yHAyHer.png", "https://i.imgur.com/te0LiY6.png"];
 
 all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
@@ -124,16 +124,17 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "tamarix_g": "https://i.imgur.com/sYgm6Vn.png", "rhizophora_m": "https://i.imgur.com/fysAyNU.png", "capparis": "https://i.imgur.com/lMlO3l6.png",
              "vachellia_n": "https://i.imgur.com/IbCbKic.png", "haloxylon": "https://i.imgur.com/1WxCgPc.png", "silphium": "https://i.imgur.com/QRu7OJ4.png",
              "meat_stalagmite_left": "https://i.imgur.com/B2Xy5fz.png", "meat_stalagmite_right": "https://i.imgur.com/JsZZYIF.png",
-             "pink_jellies": "https://i.imgur.com/MaBKpxS.png", "blue_jellies": "https://i.imgur.com/I37WOzN.png", "whales": "https://i.imgur.com/AqEPGpx.png"};
+             "pink_jellies": "https://i.imgur.com/MaBKpxS.png", "blue_jellies": "https://i.imgur.com/I37WOzN.png", "whales": "https://i.imgur.com/AqEPGpx.png",
+             "frog_green": "https://i.imgur.com/0X7RqRg.png", "frog_brown": "https://i.imgur.com/F93ic5D.png", "tree_frog": "https://i.imgur.com/Zt0jeT9.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
-common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78, 80, 81, 82, 84, 88, 91, 92, 97, 98, 99, 101, 102, 107, 111, 116, 122, 129, 137, 139, 140, 141];
+common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78, 80, 81, 82, 84, 88, 91, 92, 97, 98, 99, 101, 102, 107, 111, 116, 122, 129, 137, 139, 140, 141, 144, 145];
 
 uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43,
                                           46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79, 83, 85, 86, 90, 93, 94, 95, 103, 105, 106, 108,
-                                          114, 117, 118, 119, 120, 121, 123, 124, 126, 132, 138, 142]);
+                                          114, 117, 118, 119, 120, 121, 123, 124, 126, 132, 138, 142, 146, 148]);
 rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65, 70, 87, 89, 109, 113, 115,
-                                        125, 127, 128, 130, 131, 133, 136]);
+                                        125, 127, 128, 130, 131, 133, 136, 147]);
 // The ENTIRE special_foliage group has a rare chance to be selected instead of a standard base, then one's chosen from within at random.
 // I need to figure out math such that any given special base has ~20% of the chance of being chosen vs. any other seed
 // chance of any seed: 1/#total_bases
@@ -148,7 +149,7 @@ boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
 override_foliage = [];
 
-temp_boost_foliage = [135, 136, 137, 138, 139, 140, 141, 142, 143];
+temp_boost_foliage = [135, 136, 137, 138, 142, 144, 145, 146, 147, 148];
 
 
 all_features = ["https://i.imgur.com/G4h84Ht.png", "https://i.imgur.com/vXQYMkL.png", "https://i.imgur.com/p1ipMdS.png", "https://i.imgur.com/UUFJO7h.png", "https://i.imgur.com/IyaeNvt.png", "https://i.imgur.com/NXRWexZ.png", "https://i.imgur.com/VwMnyDB.png", "https://i.imgur.com/mLfzmM8.png", "https://i.imgur.com/zcXm5Op.png", "https://i.imgur.com/Osvq1V0.png", "https://i.imgur.com/iPK9aJ7.png", "https://i.imgur.com/3SpYgDN.png", "https://i.imgur.com/6MRuqb7.png", "https://i.imgur.com/jrYQjIW.png"]
@@ -205,7 +206,9 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
                     ["759e94", "77725b", "785634", "7a4017"], ["b4f6eb", "76c6cd", "3a7b9c", "1f4f7f"],
                     // 90
                     ["d0c26d", "aaaa6a", "738a66", "446c62"], ["b8efe6", "83a3ce", "6b60b3", "6e3789"],
-                    ["c498a3", "9f7688", "6e446c", "472147"]];
+                    ["c498a3", "9f7688", "6e446c", "472147"], ["d17936", "b35d33", "7b2806", "421c16"],
+                    ["ecffdd", "aed0c0", "718c93", "444e63"], ["9c4547", "7f3d4a", "51314d", "3b2b4f"],
+                    ["efeccc", "d1cba6", "978d72", "6c6a6e"]];
 
 // There's three types of palette:
 // Foliage: Generally the bulk of a plant. Greens and browns are most common
@@ -216,10 +219,14 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
 var common_foliage_palettes = [0, 1, 2, 3, 3, 4, 5, 6, 7, 8, 11, 18, 21, 21, 22, 23, 29, 30, 30, 41, 42, 43, 44, 45, 49, 56, 62, 65, 68, 69, 71, 72, 74, 75, 76, 77, 82, 83, 84, 85, 86];
 common_foliage_palettes = common_foliage_palettes.concat(common_foliage_palettes);  // Cheap greenery boost
 var common_accent_palettes = [19, 20, 35, 36, 37, 38, 39, 40];
-var common_feature_palettes = [1, 20, 29, 32, 33, 34, 52, 58, 61, 64, 78, 79, 80, 81, 86, 92];
+//var common_feature_palettes = [1, 20, 29, 32, 33, 34, 52, 58, 61, 62, 64, 78, 79, 80, 81, 86, 92, 93, 94, 95];
+common_feature_palettes = [1, 20, 29, 32, 33, 34, 52, 58, 61, 62, 64, 78, 79, 80, 81, 86, 92, 96];
 var common_feature_palettes = common_feature_palettes.concat(common_feature_palettes);  // Cheap wood/stone boost
-var uncommon_palettes = [2, 9, 10, 11, 12, 13, 14, 15, 18, 24, 25, 38, 46, 47, 50, 55, 57, 60, 63, 66, 67, 70, 71, 72, 76, 82, 87, 88, 89, 90];
-var rare_palettes = [5, 16,  17, 26, 27, 28, 30, 31, 48, 51, 53, 54, 59, 64, 73, 91, 92];
+var uncommon_palettes = [2, 9, 10, 11, 12, 13, 14, 15, 18, 24, 25, 38, 46, 47, 50, 55, 57, 60, 63, 66, 67, 70, 71, 72, 76, 82, 87, 88, 89, 90, 94, 96];
+var rare_palettes = [5, 16,  17, 26, 27, 28, 30, 31, 48, 51, 53, 54, 59, 64, 73, 91, 92, 95];
+
+// Used for boosting rates when I'm generating lots of plants
+//rare_palettes = rare_palettes.concat([31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31]);
 
 var uncommon_foliage_palettes = common_foliage_palettes.concat(uncommon_palettes);
 var rare_foliage_palettes = uncommon_foliage_palettes.concat(rare_palettes);
@@ -233,20 +240,10 @@ var rare_accent_palettes = uncommon_accent_palettes.concat(rare_palettes);
 // Universal use, removes chance of getting common palettes
 var boosted_rare_palettes = uncommon_palettes.concat(rare_palettes);
 
-// Used for boosting rates when I'm generating lots of plants
-//var boost_with = [12, 12, 12, 12, 12, 12, 12, 63, 63, 63, 63, 63, 63, 66, 66, 66, 66, 66, 64, 64, 64, 64, 64, 60, 60]
-/*rare_foliage_palettes = rare_foliage_palettes.concat(common_foliage_palettes);
-rare_foliage_palettes = rare_foliage_palettes.concat(common_foliage_palettes);
-rare_feature_palettes = rare_feature_palettes.concat(common_feature_palettes);
-rare_feature_palettes = rare_feature_palettes.concat(common_feature_palettes);
-rare_foliage_palettes = rare_foliage_palettes.concat(common_foliage_palettes);
-rare_feature_palettes = rare_feature_palettes.concat(common_feature_palettes);
-rare_accent_palettes = rare_accent_palettes.concat(72, 72, 72, 72, 72, 5, 5, 5, 5);
-rare_foliage_palettes = rare_foliage_palettes.concat([72, 72, 72, 72, 72]);*/
 // Used for replacing ALL colors...
-//rare_foliage_palettes = [82, 83, 84, 85, 86, 82, 87, 88, 90, 89, 91, 92];
-//rare_feature_palettes = [86, 92, 82, 87, 88, 90, 89, 91, 92];
-//rare_accent_palettes = [82, 87, 88, 90, 89, 91, 92];
+//rare_foliage_palettes = [];
+//rare_feature_palettes = [93, 94, 95, 96];
+//rare_accent_palettes = [55];
 
 
 async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, chance, anchor_to_bottom=false){
@@ -272,24 +269,24 @@ async function preload_all_images()
   lists_to_load = [all_foliage, all_features, Object.values(all_named)];
   for(var i=0; i<lists_to_load.length; i++){
       for(var j=0; j<lists_to_load[i].length;j++){
-        var promise = preload_single_image(lists_to_load[i][j]);
-        refs[lists_to_load[i][j]] = promise;
+        refs[lists_to_load[i][j]] = preload_single_image(lists_to_load[i][j]);
       }
   }
 }
 
 // Sound of me not being 100% confident in my async usage yet
 async function preload_single_image(url){
-    let img;
-    imageLoadPromise = new Promise(resolve => {
-            img = new Image();
+    return new Promise(resolve => {
+            const img = new Image();
             img.src=url;
             img.crossOrigin = "anonymous"
-            img.onload = resolve;
+            // Setting the .onload = resolve instead of using an eventListener resulted in an
+            // Event getting returned. I don't have time to argue with Javascript tonight...
+            img.addEventListener('load', () => {
+                resolve(img);
+            });
             img.onerror = function() { img.src = BAD_IMG_URL;};
         });
-    await imageLoadPromise;
-    return img;
     // Not yet supported in common versions of Safari
     /*return fetch(url)
            .then(response => response.blob())
