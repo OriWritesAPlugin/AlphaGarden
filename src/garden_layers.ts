@@ -54,6 +54,11 @@ abstract class Layer {
                              place_onto_canvas.height-this.y_offset-this.height,
                              this.width, this.height);
   }
+
+  clearCanvas(){
+    let ctx = this.canvas.getContext("2d");
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
 }
 
 ///////////////////////  GARDEN LAYER   ////////////////////////////////////////
@@ -272,7 +277,7 @@ class GardenLayer extends Layer{
       let gardenItem = await this.content[i];
       gardenItem.place(this.canvasGarden);
     }
-    this.draw();
+    this.update();
   }
 
   /** Update the contents of the ground canvas, grass/sand/stone/etc.**/
@@ -285,10 +290,10 @@ class GardenLayer extends Layer{
     let recoloredGround = replace_color_palette_single_image(overall_palette, newPalette, await refs[available_ground[this.ground]]);
     // Draw everything but the groundcover. We start at y=64 and keep going til we're fully off the canvas
     let incrementBy = recoloredGround.height;
-    let ground_y_pos = 64;
-    while(ground_y_pos<this.canvasGround.height){
-      tile_along_y(ctxGround, recoloredGround, ground_y_pos);
-      ground_y_pos += incrementBy;
+    let groundYPos = 64;
+    while(groundYPos<this.canvasGround.height){
+      tileAlongY(ctxGround, recoloredGround, groundYPos);
+      groundYPos += incrementBy;
     }
     // Draw the groundcover...and ONLY the groundcover.
     // Why doesn't it use the tileable function, which is almost exactly identical?
@@ -296,20 +301,20 @@ class GardenLayer extends Layer{
     // the art vertically, which somehow makes it look much, *much* better, especially the riverbed and meat ones.
     // Until I can make something that looks equally good, this "bug" is promoted to feature
     let recoloredGroundCover = replace_color_palette_single_image(overall_palette, newPalette, await refs[available_ground[this.groundCover]]);
-    let ground_x_pos = 0;
-    while(ground_x_pos < this.canvas.width){
+    let groundXPos = 0;
+    while(groundXPos < this.canvas.width){
         // the world isn't ready for this truth:
         //ctx.drawImage(recolored_ground, ground_x_pos, 70-recolored_ground.height*2, 200, recolored_ground.height*2);
-        ctxGround.drawImage(recoloredGroundCover, ground_x_pos, 64-6, 200, 6);
-        ground_x_pos += 200;
+        ctxGround.drawImage(recoloredGroundCover, groundXPos, 64-6, 200, 6);
+        groundXPos += 200;
     }
-    this.draw();
+    this.update();
   }
 
   /** Applies both canvases to the main one, preparing it to be drawn. **/
-  draw(){
+  update(){
+    this.clearCanvas();
     let ctx = this.canvas.getContext("2d");
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.drawImage(this.canvasGarden, 0, 0, this.canvasGarden.width, this.canvasGarden.height);
     ctx.drawImage(this.canvasGround, 0, 0, this.canvasGround.width, this.canvasGround.height);
   }
@@ -327,3 +332,88 @@ class GardenLayer extends Layer{
 }
 
 ///////////////////////  DECOR LAYER   /////////////////////////////////////////
+
+/** The decor layer draws mid/foreground things like stalagmites and trees.**/
+class DecorLayer extends Layer{
+  content: string;
+  contentPaletteSeed: string;
+  palette: string[];
+
+  constructor(width: number, x_offset: number, y_offset: number,
+              content: string, contentPaletteSeed: string){
+    super(width, x_offset, y_offset);
+    this.content = content;
+    this.contentPaletteSeed = contentPaletteSeed;
+  }
+
+  // Really, this can place any tileable, it's just our only tileables are decor.
+  async placeDecor(){
+    let tileCtx = this.canvas.getContext("2d");
+    tileCtx.imageSmoothingEnabled = false;
+    if(available_tileables[this.content].hasOwnProperty("bottom")){
+        const bottom = await this.recolorOwnTileable("bottom");
+        tileAlongY(tileCtx, bottom, this.canvas.height-bottom.height*2);
+        // "middle" only has any meaning if there's also a bottom
+        if(available_tileables[this.content].hasOwnProperty("middle")){
+          const middle = await this.recolorOwnTileable("middle");
+          const bottom_img_height = refs[available_tileables[this.content]["bottom"]].height*2;
+          const middle_img_height = refs[available_tileables[this.content]["middle"]].height*2;
+          let current_y = this.canvas.height - bottom_img_height - middle_img_height;
+          while(current_y > -middle_img_height){
+            tileAlongY(tileCtx, middle, current_y);
+            current_y -= middle_img_height;
+          }
+        }
+    }
+    if(available_tileables[this.content].hasOwnProperty("top")){
+      const top = await this.recolorOwnTileable("top");
+      tileAlongY(tileCtx, top, 0);
+    }
+  }
+
+  async recolorOwnTileable(portion: string){
+    return replace_color_palette_single_image(overall_palette, this.palette, await refs[available_tileables[this.content][portion]]);
+  }
+
+  update(){
+    let colorData = decode_plant_data(this.contentPaletteSeed);
+    this.palette = all_palettes[colorData["foliage_palette"]].concat(all_palettes[colorData["accent_palette"]]).concat(all_palettes[colorData["feature_palette"]]);
+    this.clearCanvas();
+    this.placeDecor();
+  }
+
+  place_back(_place_onto_canvas: HTMLCanvasElement) {
+    return
+  }
+}
+
+///////////////////////  OVERLAY LAYER   ///////////////////////////////////////
+class OverlayLayer extends Layer{
+  content: string;
+  opacity: number;
+  affectsBackground: Boolean;
+  rgbPalette: number[];
+
+  constructor(width: number, x_offset: number, y_offset: number,
+              content: string, opacity: number, affectsBackground: Boolean){
+    super(width, x_offset, y_offset);
+    this.content = content;
+    this.opacity = opacity;
+    this.affectsBackground = affectsBackground;
+  }
+
+  update(){
+    // "Caching" as an overlay layer is pointless; we have to calculate on
+    // demand, since the canvas might have updated beneath us.
+    return;
+  }
+
+  place_fore(place_onto_canvas: HTMLCanvasElement) {
+    applyOverlay(place_onto_canvas, this.content, this.opacity);
+  }
+
+  place_back(place_onto_canvas: HTMLCanvasElement) {
+    if(!this.affectsBackground){ return; }
+    applyOverlay(place_onto_canvas, this.content, this.opacity);
+  }
+}
