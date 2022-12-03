@@ -30,7 +30,6 @@ abstract class Layer {
   y_offset: number;
   width: number;
   canvas: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
   height = LAYER_HEIGHT;
 
   constructor(width: number, x_offset: number, y_offset: number) {
@@ -40,17 +39,17 @@ abstract class Layer {
     this.x_offset = x_offset;
     this.y_offset = y_offset;
     this.width = width;
-    this.ctx = this.canvas.getContext("2d");
-    this.ctx.imageSmoothingEnabled = false;
   }
 
-  place_fore(place_onto_canvas: HTMLCanvasElement, place_onto_ctx: CanvasRenderingContext2D) {
+  place_fore(place_onto_canvas: HTMLCanvasElement) {
+    let place_onto_ctx = place_onto_canvas.getContext("2d");
     place_onto_ctx.drawImage(this.canvas, this.x_offset,
                              place_onto_canvas.height-this.y_offset-this.height,
                              this.width, this.height);
   }
 
-  place_back(place_onto_canvas: HTMLCanvasElement, place_onto_ctx: CanvasRenderingContext2D) {
+  place_back(place_onto_canvas: HTMLCanvasElement) {
+    let place_onto_ctx = place_onto_canvas.getContext("2d");
     place_onto_ctx.drawImage(this.canvas, this.x_offset,
                              place_onto_canvas.height-this.y_offset-this.height,
                              this.width, this.height);
@@ -93,7 +92,7 @@ abstract class GardenItem {
     this.type = type
   }
 
-  abstract place(place_onto_canvas: HTMLCanvasElement, place_onto_ctx: CanvasRenderingContext2D): void;
+  abstract place(place_onto_canvas: HTMLCanvasElement): void;
 }
 
 /**
@@ -116,7 +115,9 @@ class GardenPlacedItem extends GardenItem{
     this.heightCategory = height;
   }
 
-  async place(place_onto_canvas: HTMLCanvasElement, place_onto_ctx: CanvasRenderingContext2D){
+  async place(place_onto_canvas: HTMLCanvasElement){
+    let place_onto_ctx = place_onto_canvas.getContext("2d");
+    place_onto_ctx.imageSmoothingEnabled = false;
     place_onto_ctx.drawImage(this.canvas, place_onto_canvas.width*this.offset, 0, GARDEN_ITEM_SIZE*2, GARDEN_ITEM_SIZE*2);
   }
 }
@@ -136,8 +137,8 @@ class GardenOverlayItem extends GardenItem{
     this.opacity = opacity;
   }
 
-  place(place_onto_canvas: HTMLCanvasElement, place_onto_ctx: CanvasRenderingContext2D){
-    applyOverlay(place_onto_canvas, place_onto_ctx, this.identity, this.opacity);
+  place(place_onto_canvas: HTMLCanvasElement){
+    applyOverlay(place_onto_canvas, this.identity, this.opacity);
   }
 }
 
@@ -153,10 +154,14 @@ class GardenLayer extends Layer{
   seedList: string[];
   content: Array<Promise<GardenItem>>;
   smart_coords: object;
-  canvasMain: HTMLCanvasElement;
+  canvasGarden: HTMLCanvasElement;
   canvasGround: HTMLCanvasElement;
+  groundPaletteSeed: string;
+  groundCover: string;
+  ground: string;
 
-  constructor(width: number, x_offset: number, y_offset: number, seedList: string[]){
+  constructor(width: number, x_offset: number, y_offset: number, seedList: string[],
+              groundPaletteSeed: string, groundCover: string, ground: string){
     super(width, x_offset, y_offset);
     this.seedList = seedList;
     this.smart_coords = {};
@@ -171,9 +176,18 @@ class GardenLayer extends Layer{
     seedList.forEach(seed => {
       this.content.push(this.makeGardenItem(seed));
     })
-    this.canvasMain = document.createElement("canvas") as HTMLCanvasElement;
-    this.canvasMain.width = this.width;
-    this.canvasMain.height = LAYER_HEIGHT;
+    this.height += y_offset  // Gardens can have terrain below
+    this.canvas.height = this.height;
+    this.canvasGarden = document.createElement("canvas") as HTMLCanvasElement;
+    this.canvasGarden.width = this.width;
+    this.canvasGarden.height = LAYER_HEIGHT;
+    this.canvasGround = document.createElement("canvas") as HTMLCanvasElement;
+    this.canvasGround.width = this.width;
+    this.canvasGround.height = this.height;
+    this.groundPaletteSeed = groundPaletteSeed;
+    this.groundCover = groundCover;
+    this.ground = ground;
+
   }
 
   /** Use the height of contained GardenPlacedItems to pick (hopefully appealing) spots for them.**/
@@ -252,12 +266,11 @@ class GardenLayer extends Layer{
 
   /** Update the contents of the main canvas, which holds all the plants. **/
   async updateMain(){
-    var ctxMain = this.canvasMain.getContext("2d");
-    ctxMain.clearRect(0, 0, this.canvasMain.width, this.canvasMain.height);
-    ctxMain.imageSmoothingEnabled = false;
+    var ctxGarden = this.canvasGarden.getContext("2d");
+    ctxGarden.clearRect(0, 0, this.canvasGarden.width, this.canvasGarden.height);
     for(let i=0; i<this.content.length; i++){
       let gardenItem = await this.content[i];
-      gardenItem.place(this.canvasMain, ctxMain);
+      gardenItem.place(this.canvasGarden);
     }
     this.draw();
   }
@@ -265,18 +278,50 @@ class GardenLayer extends Layer{
   /** Update the contents of the ground canvas, grass/sand/stone/etc.**/
   async updateGround(){
     let ctxGround = this.canvasGround.getContext("2d");
+    ctxGround.imageSmoothingEnabled = false;
     ctxGround.clearRect(0, 0, this.canvasGround.width, this.canvasGround.height);
-
+    let colorData = decode_plant_data(this.groundPaletteSeed);
+    let newPalette = all_palettes[colorData["foliage_palette"]].concat(all_palettes[colorData["accent_palette"]]).concat(all_palettes[colorData["feature_palette"]]);
+    let recoloredGround = replace_color_palette_single_image(overall_palette, newPalette, await refs[available_ground[this.ground]]);
+    // Draw everything but the groundcover. We start at y=64 and keep going til we're fully off the canvas
+    let incrementBy = recoloredGround.height;
+    let ground_y_pos = 64;
+    while(ground_y_pos<this.canvasGround.height){
+      tile_along_y(ctxGround, recoloredGround, ground_y_pos);
+      ground_y_pos += incrementBy;
+    }
+    // Draw the groundcover...and ONLY the groundcover.
+    // Why doesn't it use the tileable function, which is almost exactly identical?
+    // Simple: my pixel art is trash. The original version of this function contained a bug that slightly squashes
+    // the art vertically, which somehow makes it look much, *much* better, especially the riverbed and meat ones.
+    // Until I can make something that looks equally good, this "bug" is promoted to feature
+    let recoloredGroundCover = replace_color_palette_single_image(overall_palette, newPalette, await refs[available_ground[this.groundCover]]);
+    let ground_x_pos = 0;
+    while(ground_x_pos < this.canvas.width){
+        // the world isn't ready for this truth:
+        //ctx.drawImage(recolored_ground, ground_x_pos, 70-recolored_ground.height*2, 200, recolored_ground.height*2);
+        ctxGround.drawImage(recoloredGroundCover, ground_x_pos, 64-6, 200, 6);
+        ground_x_pos += 200;
+    }
+    this.draw();
   }
 
   /** Applies both canvases to the main one, preparing it to be drawn. **/
   draw(){
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.drawImage(this.canvasMain, 0, 0, this.canvasMain.width, this.canvasMain.height);
+    let ctx = this.canvas.getContext("2d");
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.drawImage(this.canvasGarden, 0, 0, this.canvasGarden.width, this.canvasGarden.height);
+    ctx.drawImage(this.canvasGround, 0, 0, this.canvasGround.width, this.canvasGround.height);
+  }
+
+  place_fore(place_onto_canvas: HTMLCanvasElement) {
+    let place_onto_ctx = place_onto_canvas.getContext("2d");
+    place_onto_ctx.drawImage(this.canvas, this.x_offset, place_onto_canvas.height-this.canvas.height,
+                             this.width, this.height);
   }
 
   /** Gardens never go on the background layer. **/
-  place_back(_place_onto_canvas: HTMLCanvasElement, _place_onto_ctx: CanvasRenderingContext2D) {
+  place_back(_place_onto_canvas: HTMLCanvasElement) {
     return
   }
 }
