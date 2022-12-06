@@ -1,25 +1,26 @@
 /** This module holds the UI logic for garden creation. **/
 
-const PROPERTIES = {"base": {"defaultPalette": "CoHC9CNzEt", "mainColor": "#FF0000", "secondColor": "#AA0000"},
-                    "garden": {"defaultPalette": "CoHC9CNzEt", "mainColor": "#1C2121", "secondColor": "#151818"},
-                    "decor": {"defaultPalette": "CoHC9CNzEt", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains"},
-                    "overlay": {"mainColor": "#1F191A", "secondColor": "#171213", "defaultColor": "night", "defaultOpacity": 0.25},
-                    "celestial": {"defaultPalette": "early_evening", "mainColor": "#1B1D24", "secondColor": "#141519", "defaultContent": "Sky_Gradient"}}
+const PROPERTIES = {"base": {"defaultPalette": "CoHC9CNzEt", "mainColor": "#FF0000", "secondColor": "#AA0000", "accentColor": "#FFAA00", "icon": "▒"},
+                    "garden": {"defaultPalette": "CoHC9CNzEt", "mainColor": "#1C2121", "secondColor": "#151818", "accentColor": "#273831", "icon": "⚘"},
+                    "decor": {"defaultPalette": "CoHC9CNzEt", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains", "accentColor": "#3D362B", "icon": "ꕔ"},
+                    "overlay": {"mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "night", "defaultOpacity": 0.25, "icon": "☾"},
+                    "celestial": {"defaultPalette": "early_evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "icon": "☁"}}// old overlay: 1F191A
 
 class LayerDiv {
   selfDiv: HTMLDivElement;
   mainColor: string;
   editDiv: HTMLDivElement;
   secondColor: string;
+  accentColor: string;
   editButton: HTMLButtonElement;
   name: string;
-  editMode = false;
+  editMode = true;
   layer: Layer;
   id: string;
   // Labels require IDs, and unique IDs don't seem to be trivial with Javascript
   // Semi-meaningful IDs are assigned as layer_this.id_descriptor_childIds[descriptor],
   // and then incremented.
-  childIds = {"selectbox": 0, "fillin": 0, "generic": 0};
+  childIds = {"selectbox": 0, "fillin": 0, "generic": 0, "numberBox": 0};
   // Lets ups propagate changes up to the layer manager
   onEditCallback: Function;
 
@@ -29,8 +30,14 @@ class LayerDiv {
     // This properties stuff is to save some pain with super() and derived class colors
     this.mainColor = PROPERTIES[type]["mainColor"];
     this.secondColor = PROPERTIES[type]["secondColor"];
+    this.accentColor = PROPERTIES[type]["accentColor"];
     this.selfDiv = this.buildGenericDiv(this.mainColor);
+    this.selfDiv.className = "draggable_layer_div";
+    this.selfDiv.style.cursor = "move";
+    this.selfDiv.style.userSelect = "none";
     this.onEditCallback = onEditCallback;
+    this.selfDiv.addEventListener('mousedown', draggableLayerMouseDownHandler);
+    this.selfDiv.style.border = "3px solid "+this.accentColor;
     this.layer = layer
     this.id = "layer_"+id;
     this.selfDiv.id = this.id;
@@ -55,6 +62,8 @@ class LayerDiv {
     genericDiv.className = "layer_div";
     genericDiv.style.backgroundColor = color;
     genericDiv.id = this.generateId("generic");
+    genericDiv.style.cursor = "default";
+    genericDiv.style.userSelect = "default";
     return genericDiv;
   }
 
@@ -70,12 +79,17 @@ class LayerDiv {
     this.editButton.classList.toggle('active');
   }
 
+  buildGenericButton(){
+
+  }
+
   buildEditButton(){
     let editButton = document.createElement("input");
     editButton.type = "button";
     editButton.className = "chunky_wrap";
     editButton.value = "✎";
     editButton.addEventListener('click', this.toggleEditMode.bind(this));
+    editButton.style.backgroundColor = this.accentColor;
     return editButton;
   }
 
@@ -88,6 +102,7 @@ class LayerDiv {
       delete this.layer;
       document.getElementById(this.id).remove();
     }.bind(this));
+    deleteButton.style.backgroundColor = this.accentColor;
     return deleteButton;
   }
 
@@ -103,6 +118,8 @@ class LayerDiv {
       await this.layer.update();
       this.onEditCallback();
     }.bind(this, target);
+    selectBox.options[0].selected = true;
+    selectBox.style.backgroundColor = this.mainColor;
     return selectBox;
   }
 
@@ -112,19 +129,41 @@ class LayerDiv {
     return id;
   }
 
-  buildGenericFillIn(target:string){
-    let fillIn = document.createElement("number") as HTMLInputElement;
+  buildGenericFillIn(target:string, labelText:string, color: string, coerceNumber=false){
+    let fillIn = document.createElement("input") as HTMLInputElement;
     fillIn.className = "garden-dim-bar";
     fillIn.id = this.generateId("fillin");
+    fillIn.style.backgroundColor = color;
     fillIn.onchange = function(){
-      this.layer[target]=fillIn.value;
+      if(coerceNumber){
+        this.layer[target]=parseFloat(fillIn.value);
+      } else {
+        this.layer[target]=fillIn.value;
+      }
       this.layer.update();
       this.onEditCallback();
     }.bind(this, target);
     let label = document.createElement("label") as HTMLLabelElement;
     label.setAttribute("for", fillIn.id);
-    label.innerHTML = target;
-    return fillIn;
+    label.innerHTML = labelText;
+    return [fillIn, label];
+  }
+
+  buildPositionDiv(){
+    const pairs = [["x_offset", "x:"], ["y_offset", "y:"], ["width", "<br>width:"]];
+    let holdDiv = this.buildGenericDiv(this.mainColor);
+    holdDiv.style.display = "inline-block";
+    holdDiv.style.height = "auto";
+    holdDiv.style.textAlign = "right";
+    for(let i=0; i < pairs.length; i++){
+      let [fillIn, label] = this.buildGenericFillIn(pairs[i][0], pairs[i][1], this.secondColor, true);
+      if(pairs[i][0] != "width"){
+        fillIn.style.width = "2vw";
+      }
+      holdDiv.appendChild(label);
+      holdDiv.appendChild(fillIn);
+    }
+    return holdDiv;
   }
 
   buildEditDiv(){
@@ -133,7 +172,7 @@ class LayerDiv {
     editDiv.style.backgroundColor = this.secondColor;
     editDiv.appendChild(this.buildGenericDropdown("name", ["Larry", "Moe", "Curly"]));
     editDiv.appendChild(this.buildGenericDropdown("name", ["Sue", "Anne", "Barbara"]));
-    editDiv.appendChild(this.buildGenericFillIn("name"));
+    editDiv.appendChild(this.buildPositionDiv());
     return editDiv;
   }
 }
@@ -162,7 +201,9 @@ class GardenLayerDiv extends LayerDiv {
     }.bind(this);
     editDiv.appendChild(groundCoverSelect);
     editDiv.appendChild(groundSelect);
-    editDiv.appendChild(this.buildGenericFillIn("groundPaletteSeed"));
+    let [fillIn, label] = this.buildGenericFillIn("groundPaletteSeed", "ground palette", this.mainColor);
+    editDiv.appendChild(label);
+    editDiv.appendChild(fillIn);
     return editDiv;
   }
 }
@@ -178,7 +219,10 @@ class DecorLayerDiv extends LayerDiv {
     editDiv.style.backgroundColor = this.secondColor;
     let contentSelect = this.buildGenericDropdown("content", Object.keys(available_tileables))
     editDiv.appendChild(contentSelect);
-    editDiv.appendChild(this.buildGenericFillIn("contentPaletteSeed"));
+    let [fillIn, label] = this.buildGenericFillIn("contentPaletteSeed", "palette", this.mainColor);
+    editDiv.appendChild(label);
+    editDiv.appendChild(fillIn);
+    editDiv.appendChild(this.buildPositionDiv());
     return editDiv;
   }
 }
@@ -198,7 +242,8 @@ class CelestialLayerDiv extends LayerDiv {
     let editDiv = document.createElement("div");
     editDiv.className = "layer_div";
     editDiv.style.backgroundColor = this.secondColor;
-    let contentSelect = this.buildGenericDropdown("content", Object.keys(CelestialType))
+    // TODO: Typescript is amazing fantastic awesome but the enums might be worth holding off on
+    let contentSelect = this.buildGenericDropdown("content", Object.keys(CelestialType).filter(value => isNaN(Number(value))));
     let skyPaletteSelect = this.buildGenericDropdown("skyPalette", Object.keys(available_backgrounds))
     editDiv.appendChild(contentSelect);
     editDiv.appendChild(skyPaletteSelect);
@@ -213,19 +258,24 @@ class LayerManager {
   fullCanvas: HTMLCanvasElement;
   activeLayerDivs: LayerDiv[];
   selfDiv: HTMLDivElement;
+  layerHolderDiv: HTMLDivElement;
   activeGardenLayer: GardenLayer;
   layers_created = 0;
   default_width = 500;
   updateCallback: Function;
+  isVisible = false;
+  divToLayerMapper = {};  // Associates div IDs to the layer they represent
 
   get_id(){
     this.layers_created ++;
     return this.layers_created;
   }
-  // ⚘ꕔ★☁☾▒
-  constructor(managedCanvas: HTMLCanvasElement, activeGardenLayer: GardenLayer){
+
+  constructor(managedCanvas: HTMLCanvasElement){
     this.selfDiv = document.createElement("div");
     this.selfDiv.id = "layer_manager";
+    this.layerHolderDiv = document.createElement("div");
+    this.layerHolderDiv.id = "layer_holder";
     this.fullCanvas = managedCanvas;
     this.foreCanvas = document.createElement("canvas");
     this.foreCanvas.width = this.fullCanvas.width;
@@ -234,50 +284,106 @@ class LayerManager {
     this.backCanvas.width = this.fullCanvas.width;
     this.backCanvas.height = this.fullCanvas.height;
     this.activeLayerDivs = [];
-    this.activeGardenLayer = activeGardenLayer;
     this.updateCallback = this.redraw.bind(this);
+    this.selfDiv.appendChild(this.buildLayerButton("garden", this.makeGardenLayer));
+    this.selfDiv.appendChild(this.buildLayerButton("decor", this.makeDecorLayer));
+    this.selfDiv.appendChild(this.buildLayerButton("celestial", this.makeCelestialLayer));
+    this.selfDiv.appendChild(this.buildLayerButton("overlay", this.makeOverlayLayer));
+    this.selfDiv.appendChild(this.layerHolderDiv);
+    this.activeGardenLayer = this.makeGardenLayer(false).layer as GardenLayer;
   }
 
-  makeGardenLayer(){
-    let newGardenLayer = cloneGardenLayer(this.activeGardenLayer);
+  toggleVisibility(){
+    this.isVisible = !this.isVisible;
+    if(!this.isVisible){
+      this.selfDiv.style.marginRight = "-30%";
+    } else {
+      this.selfDiv.style.marginRight = "0%";
+    }
+  }
+
+  buildLayerButton(type: string, callback: Function){
+    let layerButton = document.createElement("input");
+    layerButton.type = "button";
+    layerButton.className = "chunky_wrap";
+    layerButton.value = PROPERTIES[type]["icon"];
+    layerButton.addEventListener('click', callback.bind(this));
+    layerButton.style.backgroundColor = PROPERTIES[type]["accentColor"];
+    layerButton.style.width = "5vw";
+    layerButton.style.height = "3vw";
+    return layerButton;
+  }
+
+  addLayerAndAnimate(newLayerDiv: LayerDiv, openEditMode: Boolean){
+    this.divToLayerMapper[newLayerDiv.selfDiv.id] = newLayerDiv;
+    this.layerHolderDiv.insertBefore(newLayerDiv.selfDiv, this.layerHolderDiv.firstChild);
+    if(openEditMode){
+      setTimeout(() => {  newLayerDiv.toggleEditMode();}, 10);
+    }
+    return newLayerDiv;
+  }
+
+  makeGardenLayer(openEditMode=true){
+    let newGardenLayer = new GardenLayer(this.default_width, 0, 0, [], PROPERTIES["garden"]["defaultdefaultPalette"], "grass [palette]", "grass [palette]");
     let newGardenLayerDiv = new GardenLayerDiv(newGardenLayer, this.get_id(), this.updateCallback);
-    this.activeLayerDivs.push(newGardenLayerDiv);
-    this.selfDiv.appendChild(newGardenLayerDiv.selfDiv);
+    return this.addLayerAndAnimate(newGardenLayerDiv, openEditMode);
   }
 
-  makeDecorLayer(){
+  makeDecorLayer(openEditMode=true){
     let newDecorLayer = new DecorLayer(this.default_width, 0, 0, PROPERTIES["decor"]["default_content"], PROPERTIES["decor"]["defaultPalette"])
     let newDecorLayerDiv = new DecorLayerDiv(newDecorLayer, this.get_id(), this.updateCallback);
-    this.activeLayerDivs.push(newDecorLayerDiv);
-    this.selfDiv.appendChild(newDecorLayerDiv.selfDiv);
+    return this.addLayerAndAnimate(newDecorLayerDiv, openEditMode);
   }
 
-  makeOverlayLayer(){
+  makeOverlayLayer(openEditMode=true){
     let newOverlayLayer = new OverlayLayer(this.default_width, 0, 0, PROPERTIES["overlay"]["default_color"],
                                            PROPERTIES["overlay"]["default_opacity"], false)
     let newOverlayLayerDiv = new OverlayLayerDiv(newOverlayLayer, this.get_id(), this.updateCallback);
-    this.activeLayerDivs.push(newOverlayLayerDiv);
-    this.selfDiv.appendChild(newOverlayLayerDiv.selfDiv);
+    return this.addLayerAndAnimate(newOverlayLayerDiv, openEditMode);
   }
 
-  makeCelestialLayer(){
+  makeCelestialLayer(openEditMode=true){
     let newCelestialLayer = new CelestialLayer(this.default_width, 0, 0, PROPERTIES["celestial"]["defaultContent"],
                                                PROPERTIES["celestial"]["defaultPalette"])
     let newCelestialLayerDiv = new CelestialLayerDiv(newCelestialLayer, this.get_id(), this.updateCallback);
-    this.activeLayerDivs.push(newCelestialLayerDiv);
-    this.selfDiv.appendChild(newCelestialLayerDiv.selfDiv);
+    return this.addLayerAndAnimate(newCelestialLayerDiv, openEditMode);
+  }
+
+  parseSeedList(seedList: string, callback: Function){
+    var seeds = seedList.split(" ").join("").replace(/[\r\n]+/gm,'').replace(/(^,)|(,$)/g, '').split(",");
+    for(let i=0; i<seeds.length; i++){
+       if(seeds[i][0] == "*"){
+           let cleaned_seed = seeds[i].split("%")[0];
+           if(!all_named.hasOwnProperty(cleaned_seed)){
+               imageFromPopup(document.body, cleaned_seed, callback.bind(seedList))
+               return;
+           }
+       }
+    }
+    return seeds;
+  }
+
+  async regenActiveGarden(seedList: string){
+    let parsedSeedList = this.parseSeedList(seedList, this.regenActiveGarden.bind(seedList));
+    this.activeGardenLayer.seedList = parsedSeedList;
+    this.activeGardenLayer.generateContent();
+    await this.activeGardenLayer.assignSmartPositions();
+    await this.activeGardenLayer.updateMain();
+    this.redraw();
   }
 
   redraw(){
     clearCanvas(this.foreCanvas);
     clearCanvas(this.backCanvas);
     clearCanvas(this.fullCanvas);
-    for(let layerDiv of this.activeLayerDivs){
-      layerDiv.layer.place_fore(this.foreCanvas);
-      layerDiv.layer.place_back(this.backCanvas);
+    for(let i=this.layerHolderDiv.children.length; i>0; i--){
+      // TODO: right now we just free the layer. Should propagate the deletion fully to the manager.
+      let layerDivObj = this.divToLayerMapper[this.layerHolderDiv.children[i-1].id];
+      if(layerDivObj.layer === undefined){
+        continue;
+      }
+      layerDivObj.layer.place(this.foreCanvas, this.backCanvas);
     }
-    this.activeGardenLayer.place_fore(this.foreCanvas);
-    this.activeGardenLayer.place_back(this.backCanvas);
     let fullCtx = this.fullCanvas.getContext("2d");
     fullCtx.drawImage(this.backCanvas, 0, 0, this.fullCanvas.width, this.fullCanvas.height);
     fullCtx.drawImage(this.foreCanvas, 0, 0, this.fullCanvas.width, this.fullCanvas.height);

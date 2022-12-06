@@ -14,7 +14,7 @@ its content (image URL, list of seeds, ...), a seed palette, width, and offset. 
 there's quite a bit of logic in this module.
 **/
 
-const LAYER_HEIGHT = 64;
+const LAYER_HEIGHT = 70;
 const GARDEN_ITEM_SIZE = 32;
 
 ///////////////////////  GENERIC LAYER   ///////////////////////////////////////
@@ -43,16 +43,19 @@ abstract class Layer {
 
   place_fore(place_onto_canvas: HTMLCanvasElement) {
     let place_onto_ctx = place_onto_canvas.getContext("2d");
-    place_onto_ctx.drawImage(this.canvas, this.x_offset,
-                             place_onto_canvas.height-this.y_offset-this.height,
+    place_onto_ctx.drawImage(this.canvas, this.x_offset, this.y_offset*-1,
                              this.width, this.height);
   }
 
   place_back(place_onto_canvas: HTMLCanvasElement) {
     let place_onto_ctx = place_onto_canvas.getContext("2d");
-    place_onto_ctx.drawImage(this.canvas, this.x_offset,
-                             place_onto_canvas.height-this.y_offset-this.height,
-                             this.width, this.height);
+    place_onto_ctx.drawImage(this.canvas, this.x_offset, this.y_offset*-1,
+                             this.canvas.width, this.canvas.height);
+  }
+
+  place(fore_canvas: HTMLCanvasElement, back_canvas: HTMLCanvasElement){
+    this.place_fore(fore_canvas);
+    this.place_back(back_canvas);
   }
 
   clearCanvas(){
@@ -169,18 +172,7 @@ class GardenLayer extends Layer{
               groundPaletteSeed: string, groundCover: string, ground: string){
     super(width, x_offset, y_offset);
     this.seedList = seedList;
-    this.smart_coords = {};
-    // Iterating over Typescript enums is very strange and perhaps not worth it? Do NOT remove that filter.
-    Object.values(GardenItemHeightCategory).filter(value => !isNaN(Number(value))).forEach(height => {
-      this.smart_coords[height] = createSpacedPlacementQueue(this.width, <number>height*24);
-    });
-    // Javascript's inability to pause execution outside certain special calls (alert()) means we can't handle wildcards while
-    // generating a garden. By the time we reach GardenLayer, we expect all wildcards to be resolved and the seeds in a
-    // nice list.
-    this.content = [];
-    seedList.forEach(seed => {
-      this.content.push(this.makeGardenItem(seed));
-    })
+    this.generateContent();
     this.height += y_offset  // Gardens can have terrain below
     this.canvas.height = this.height;
     this.canvasGarden = document.createElement("canvas") as HTMLCanvasElement;
@@ -192,7 +184,21 @@ class GardenLayer extends Layer{
     this.groundPaletteSeed = groundPaletteSeed;
     this.groundCover = groundCover;
     this.ground = ground;
+  }
 
+  generateContent(){
+    // Iterating over Typescript enums is very strange and perhaps not worth it? Do NOT remove that filter.
+    this.smart_coords = {};
+    Object.values(GardenItemHeightCategory).filter(value => !isNaN(Number(value))).forEach(height => {
+      this.smart_coords[height] = createSpacedPlacementQueue(this.width, <number>height*24-<number>height);
+    });
+    // Javascript's inability to pause execution outside certain special calls (alert()) means we can't handle wildcards while
+    // generating a garden. By the time we reach GardenLayer, we expect all wildcards to be resolved and the seeds in a
+    // nice list.
+    this.content = [];
+    this.seedList.forEach(seed => {
+      this.content.push(this.makeGardenItem(seed));
+    })
   }
 
   /** Use the height of contained GardenPlacedItems to pick (hopefully appealing) spots for them.**/
@@ -375,11 +381,11 @@ class DecorLayer extends Layer{
     return replace_color_palette_single_image(overall_palette, this.palette, await refs[available_tileables[this.content][portion]]);
   }
 
-  update(){
+  async update(){
     let colorData = decode_plant_data(this.contentPaletteSeed);
     this.palette = all_palettes[colorData["foliage_palette"]].concat(all_palettes[colorData["accent_palette"]]).concat(all_palettes[colorData["feature_palette"]]);
     this.clearCanvas();
-    this.placeDecor();
+    await this.placeDecor();
   }
 
   place_back(_place_onto_canvas: HTMLCanvasElement) {
@@ -389,15 +395,15 @@ class DecorLayer extends Layer{
 
 ///////////////////////  OVERLAY LAYER   ///////////////////////////////////////
 class OverlayLayer extends Layer{
-  content: string;
+  color: string;
   opacity: number;
   affectsBackground: Boolean;
   rgbPalette: number[];
 
   constructor(width: number, x_offset: number, y_offset: number,
-              content: string, opacity: number, affectsBackground: Boolean){
+              color: string, opacity: number, affectsBackground: Boolean){
     super(width, x_offset, y_offset);
-    this.content = content;
+    this.color = color;
     this.opacity = opacity;
     this.affectsBackground = affectsBackground;
   }
@@ -409,11 +415,133 @@ class OverlayLayer extends Layer{
   }
 
   place_fore(place_onto_canvas: HTMLCanvasElement) {
-    applyOverlay(place_onto_canvas, this.content, this.opacity);
+    applyOverlay(place_onto_canvas, this.color, this.opacity);
   }
 
   place_back(place_onto_canvas: HTMLCanvasElement) {
     if(!this.affectsBackground){ return; }
-    applyOverlay(place_onto_canvas, this.content, this.opacity);
+    applyOverlay(place_onto_canvas, this.color, this.opacity);
   }
+}
+
+///////////////////////  CELESTIAL LAYER   /////////////////////////////////////
+enum CelestialType {
+  Stars,
+  Sky_Gradient,
+  Sky_Chunked
+}
+
+class CelestialLayer extends Layer{
+  skyPalette: string;
+  content: string;
+
+  constructor(width: number, x_offset: number, y_offset: number,
+              content: string, skyPalette: string){
+    super(width, x_offset, y_offset);
+    this.content = content;
+    this.skyPalette = skyPalette;
+  }
+
+  update(){
+    this.clearCanvas();
+    let type = CelestialType[this.content];
+    // First, we parse the sky color(s)
+    let actingPalette: string[];
+    let ctx = this.canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+    if(available_backgrounds.hasOwnProperty(this.skyPalette)){
+      actingPalette = available_backgrounds[this.skyPalette]
+    } else {
+      actingPalette = this.skyPalette.split(",")
+    }
+    if(type==CelestialType.Sky_Gradient){
+      let grad =  ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+      let step = 1/(actingPalette.length);
+      for(let i=0; i<actingPalette.length-1; i++){
+        grad.addColorStop(i*step, actingPalette[i]);
+      }
+      grad.addColorStop(1, actingPalette[actingPalette.length-1]);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    } else if(type==CelestialType.Sky_Chunked){
+      let step = 1/(actingPalette.length);
+      for(let i=actingPalette.length-1; i>=0; i--){
+        ctx.fillStyle = actingPalette[i];
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height*step*(i+1));
+      }
+    } else if(type==CelestialType.Stars){
+      this.generateStarfield(actingPalette[0]);
+    }
+  }
+
+  generateStarfield(accentColor: string){
+    // First we need to decide how many stars to make relative to pixels in the canvas, at max
+    // There's essentially 4 levels: [1, 2, 3, 4] in a thousand
+    let star_ratio = (Math.random() * 4 + 1)/1000;
+    let pixel_indices = this.canvas.width * this.canvas.height - 1 // Let's get that 0 index out of the way
+    // Now we pick our potential star positions
+    let dim_pixel_pos = [];
+    let bright_pixel_pos = [];
+    for(let i=0; i<(pixel_indices*star_ratio); i++){
+      let star_roll = Math.random()*1000;
+      // To give some variation in the star count, there's a 30% chance that any given star gets cut.
+      if(star_roll < 300){continue;}
+      // Now small, dim stars...
+      if(star_roll < 800){
+          dim_pixel_pos.push(Math.round(Math.random()*pixel_indices));
+      } else if(star_roll < 870){
+          bright_pixel_pos.push(Math.round(Math.random()*pixel_indices));
+      } else {
+          // Math out the large, cross-shaped stars
+          let star_core = Math.round(Math.random()*pixel_indices);
+          bright_pixel_pos.push(star_core);
+          if(star_core > 0){dim_pixel_pos.push(star_core - 1);}
+          if(star_core < pixel_indices){dim_pixel_pos.push(star_core + 1);}
+          if(star_core > this.canvas.width){dim_pixel_pos.push(star_core-this.canvas.width);}
+          if(star_core < pixel_indices-this.canvas.width){dim_pixel_pos.push(star_core+this.canvas.width);}
+      } // Might add shooting stars and the like later
+    }
+    let ctx = this.canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+    let main_img = ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+    let main_imgData = main_img.data;
+    let rgb_to_use = get_overlay_color_from_name(accentColor, 1);
+    for(let i=0; i<bright_pixel_pos.length; i++){
+        let pos = bright_pixel_pos[i]*4;
+        main_imgData[pos] = 255;
+        main_imgData[pos+1] = 255;
+        main_imgData[pos+2] = 255;
+        main_imgData[pos+3] = 255;
+    }
+    for(let i=0; i<dim_pixel_pos.length; i++){
+        let pos = dim_pixel_pos[i]*4;
+        main_imgData[pos] = rgb_to_use[0];
+        main_imgData[pos+1] = rgb_to_use[1];
+        main_imgData[pos+2] = rgb_to_use[2];
+        main_imgData[pos+3] = 100+Math.random()*155;
+    }
+    ctx.putImageData(main_img, 0, 0);
+  }
+
+  // Celestials don't touch the foreground (probably)
+  place_fore(_place_onto_canvas: HTMLCanvasElement) {
+    return
+  }
+}
+
+/**
+Shallow clone a garden layer from another garden layer. Mostly used by the layer manager.
+
+Some day I, too, will be able to structuredClone()
+**/
+function cloneGardenLayer(gardenLayer: GardenLayer){
+  // Empty seed list to start so we don't waste time regenerating canvases
+  let newGarden = new GardenLayer(gardenLayer.width, gardenLayer.x_offset, gardenLayer.y_offset, [], gardenLayer.groundPaletteSeed, gardenLayer.groundCover, gardenLayer.ground);
+  newGarden.smart_coords = gardenLayer.smart_coords;
+  newGarden.content = gardenLayer.content;
+  newGarden.canvasGarden = gardenLayer.canvasGarden;
+  newGarden.canvasGround = gardenLayer.canvasGround;
+  newGarden.canvas = gardenLayer.canvas;
+  newGarden.seedList = gardenLayer.seedList;
+  return newGarden;
 }
