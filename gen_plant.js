@@ -83,9 +83,10 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                // 141
                "https://i.imgur.com/S01WpzA.png", "https://i.imgur.com/BKrhChN.png", "https://i.imgur.com/g07biTg.png",
                "https://i.imgur.com/ieCLRr4.png", "https://i.imgur.com/vrsojTx.png", "https://i.imgur.com/JdBQXD9.png",
-               "https://i.imgur.com/yHAyHer.png", "https://i.imgur.com/te0LiY6.png"];
+               "https://i.imgur.com/yHAyHer.png", "https://i.imgur.com/te0LiY6.png", "https://i.imgur.com/DVXz8Nr.png",
+               "https://i.imgur.com/snN8fJY.png", "https://i.imgur.com/wNf7FXA.png"];
 
-all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
+var all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
              "bunbun": "https://i.imgur.com/Qn23rZb.png", "bunbun_black": "https://i.imgur.com/S6vpB9i.png", "bunbun_white": "https://i.imgur.com/1xnwUWv.png",
              "grazing_goat": "https://i.imgur.com/6LsCzM6.png", "grazing_goatbrown": "https://i.imgur.com/ZbLlfdq.png",
@@ -106,7 +107,7 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "obsidian_rock_1": "https://i.imgur.com/VJbGsNP.png", "obsidian_rock_2": "https://i.imgur.com/QD7qunp.png", "obsidian_rock_3": "https://i.imgur.com/wVqYlpE.png", "obsidian_rock_4": "https://i.imgur.com/G3YixT4.png",
              "aventurine_rock_1": "https://i.imgur.com/x8PAyAR.png", "aventurine_rock_2": "https://i.imgur.com/FAuYH6y.png", "aventurine_rock_3": "https://i.imgur.com/SiOomwa.png", "aventurine_rock_4": "https://i.imgur.com/XBTiOM1.png",
              "shale_cairn": "https://i.imgur.com/mPCJ6xK.png", "limestone_cairn": "https://i.imgur.com/YY3aAhM.png", "obsidian_cairn": "https://i.imgur.com/z85y3DB.png", "aventurine_cairn": "https://i.imgur.com/xfoVNh6.png",
-             "shale_spring": "https://i.imgur.com/SS5wlwB.png", "limestone_spring": "https://i.imgur.com/YvFBGtb.png", "obsidian_spring": "https://i.imgur.com/HDguTqn.png","aventurine_spring": "https://i.imgur.com/aqWObIl.png", 
+             "shale_spring": "https://i.imgur.com/SS5wlwB.png", "limestone_spring": "https://i.imgur.com/YvFBGtb.png", "obsidian_spring": "https://i.imgur.com/HDguTqn.png","aventurine_spring": "https://i.imgur.com/aqWObIl.png",
              "simple_fence": "https://i.imgur.com/WE4YzQb.png", "simple_fence_broken": "https://i.imgur.com/E1E1q3w.png", "simple_signpost": "https://i.imgur.com/LrdkTBi.png", "shale_birdbath": "https://i.imgur.com/7P7OqPQ.png",
              "bleached_skull": "https://i.imgur.com/kIgNges.png", "bleached_ribs": "https://i.imgur.com/gb5h2ct.png", "burnt_skull": "https://i.imgur.com/swmqdOf.png", "burnt_ribs": "https://i.imgur.com/yCHsvce.png",
              "lawn_deco": "https://i.imgur.com/A5SsKVL.png", "lawn_sin": "https://i.imgur.com/hAqeR7Z.png", "peacock": "https://i.imgur.com/AqGytLV.png",
@@ -125,23 +126,26 @@ all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "http
              "vachellia_n": "https://i.imgur.com/IbCbKic.png", "haloxylon": "https://i.imgur.com/1WxCgPc.png", "silphium": "https://i.imgur.com/QRu7OJ4.png",
              "meat_stalagmite_left": "https://i.imgur.com/B2Xy5fz.png", "meat_stalagmite_right": "https://i.imgur.com/JsZZYIF.png",
              "pink_jellies": "https://i.imgur.com/MaBKpxS.png", "blue_jellies": "https://i.imgur.com/I37WOzN.png", "whales": "https://i.imgur.com/AqEPGpx.png",
-             "frog_green": "https://i.imgur.com/0X7RqRg.png", "frog_brown": "https://i.imgur.com/F93ic5D.png", "tree_frog": "https://i.imgur.com/Zt0jeT9.png"};
+             "frog_green": "https://i.imgur.com/0X7RqRg.png", "frog_brown": "https://i.imgur.com/F93ic5D.png", "tree_frog": "https://i.imgur.com/Zt0jeT9.png",
+             "pride_flag": "https://i.imgur.com/WBru8R3.png", "blue_heron": "https://i.imgur.com/rVcZX7c.png", "great_egret": "https://i.imgur.com/b0eN5mb.png",
+             "glossy_ibis": "https://i.imgur.com/1oSfgPo.png", "scarlet_ibis": "https://i.imgur.com/R1a5AIJ.png", "white_ibis": "https://i.imgur.com/6MPgjBa.png",
+             "spoonbill": "https://i.imgur.com/Rtj4qvX.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
 // But it's also key to how the seeds work!
 common_foliage = [0, 1, 5, 8, 14, 19, 26, 28, 38, 41, 45, 48, 55, 57, 59, 61, 62, 64, 68, 69, 71, 73, 74, 75, 76, 78, 80, 81, 82, 84, 88, 91, 92, 97, 98, 99, 101, 102, 107, 111, 116, 122, 129, 137, 139, 140, 141, 144, 145];
 
 uncommon_foliage = common_foliage.concat([2, 3, 4, 7, 9, 10, 11, 12, 13, 15, 18, 20, 21, 24, 25, 29, 31, 35, 36, 42, 43,
                                           46, 47, 50, 51, 52, 54, 60, 63, 66, 67, 72, 77, 79, 83, 85, 86, 90, 93, 94, 95, 103, 105, 106, 108,
-                                          114, 117, 118, 119, 120, 121, 123, 124, 126, 132, 138, 142, 146, 148]);
+                                          114, 117, 118, 119, 120, 121, 123, 124, 126, 132, 138, 142, 146, 148, 150]);
 rare_foliage = uncommon_foliage.concat([6, 16, 17, 22, 23, 27, 30, 32, 33, 34, 37, 39, 40, 44, 49, 53, 56, 58, 65, 70, 87, 89, 109, 113, 115,
-                                        125, 127, 128, 130, 131, 133, 136, 147]);
+                                        125, 127, 128, 130, 131, 133, 136, 147, 151]);
 // The ENTIRE special_foliage group has a rare chance to be selected instead of a standard base, then one's chosen from within at random.
 // I need to figure out math such that any given special base has ~20% of the chance of being chosen vs. any other seed
 // chance of any seed: 1/#total_bases
 // target chance: 1/#total_bases * 0.2
 // chance of a given special: 1/#specials * x, where x is the chance of the special pool being selected instead of a standard base
 // formula: x = 1/#total_bases * 0.2 * #specials
-special_foliage = [96, 100, 104, 110, 112, 134, 135, 143];
+special_foliage = [96, 100, 104, 110, 112, 134, 135, 143, 149];
 const special_foliage_chance = 1/all_foliage.length * 0.2 * special_foliage.length
 
 
@@ -149,7 +153,7 @@ boosted_rare_foliage = rare_foliage.slice(common_foliage.length);
 
 override_foliage = [];
 
-temp_boost_foliage = [135, 136, 137, 138, 142, 144, 145, 146, 147, 148];
+temp_boost_foliage = [145, 146, 147, 148, 149, 150, 151];
 
 
 all_features = ["https://i.imgur.com/G4h84Ht.png", "https://i.imgur.com/vXQYMkL.png", "https://i.imgur.com/p1ipMdS.png", "https://i.imgur.com/UUFJO7h.png", "https://i.imgur.com/IyaeNvt.png", "https://i.imgur.com/NXRWexZ.png", "https://i.imgur.com/VwMnyDB.png", "https://i.imgur.com/mLfzmM8.png", "https://i.imgur.com/zcXm5Op.png", "https://i.imgur.com/Osvq1V0.png", "https://i.imgur.com/iPK9aJ7.png", "https://i.imgur.com/3SpYgDN.png", "https://i.imgur.com/6MRuqb7.png", "https://i.imgur.com/jrYQjIW.png"]
@@ -166,7 +170,7 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
                     ["8f8090", "655666", "453946", "2a212b"], ["f5dbd7", "eec3c3", "d396a8", "c9829d"],
                     ["cdd1ff", "9fc0ff", "709ade", "4b5e95"], ["f6e9a4", "e8b78e", "d5737d", "c45088"],
                     ["e88c50", "d0653e", "af3629", "9b1f1f"], ["fef4cc", "fde47b", "ffd430", "ecb600"],
-                    // next row is zero-indexed 20, 21                    
+                    // next row is zero-indexed 20, 21
                     ["f3addd", "d87fbc", "c059a0", "aa3384"], ["3ac140", "1b9832", "116d22", "085c17"],
                     ["eaf4bd", "aade87", "6cc750", "1aaa09"], ["b77e4e", "88572e", "674426", "543a24"],
                     ["b7ed6c", "83d764", "47be5c", "0ca553"], ["f3eacf", "e4d4be", "ccb4a4", "b69389"],
@@ -476,7 +480,7 @@ function decode_plant_data(plant_data) {
 
 // Stolen from https://stackoverflow.com/questions/6213227/fastest-way-to-convert-a-number-to-radix-64-in-javascript
 Base64 = (function () {
-    var digitsStr = 
+    var digitsStr =
     //   0       8       16      24      32      40      48      56     63
     //   v       v       v       v       v       v       v       v      v
         "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+-";
@@ -572,7 +576,7 @@ function replace_color(old_rgb, new_rgb, ctx, width=work_canvas_size, height=wor
               imageData.data[i+2]=newBlue;
           }
       }
-    // put the data back on the canvas  
+    // put the data back on the canvas
     ctx.putImageData(imageData,0,0);
 }
 
@@ -618,7 +622,7 @@ function replace_color_palette(old_palette, new_palette, ctx, work_canvas_width=
               imageData.data[i+2]=newRGB[2];
           }
       }
-    // put the data back on the canvas  
+    // put the data back on the canvas
     ctx.putImageData(imageData,0,0);
 }
 
