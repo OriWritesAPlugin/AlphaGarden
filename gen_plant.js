@@ -127,7 +127,7 @@ var all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "
              "meat_stalagmite_left": "https://i.imgur.com/B2Xy5fz.png", "meat_stalagmite_right": "https://i.imgur.com/JsZZYIF.png",
              "pink_jellies": "https://i.imgur.com/MaBKpxS.png", "blue_jellies": "https://i.imgur.com/I37WOzN.png", "whales": "https://i.imgur.com/AqEPGpx.png",
              "frog_green": "https://i.imgur.com/0X7RqRg.png", "frog_brown": "https://i.imgur.com/F93ic5D.png", "tree_frog": "https://i.imgur.com/Zt0jeT9.png",
-             "pride_flag": "https://i.imgur.com/WBru8R3.png", "blue_heron": "https://i.imgur.com/rVcZX7c.png", "great_egret": "https://i.imgur.com/b0eN5mb.png",
+             "pride_flag": "https://i.imgur.com/DtqGXQD.png", "blue_heron": "https://i.imgur.com/rVcZX7c.png", "great_egret": "https://i.imgur.com/b0eN5mb.png",
              "glossy_ibis": "https://i.imgur.com/1oSfgPo.png", "scarlet_ibis": "https://i.imgur.com/R1a5AIJ.png", "white_ibis": "https://i.imgur.com/6MPgjBa.png",
              "spoonbill": "https://i.imgur.com/Rtj4qvX.png"};
 // Doing it this way lets us preserve the numbering to know which plant is which.
