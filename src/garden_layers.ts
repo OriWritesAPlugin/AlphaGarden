@@ -354,6 +354,7 @@ class DecorLayer extends Layer{
 
   // Really, this can place any tileable, it's just our only tileables are decor.
   async placeDecor(){
+    this.canvas.width = this.width;
     let tileCtx = this.canvas.getContext("2d");
     tileCtx.imageSmoothingEnabled = false;
     if(available_tileables[this.content].hasOwnProperty("bottom")){
