@@ -17,7 +17,7 @@
             "n": {"description": "Any battle stone", "points": 100, "category": "coli", "full": "Get ANY battle stone whatsoever"},
             "o": {"description": "Health potion", "points": 150, "category": "coli", "full": "Get ANY of the potions (but not a tincture)"},
             "p": {"description": "3x 1 item", "points": 200, "category": "coli", "full": "Get 3 of the SAME item (so a 3 on at least one item box in the post-battle loot screen)"},
-            "q": {"description": "Rest your eyes!", "points": 0, "category": "neutral", "full": "Look at something at least 20 feet away for at least 20 seconds"},
+            "q": {"description": "Free space", "points": 0, "category": "neutral", "full": "Claim me!"},
             "r": {"description": "Spend 5 min in coli", "points": 200, "category": "coli", "full": "Spend 5 minutes coli-ing; doesn't \"stack\" with other time squares (5+15=20 minutes total)"},
             "s": {"description": "Get something brown", "points": 100, "category": "coli", "full": "Get any item that's mostly brown, such as a brown rock, a brownish granola bar, a brown otter..."},
             "t": {"description": "5+ items", "points": 100, "category": "coli", "full": "Get 5+ TOTAL items (so if you add up the item counts in the post-battle loot screen, you get at least 5)"},
@@ -56,8 +56,18 @@
             "aa": {"description": "Every enemy drops food", "points": 200, "category": "coli", "full": "Get a number of enemy-specific food items greater than or equal to the number of enemies you fought"},
             "ab": {"description": "Stretch them joints", "points": 200, "category": "coli", "full": "Wrists especially!"},
             "ac": {"description": "Move a bit", "points": 200, "category": "coli", "full": "Physically move yourself, ex: pacing around the room"},
+<<<<<<< HEAD
             "ad": {"description": "2 NotN packs back to back", "points": 200, "category": "coli", "full": "Face 2 enemy packs containing NotN enemies back-to-back"},
             "ae": {"description": "7 battles no NotN enemy", "points": 200, "category": "coli", "full": "Go 7 battles in a row without encountering a NotN enemy"},
+=======
+            "ad": {"description": "Rest your eyes!", "points": 200, "category": "coli", "full": "Look at something at least 20 feet away for at least 20 seconds"},
+            "ae": {"description": "Bio check", "points": 200, "category": "coli", "full": "Do you need water? Are you hungry? Any other needs to tend?"},
+            "af": {"description": "2 NotN packs back to back", "points": 200, "category": "coli", "full": "Face 2 enemy packs containing NotN enemies back-to-back"},
+            "ag": {"description": "7 battles no NotN enemy", "points": 200, "category": "coli", "full": "Go 7 battles in a row without encountering a NotN enemy"},
+            "ah": {"description": "NotN chest", "points": 200, "category": "coli", "full": "What's inside?!"},
+            "ai": {"description": "NotN item x3", "points": 200, "category": "coli", "full": "Get 3 of any NotN drop from 1 battle"},
+            "aj": {"description": "4+ UNIQUE NotN drops", "points": 200, "category": "coli", "full": "...from one battle! Like a cuckoo, hourglass, orchid, and chest"},
+>>>>>>> master
             //"v": {"description": "15 of any item", "points": 500, "category": "coli"},
                     }, "h": {
             "a": {"description": "Boss familiar", "points": 3000, "category": "coli", "full": "Get a boss enemy as a familiar"},
