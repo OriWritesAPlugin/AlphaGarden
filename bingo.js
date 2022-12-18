@@ -1,6 +1,6 @@
         var alt_background = "linear-gradient(to right, #134e5e, #71b280)";
 
-        all_challenges = {"e": { 
+        all_challenges = {"e": {
             "a": {"description": "No drops", "points": 300, "category": "coli", "full": "Receive no drops from a battle"},
             "b": {"description": "Dragon misses", "points": 50, "category": "coli", "full": "Any of your dragons misses an attack"},
             "c": {"description": "Enemy misses", "points": 50, "category": "coli", "full": "Any enemy misses its attack"},
@@ -17,7 +17,7 @@
             "n": {"description": "Any battle stone", "points": 100, "category": "coli", "full": "Get ANY battle stone whatsoever"},
             "o": {"description": "Health potion", "points": 150, "category": "coli", "full": "Get ANY of the potions (but not a tincture)"},
             "p": {"description": "3x 1 item", "points": 200, "category": "coli", "full": "Get 3 of the SAME item (so a 3 on at least one item box in the post-battle loot screen)"},
-            "q": {"description": "Free space", "points": 0, "category": "neutral", "full": "Claim me! :]"},
+            "q": {"description": "Rest your eyes!", "points": 0, "category": "neutral", "full": "Look at something at least 20 feet away for at least 20 seconds"},
             "r": {"description": "Spend 5 min in coli", "points": 200, "category": "coli", "full": "Spend 5 minutes coli-ing; doesn't \"stack\" with other time squares (5+15=20 minutes total)"},
             "s": {"description": "Get something brown", "points": 100, "category": "coli", "full": "Get any item that's mostly brown, such as a brown rock, a brownish granola bar, a brown otter..."},
             "t": {"description": "5+ items", "points": 100, "category": "coli", "full": "Get 5+ TOTAL items (so if you add up the item counts in the post-battle loot screen, you get at least 5)"},
@@ -25,6 +25,7 @@
             "v": {"description": "Get something red", "points": 100, "category": "coli", "full": "Get any item that's mostly red, such as a slash battlestone, a red flower..."},
             "w": {"description": "Item + its recolor", "points": 100, "category": "coli", "full": "Get an item and its color variant in the same battle (like a micro deer + dwarf fawn)"},
             "x": {"description": "Get a flower", "points": 100, "category": "coli", "full": "Get any item that could be considered a flower, be it food, material, apparel, etc."},
+            "y": {"description": "NotN drop from non-NotN", "points": 200, "category": "coli", "full": "Get a NotN item from a non-NotN enemy pack"},
                       }, "m": {
             "a": {"description": "Any apparel", "points": 350, "category": "coli", "full": "Get any apparel, such as Veteran's Eye Scar"},
             "b": {"description": "Boss fight", "points": 250, "category": "coli", "full": "Fight any boss. You don't have to win!"},
@@ -53,6 +54,10 @@
             "y": {"description": "All drops are food", "points": 200, "category": "coli", "full": "EVERY item that drops from a battle is food, and at least one item drops"},
             "z": {"description": "Clear a + shape", "points": 200, "category": "coli", "full": "Clear a square plus the square above, below, left, and right of it. Can be anywhere on the board"},
             "aa": {"description": "Every enemy drops food", "points": 200, "category": "coli", "full": "Get a number of enemy-specific food items greater than or equal to the number of enemies you fought"},
+            "ab": {"description": "Stretch them joints", "points": 200, "category": "coli", "full": "Wrists especially!"},
+            "ac": {"description": "Move a bit", "points": 200, "category": "coli", "full": "Physically move yourself, ex: pacing around the room"},
+            "ad": {"description": "2 NotN packs back to back", "points": 200, "category": "coli", "full": "Face 2 enemy packs containing NotN enemies back-to-back"},
+            "ae": {"description": "7 battles no NotN enemy", "points": 200, "category": "coli", "full": "Go 7 battles in a row without encountering a NotN enemy"},
             //"v": {"description": "15 of any item", "points": 500, "category": "coli"},
                     }, "h": {
             "a": {"description": "Boss familiar", "points": 3000, "category": "coli", "full": "Get a boss enemy as a familiar"},
@@ -302,7 +307,7 @@
                     }
                     continue;
                 }
-                // Non-fixed rarity follows the pattern documented at `plant_rarity_lookup`   
+                // Non-fixed rarity follows the pattern documented at `plant_rarity_lookup`
                 var current_rarity = difficulties[difficulty]["starting_rarity"]
                 for(var i=1; i<num_rows; i++){
                     // The +1 here is because the pattern is 0, 0, 1, 1, 1...., not 0, 1, 1...
@@ -387,7 +392,7 @@
                     rewards[i] = reward_list.pop();
                 }
             }
-            return [rewards, reward_list.pop()];    
+            return [rewards, reward_list.pop()];
          }
 
         function clear_board() {
@@ -690,7 +695,7 @@
             setTimeout(function(){ clicked.textContent = "[Export]"; }, 1000);
         }
 
-        function import_bingo_onclick() {  
+        function import_bingo_onclick() {
            let bingo_board = JSON.parse(prompt("Paste in your board:"));
            clear_board();
            current_board = deminify_squares(bingo_board["squares"]);
@@ -712,7 +717,7 @@
             }
         }
 
-        // Attempts to make the save data more copy-pasteable 
+        // Attempts to make the save data more copy-pasteable
         function minify_squares(to_minify){
            minified_board = []
            for(let i=0; i<to_minify.length; i++){
