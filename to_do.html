@@ -45,7 +45,7 @@
     var seeds_earned = [];
     var plant_canvases = [];
     var second_set_revealed = false;
-    // TODO: rename resting_num_plants_revealed once I'm done reworking the way tasks are revealed. 
+    // TODO: rename resting_num_plants_revealed once I'm done reworking the way tasks are revealed.
     var resting_num_plants_revealed = 0;  // we need to do it this way since less plants are generated as time goes on.
     const task_hints = Array("Done anything nice for yourself lately?", "Anyone you've been meaning to respond to?",
                              "How are you doing on food?", "How go the hobbies as of late?", "Any meals you're excited for?",
@@ -87,7 +87,7 @@
           label.appendChild(document.createTextNode(i+1));
           new_plant_box.appendChild(label);
           plant_container.appendChild(new_plant_box);
-        }   
+        }
         // Generate the task box
         let initial_num_tasks = task_sets_generated * num_tasks;
         for(let i=initial_num_tasks; i < initial_num_tasks + num_tasks; i++){
@@ -140,7 +140,7 @@
         available_sounds[Math.floor(Math.random() * available_sounds.length)].play();
         return;
       }
-      
+
       let checkbox_reward_plant_id = document.getElementById(e.target.id+"_reward").value - 1;
       let bubble_palette = samplePlantColor(checkbox_reward_plant_id);
       for (let i = 0; i < 75; i++) {

@@ -152,7 +152,7 @@
             var ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.imageSmoothingEnabled = false;
-            
+
             // TODO: the split/join/replace construct should be simplified and turned into a function.
             var plant_1 = decode_plant_data(document.getElementById("plant_1_text").value.split(" ").join("").replace(/(^,)|(,$)|"/g, ''));
             var plant_2 = decode_plant_data(document.getElementById("plant_2_text").value.split(" ").join("").replace(/(^,)|(,$)|"/g, ''));

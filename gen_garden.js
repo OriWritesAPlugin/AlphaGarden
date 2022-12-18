@@ -4,6 +4,7 @@ const available_ground = {"grass [palette]": "https://i.imgur.com/yPNa3WB.png", 
                           "sand [palette]": "https://i.imgur.com/Rzr07Ev.png", "none": "https://i.imgur.com/Hq3VDgi.png",
                           "riverbed": "https://i.imgur.com/68dUehJ.png",
                           "snow": "https://i.imgur.com/ljWMvBo.png", "dirt": "https://i.imgur.com/CqQDCgC.png",
+                          //"forgive me [palette]": "https://i.imgur.com/hpvghNN.png",
                           "eyeball": "https://i.imgur.com/aoPg4Wa.png"};
 const available_overlay_colors = {"blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
                                   "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2"}
@@ -166,7 +167,7 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
             smart_coords = {"short": [], "medium": [], "tall": []};
             for(let i=0; i<components_to_place.length; i++){
                 component = components_to_place[i];
-                if(component.do_not_scramble_pos){ 
+                if(component.do_not_scramble_pos){
                     continue;
                 } else {
                     smart_coords[component.height_category].push(component.x_pos);
@@ -177,7 +178,7 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
             smart_coords["tall"] = smart_coords["tall"].sort(() => Math.random() - 0.5);
             for(let i=0; i<components_to_place.length; i++){
                 let component = components_to_place[i];
-                if(component.do_not_scramble_pos){ 
+                if(component.do_not_scramble_pos){
                     continue;
                 } else {
                     component.x_pos = smart_coords[component.height_category].pop();
@@ -186,7 +187,7 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
         } else {
             let available_coords = [];
             for(let i=0; i<components_to_place.length; i++){
-                if(components_to_place[i].do_not_scramble_pos){ 
+                if(components_to_place[i].do_not_scramble_pos){
                     continue;
                 } else {
                     available_coords.push(components_to_place[i].x_pos);
@@ -195,7 +196,7 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
             available_coords.sort(() => Math.random() - 0.5);
             for(let i=0; i<components_to_place.length; i++){
                 let component = components_to_place[i];
-                if(component.do_not_scramble_pos){ 
+                if(component.do_not_scramble_pos){
                     continue;
                 } else {
                     component.x_pos = available_coords.pop();
@@ -230,7 +231,7 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
         underlay_canvas.width = garden_width;
         underlay_canvas.height = garden_height;
         rgb_code = get_rgb_from_overlay_name(background_overlay["color"]);
-        rgb_code[3] = rgb_code[3]/255.0  // we need to convert to fillStyle's form 
+        rgb_code[3] = rgb_code[3]/255.0  // we need to convert to fillStyle's form
         underlay_ctx.fillStyle = 'rgba('+rgb_code.toString()+')';
         underlay_ctx.fillRect(0, 0, underlay_canvas.width, underlay_canvas.height);
         underlay_ctx.drawImage(canvas, 0, 0);
@@ -251,7 +252,7 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
         let colors = [];
         if(background_color == "from overlays (all)"){
             for(let i=0; i<components_to_place.length; i++){
-                if(components_to_place[i].hasOwnProperty("color")){ 
+                if(components_to_place[i].hasOwnProperty("color")){
                     colors.push("#"+get_hex_from_overlay_name(components_to_place[i]["color"]));
                 }
             }
@@ -270,7 +271,7 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
             let step = 1/(colors.length);
             for(let i=0; i<colors.length-1; i++){
                 grad.addColorStop(i*step, colors[i]);
-            } 
+            }
             grad.addColorStop(1, colors[colors.length-1]);
             background_ctx.fillStyle = grad;
             background_ctx.fillRect(0, 0, garden_width, garden_height);
@@ -280,7 +281,7 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
             for(let i=colors.length-1; i>=0; i--){
                 background_ctx.fillStyle = colors[i];
                 background_ctx.fillRect(0, 0, garden_width, garden_height*step*(i+1));
-            } 
+            }
         }
     }
     let do_draw_starfield = document.getElementById("draw_starfield").checked;
@@ -509,7 +510,7 @@ async function assign_component(canvas, x_pos, seed, use_smart_spacing){
     }
     component_info["x_pos"]=x_pos;
     component_info["height_category"]=height;
-    return component_info; 
+    return component_info;
 }
 
 async function place_component(ctx, component){
@@ -556,7 +557,7 @@ function gen_background_style_selection(dropdown_id){
 }
 
 function set_ground_selection(opt){
-    current_ground = opt;  
+    current_ground = opt;
 }
 
 async function get_canvas_for_named_component(name){
@@ -634,7 +635,7 @@ async function draw_outline(color, ctx){
            // TODO: could we do this before the resize? Easy 4x efficiency
            colors_to_use.push(most_recent_color);
            //colors_to_use.push(most_recent_color);
-           
+
        } else if (this_is_background && !last_was_background){
            points_to_color.push(i);
            colors_to_use.push(most_recent_color);
