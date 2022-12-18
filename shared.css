@@ -60,7 +60,7 @@ input[name=dream_desc]{
     background-color: #2F252D;
 }
 
-input.chunky {
+input.chunky, input.chunky_wrap {
     width: 400px;
     font-family: monospace, Verdana, sans-serif;
     border-radius: 5px;
@@ -75,15 +75,6 @@ input.chunky {
 
 input.chunky_wrap {
     width: auto;
-    font-family: monospace, Verdana, sans-serif;
-    border-radius: 5px;
-    padding: 4px;
-    margin: 0px;
-    display: inline-block;
-    border: 0px;
-    color: #DFC48C;
-    background-color: #2F252D;
-    font-size: 22px;
 }
 
 .center-parent{
@@ -117,7 +108,15 @@ input.chunky_wrap {
     color: #DFC48C;
     background-color: #2F252D;
     width: 5vw;
-    min-width: 70px;
+    min-width: 40px;
+    margin: 2px 4px 2px 2px;
+    border-style: solid;
+    border-color: #DFC48C00;
+}
+
+.garden-dim-bar:focus {
+  border-color: #DFC48CA0;
+  outline: none;
 }
 
 .form-container {
@@ -127,6 +126,40 @@ input.chunky_wrap {
     color: #DFC48C;
     background-color: #2F252D;
     width: 50%;
+}
+
+.layer_div, .draggable_layer_div, #layer_manager, #layer_holder {
+      width: fit-content;
+      height: 15vh;
+      font-family: monospace, Verdana, sans-serif;
+      border-radius: 5px;
+      padding: 1vh;
+      margin: 0px;
+      display: block;
+      border: 0px;
+      color: #DFC48C;
+      overflow: hidden;
+      transition: height 0.40s ease-in-out;
+}
+
+.draggable_layer_div {
+    cursor: move;
+    user-select: none;
+}
+
+#layer_manager {
+  height: 100%;
+  float: right;
+  width: 30%;
+  min-width: 200px;
+  border-color: #2F252D;
+  border-style: solid;
+  border-width: thin;
+}
+
+#layer_holder {
+  width: 28vw;
+  height: auto;
 }
 
 #printout {
@@ -275,7 +308,7 @@ input.chunky_wrap {
     border-width: thin;
     padding: 20px;
 }
-  
+
 
 .collection_box {
     display: flex;
@@ -325,7 +358,7 @@ input[type="text"].position_div {
   top: 20%;
   left: 40%;
   background-color: #201920;
-  min-height: 20vh; 
+  min-height: 20vh;
   align-items: center;
   justify-content: center;
   display: flex;

@@ -3,10 +3,11 @@
 const PROPERTIES = {"base": {"defaultPalette": "CoHC9CNzEt", "mainColor": "#FF0000", "secondColor": "#AA0000", "accentColor": "#FFAA00", "icon": "▒"},
                     "garden": {"defaultPalette": "CoHC9CNzEt", "mainColor": "#1C2121", "secondColor": "#151818", "accentColor": "#273831", "icon": "⚘"},
                     "decor": {"defaultPalette": "CoHC9CNzEt", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains", "accentColor": "#3D362B", "icon": "ꕔ"},
-                    "overlay": {"mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "night", "defaultOpacity": 0.25, "icon": "☾"},
+                    "overlay": {"mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "☾"},
                     "celestial": {"defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "icon": "☁"}}// old overlay: 1F191A
 
 class LayerDiv {
+  type: string;
   selfDiv: HTMLDivElement;
   mainColor: string;
   editDiv: HTMLDivElement;
@@ -17,10 +18,10 @@ class LayerDiv {
   editMode = true;
   layer: Layer;
   id: string;
-  // Labels require IDs, and unique IDs don't seem to be trivial with Javascript
-  // Semi-meaningful IDs are assigned as layer_this.id_descriptor_childIds[descriptor],
-  // and then incremented.
-  childIds = {"selectbox": 0, "fillin": 0, "generic": 0, "numberBox": 0};
+  // TODO: BAD KLUDGE! The garden layer needs to be able to redraw itself when two specific fields are changed
+  // Since we'er not added to the document until after the layer constructor's called, we can't just getElementById
+  widthInput: HTMLElement;
+  yOffsetInput: HTMLElement;
   // Lets ups propagate changes up to the layer manager
   onEditCallback: Function;
 
@@ -68,11 +69,20 @@ class LayerDiv {
     let genericDiv = document.createElement("div");
     genericDiv.className = "layer_div";
     genericDiv.style.backgroundColor = color;
-    genericDiv.id = this.generateId("generic");
+    //genericDiv.id = this.generateId("generic");
     genericDiv.style.cursor = "default";
     genericDiv.style.userSelect = "default";
     genericDiv.style.width = "fit-content"
     return genericDiv;
+  }
+
+  buildOptionsHolderDiv(){
+    let optionsHolderDiv = this.buildGenericDiv(this.mainColor);
+    optionsHolderDiv.style.display = "inline-block"
+    optionsHolderDiv.style.height = "80%"
+    optionsHolderDiv.style.textAlign = "left";
+    optionsHolderDiv.style.width = "43%";
+    return optionsHolderDiv
   }
 
   toggleEditMode(){
@@ -111,10 +121,11 @@ class LayerDiv {
     return deleteButton;
   }
 
-  buildGenericDropdown(target:string, optionList: string[]){
+  buildGenericDropdown(target: string, optionList: string[]){
     let selectBox = document.createElement("select");
-    selectBox.id = this.generateId("selectbox");
+    selectBox.id = this.generateId("selectbox", target);
     selectBox.className = "garden_dropdown";
+    selectBox.style.width = "90%";
     for (let option of optionList) {
         let newOption = new Option(option, option)
         if(option == this.layer[target]) {
@@ -133,16 +144,17 @@ class LayerDiv {
     return selectBox;
   }
 
-  generateId(childType: string){
-    let id = this.id + "_" + childType + "_" + this.childIds[childType];
-    this.childIds[childType] ++;
+  generateId(childType: string, descriptor: string){
+    let id = this.id + "_" + childType + "_" + descriptor;
     return id;
   }
 
   buildGenericFillIn(target:string, labelText:string, color: string, coerceNumber=false){
     let fillIn = document.createElement("input") as HTMLInputElement;
     fillIn.className = "garden-dim-bar";
-    fillIn.id = this.generateId("fillin");
+    fillIn.id = this.generateId("fillin", target);
+    fillIn.style.width = "50%";
+    fillIn.style.backgroundColor = color;
     fillIn.style.backgroundColor = color;
     fillIn.onchange = async function(){
       if(coerceNumber){
@@ -168,7 +180,12 @@ class LayerDiv {
     for(let i=0; i < pairs.length; i++){
       let [fillIn, label] = this.buildGenericFillIn(pairs[i][0], pairs[i][1], this.secondColor, true);
       if(pairs[i][0] != "width"){
-        fillIn.style.width = "2vw";
+        fillIn.style.width = "30%";
+        if(pairs[i][0] == "y_offset"){
+          this.yOffsetInput = fillIn;
+        }
+      } else {
+        this.widthInput = fillIn;
       }
       holdDiv.appendChild(label);
       holdDiv.appendChild(fillIn);
@@ -176,6 +193,7 @@ class LayerDiv {
     holdDiv.style.cssFloat = "right";
     holdDiv.style.display = "inline";
     holdDiv.style.height = "80%";
+    holdDiv.style.width = "43%";
     return holdDiv;
   }
 
@@ -183,6 +201,7 @@ class LayerDiv {
     let editDiv = document.createElement("div");
     editDiv.className = "layer_div";
     editDiv.style.backgroundColor = this.secondColor;
+    editDiv.style.textAlign = "right";
     editDiv.appendChild(this.buildGenericDropdown("name", ["Larry", "Moe", "Curly"]));
     editDiv.appendChild(this.buildGenericDropdown("name", ["Sue", "Anne", "Barbara"]));
     editDiv.appendChild(this.buildPositionDiv());
@@ -196,12 +215,28 @@ class GardenLayerDiv extends LayerDiv {
 
   constructor(layer: Layer, id: number, onEditCallback: Function){
     super(layer, id, onEditCallback, "garden");
+    // see note on these fields in the parent class, this is bad kludge.
+    // Maybe we could pass a modified callback? It's wasteful for the x offset,
+    // but that's about it.
+    this.widthInput.onchange = async function(){
+        this.layer["width"]=parseFloat(this.widthInput.value);
+        await this.layer.updateMain();
+        await this.layer.updateGround();
+        await this.onEditCallback();
+      }.bind(this);
+      this.yOffsetInput.onchange = async function(){
+          this.layer["y_offset"]=parseFloat(this.yOffsetInput.value);
+          await this.layer.updateMain();
+          await this.layer.updateGround();
+          await this.onEditCallback();
+        }.bind(this);
   }
 
   buildEditDiv(){
     let editDiv = document.createElement("div");
     editDiv.className = "layer_div";
     editDiv.style.backgroundColor = this.secondColor;
+    let dropdownDiv = this.buildGenericDiv(this.mainColor);
     let groundCoverSelect = this.buildGenericDropdown("groundCover", Object.keys(available_ground))
     let groundSelect = this.buildGenericDropdown("ground", Object.keys(available_ground))
     groundCoverSelect.onchange = async function(){
@@ -214,13 +249,20 @@ class GardenLayerDiv extends LayerDiv {
       await this.layer.updateGround();
       this.onEditCallback();
     }.bind(this);
-    editDiv.appendChild(groundCoverSelect);
-    editDiv.appendChild(groundSelect);
-    let [fillIn, label] = this.buildGenericFillIn("groundPaletteSeed", "ground palette", this.mainColor);
-    editDiv.appendChild(label);
-    editDiv.appendChild(fillIn);
+    dropdownDiv.appendChild(groundCoverSelect);
+    dropdownDiv.appendChild(groundSelect);
+    let [fillIn, label] = this.buildGenericFillIn("groundPaletteSeed", "colors:", this.mainColor);
+    dropdownDiv.appendChild(label);
+    dropdownDiv.appendChild(fillIn);
+    dropdownDiv.style.display = "inline-block"
+    dropdownDiv.style.height = "80%"
+    dropdownDiv.style.textAlign = "left";
+    dropdownDiv.style.width = "43%";
+    editDiv.appendChild(dropdownDiv);
+    editDiv.appendChild(this.buildPositionDiv());
     return editDiv;
   }
+
 }
 
 class DecorLayerDiv extends LayerDiv {
@@ -232,15 +274,13 @@ class DecorLayerDiv extends LayerDiv {
     let editDiv = document.createElement("div");
     editDiv.className = "layer_div";
     editDiv.style.backgroundColor = this.secondColor;
-    let dropdownDiv = this.buildGenericDiv(this.mainColor);
+    let dropdownDiv = this.buildOptionsHolderDiv();
     let contentSelect = this.buildGenericDropdown("content", Object.keys(available_tileables))
     dropdownDiv.appendChild(contentSelect);
-    let [fillIn, label] = this.buildGenericFillIn("contentPaletteSeed", "palette", this.secondColor);
+    let [fillIn, label] = this.buildGenericFillIn("contentPaletteSeed", "colors:", this.secondColor);
     dropdownDiv.appendChild(label);
     dropdownDiv.appendChild(fillIn);
-    dropdownDiv.style.display = "inline-block"
-    dropdownDiv.style.height = "80%"
-    dropdownDiv.style.textAlign = "left";
+
     editDiv.appendChild(dropdownDiv);
     editDiv.appendChild(this.buildPositionDiv());
     return editDiv;
@@ -250,6 +290,27 @@ class DecorLayerDiv extends LayerDiv {
 class OverlayLayerDiv extends LayerDiv {
   constructor(layer: Layer, id: number, onEditCallback: Function){
     super(layer, id, onEditCallback, "overlay");
+  }
+
+  buildEditDiv(){
+    let editDiv = document.createElement("div");
+    editDiv.className = "layer_div";
+    editDiv.style.backgroundColor = this.secondColor;
+    let leftOptionsDiv = this.buildOptionsHolderDiv();
+    let rightOptionsDiv = this.buildOptionsHolderDiv();
+    let [_fillInCast, label] = this.buildGenericFillIn("color", "color:", this.mainColor);
+    let fillIn = _fillInCast as HTMLInputElement;
+    fillIn.value = PROPERTIES["overlay"]["defaultColor"];
+    leftOptionsDiv.appendChild(label);
+    leftOptionsDiv.appendChild(fillIn);
+    let [_fillIn2Cast, label2] = this.buildGenericFillIn("opacity", "alpha:", this.mainColor, true);
+    let fillIn2 = _fillIn2Cast as HTMLInputElement;
+    fillIn2.value = ""+PROPERTIES["overlay"]["defaultOpacity"];
+    rightOptionsDiv.appendChild(label2);
+    rightOptionsDiv.appendChild(fillIn2);
+    editDiv.appendChild(leftOptionsDiv);
+    editDiv.appendChild(rightOptionsDiv);
+    return editDiv;
   }
 }
 
