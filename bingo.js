@@ -25,7 +25,6 @@
             "v": {"description": "Get something red", "points": 100, "category": "coli", "full": "Get any item that's mostly red, such as a slash battlestone, a red flower..."},
             "w": {"description": "Item + its recolor", "points": 100, "category": "coli", "full": "Get an item and its color variant in the same battle (like a micro deer + dwarf fawn)"},
             "x": {"description": "Get a flower", "points": 100, "category": "coli", "full": "Get any item that could be considered a flower, be it food, material, apparel, etc."},
-            "y": {"description": "NotN drop from non-NotN", "points": 200, "category": "coli", "full": "Get a NotN item from a non-NotN enemy pack"},
                       }, "m": {
             "a": {"description": "Any apparel", "points": 350, "category": "coli", "full": "Get any apparel, such as Veteran's Eye Scar"},
             "b": {"description": "Boss fight", "points": 250, "category": "coli", "full": "Fight any boss. You don't have to win!"},
@@ -58,12 +57,6 @@
             "ac": {"description": "Move a bit", "points": 200, "category": "coli", "full": "Physically move yourself, ex: pacing around the room"},
             "ad": {"description": "Rest your eyes!", "points": 200, "category": "coli", "full": "Look at something at least 20 feet away for at least 20 seconds"},
             "ae": {"description": "Bio check", "points": 200, "category": "coli", "full": "Do you need water? Are you hungry? Any other needs to tend?"},
-            "af": {"description": "2 NotN packs back to back", "points": 200, "category": "coli", "full": "Face 2 enemy packs containing NotN enemies back-to-back"},
-            "ag": {"description": "7 battles no NotN enemy", "points": 200, "category": "coli", "full": "Go 7 battles in a row without encountering a NotN enemy"},
-            "ah": {"description": "NotN chest", "points": 200, "category": "coli", "full": "What's inside?!"},
-            "ai": {"description": "NotN item x3", "points": 200, "category": "coli", "full": "Get 3 of any NotN drop from 1 battle"},
-            "aj": {"description": "4+ UNIQUE NotN drops", "points": 200, "category": "coli", "full": "...from one battle! Like a cuckoo, hourglass, orchid, and chest"},
-            //"v": {"description": "15 of any item", "points": 500, "category": "coli"},
                     }, "h": {
             "a": {"description": "Boss familiar", "points": 3000, "category": "coli", "full": "Get a boss enemy as a familiar"},
             "b": {"description": "Wing or body apparel", "points": 2500, "category": "coli", "full": "Get any piece of apparel that goes on the wings or body, like a date plumed cover or green lace waist frill"},
