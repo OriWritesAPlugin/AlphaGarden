@@ -8,8 +8,9 @@ const available_ground = { "grass [palette]": "https://i.imgur.com/yPNa3WB.png",
     "eyeball": "https://i.imgur.com/aoPg4Wa.png" };
 const available_ground_base = { "grass": "https://i.imgur.com/lUDZfla.png",
     "chunky dirt": "https://i.imgur.com/Q5WSQ4g.png", "glossy": "https://i.imgur.com/JNt11PZ.png",
-    "gravel": "https://i.imgur.com/eVOOzIi.png", "none": "https://i.imgur.com/Hq3VDgi.png",
-    "cracked": "https://i.imgur.com/dHWuGGN.png", "clumpy dirt": "https://i.imgur.com/MsIbnoa.png" };
+    "gravel": "https://i.imgur.com/kKLKBFO.png", "none": "https://i.imgur.com/Hq3VDgi.png",
+    "cracked": "https://i.imgur.com/dHWuGGN.png", "clumpy dirt": "https://i.imgur.com/MsIbnoa.png",
+    "brick": "https://i.imgur.com/coV4D2G.png" };
 const available_overlay_colors = { "blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
     "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2" };
 // REMEMBER: TOP DOWN

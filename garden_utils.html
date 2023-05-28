@@ -38,7 +38,7 @@
                     <input type="button" class="chunky_wrap" value="Check colors" onClick="analyze_seed()">
                     </br></br>
                     <canvas id="analysis_preview_canvas" width="64" height="64"></canvas><br>
-                    <canvas id="analysis_output_canvas" width="64" height="64"></canvas>
+                    <canvas id="analysis_output_canvas" width="64" height="64"></canvas><br>
                     <span id="analysis_output_text"></span>
                 </div>
             </div>
@@ -67,7 +67,8 @@
             </div>
         </div>
     </body>
-    <script src="gen_plant.js"></script>
+    <script src="built/gen_plant.js"></script>
+    <script src="built/gen_garden.js"></script>
     <script type="text/javascript">
         var img_loadup = []
         var last_child_seed;
@@ -201,7 +202,7 @@
             var canvas = document.getElementById("analysis_output_canvas");
             var ctx = canvas.getContext("2d");
             var raw_plant_data = decode_plant_data(seed_string);
-            var plant_data = parse_plant_data(raw_plant_data);
+            var plant_data = parse_plant_data_improved(raw_plant_data);
             var img=new Image();
             img.src="https://i.imgur.com/rSLWUqw.png";  // palette preview image
             img.crossOrigin = "anonymous"
@@ -216,7 +217,8 @@
             preview_ctx.clearRect(0, 0, preview_canvas.width, preview_canvas.height);
             preview_ctx.imageSmoothingEnabled = false;
             preview_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
-            //var text_output = document.getElementById("analysis_output_text");
+            var text_output = document.getElementById("analysis_output_text");
+            text_output.innerText = "Name: "+reformatted_foliage[raw_plant_data["foliage"]]["name"]+"\nArtist: "+reformatted_foliage[raw_plant_data["foliage"]]["artist"]+"\nType: "+reformatted_foliage[raw_plant_data["foliage"]]["categories"];
             //text_output.innerText = `Base: ${raw_plant_data["foliage"]}`+"\n"+`Simple Feature: ${raw_plant_data["simple_feature"]}`+"\n"+`Complex Feature: ${raw_plant_data["complex_feature"]}`;
         }
 
@@ -310,7 +312,7 @@
 
 
         async function do_preload() {
-            await preload_all_images();
+            await do_preload_initial();
         }
     </script>
     </body>
