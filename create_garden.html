@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="utf-8"/>
+    <head>
+        <title>Garden [EG]</title>
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
+        <link rel="icon" href="https://i.imgur.com/U7WgCMt.png">
+    </head>
+    <body onload="">
+    <div id=create_garden_organizer style="display: flex">
+      <div style="width: 100%">
+        <a href="index.html" class="index_link"><--Home</a>
+        <h1 id="title">Endless Garden Creator</h1>
+        <h2 id="subtitle">This is the advanced garden creator tool! Good luck and go nuts!</h2>
+        </br>
+        <label for="seed_list">Seed list (comma-separated):</label><br>
+        <textarea id="seed_list" name="seed_list" size="4" placeholder="Click here and paste!"></textarea><br>
+        <label for="quantity">Garden width:</label> <input class="garden-dim-bar" type="number" id="garden_width" name="quantity" min="64" value=450>
+        <label for="garden_height">Garden height:</label> <input class="garden-dim-bar" type="number" id="garden_height" name="garden_height" min="70" value=70>
+        <label for="draw_outline" style="margin-left: 10px">Draw outline:</label><input type="checkbox" id="draw_outline" value="Draw outline">
+        <input type="button" class="chunky_wrap" value="Toggle Editor" onClick="gm.toggleVisibility()">
+        <br><br>
+        <div id=content_div>
+            </br></br>
+            <input type="button" class="chunky" value="&gt;&gt; Generate a garden!&lt;&lt;" onClick="doThisRegen()">
+            </br></br>
+            <div id="output"><canvas id="output_canvas" width="450" height="70"></canvas></div>
+            </br></br>
+            <input type="button" class="chunky_wrap" value="Scramble" onClick="scramble_randogarden()">
+            <input type="button" class="chunky_wrap" value="Reroll ground" onClick="place_ground(scramble_ground=true)">
+            <input type="button" class="chunky_wrap" value="Claim" onClick="claim_garden()">
+        </div>
+      </div>
+    </div>
+    </body>
+    <script src="built/gen_plant.js"></script>
+    <script src="built/gen_garden.js"></script>
+    <script src="built/shared.js"></script>
+    <script src="built/garden_layers.js"></script>
+    <script src="built/garden_ui.js"></script>
+    <script src="built/drag_and_drop.js"></script>
+    <script type="text/javascript">
+
+      var sl;
+      var gl;
+      var g2;
+      var o1;
+      var d1;
+      var da_canvas;
+      var da_ctx;
+      var gm;
+
+        async function do_stuff(){
+          await do_preload_initial();
+          da_canvas = document.getElementById("output_canvas");
+          gm = new LayerManager(da_canvas, document.getElementById("seed_list"));
+          gm.toggleVisibility();
+          gl = gm.activeGardenDiv.layer;
+          document.getElementById("create_garden_organizer").appendChild(gm.selfDiv);
+          callOnDrag = gm.updateCallback;  // Horrible little sin on my otherwise (IMO) nice refactor.
+          // We need to pre-prime the ground canvas, since it and the seed list update independently
+          await gl.updateGround();
+          await gm.redraw();
+        }
+        do_stuff();
+
+      function doThisRegen(){
+        gm.setHeight(parseInt(document.getElementById("garden_height").value));
+        gm.setWidth(parseInt(document.getElementById("garden_width").value));
+        gm.regenActiveGarden(document.getElementById("seed_list").value);
+      }
+
+    </script>
+</html>
