@@ -57,7 +57,6 @@
             "ac": {"description": "Move a bit", "points": 200, "category": "coli", "full": "Physically move yourself, ex: pacing around the room"},
             "ad": {"description": "Rest your eyes!", "points": 200, "category": "coli", "full": "Look at something at least 20 feet away for at least 20 seconds"},
             "ae": {"description": "Bio check", "points": 200, "category": "coli", "full": "Do you need water? Are you hungry? Any other needs to tend?"},
-            //"v": {"description": "15 of any item", "points": 500, "category": "coli"},
                     }, "h": {
             "a": {"description": "Boss familiar", "points": 3000, "category": "coli", "full": "Get a boss enemy as a familiar"},
             "b": {"description": "Wing or body apparel", "points": 2500, "category": "coli", "full": "Get any piece of apparel that goes on the wings or body, like a date plumed cover or green lace waist frill"},
