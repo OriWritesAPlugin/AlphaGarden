@@ -27,7 +27,7 @@ const BAD_IMG_URL = "https://i.imgur.com/kxStIJE.png";
 
 // Javascript can't access images by path.
 // This workaround is hideous, but what can ya do :) (while hosting to github and not using ajax, I mean)
-all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.png", "https://i.imgur.com/wsC3ifp.png",
+/**all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.png", "https://i.imgur.com/wsC3ifp.png",
                "https://i.imgur.com/NFM09J5.png", "https://i.imgur.com/urBlTiV.png", "https://i.imgur.com/kyfs2Yl.png",
                "https://i.imgur.com/nMW2bBb.png", "https://i.imgur.com/tBQb6yy.png", "https://i.imgur.com/5j6u58a.png",
                "https://i.imgur.com/Mb1wqi1.png", "https://i.imgur.com/Rk7vvo3.png", "https://i.imgur.com/DdEYVYA.png",
@@ -84,9 +84,9 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
                "https://i.imgur.com/S01WpzA.png", "https://i.imgur.com/BKrhChN.png", "https://i.imgur.com/g07biTg.png",
                "https://i.imgur.com/ieCLRr4.png", "https://i.imgur.com/vrsojTx.png", "https://i.imgur.com/JdBQXD9.png",
                "https://i.imgur.com/yHAyHer.png", "https://i.imgur.com/te0LiY6.png", "https://i.imgur.com/DVXz8Nr.png",
-               "https://i.imgur.com/snN8fJY.png", "https://i.imgur.com/wNf7FXA.png"];
+               "https://i.imgur.com/snN8fJY.png", "https://i.imgur.com/wNf7FXA.png"];**/
 
-reformatted_foliage = [
+all_foliage = [
         {'artist': 'Oranitha', 'name': 'tall stalk', 'categories': ['flower'], 'source': 'https://i.imgur.com/PabdLnL.png'}, 
         {'artist': 'Oranitha', 'name': 'short stalk', 'categories': ['flower'], 'source': 'https://i.imgur.com/WN2m2Aa.png'},
         {'artist': 'Oranitha', 'name': 'pebble', 'categories': ['rock'], 'source': 'https://i.imgur.com/wsC3ifp.png'},
@@ -371,7 +371,12 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
                     ["d0c26d", "aaaa6a", "738a66", "446c62"], ["b8efe6", "83a3ce", "6b60b3", "6e3789"],
                     ["c498a3", "9f7688", "6e446c", "472147"], ["d17936", "b35d33", "7b2806", "421c16"],
                     ["ecffdd", "aed0c0", "718c93", "444e63"], ["9c4547", "7f3d4a", "51314d", "3b2b4f"],
-                    ["efeccc", "d1cba6", "978d72", "6c6a6e"]];
+                    ["efeccc", "d1cba6", "978d72", "6c6a6e"], ["479ec2", "3b76aa", "1e3663", "1a0945"],
+                    ["f8a818", "fe5f14", "c91831", "730c4e"], ["eca3b2", "b65d86", "72205f", "440843"],
+                    ["f0d9ee", "e0c0e4", "bd9ad5", "9379bd"], ["d798f3", "da6ace", "ca3b97", "a22152"],
+                    ["d4f1d7", "c4e47b", "e9db5d", "ef924b"], ["ffe0b5", "eea383", "db5754", "ca2e55"]];
+
+// verdant earthen soft bold strange deep
 
 // There's three types of palette:
 // Foliage: Generally the bulk of a plant. Greens and browns are most common
@@ -385,7 +390,7 @@ var common_accent_palettes = [19, 20, 35, 36, 37, 38, 39, 40];
 //var common_feature_palettes = [1, 20, 29, 32, 33, 34, 52, 58, 61, 62, 64, 78, 79, 80, 81, 86, 92, 93, 94, 95];
 common_feature_palettes = [1, 20, 29, 32, 33, 34, 52, 58, 61, 62, 64, 78, 79, 80, 81, 86, 92, 96];
 var common_feature_palettes = common_feature_palettes.concat(common_feature_palettes);  // Cheap wood/stone boost
-var uncommon_palettes = [2, 9, 10, 11, 12, 13, 14, 15, 18, 24, 25, 38, 46, 47, 50, 55, 57, 60, 63, 66, 67, 70, 71, 72, 76, 82, 87, 88, 89, 90, 94, 96];
+var uncommon_palettes = [2, 9, 10, 11, 12, 13, 14, 15, 18, 24, 25, 38, 46, 47, 50, 55, 57, 60, 63, 66, 67, 70, 71, 72, 76, 82, 87, 88, 89, 90, 94, 96, 97];
 var rare_palettes = [5, 16,  17, 26, 27, 28, 30, 31, 48, 51, 53, 54, 59, 64, 73, 91, 92, 95];
 
 // Used for boosting rates when I'm generating lots of plants
@@ -431,7 +436,7 @@ async function place_foliage(img_idx, ctx){
     ctx.drawImage(refs["foliage"+img_idx.toString()], 0, 0);
 }
 
-async function preload_all_images()
+/**async function preload_all_images()
 // TODO: Gross prototype nonsense. Must be called ahead. Loads refs.
 {
   lists_to_load = [all_foliage, all_features, Object.values(all_named)];
@@ -440,7 +445,18 @@ async function preload_all_images()
         refs[lists_to_load[i][j]] = preload_single_image(lists_to_load[i][j]);
       }
   }
-}
+}**/
+
+async function preload_plants() {
+    // TODO: Replace with spritesheet
+    lists_to_load = [all_features];
+    for(var i=0; i<lists_to_load.length; i++){
+        for(var j=0; j<lists_to_load[i].length;j++){
+          refs[lists_to_load[i][j]] = preload_single_image(lists_to_load[i][j]);
+        }
+    }
+      await preload_spritesheet("foliage", FOLIAGE_SPRITESHEET, all_foliage.length);
+  }
 
 // Sound of me not being 100% confident in my async usage yet
 function preload_single_image(url){
@@ -455,6 +471,26 @@ function preload_single_image(url){
     /*return fetch(url)
            .then(response => response.blob())
            .then(blob => createImageBitmap(blob));*/
+}
+
+async function preload_spritesheet(name, URL, count){
+    img = await preload_single_image(URL);
+    let canvas = document.createElement("canvas");
+    canvas.width = 32;
+    canvas.height = 32;
+    let ctx = canvas.getContext("2d");
+    offset = 0
+    while(offset < count){
+        ctx.clearRect(0, 0, 32, 32);
+        // All spritesheets are 10 wide, N tall
+        source_offset_y = Math.floor(offset/10)*32;
+        source_offset_x = (offset % 10)*32;
+        ctx.drawImage(img, source_offset_x, source_offset_y, 32, 32, 0, 0, 32, 32);
+        let new_img = new Image;
+        new_img.src = canvas.toDataURL();
+        refs[name+offset.toString()] = new_img;
+        offset ++;
+    }
 }
 
 // We have things like foliage, colors, and features that exist in "master lists"

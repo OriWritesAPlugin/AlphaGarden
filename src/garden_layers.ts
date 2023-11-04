@@ -134,11 +134,12 @@ class GardenPlacedItem extends GardenItem{
   canvas: HTMLCanvasElement;
   heightCategory: GardenItemHeightCategory;
   constructor(identity: string, type:GardenItemType, offset: number,
-              canvas: HTMLCanvasElement, height: GardenItemHeightCategory) {
+              canvas: HTMLCanvasElement, height: GardenItemHeightCategory, offsetSpecified: Boolean) {
     super(identity, type);
     this.offset = offset;
     this.canvas = canvas;
     this.heightCategory = height;
+    this.offsetSpecified = offsetSpecified;
   }
 
   async place(place_onto_canvas: HTMLCanvasElement){
@@ -244,9 +245,11 @@ class GardenLayer extends Layer{
     let canvas: HTMLCanvasElement;
     let percent_pos = identity.indexOf('%');
     let percent_val = null;
+    let custom_pos = false;
     if(percent_pos > -1) {
       percent_val = parseFloat(identity.slice(percent_pos + 1))/100;
       identity = identity.slice(0, percent_pos);
+      custom_pos = true;
     }
     if(identity.startsWith("#")){
       type = GardenItemType.Overlay;
@@ -265,7 +268,7 @@ class GardenLayer extends Layer{
     }
     let height = await this.classifyHeight(canvas);
     if(percent_pos == null){ percent_val = Math.random(); }
-    return new GardenPlacedItem(identity, type, percent_val, canvas, height)
+    return new GardenPlacedItem(identity, type, percent_val, canvas, height, custom_pos);
   }
 
   /**

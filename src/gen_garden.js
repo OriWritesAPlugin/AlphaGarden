@@ -877,7 +877,8 @@ async function do_preload() {
 // This is the only portion that needs run for the new layer-based interface, so for now they live in parallel.
 async function do_preload_initial() {
     // Get all the tileable images. We use a set because some tileables have the same bottom and middle (like tree trunks)
-    refs["foliage"] = await preload_spritesheet("foliage", FOLIAGE_SPRITESHEET, all_foliage.length);
+    // refs["foliage"] = await preload_spritesheet("foliage", FOLIAGE_SPRITESHEET, all_foliage.length);
+    await preload_plants();
     refs["named"] = await preload_single_image(NAMED_SPRITESHEET);
     tileables = new Set();
     for (const key in available_ground){
@@ -895,7 +896,7 @@ async function do_preload_initial() {
     for (const img of tileables){
       refs[img] = await preload_single_image(img);
     }
-    preload_all_images();
+    // preload_all_images();
 }
 
 async function preload_spritesheet(name, URL, count){

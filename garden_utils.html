@@ -74,12 +74,12 @@
         var last_child_seed;
 
         // Used for the prompt generator
-        const prompts = ["Hopes for the future are no substitute for acts in the present", "Kindness doesn't always come easily", "There is an end to this",
+        const prompts = ["Kindness doesn't always come easily", "There is an end to this", "Face me", "I didn't forget. Did you?", "Lessons learned long ago",
                          "None but you can see it through", "Your light is a beacon", "Dreams may become reality, even the weird ones", "You are not broken", "Rest a little",
                          "You did your best", "You reap what you sow", "Welcome peace while it lasts", "Forgiveness does not entitle forgetfulness",
                          "You did good!", "Your confidence is earned", "This was a long time coming", "Are you tired?", "You're an inspiration", "They'll remember you",
                          "You'll meet a mysterious stranger", "Discovery awaits", "All is not as it seems", "Your acts have been witnessed",
-                         "Good things come to those who act", "There is a lightness in the air", "Shadows waver", "All is not lost", "Are you forgetting anything?",
+                         "There is a lightness in the air", "Shadows waver", "All is not lost", "Are you forgetting anything?",
                          "Are you fit to rule?", "Are we obligated to act?", "The weak meet the strong", "Pack extra socks", "The road stretches ahead",
                          "The wind brings fresh news", "You hold the key", "A lull in the storm", "The storm is building", "The storm breaks", "The woods may help",
                          "Better safe than sorry", "An ounce of prevention's worth a pound of cure", "There is a delicate balance to things", "Hello, friend!",
@@ -218,7 +218,7 @@
             preview_ctx.imageSmoothingEnabled = false;
             preview_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
             var text_output = document.getElementById("analysis_output_text");
-            text_output.innerText = "Name: "+reformatted_foliage[raw_plant_data["foliage"]]["name"]+"\nArtist: "+reformatted_foliage[raw_plant_data["foliage"]]["artist"]+"\nType: "+reformatted_foliage[raw_plant_data["foliage"]]["categories"];
+            text_output.innerText = "Name: "+all_foliage[raw_plant_data["foliage"]]["name"]+"\nArtist: "+all_foliage[raw_plant_data["foliage"]]["artist"]+"\nType: "+all_foliage[raw_plant_data["foliage"]]["categories"];
             //text_output.innerText = `Base: ${raw_plant_data["foliage"]}`+"\n"+`Simple Feature: ${raw_plant_data["simple_feature"]}`+"\n"+`Complex Feature: ${raw_plant_data["complex_feature"]}`;
         }
 
