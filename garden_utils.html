@@ -202,7 +202,7 @@
             var canvas = document.getElementById("analysis_output_canvas");
             var ctx = canvas.getContext("2d");
             var raw_plant_data = decode_plant_data(seed_string);
-            var plant_data = parse_plant_data_improved(raw_plant_data);
+            var plant_data = parse_plant_data(raw_plant_data);
             var img=new Image();
             img.src="https://i.imgur.com/rSLWUqw.png";  // palette preview image
             img.crossOrigin = "anonymous"
@@ -218,7 +218,7 @@
             preview_ctx.imageSmoothingEnabled = false;
             preview_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
             var text_output = document.getElementById("analysis_output_text");
-            text_output.innerText = "Name: "+all_foliage[raw_plant_data["foliage"]]["name"]+"\nArtist: "+all_foliage[raw_plant_data["foliage"]]["artist"]+"\nType: "+all_foliage[raw_plant_data["foliage"]]["categories"];
+            text_output.innerText = "Name: "+all_foliage[plant_data["foliage"]]["name"]+"\nArtist: "+all_foliage[plant_data["foliage"]]["artist"]+"\nType: "+all_foliage[plant_data["foliage"]]["categories"];
             //text_output.innerText = `Base: ${raw_plant_data["foliage"]}`+"\n"+`Simple Feature: ${raw_plant_data["simple_feature"]}`+"\n"+`Complex Feature: ${raw_plant_data["complex_feature"]}`;
         }
 

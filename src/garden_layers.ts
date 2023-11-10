@@ -310,7 +310,7 @@ class GardenLayer extends Layer{
     ctxGround.imageSmoothingEnabled = false;
     ctxGround.clearRect(0, 0, this.canvasGround.width, this.canvasGround.height);
     let colorData = decode_plant_data(this.groundPaletteSeed);
-    let newPalette = all_palettes[colorData["foliage_palette"]].concat(all_palettes[colorData["accent_palette"]]).concat(all_palettes[colorData["feature_palette"]]);
+    let newPalette = all_palettes[colorData["foliage_palette"]]["palette"].concat(all_palettes[colorData["accent_palette"]]["palette"]).concat(all_palettes[colorData["feature_palette"]]["palette"]);
     let recoloredGround = replace_color_palette_single_image(overall_palette, newPalette, await refs[available_ground_base[this.ground]]);
     let recoloredGroundCover = replace_color_palette_single_image(overall_palette, newPalette, await refs[available_ground[this.groundCover]]);
     // Draw everything but the groundcover. We keep going til we're fully off the canvas
@@ -428,7 +428,7 @@ class DecorLayer extends Layer{
 
   async update(){
     let colorData = decode_plant_data(this.contentPaletteSeed);
-    this.palette = all_palettes[colorData["foliage_palette"]].concat(all_palettes[colorData["accent_palette"]]).concat(all_palettes[colorData["feature_palette"]]);
+    this.palette = all_palettes[colorData["foliage_palette"]]["palette"].concat(all_palettes[colorData["accent_palette"]]["palette"]).concat(all_palettes[colorData["feature_palette"]]["palette"]);
     this.clearCanvas();
     await this.placeDecor();
   }

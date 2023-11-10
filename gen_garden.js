@@ -369,12 +369,12 @@ async function scramble_tileable_palette(){
               // Of course, this gives you bright green sand...but it -is- essentially an error state.
               ground_palette[palette_type] = base_foliage_palette;
           } else {
-              ground_palette[palette_type] = all_palettes[possible_ground_palettes[palette_type][0]];
+              ground_palette[palette_type] = all_palettes[possible_ground_palettes[palette_type][0]]["palette"];
           }
         } else {
           // Try to avoid picking the same one twice
           for(let allowed_attempts=20; allowed_attempts>0; allowed_attempts--){
-            let temp_palette = all_palettes[random_from_list(possible_ground_palettes[palette_type])];
+            let temp_palette = all_palettes[random_from_list(possible_ground_palettes[palette_type])]["palette"];
             if(JSON.stringify(temp_palette) != JSON.stringify(palette)){
               ground_palette[palette_type] = temp_palette;
               break;

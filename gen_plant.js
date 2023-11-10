@@ -214,6 +214,111 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
                     ["ecffdd", "aed0c0", "718c93", "444e63"], ["9c4547", "7f3d4a", "51314d", "3b2b4f"],
                     ["efeccc", "d1cba6", "978d72", "6c6a6e"]];
 
+                    var all_palettes = [{ "palette": ['aed740', '76c935', '50aa37', '2f902b'], "categories": [] },
+                    { "palette": ['a2ac4d', '8f974a', '66732a', '4b692f'], "categories": [] },
+                    { "palette": ['7ad8b7', '5eb995', '3e946d', '277b50'], "categories": [] },
+                    { "palette": ['9dbb86', '679465', '476f58', '2f4d47'], "categories": [] },
+                    { "palette": ['8fbe99', '58906f', '3f7252', '215a3f'], "categories": [] },
+                    { "palette": ['fdff07', 'b9d50f', '669914', '34670b'], "categories": [] },
+                    { "palette": ['b0f7a9', '7dcc75', '63aa5a', '448d3c'], "categories": [] },
+                    { "palette": ['c5af7a', 'a6905c', '806d40', '69582e'], "categories": [] },
+                    { "palette": ['6ee964', '54c44b', '3da136', '228036'], "categories": [] },
+                    { "palette": ['e7d7c1', 'a78a7f', '735751', '603f3d'], "categories": [] },
+                    { "palette": ['9c6695', '734978', '4c2d5c', '2f1847'], "categories": [] },
+                    { "palette": ['f8cd1e', 'd3a740', 'b2773a', '934634'], "categories": [] },
+                    { "palette": ['e4eaf3', 'c0cfe7', '9ab3db', '7389ad'], "categories": [] },
+                    { "palette": ['b98838', '8c6526', '674426', '54401f'], "categories": [] },
+                    { "palette": ['8f8090', '655666', '453946', '2a212b'], "categories": [] },
+                    { "palette": ['f5dbd7', 'eec3c3', 'd396a8', 'c9829d'], "categories": [] },
+                    { "palette": ['cdd1ff', '9fc0ff', '709ade', '4b5e95'], "categories": [] },
+                    { "palette": ['f6e9a4', 'e8b78e', 'd5737d', 'c45088'], "categories": [] },
+                    { "palette": ['e88c50', 'd0653e', 'af3629', '9b1f1f'], "categories": [] },
+                    { "palette": ['fef4cc', 'fde47b', 'ffd430', 'ecb600'], "categories": [] },
+                    { "palette": ['f3addd', 'd87fbc', 'c059a0', 'aa3384'], "categories": [] },
+                    { "palette": ['3ac140', '1b9832', '116d22', '085c17'], "categories": [] },
+                    { "palette": ['eaf4bd', 'aade87', '6cc750', '1aaa09'], "categories": [] },
+                    { "palette": ['b77e4e', '88572e', '674426', '543a24'], "categories": [] },
+                    { "palette": ['b7ed6c', '83d764', '47be5c', '0ca553'], "categories": [] },
+                    { "palette": ['f3eacf', 'e4d4be', 'ccb4a4', 'b69389'], "categories": [] },
+                    { "palette": ['edc55c', 'd99b61', 'bf7464', 'a6636c'], "categories": [] },
+                    { "palette": ['8bfdd6', '55dbc3', '25b8b5', '0b8c9d'], "categories": [] },
+                    { "palette": ['f5e2af', 'f3c13d', 'cba134', 'a7832d'], "categories": [] },
+                    { "palette": ['a66547', '6e3837', '542c37', '45283a'], "categories": [] },
+                    { "palette": ['cedd80', '95c27d', '52a279', '057d77'], "categories": [] },
+                    { "palette": ['fff9cf', 'f4d6bc', 'eaaba8', 'dc91b8'], "categories": [] },
+                    { "palette": ['b77e4e', '88572e', '674426', '543a24'], "categories": [] },
+                    { "palette": ['c5af7a', 'a6905c', '806d40', '69582e'], "categories": [] },
+                    { "palette": ['a6705a', '8b4e35', '6c2e1c', '571d0e'], "categories": [] },
+                    { "palette": ['fa9292', 'f55757', 'e32b2b', 'ca0e18'], "categories": [] },
+                    { "palette": ['93aaff', '5778f5', '3a5ad2', '233fa8'], "categories": [] },
+                    { "palette": ['ffcf80', 'ffb63e', 'ff9300', 'da7500'], "categories": [] },
+                    { "palette": ['f5fff4', 'dbf5d9', 'bee1bb', '9fc99c'], "categories": [] },
+                    { "palette": ['cd41d9', 'b309c0', '860d9e', '61067b'], "categories": [] },
+                    { "palette": ['8cf5f8', '30e8ed', '18c9d4', '0798a6'], "categories": [] },
+                    { "palette": ['b5c085', '7b9b64', '47774a', '305540'], "categories": [] },
+                    { "palette": ['9bcf4b', '719e34', '45681a', '274409'], "categories": [] },
+                    { "palette": ['4fb81d', '339324', '1d7628', '075a2d'], "categories": [] },
+                    { "palette": ['6e7706', '465f14', '234d21', '033a34'], "categories": [] },
+                    { "palette": ['78a562', '4e875a', '2a6e53', '0c584d'], "categories": [] },
+                    { "palette": ['077773', '135260', '21294d', '2e033a'], "categories": [] },
+                    { "palette": ['e0ea8a', 'bdbb5c', 'b0983a', 'a5791b'], "categories": [] },
+                    { "palette": ['fcf050', 'dca02a', 'c46212', 'ae2c00'], "categories": [] },
+                    { "palette": ['adef94', '71d86b', '2fc45a', '0aab68'], "categories": [] },
+                    { "palette": ['f6cfec', 'eca9ee', 'cd86e6', 'ab6ce0'], "categories": [] },
+                    { "palette": ['ffd2c6', 'ffb39c', 'ff8e69', 'f87e4a'], "categories": [] },
+                    { "palette": ['684e39', '513522', '391e10', '1f0c03'], "categories": [] },
+                    { "palette": ['fce382', 'ebab8a', 'dc5890', 'b027a1'], "categories": [] },
+                    { "palette": ['71f4a3', '68dbba', '4cb1c4', '3c7fb2'], "categories": [] },
+                    { "palette": ['c5e9fc', 'b5c1fa', 'a494f8', '9163f5'], "categories": [] },
+                    { "palette": ['f83234', 'c92637', '841732', '560e27'], "categories": [] },
+                    { "palette": ['fbeba5', 'c6b05f', '929564', '527259'], "categories": [] },
+                    { "palette": ['fff7cf', 'ece2b1', 'ddcea1', 'ccb78e'], "categories": [] },
+                    { "palette": ['fb8dc2', 'd75dd0', 'a44abf', '7c3fae'], "categories": [] },
+                    { "palette": ['e1e0ff', 'aaa8c1', '7c7a8f', '4c4b53'], "categories": [] },
+                    { "palette": ['a6a190', '938a7d', '74685a', '5a5144'], "categories": [] },
+                    { "palette": ['2e7747', '175143', '143841', '12253e'], "categories": [] },
+                    { "palette": ['7dc9d2', '4e85b1', '325689', '312f70'], "categories": [] },
+                    { "palette": ['405251', '2b393a', '1e252a', '14151e'], "categories": [] },
+                    { "palette": ['666fa9', '424071', '2c1f4c', '240539'], "categories": [] },
+                    { "palette": ['cc3a77', '942162', '5d1354', '2f0e4d'], "categories": [] },
+                    { "palette": ['59a89f', '325354', '2b262e', '2e0d19'], "categories": [] },
+                    { "palette": ['899571', '545a4a', '40463a', '2d302e'], "categories": [] },
+                    { "palette": ['99ad57', '54623c', '37422c', '151d1d'], "categories": [] },
+                    { "palette": ['c25a4a', '8f2e21', '711612', '4d0606'], "categories": [] },
+                    { "palette": ['9c0900', '6a0b00', '3e0600', '180200'], "categories": [] },
+                    { "palette": ['ddd784', 'c1c656', '99ae39', '769926'], "categories": [] },
+                    { "palette": ['b1ed11', '46d01b', '18b069', '168b98'], "categories": [] },
+                    { "palette": ['ccc65d', '99902f', '7f771d', '605a16'], "categories": [] },
+                    { "palette": ['8e8e4f', '6d703e', '4d542b', '3b4429'], "categories": [] },
+                    { "palette": ['b9d163', 'b7a949', '9b6d3b', '7c352c'], "categories": [] },
+                    { "palette": ['e3c510', 'bc8c0e', '864a0b', '541f08'], "categories": [] },
+                    { "palette": ['452a31', '3b1817', '29100e', '1a0a06'], "categories": [] },
+                    { "palette": ['ba7b59', 'a05d39', '7f4323', '66371c'], "categories": [] },
+                    { "palette": ['bc8060', '8c6047', '76523c', '644030'], "categories": [] },
+                    { "palette": ['b4a58a', '8e795e', '674d36', '432a1c'], "categories": [] },
+                    { "palette": ['e2cda7', 'd5835d', 'bd4b34', '692b26'], "categories": [] },
+                    { "palette": ['578759', '316140', '21372a', '101e11'], "categories": [] },
+                    { "palette": ['82d083', '53ab6b', '277e5a', '0d534b'], "categories": [] },
+                    { "palette": ['82d083', '81b964', '318945', '105949'], "categories": [] },
+                    { "palette": ['ab5b11', '8f4711', '5d2611', '481b13'], "categories": [] },
+                    { "palette": ['d8c6f2', 'a08dcb', '7466b0', '352e63'], "categories": [] },
+                    { "palette": ['759e94', '77725b', '785634', '7a4017'], "categories": [] },
+                    { "palette": ['b4f6eb', '76c6cd', '3a7b9c', '1f4f7f'], "categories": [] },
+                    { "palette": ['d0c26d', 'aaaa6a', '738a66', '446c62'], "categories": [] },
+                    { "palette": ['b8efe6', '83a3ce', '6b60b3', '6e3789'], "categories": [] },
+                    { "palette": ['c498a3', '9f7688', '6e446c', '472147'], "categories": [] },
+                    { "palette": ['d17936', 'b35d33', '7b2806', '421c16'], "categories": [] },
+                    { "palette": ['ecffdd', 'aed0c0', '718c93', '444e63'], "categories": [] },
+                    { "palette": ['9c4547', '7f3d4a', '51314d', '3b2b4f'], "categories": [] },
+                    { "palette": ['efeccc', 'd1cba6', '978d72', '6c6a6e'], "categories": [] },
+                    { "palette": ['479ec2', '3b76aa', '1e3663', '1a0945'], "categories": [] },
+                    { "palette": ['f8a818', 'fe5f14', 'c91831', '730c4e'], "categories": [] },
+                    { "palette": ['eca3b2', 'b65d86', '72205f', '440843'], "categories": [] },
+                    { "palette": ['f0d9ee', 'e0c0e4', 'bd9ad5', '9379bd'], "categories": [] },
+                    { "palette": ['d798f3', 'da6ace', 'ca3b97', 'a22152'], "categories": [] },
+                    { "palette": ['d4f1d7', 'c4e47b', 'e9db5d', 'ef924b'], "categories": [] },
+                    { "palette": ['ffe0b5', 'eea383', 'db5754', 'ca2e55'], "categories": [] }];
+
 // There's three types of palette:
 // Foliage: Generally the bulk of a plant. Greens and browns are most common
 // Feature: Think of the secondary on a dragon. Structures like trunks, flower brachts, and stone
@@ -242,7 +347,7 @@ var uncommon_accent_palettes = common_accent_palettes.concat(uncommon_palettes);
 var rare_accent_palettes = uncommon_accent_palettes.concat(rare_palettes);
 
 // Universal use, removes chance of getting common palettes
-var boosted_rare_palettes = uncommon_palettes.concat(rare_palettes);
+//var boosted_rare_palettes = uncommon_palettes.concat(rare_palettes);
 
 // Used for replacing ALL colors...
 //rare_foliage_palettes = [];
@@ -318,11 +423,7 @@ function random_from_foliage(list, prng=null) {
     if(prng==null){ diceroll = Math.random(); }
     else { diceroll = prng(); }
 
-    if(diceroll < special_foliage_chance){
-        return random_from_list(special_foliage, prng);
-    } else {
-        return random_from_list(list, prng);
-    }
+    return random_from_list(list, prng);
 }
 
 
@@ -352,9 +453,9 @@ function parse_plant_data(plant_data){
     return {"foliage": all_foliage[plant_data["foliage"]],
             "simple_feature": all_features[plant_data["simple_feature"]],
             "complex_feature": all_features[plant_data["complex_feature"]],
-            "foliage_palette": all_palettes[plant_data["foliage_palette"]],
-            "feature_palette": all_palettes[plant_data["feature_palette"]],
-            "accent_palette": all_palettes[plant_data["accent_palette"]]}
+            "foliage_palette": all_palettes[plant_data["foliage_palette"]]["palette"],
+            "feature_palette": all_palettes[plant_data["feature_palette"]]["palette"],
+            "accent_palette": all_palettes[plant_data["accent_palette"]]["palette"]}
 }
 
 
@@ -392,7 +493,7 @@ function gen_plant_data(rarity, seed_string=null) {
     var available_accent_palettes = common_accent_palettes;
 
     // A bit grody ngl
-    if(rarity>=1){available_foliage = uncommon_foliage;}
+    /**if(rarity>=1){available_foliage = uncommon_foliage;}
     if(rarity>=2){available_complex_features = complex_features;}
     if(rarity>=3){available_foliage_palettes = uncommon_foliage_palettes;}
     if(rarity>=4){
@@ -411,7 +512,7 @@ function gen_plant_data(rarity, seed_string=null) {
     // Special rarity
     if(rarity==99){available_foliage = special_foliage;}
 
-    if(override_foliage.length > 0){available_foliage = override_foliage};
+    if(override_foliage.length > 0){available_foliage = override_foliage};**/
 
     var prng;
     if(seed_string == null){prng = null;}
