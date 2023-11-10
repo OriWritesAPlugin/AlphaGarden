@@ -40,6 +40,48 @@ function claimCanvas(canvas){
 }
 
 
+function collectSeed(seed){
+  let seeds = sortAndVerifySeedList(seed);
+  if (seeds.length == 0){
+    return;
+  }
+    else if (localStorage.seed_collection == undefined) {
+    localStorage.seed_collection = seeds;
+  } else {
+    localStorage.seed_collection = seeds + "," + localStorage.seed_collection;
+  }
+}
+
+
+function getSeedCollection(){
+  if (localStorage.seed_collection == undefined) {
+    return [];
+  }
+  return localStorage.seed_collection.split(",");
+}
+
+
+// Used mostly in the collection, parses a list of seeds, splitting it into named and unnamed
+function sortAndVerifySeedList(raw_list){
+  true_seeds = [];
+  if(raw_list.length == 0){
+    return true_seeds;
+  }
+  split_seeds = raw_list.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");;
+  for(seed of split_seeds){
+    if(seed.startsWith("!")){
+      continue;  // we skip these here
+    }
+    else if(seed.length != 10){
+      alert("You seem to have a malformed seed! Seeds are 10 characters long, but got \""+seed+"\". Skipping!");
+    } else {
+      true_seeds.push(seed);
+    }
+  }
+  return true_seeds;
+}
+
+
 // Returns true if there's a non-transparent pixel in `row` in ImageData `image_data`. Row is 0-indexed.
 // Modified from https://stackoverflow.com/questions/11796554/automatically-crop-html5-canvas-to-contents
 function hasPixelInRow(image_data, row, width=32){
