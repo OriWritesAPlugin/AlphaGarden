@@ -275,6 +275,140 @@ var all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "
              "glossy_ibis": "https://i.imgur.com/1oSfgPo.png", "scarlet_ibis": "https://i.imgur.com/R1a5AIJ.png", "white_ibis": "https://i.imgur.com/6MPgjBa.png",
              "spoonbill": "https://i.imgur.com/Rtj4qvX.png"};
 
+reformatted_named = {
+    "nigel": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/zYolkmE.png', 'offset': 0},
+    "vine_supporter": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/72uDqMq.png', 'offset': 1},
+    "root_supporter": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/y9eN0Ae.png', 'offset': 2},
+    "bone_supporter": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/EzL4aw0.png', 'offset': 3},
+    "stone_supporter": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/xyB8zjm.png', 'offset': 4},
+    "bunbun": {'artist': 'aprilofsnow', 'source': 'https://i.imgur.com/Qn23rZb.png', 'offset': 5},
+    "bunbun_black": {'artist': 'aprilofsnow', 'source': 'https://i.imgur.com/S6vpB9i.png', 'offset': 6},
+    "bunbun_white": {'artist': 'aprilofsnow', 'source': 'https://i.imgur.com/1xnwUWv.png', 'offset': 7},
+    "grazing_goat": {'artist': 'TwoPuffins', 'source': 'https://i.imgur.com/6LsCzM6.png', 'offset': 8},
+    "grazing_goatbrown": {'artist': 'TwoPuffins', 'source': 'https://i.imgur.com/ZbLlfdq.png', 'offset': 9},
+    "grazing_goatspotted": {'artist': 'TwoPuffins', 'source': 'https://i.imgur.com/wR92Own.png', 'offset': 10},
+    "micro_goat": {'artist': 'Oranitha', 'TwoPuffins': 'https://i.imgur.com/0MN5MiP.png', 'offset': 11},
+    "pots'n_pans": {'artist': 'aprilofsnow', 'source': 'https://i.imgur.com/sbh42Qu.png', 'offset': 12},
+    "male_cardinal": {'artist': 'Lixue', 'source': 'https://i.imgur.com/0WaJacd.png', 'offset': 13},
+    "female_cardinal": {'artist': 'Lixue', 'source': 'https://i.imgur.com/1RcilE0.png', 'offset': 14},
+    "griffon_vulture": {'artist': 'Lixue', 'source': 'https://i.imgur.com/a01VWAo.png', 'offset': 15},
+    "turkey_vulture": {'artist': 'Lixue', 'source': 'https://i.imgur.com/a6jGcCr.png', 'offset': 16},
+    "summer_col": {'artist': 'Ico', 'source': 'https://i.imgur.com/5hsYi2x.png', 'offset': 17},
+    "winter_col": {'artist': 'Ico', 'source': 'https://i.imgur.com/PIvtEQp.png', 'offset': 18},
+    "autumn_col": {'artist': 'Ico', 'source': 'https://i.imgur.com/SM9CLUW.png', 'offset': 19},
+    "spring_col": {'artist': 'Ico', 'source': 'https://i.imgur.com/z22QWj1.png', 'offset': 20},
+    "stone_simple_bench": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/CxUk9nb.png', 'offset': 21},
+    "sandy_simple_bench": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/PdgM5Dm.png', 'offset': 22},
+    "ice_simple_bench": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/Z9KDYr7.png', 'offset': 23},
+    "growth_simple_bench": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/uGxm8Pp.png', 'offset': 24},
+    "onyx_simple_bench": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/ZHHWzqf.png', 'offset': 25},
+    "crystal_simple_bench": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/LewbVev.png', 'offset': 26},
+    "light_uni": {'artist': 'TwoPuffins', 'source': 'https://i.imgur.com/h25jofW.png', 'offset': 27},
+    "dark_uni": {'artist': 'TwoPuffins', 'source': 'https://i.imgur.com/wZDto2T.png', 'offset': 28},
+    "big_fountain": {'artist': 'aprilofsnow', 'source': 'https://i.imgur.com/Gb64tAf.png', 'offset': 29},
+    "bunbun_grass": {'artist': 'aprilofsnow', 'source': 'https://i.imgur.com/dzonSfL.png', 'offset': 30},
+    "bunbun_sakura": {'artist': 'aprilofsnow', 'source': 'https://i.imgur.com/tFsZkwX.png', 'offset': 31},
+    "bunbun_snow": {'artist': 'aprilofsnow', 'source': 'https://i.imgur.com/w5HmhlH.png', 'offset': 32},
+    "plain_big_bone": {'artist': 'WynnDawnstrider', 'source': 'https://i.imgur.com/7uVtIgT.png', 'offset': 33},
+    "mossy_big_bone": {'artist': 'WynnDawnstrider', 'source': 'https://i.imgur.com/TCwHxZY.png', 'offset': 34},
+    "bloody_big_bone": {'artist': 'WynnDawnstrider', 'source': 'https://i.imgur.com/Ra1hOOE.png', 'offset': 35},
+    "misty_big_bone": {'artist': 'WynnDawnstrider', 'source': 'https://i.imgur.com/Pj6BCRJ.png', 'offset': 36},
+    "shaded_big_bone": {'artist': 'WynnDawnstrider', 'source': 'https://i.imgur.com/ZTR99ug.png', 'offset': 37},
+    "giant_gold": {'artist': 'RedRevival', 'source': 'https://i.imgur.com/BJt4LwQ.png', 'offset': 38},
+    "giant_rosegold": {'artist': 'RedRevival', 'source': 'https://i.imgur.com/mswDGRW.png', 'offset': 39},
+    "giant_silver": {'artist': 'RedRevival', 'source': 'https://i.imgur.com/I4cluBv.png', 'offset': 40},
+    "giant_copper": {'artist': 'RedRevival', 'source': 'https://i.imgur.com/0Ymk8oM.png', 'offset': 41},
+    "giant_copperhalf": {'artist': 'RedRevival', 'source': 'https://i.imgur.com/kU4sPSw.png', 'offset': 42},
+    "giant_copperfull": {'artist': 'RedRevival', 'source': 'https://i.imgur.com/JXyQeXD.png', 'offset': 43},
+    "giant_copperblended": {'artist': 'RedRevival', 'source': 'https://i.imgur.com/DDqoxuB.png', 'offset': 44},
+    "giant_cobalt": {'artist': 'RedRevival', 'source': 'https://i.imgur.com/r8tfKle.png', 'offset': 45},
+    "giant_iron": {'artist': 'RedRevival', 'source': 'https://i.imgur.com/dQy3aKl.png', 'offset': 46},
+    "shale_rock_1": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/kWy5LYK.png', 'offset': 47},
+    "shale_rock_2": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/FvM0af4.png', 'offset': 48},
+    "shale_rock_3": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/gOI3GWA.png', 'offset': 49},
+    "shale_rock_4": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/rdHtEmf.png', 'offset': 50},
+    "limestone_rock_1": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/e8WGNIX.png', 'offset': 51},
+    "limestone_rock_2": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/z9G8xUz.png', 'offset': 52},
+    "limestone_rock_3": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/4eS8voG.png', 'offset': 53},
+    "limestone_rock_4": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/zisb1Sm.png', 'offset': 54},
+    "obsidian_rock_1": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/VJbGsNP.png', 'offset': 55},
+    "obsidian_rock_2": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/QD7qunp.png', 'offset': 56},
+    "obsidian_rock_3": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/wVqYlpE.png', 'offset': 57},
+    "obsidian_rock_4": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/G3YixT4.png', 'offset': 58},
+    "aventurine_rock_1": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/x8PAyAR.png', 'offset': 59},
+    "aventurine_rock_2": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/FAuYH6y.png', 'offset': 60},
+    "aventurine_rock_3": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/SiOomwa.png', 'offset': 61},
+    "aventurine_rock_4": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/XBTiOM1.png', 'offset': 62},
+    "shale_cairn": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/mPCJ6xK.png', 'offset': 63},
+    "limestone_cairn": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/YY3aAhM.png', 'offset': 64},
+    "obsidian_cairn": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/z85y3DB.png', 'offset': 65},
+    "aventurine_cairn": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/xfoVNh6.png', 'offset': 66},
+    "shale_spring": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/SS5wlwB.png', 'offset': 67},
+    "limestone_spring": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/YvFBGtb.png', 'offset': 68},
+    "obsidian_spring": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/HDguTqn.png', 'offset': 69},
+    "aventurine_spring": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/aqWObIl.png', 'offset': 70},
+    "simple_fence": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/WE4YzQb.png', 'offset': 71},
+    "simple_fence_broken": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/E1E1q3w.png', 'offset': 72},
+    "simple_signpost": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/LrdkTBi.png', 'offset': 73},
+    "shale_birdbath": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/7P7OqPQ.png', 'offset': 74},
+    "bleached_skull": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/kIgNges.png', 'offset': 75},
+    "bleached_ribs": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/gb5h2ct.png', 'offset': 76},
+    "burnt_skull": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/swmqdOf.png', 'offset': 77},
+    "burnt_ribs": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/yCHsvce.png', 'offset': 78},
+    "lawn_deco": {'artist': 'Xaotician', 'source': 'https://i.imgur.com/A5SsKVL.png', 'offset': 79},
+    "lawn_sin": {'artist': 'Xaotician', 'source': 'https://i.imgur.com/hAqeR7Z.png', 'offset': 80},
+    "peacock": {'artist': 'Xaotician', 'source': 'https://i.imgur.com/AqGytLV.png', 'offset': 81},
+    "brown_cat": {'artist': 'CrystalDragon14', 'source': 'https://i.imgur.com/has3IZH.png', 'offset': 82},
+    "colorpoint_cat": {'artist': 'CrystalDragon14', 'source': 'https://i.imgur.com/alQoAKw.png', 'offset': 83},
+    "grey_cat": {'artist': 'CrystalDragon14', 'source': 'https://i.imgur.com/IGjw0kH.png', 'offset': 84},
+    "ginger_cat": {'artist': 'CrystalDragon14', 'source': 'https://i.imgur.com/XMZSI4u.png', 'offset': 85},
+    "tuxedo_cat": {'artist': 'CrystalDragon14', 'source': 'https://i.imgur.com/H93FT89.png', 'offset': 86},
+    "robin": {'artist': 'Ambulocetus', 'source': 'https://i.imgur.com/jtY79vc.png', 'offset': 87},
+    "bluebird": {'artist': 'Ambulocetus', 'source': 'https://i.imgur.com/MMdnP2E.png', 'offset': 88},
+    "gardeneel": {'artist': 'Ambulocetus', 'source': 'https://i.imgur.com/P5j7JGs.png', 'offset': 89},
+    "bubble_column": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/iDCiNK0.png', 'offset': 90},
+    "bubble_cloud": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/WbUJsff.png', 'offset': 91},
+    "punkle": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/mGu0QXM.png', 'offset': 92},
+    "grummi": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/XZqToAL.png', 'offset': 93},
+    "pip": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/5PRAPj7.png', 'offset': 94},
+    "tlik": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/MaDQORq.png', 'offset': 95},
+    "the_council": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/P7eG6uq.png', 'offset': 96},
+    "rupert": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/CnfSm6K.png', 'offset': 97},
+    "rupert_ascendant": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/Na1gT9v.png', 'offset': 98},
+    "oriole": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/KTdWhYB.png', 'offset': 99},
+    "blackbird": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/GvnkSA7.png', 'offset': 100},
+    "cardinal": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/Zu9xxP5.png', 'offset': 101},
+    "spoop_one": {'artist': 'Xaotician', 'source': 'https://i.imgur.com/2BYYsbd.png', 'offset': 102},
+    "spoop_two": {'artist': 'Xaotician', 'source': 'https://i.imgur.com/iUxGYsi.png', 'offset': 103},
+    "spoop_three": {'artist': 'Xaotician', 'source': 'https://i.imgur.com/mQRx5sJ.png', 'offset': 104},
+    "ghost_one": {'artist': 'Xaotician', 'source': 'https://i.imgur.com/KrLlzh3.png', 'offset': 105},
+    "ghost_two": {'artist': 'Xaotician', 'source': 'https://i.imgur.com/ppt6svW.png', 'offset': 106},
+    "ghost_three": {'artist': 'Xaotician', 'source': 'https://i.imgur.com/6gjzp4g.png', 'offset': 107},
+    "lamppost_glow": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/cOcM3OH.png', 'offset': 108},
+    "pumpkin": {'artist': 'Frigate', 'source': 'https://i.imgur.com/FdHd60J.png', 'offset': 109},
+    "tamarix_g": {'artist': 'Natron', 'source': 'https://i.imgur.com/sYgm6Vn.png', 'offset': 110},
+    "rhizophora_m": {'artist': 'Natron', 'source': 'https://i.imgur.com/fysAyNU.png', 'offset': 111},
+    "capparis": {'artist': 'Natron', 'source': 'https://i.imgur.com/lMlO3l6.png', 'offset': 112},
+    "vachellia_n": {'artist': 'Natron', 'source': 'https://i.imgur.com/IbCbKic.png', 'offset': 113},
+    "haloxylon": {'artist': 'Natron', 'source': 'https://i.imgur.com/1WxCgPc.png', 'offset': 114},
+    "silphium": {'artist': 'Natron', 'source': 'https://i.imgur.com/QRu7OJ4.png', 'offset': 115},
+    "meat_stalagmite_left": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/B2Xy5fz.png', 'offset': 116},
+    "meat_stalagmite_right": {'artist': 'Oranitha', 'source': 'https://i.imgur.com/JsZZYIF.png', 'offset': 117},
+    "pink_jellies": {'artist': 'Semisketched', 'source': 'https://i.imgur.com/MaBKpxS.png', 'offset': 118},
+    "blue_jellies": {'artist': 'Semisketched', 'source': 'https://i.imgur.com/I37WOzN.png', 'offset': 119},
+    "whales": {'artist': 'Semisketched', 'source': 'https://i.imgur.com/AqEPGpx.png', 'offset': 120},
+    "frog_green": {'artist': 'RedRevival', 'source': 'https://i.imgur.com/0X7RqRg.png', 'offset': 121},
+    "frog_brown": {'artist': 'RedRevival', 'source': 'https://i.imgur.com/F93ic5D.png', 'offset': 122},
+    "tree_frog": {'artist': 'RedRevival', 'source': 'https://i.imgur.com/Zt0jeT9.png', 'offset': 123},
+    "pride_flag": {'artist': 'Frigate', 'source': 'https://i.imgur.com/DtqGXQD.png', 'offset': 124},
+    "blue_heron": {'artist': 'HurricaneWinds', 'source': 'https://i.imgur.com/rVcZX7c.png', 'offset': 125},
+    "great_egret": {'artist': 'HurricaneWinds', 'source': 'https://i.imgur.com/b0eN5mb.png', 'offset': 126},
+    "glossy_ibis": {'artist': 'HurricaneWinds', 'source': 'https://i.imgur.com/1oSfgPo.png', 'offset': 127},
+    "scarlet_ibis": {'artist': 'HurricaneWinds', 'source': 'https://i.imgur.com/R1a5AIJ.png', 'offset': 128},
+    "white_ibis": {'artist': 'HurricaneWinds', 'source': 'https://i.imgur.com/6MPgjBa.png', 'offset': 129},
+    "spoonbill": {'artist': 'HurricaneWinds', 'source': 'https://i.imgur.com/Rtj4qvX.png', 'offset': 130}
+    }
+
 var FOLIAGE_SPRITESHEET = "https://i.imgur.com/GuMBlpX.png";
 var NAMED_SPRITESHEET = "https://i.imgur.com/wXkVzuy.png";
 
@@ -310,7 +444,7 @@ var all_palettes = [{"palette": ['aed740', '76c935', '50aa37', '2f902b'], "categ
                     {"palette": ['f3addd', 'd87fbc', 'c059a0', 'aa3384'], "categories": ["bold"]},
                     {"palette": ['3ac140', '1b9832', '116d22', '085c17'], "categories": ["foliar", "bold"]},
                     {"palette": ['eaf4bd', 'aade87', '6cc750', '1aaa09'], "categories": ["strange"]},  // slime
-                    {"palette": ['b77e4e', '88572e', '674426', '543a24'], "categories": ["natural"]},
+                    {"palette": ['b77e4e', '88572e', '674426', '543a24'], "categories": ["earthen"]},
                     {"palette": ['b7ed6c', '83d764', '47be5c', '0ca553'], "categories": ["foliar"]},
                     {"palette": ['f3eacf', 'e4d4be', 'ccb4a4', 'b69389'], "categories": ["pastel"]},
                     {"palette": ['edc55c', 'd99b61', 'bf7464', 'a6636c'], "categories": ["foliar"]},
@@ -328,11 +462,11 @@ var all_palettes = [{"palette": ['aed740', '76c935', '50aa37', '2f902b'], "categ
                     {"palette": ['f5fff4', 'dbf5d9', 'bee1bb', '9fc99c'], "categories": ["pastel"]},
                     {"palette": ['cd41d9', 'b309c0', '860d9e', '61067b'], "categories": ["bold"]},
                     {"palette": ['8cf5f8', '30e8ed', '18c9d4', '0798a6'], "categories": ["bold"]},
-                    {"palette": ['b5c085', '7b9b64', '47774a', '305540'], "categories": ["verdant"]},
-                    {"palette": ['9bcf4b', '719e34', '45681a', '274409'], "categories": ["verdant"]},
-                    {"palette": ['4fb81d', '339324', '1d7628', '075a2d'], "categories": ["verdant"]},
+                    {"palette": ['b5c085', '7b9b64', '47774a', '305540'], "categories": ["foliar"]},
+                    {"palette": ['9bcf4b', '719e34', '45681a', '274409'], "categories": ["foliar"]},
+                    {"palette": ['4fb81d', '339324', '1d7628', '075a2d'], "categories": ["foliar"]},
                     {"palette": ['6e7706', '465f14', '234d21', '033a34'], "categories": ["dark"]},
-                    {"palette": ['78a562', '4e875a', '2a6e53', '0c584d'], "categories": ["verdant"]},
+                    {"palette": ['78a562', '4e875a', '2a6e53', '0c584d'], "categories": ["foliar"]},
                     {"palette": ['077773', '135260', '21294d', '2e033a'], "categories": ["dark"]},
                     {"palette": ['e0ea8a', 'bdbb5c', 'b0983a', 'a5791b'], "categories": ["strange"]},
                     {"palette": ['fcf050', 'dca02a', 'c46212', 'ae2c00'], "categories": ["foliar"]},  // fiery autumn
@@ -349,7 +483,7 @@ var all_palettes = [{"palette": ['aed740', '76c935', '50aa37', '2f902b'], "categ
                     {"palette": ['fb8dc2', 'd75dd0', 'a44abf', '7c3fae'], "categories": ["strange"]},
                     {"palette": ['e1e0ff', 'aaa8c1', '7c7a8f', '4c4b53'], "categories": ["strange"]},
                     {"palette": ['a6a190', '938a7d', '74685a', '5a5144'], "categories": ["earthen"]},
-                    {"palette": ['2e7747', '175143', '143841', '12253e'], "categories": ["verdant"]},
+                    {"palette": ['2e7747', '175143', '143841', '12253e'], "categories": ["foliar"]},
                     {"palette": ['7dc9d2', '4e85b1', '325689', '312f70'], "categories": ["strange"]},
                     {"palette": ['405251', '2b393a', '1e252a', '14151e'], "categories": ["dark"]},
                     {"palette": ['666fa9', '424071', '2c1f4c', '240539'], "categories": ["dark"]},
@@ -370,9 +504,9 @@ var all_palettes = [{"palette": ['aed740', '76c935', '50aa37', '2f902b'], "categ
                     {"palette": ['bc8060', '8c6047', '76523c', '644030'], "categories": ["earthen"]},
                     {"palette": ['b4a58a', '8e795e', '674d36', '432a1c'], "categories": ["earthen"]},
                     {"palette": ['e2cda7', 'd5835d', 'bd4b34', '692b26'], "categories": ["strange"]},
-                    {"palette": ['578759', '316140', '21372a', '101e11'], "categories": ["verdant"]},
-                    {"palette": ['82d083', '53ab6b', '277e5a', '0d534b'], "categories": ["verdant"]},
-                    {"palette": ['82d083', '81b964', '318945', '105949'], "categories": ["verdant"]},
+                    {"palette": ['578759', '316140', '21372a', '101e11'], "categories": ["foliar"]},
+                    {"palette": ['82d083', '53ab6b', '277e5a', '0d534b'], "categories": ["foliar"]},
+                    {"palette": ['82d083', '81b964', '318945', '105949'], "categories": ["foliar"]},
                     {"palette": ['ab5b11', '8f4711', '5d2611', '481b13'], "categories": ["earthen"]},
                     {"palette": ['d8c6f2', 'a08dcb', '7466b0', '352e63'], "categories": ["bold"]},
                     {"palette": ['759e94', '77725b', '785634', '7a4017'], "categories": ["strange"]},
@@ -393,7 +527,7 @@ var all_palettes = [{"palette": ['aed740', '76c935', '50aa37', '2f902b'], "categ
                     {"palette": ['ffe0b5', 'eea383', 'db5754', 'ca2e55'], "categories": ["foliar"]}];
                     //{"palette": ["ffffff", "ffffff", "ffffff", "ffffff"], "categories": ["blorpo"]}];
 
-// verdant earthen soft bold strange deep
+// foliar earthen soft bold strange deep
 palettes_by_category = assemble_categories("all_palettes");
 foliage_palettes_base_odds = assemble_base_odds(palettes_by_category, 2);
 foliage_palettes_base_odds["foliar"] = 5;
@@ -448,7 +582,7 @@ async function preload_plants() {
 }
 
 async function preload_named() {
-    await preload_spritesheet("named", NAMED_SPRITESHEET, all_named.length);
+    await preload_spritesheet("named", NAMED_SPRITESHEET, Object.keys(reformatted_named).length);
 }
 
 // Sound of me not being 100% confident in my async usage yet
@@ -670,6 +804,15 @@ async function gen_plant(plant_data) {
     replace_color_palette(overall_palette, new_overall_palette, work_ctx);
 
     // We can draw a canvas directly on another canvas
+    return work_canvas;
+}
+
+async function gen_named(name){
+    let work_canvas = document.createElement("canvas");
+    let work_ctx = work_canvas.getContext("2d");
+    work_canvas.width = work_canvas_size;
+    work_canvas.height = work_canvas_size;
+    place_image_at_coords_with_chance("named"+reformatted_named[name]["offset"], [[Math.floor(work_canvas_size/2), work_canvas_size-1]], work_ctx, 1, true);
     return work_canvas;
 }
 
