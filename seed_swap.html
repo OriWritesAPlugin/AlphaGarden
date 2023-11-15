@@ -17,6 +17,7 @@
     </body>
     <script src="built/gen_plant.js"></script>
     <script src="built/bingo.js"></script>
+    <script src="built/shared.js"></script>
     <script type="text/javascript">
 
         const days_to_gen = 3;
@@ -94,8 +95,8 @@
               swapped_seeds.push(swappable_seeds[id]);
             }
             document.getElementById("seeds_earned").innerHTML = swapped_seeds.join(", ");
+            collectSeed(swappable_seeds[id]);
         }
-
 
         async function do_preload() {
             await preload_plants();

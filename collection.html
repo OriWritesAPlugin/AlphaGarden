@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="utf-8"/>
+    <head>
+        <title>Utilities [EG]</title>
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
+        <link rel="icon" href="https://i.imgur.com/13AXCvH.png">
+    </head>
+    <body onload="do_preload()">
+        <a href="index.html" class="index_link"><--Home</a>
+        <h1 id="title">Your Collection</h1>
+        <div id=content_div style="padding: 0px;">
+            <div id="collection_horiz_div", class="collection_row">
+              <div id=seed_collection_display_container class=garden_util_box style="width:20%; min-width: 100px">
+                <div id=seed_info_div class=garden_util_box style="text-align: left">
+                  <input type="button" class="chunky_wrap" value="Sort" onClick="doFilter()">
+                  <h3>Sort By</h2>
+                  <input type="radio" id="none_opt" name="sort_order" value="None" checked>
+                  <label for="none_opt">Nothing</label><br>
+                  <input type="radio" id="base" name="sort_order" value="foliage">
+                  <label for="base">Base</label><br>
+                  <input type="radio" id="foliage" name="sort_order" value="foliage_palette">
+                  <label for="foliage">Foliage Palette</label><br>
+                  <input type="radio" id="feature" name="sort_order" value="feature_palette">
+                  <label for="feature">Feature Palette</label><br>
+                  <input type="radio" id="accent" name="sort_order" value="accent_palette">
+                  <label for="accent">Accent Palette</label>
+                  <h3>Show Seeds of Type</h2>
+                  <div id="base_sort_categories_div"></div>
+                  <h3>With Colors</h2>
+                  <div id="palette_sort_categories_div"></div>
+                  <h3>Display</h2>
+                  <input id="hide_seeds" type="checkbox" class="chunky_wrap" value="Hide seeds">
+                  <label for="hide_seeds">Numbers</label>
+                </div>
+              </div>
+              <div id=seed_collection_display_container class=garden_util_box style="width:60%; border: none">
+                  <label for="seed_collection">Manually add seeds:</label>
+                  <input type="text" id="seed_collection" name="seed_collection" size="4" placeholder="Click here and paste!", style="min-width: 292px;">
+                  <input type="button" class="chunky_wrap" value="Add seeds" onClick="display_collection()">
+                  <div id="collection_display_div" width="450"></div>
+              </div>
+              <div id=seed_collection_display_container class=garden_util_box style="width:20%; min-width: 100px ">
+                <div id=seed_info_div class=garden_util_box>
+                  <h3>Analyze</h3>
+                  <div>
+                    <canvas id="analysis_preview_canvas" width="64" height="64"></canvas><br>
+                    <canvas id="analysis_output_canvas" width="64" height="64"></canvas><br>
+                  </div>
+                  <span id="analysis_output_text"></span>
+                </div>
+              </div>
+            </div>
+        </div>
+      </body>
+    <script src="built/gen_plant.js"></script>
+    <script src="built/gen_garden.js"></script>
+    <script src="built/shared.js"></script>
+    <script type="text/javascript">
+
+      var collection_filter = {"base": new Set(), "foliage_palette": new Set(), "feature_palette": new Set(), "accent_palette": new Set()};
+      var collection_width = Math.min(Math.ceil((screen.width*0.6)/96), 11);
+      var selected_function = "analyze";
+      var sort_intervals = [];
+
+      function doSeedOnclick(e){
+        let seed = e.target.getAttribute('data-seed');
+        if (selected_function == "analyze"){
+          analyze_seed(seed);
+        }
+      }
+
+      function cancelOngoingSort(){
+        for(interval of sort_intervals){
+          clearInterval(interval);
+        }
+      }
+
+      function makeSortCheckmark(prefix, name, parent) {
+        let checkbox = document.createElement('input');
+        checkbox.type = "checkbox";
+        checkbox.value = name;
+        checkbox.id = prefix+name;
+        label = document.createElement("label");
+        label.setAttribute("for", checkbox.id);
+        label.innerHTML = name;
+        parent.appendChild(checkbox);
+        parent.appendChild(label);
+        parent.appendChild(document.createElement("br"));
+      }
+
+      function doFilter(){
+        compileFilter();
+        display_collection();
+      }
+
+      function forceFilter(base, palette){
+        collection_filter["base"] = new Set();
+        collection_filter["foliage_palette"] = new Set();
+        collection_filter["feature_palette"] = new Set();
+        collection_filter["accent_palette"] = new Set();
+        if(base != -1){
+          collection_filter["base"] = new Set([base]);
+        }
+        if(palette != -1){
+          let palette_set = new Set();
+          palette_set.add(palette);
+          collection_filter["foliage_palette"] = palette_set;
+          collection_filter["feature_palette"] = palette_set;
+          collection_filter["accent_palette"] = palette_set;
+        }
+        display_collection();
+      }
+
+      function compileFilter(){
+        let new_base_set = new Set();
+        for(base_filter of document.getElementById("base_sort_categories_div").children){
+          if(base_filter.checked){
+            foliage_by_category[base_filter.value].forEach((item) => new_base_set.add(item));
+          }
+        }
+        collection_filter["base"] = new_base_set;
+        let new_palette_set = new Set();
+        for(palette_filter of document.getElementById("palette_sort_categories_div").children){
+          if(palette_filter.checked){
+            palettes_by_category[palette_filter.value].forEach((item) => new_palette_set.add(item));
+          }
+        }
+        collection_filter["foliage_palette"] = new_palette_set;
+        collection_filter["feature_palette"] = new_palette_set;
+        collection_filter["accent_palette"] = new_palette_set;
+      }
+
+      function applyFilter(filter_name, data_val){
+        if(data_val == undefined){ return false;}  // malformed seed
+        if(collection_filter[filter_name].size == 0) { return true;}
+        return collection_filter[filter_name].has(data_val);
+      }
+
+      function passesFilter(plant_data){
+        if(!applyFilter("base", plant_data["foliage"])) { return false;}
+        if(applyFilter("foliage_palette", plant_data["foliage_palette"])) { return true;}
+        if(applyFilter("feature_palette", plant_data["feature_palette"])) { return true;}
+        if(applyFilter("accent_palette", plant_data["accent_palette"])) { return true;}
+        return false;
+      }
+
+      function display_collection() {
+          //clear what's already in there
+          cancelOngoingSort();
+          sort_intervals = [];
+          var collection_div = document.getElementById("collection_display_div")
+          var hide_seeds = document.getElementById("hide_seeds").checked
+          while (collection_div.lastChild) {collection_div.removeChild(collection_div.lastChild);}
+          var seed_string = document.getElementById("seed_collection").value.split(" ").join("").replace(/(^,)|(,$)|"/g, '');
+          // This and the next line both "verify"--sloppy workaround for people putting !namedseeds in this field
+          //let [new_seeds, new_named] = sortAndVerifySeedList(seed_string);
+          collectSeed(seed_string);
+          document.getElementById("seed_collection").value = "";
+          let collection = getSeedCollection();
+          var sort_order_elem = document.getElementsByName('sort_order');
+          var sort_order = "None";
+          for(i = 0; i < sort_order_elem.length; i++) {
+              if(sort_order_elem[i].checked)
+              sort_order = sort_order_elem[i].value;
+          }
+          collection = get_seed_collection_sorted_by(collection, sort_order);
+          //var collection_width_elem = document.getElementsByName('collection_width');
+          for(var i=0; i<collection.length; i+=collection_width){
+            var new_row = document.createElement('div');
+            new_row.className = "collection_row";
+            collection_div.appendChild(new_row);
+            for(var j=0; j < collection_width; j++){
+              if(!collection[i+j]){continue;}
+              sort_intervals.push(setTimeout(add_collection_entry, i, new_row, i, j, collection[i+j], hide_seeds));
+            }
+          }
+      }
+
+    // Take a list of seeds, return them in the order specified (ex: sort by the base "plant")
+    function get_seed_collection_sorted_by(collection, sort_key) {
+      let needs_filtered = !(collection_filter["base"].size == 0 &&
+                             collection_filter["foliage_palette"].size == 0 && collection_filter["feature_palette"].size == 0 &&
+                             collection_filter["accent_palette"].size == 0)
+      if(sort_key == "None" && !needs_filtered){ return collection};
+      parsed_seeds = {};
+      let named_seed_data = {"foliage": 999, "foliage_palette": 999, "feature_palette": 999, "accent_palette": 999}
+      for(let i=0; i<collection.length; i++){
+          if(collection[i].startsWith("!")){
+            parsed_seeds[collection[i]] = named_seed_data;
+          } else {
+            let plant_data = decode_plant_data(collection[i]);
+            if (needs_filtered && !passesFilter(plant_data)){
+              continue;
+            }
+            parsed_seeds[collection[i]] = plant_data;
+          }
+      }
+      if(needs_filtered){
+        let filtered_collection = [];
+          let allowed_seeds = new Set(Object.keys(parsed_seeds));
+          for(let entry of collection){
+            if (allowed_seeds.has(entry)){filtered_collection.push(entry)}
+          }
+        collection = filtered_collection;
+      }
+        
+      if(sort_key == "None") { return collection; };
+      return collection.sort(function(a, b) {
+        return parsed_seeds[a][sort_key] - parsed_seeds[b][sort_key];
+      });
+    }
+
+    async function add_collection_entry(parent, column, row, seed, hide_seed){
+      var id = column + "_" + row;
+      var entry = document.createElement('div');
+      entry.id = id;
+      entry.className = 'collection_box';
+      entry.setAttribute('data-seed', seed);  // For access with onclick
+      entry.onclick = doSeedOnclick;
+      var label = document.createElement('label');
+      var scale_canvas = document.createElement("canvas");
+      scale_canvas.width = 66;
+      scale_canvas.height = 66;
+      var scale_ctx = scale_canvas.getContext("2d");
+      scale_ctx.imageSmoothingEnabled = false;
+      // Strip any positional info
+      seed = seed.replace(/%[\d .]*/g,'');
+      if(seed.startsWith("!")){
+        normalization_canvas = document.createElement("canvas");
+        normalization_canvas.width = 32;
+        normalization_canvas.height = 32;
+        var normalization_ctx = normalization_canvas.getContext("2d");
+        normalization_ctx.imageSmoothingEnabled = false;
+        let ref_img = await refs[all_named[seed.slice(1)]];
+        normalization_ctx.drawImage(ref_img, 16-ref_img.width/2, 32-ref_img.height);
+        scale_ctx.drawImage(normalization_canvas, 0, 0, 64, 64);
+      } else {
+      if(seed.length != 10){
+        alert("You seem to have a malformed seed! Seeds are 10 characters long, but got \""+seed+"\". Skipping!");
+      }
+      else {
+        var plant_canvas = await gen_plant(decode_plant_data(seed)); // Maybe I should just scale the plants up in gen_plant...
+        scale_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
+      }}
+      label.htmlFor = id;
+      label.className = 'collection_label';
+      if(hide_seed){text_content = column+row+1;} else {text_content = seed;}
+      label.appendChild(document.createTextNode(text_content));
+      let separator = document.createElement("span");
+      separator.style.color = "transparent";
+      separator.appendChild(document.createTextNode(", "));
+      label.appendChild(separator);
+      label.style.maxWidth = "86px";
+      entry.appendChild(label);
+      entry.style.background = 'url(' + scale_canvas.toDataURL() + ')  no-repeat bottom center';
+      parent.appendChild(entry);
+    }
+
+
+    async function analyze_seed(seed_string) {
+      var canvas = document.getElementById("analysis_output_canvas");
+      var ctx = canvas.getContext("2d");
+      if(seed_string[0] == "!"){
+          item_name = seed_string.slice(1);
+          var plant_canvas = await gen_named(item_name);
+          canvas.setAttribute("hidden", "hidden");
+      } else {
+          canvas.removeAttribute("hidden");
+          var raw_plant_data = decode_plant_data(seed_string);
+          var plant_data = parse_plant_data(raw_plant_data);
+          var img=new Image();
+          img.src="https://i.imgur.com/rSLWUqw.png";  // palette preview image
+          img.crossOrigin = "anonymous"
+          img.onload = function() {
+              ctx.drawImage(img, 0, 0);
+              var new_overall_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);
+              replace_color_palette(overall_palette, new_overall_palette, ctx, 64, 64);
+          };
+          var plant_canvas = await gen_plant(raw_plant_data); // Maybe I should just scale the plants up in gen_plant...
+      }
+      var preview_canvas = document.getElementById("analysis_preview_canvas");
+      var preview_ctx = preview_canvas.getContext("2d");
+      preview_ctx.clearRect(0, 0, preview_canvas.width, preview_canvas.height);
+      preview_ctx.imageSmoothingEnabled = false;
+      preview_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
+      var text_output = document.getElementById("analysis_output_text");
+      if(seed_string[0] == "!"){
+          text_output.innerText = "Name: " + item_name + "\nArtist: " + reformatted_named[item_name]["artist"]
+      } else {
+          color_msg = ""
+          for(category of ["foliage_palette", "feature_palette", "accent_palette"]){
+            let link_color = "#"+plant_data[category][1];
+            color_msg += ("<a href='javascript:forceFilter(-1, " + raw_plant_data[category] + ");' style='text-decoration-color: " + link_color + "'><span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["categories"]+"<\a><\span> ");
+          }
+          text_output.innerHTML = ("Name: "+all_foliage[plant_data["foliage"]]["name"]+
+          "<br>Artist: "+all_foliage[plant_data["foliage"]]["artist"]+
+          "<br>Type: <a href='javascript:forceFilter(" + plant_data["foliage"] + ", -1);'>"+all_foliage[plant_data["foliage"]]["categories"]+"<\a>"+
+          "<br>Colors: " + color_msg);
+          //"<br>Colors: <a href='javascript:forceFilter(-1, " + plant_data["foliage_palette"] + ");'>"+all_palettes[raw_plant_data["foliage_palette"]]["categories"]+"<\a>");
+      }//text_output.innerText = `Base: ${raw_plant_data["foliage"]}`+"\n"+`Simple Feature: ${raw_plant_data["simple_feature"]}`+"\n"+`Complex Feature: ${raw_plant_data["complex_feature"]}`;
+  }
+
+
+    async function do_preload() {
+        await preload_plants();
+        await preload_named();
+        display_collection();
+        base_sort_div = document.getElementById("base_sort_categories_div");
+        for(category of Object.keys(foliage_by_category)){
+          makeSortCheckmark("base_sort_", category, base_sort_div);
+        }
+        palette_sort_div = document.getElementById("palette_sort_categories_div");
+        for(palette of Object.keys(palettes_by_category)){
+          makeSortCheckmark("palette_sort_", palette, palette_sort_div);
+        }
+    }
+  </script>
+</body>
+</html>
