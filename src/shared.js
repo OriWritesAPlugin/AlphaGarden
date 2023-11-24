@@ -53,11 +53,38 @@ function collectSeed(seed){
 }
 
 
-function getSeedCollection(){
+function addSeedPoints(amount_to_add){
+  if (localStorage.seed_points == undefined) {
+    localStorage.seed_points = amount_to_add;
+  } else {
+    localStorage.seed_points = Number(localStorage.seed_points) + amount_to_add;
+  }
+}
+
+
+function getSeedPoints(){
+  if (localStorage.seed_points == undefined) {
+    localStorage.seed_points = 0;
+  }
+  return Number(localStorage.seed_points);
+}
+
+
+// Niche method for find-replace, you probably want its neighbor
+function getSeedCollectionAsString(){
   if (localStorage.seed_collection == undefined) {
+    return "";
+  }
+  return localStorage.seed_collection;
+}
+
+
+function getSeedCollection(){
+  collection = getSeedCollectionAsString();
+  if (collection == "") {
     return [];
   }
-  return localStorage.seed_collection.split(",");
+  return collection.split(",");
 }
 
 
