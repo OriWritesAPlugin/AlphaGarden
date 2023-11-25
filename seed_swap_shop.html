@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="utf-8"/>
+    <head>
+        <title>Seed Swap</title>
+        <link rel="stylesheet" type="text/css"  href="nature.css" />
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
+        <link rel="icon" href="https://i.imgur.com/ufm0hIO.png">
+    </head>
+    <body onload="do_preload()" style="background: #201920; display:flex; flex-direction:column; justify-content:center;">
+        <a href="index.html" class="index_link"><--Home</a>
+        <h1 id="title">Seed Swap</h1>
+        <h2 id="subtitle">Trade in your seed points for seeds! You get seed points by recycling unwanted seeds in the Collection. New seeds every day!</h2>
+        <h3 id="sp_count" style="text-align: center;">Current seed points: 0</h3>
+          <div id="content_div" class='center-parent' style="text-align: center">
+          <p id="seeds_earned">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> claimed yet<br></p>
+          </div>
+    </body>
+    <script src="built/gen_plant.js"></script>
+    <script src="built/bingo.js"></script>
+    <script src="built/shared.js"></script>
+    <script type="text/javascript">
+
+        const days_to_gen = 3;
+        const prices = [1, 2, 2, 4, 4, 5, 4, 4, 2, 2, 1];
+        const d = new Date();
+        var random_seed;
+        var swappable_seeds = {};
+        const text = {0: "Today's offerings ", 1: "Yesterday's offerings ", 2: "Offerings from 2 days ago (disappear tomorrow) "};
+        var swapped_seeds = [];
+        const daily_specials = gen_daily_specials();
+
+
+        async function gen_divs() {
+            let parent = document.getElementById("content_div");
+            for(let i=0; i<days_to_gen; i++){
+                let d = new Date();
+                d.setDate(d.getDate()-i);
+                claimed_seeds = localStorage["seed_swap_claimed_"+d.getDate()].split(",");
+                random_seed = d.getDate().toString()+d.getMonth().toString()+d.getFullYear().toString() + "_shop_salty";
+                let new_text = document.createElement('h3');
+                new_text.innerHTML = text[i] + ("(daily special: " + daily_specials[i][0] + ")");
+                let new_row = document.createElement('div');
+                new_row.className = "bingo_row";
+                parent.appendChild(new_text);
+                parent.appendChild(new_row);
+                for(let j=0; j<prices.length; j++){
+                    let id = i + "_" + j;
+                    let claimed = claimed_seeds.indexOf(j.toString()) != -1;
+                    await add_swap_square(new_row, j, id, prices[j], i, claimed);
+                    if(claimed){
+                        mark_swap_claimed(id);
+                    }
+                }
+            }
+        }
+
+
+        function gen_daily_specials() {
+            let results = [];
+            for(let i=0; i<days_to_gen; i++){
+                let d = new Date();
+                d.setDate(d.getDate()-i);
+                let random_salt = d.getDate().toString()+d.getMonth().toString()+d.getFullYear().toString() + "_shop_saltyyy";
+                let random_seed = mulberry32(xmur3(random_salt)());
+                let foliage_options = Object.keys(foliage_by_category);
+                foliage_1 = random_from_list(foliage_options, random_seed);
+                foliage_2 = random_from_list(foliage_options, random_seed);
+                if (foliage_1 == "rare") {
+                    foliage_1 = random_from_list(foliage_options, random_seed);  // double roll!
+                }
+                if (foliage_2 == "rare") {
+                    foliage_2 = random_from_list(foliage_options, random_seed);
+                }
+                let palette_options = Object.keys(palettes_by_category);
+                palette_1 = random_from_list(palette_options, random_seed);
+                palette_2 = random_from_list(palette_options, random_seed);
+                specials_text = "";
+                if (palette_1 == palette_2) { specials_text += palette_1 + " "} else {
+                    specials_text += palette_1 +" and " + palette_2 + " ";
+                }
+                if (foliage_1 == foliage_2) { specials_text += foliage_1 + "s" } else {
+                    specials_text += foliage_1 +"s and " + foliage_2 + "s";
+                }
+                foliage_set = foliage_by_category[foliage_1].concat(foliage_by_category[foliage_2]);
+                palette_set = palettes_by_category[palette_1].concat(palettes_by_category[palette_2]);
+                results.push([specials_text, [foliage_set, palette_set]])
+            }  
+            return results;
+        }
+
+        // Largely similar to bingo squares
+        async function add_swap_square(parent, column_offset, id, price, day, previously_claimed){
+            let swap_square = document.createElement('div');
+            swap_square.id = id;
+            swap_square.className = 'bingo_box';
+            if(!previously_claimed){
+                swap_square.addEventListener("click", claim_swap);
+                swap_square.addEventListener('touchend', function(e){
+                        claim_swap(e);
+                        e.preventDefault();
+                    })
+            }
+            swap_square.setAttribute("data-price", price);
+            swap_square.style.display = "inline";  // to align the label
+            let plant_data = gen_plant_data(0, random_seed+String(column_offset));
+            if(price == 4 || price == 5){
+                let specials_prng = mulberry32(xmur3(random_seed+String(column_offset))());
+                plant_data["foliage"] = random_from_list(daily_specials[day][1][0], specials_prng);
+                plant_data["foliage_palette"] = random_from_list(daily_specials[day][1][1], specials_prng);
+                plant_data["feature_palette"] = random_from_list(daily_specials[day][1][1], specials_prng);
+                plant_data["accent_palette"] = random_from_list(daily_specials[day][1][1], specials_prng);
+            }
+            let seed = encode_plant_data_v2(plant_data);
+            let data_url = await drawPlantForSquare(seed);
+            swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
+            swappable_seeds[id] = seed;
+
+            let label = document.createElement('label')
+            label.htmlFor = id;
+            label.className = 'todo_plant_label';
+            label.style.position = "relative";
+            label.style.top = "5%";
+            let label_text = price.toString()+" seeds";
+            label.appendChild(document.createTextNode(label_text));
+            label.style.verticalAlign = "top";
+            swap_square.appendChild(label);
+            parent.appendChild(swap_square);
+            return id;
+        }
+
+        function mark_swap_claimed(id){
+            var bingo_square = document.getElementById(id);
+            bingo_square.lastChild.style.opacity = 0.2;  // Make label translucent
+            bingo_square.lastChild.innerHTML = "Claimed!";
+            bingo_square = bingo_square.cloneNode(true);  // Kill the event listeners
+        }
+
+        async function claim_swap(e){
+            var id = e.target.id;
+            var price = e.target.getAttribute("data-price");
+            let seed_points = getSeedPoints();
+            if(swapped_seeds.indexOf(swappable_seeds[id]) == -1 && seed_points >= price){
+                mark_swap_claimed(id);
+                swapped_seeds.push(swappable_seeds[id]);
+                document.getElementById("seeds_earned").innerHTML = swapped_seeds.join(", ");
+                collectSeed(swappable_seeds[id]);
+                localStorage["seed_swap_claimed_" + (new Date().getDate() - id.split("_")[0])] += "," + id.split("_")[1];
+                addSeedPoints(price * -1);
+                updateSeedPointTotal();
+            }
+        }
+
+        function updateSeedPointTotal(){
+            document.getElementById("sp_count").textContent = "Current seed points: " + getSeedPoints();
+        }
+
+        async function do_preload() {
+            let d = (new Date()).getDate();
+            // Cycle date data
+            if( localStorage["seed_swap_claimed_" + d] == undefined ){
+                delete localStorage["seed_swap_claimed_" + (d-3)];
+            }
+            for(let i=0; i<3; i++){
+                access = "seed_swap_claimed_"+(d-i);
+                if( localStorage[access] == undefined) {
+                    localStorage[access] = [];
+                }
+            }
+            updateSeedPointTotal();
+            await preload_plants();
+            await gen_divs();
+        }
+    </script>
+    </body>
+</html>
