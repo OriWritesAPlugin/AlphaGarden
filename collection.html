@@ -32,6 +32,8 @@
                   <h3>Display</h2>
                   <input id="hide_seeds" type="checkbox" value="Hide seeds">
                   <label for="hide_seeds">Numbers</label>
+                  <input id="show_palettes" type="checkbox">
+                  <label for="show_palettes">Palettes</label>
                 </div>
               <div id=seed_collection_display_container class=garden_util_box style="width:60%; border: none">
                   <label for="seed_collection">Manually add seeds:</label>
@@ -127,14 +129,14 @@
 
       async function select_seed(seed) {
         let parent = document.getElementById("selection_display_div");
-        let entry = await create_collection_entry(parent.children.length, seed, document.getElementById("hide_seeds").checked);
+        let entry = await create_collection_entry(parent.children.length, seed, document.getElementById("hide_seeds").checked, document.getElementById("show_palettes").checked);
         entry.onclick = function(){parent.removeChild(entry)};
         parent.appendChild(entry);
       }
 
       async function prep_recycle_seed(seed) {
         let parent = document.getElementById("recycle_display_div");
-        let entry = await create_collection_entry(parent.children.length, seed, document.getElementById("hide_seeds").checked);
+        let entry = await create_collection_entry(parent.children.length, seed, document.getElementById("hide_seeds").checked, document.getElementById("show_palettes").checked);
         entry.onclick = function(){parent.removeChild(entry)};
         parent.appendChild(entry);   
       }
@@ -225,20 +227,6 @@
         }
       }
 
-      function makeSortCheckmark(prefix, name, parent) {
-        let checkbox = document.createElement('input');
-        checkbox.type = "checkbox";
-        checkbox.value = name;
-        checkbox.id = prefix+name;
-        label = document.createElement("label");
-        label.setAttribute("for", checkbox.id);
-        label.innerHTML = name;
-        label.classList.add("unselectable");
-        parent.appendChild(checkbox);
-        parent.appendChild(label);
-        parent.appendChild(document.createElement("br"));
-      }
-
       function doFilter(){
         compileFilter();
         display_collection();
@@ -300,7 +288,8 @@
           cancelOngoingSort();
           sort_intervals = [];
           var collection_div = document.getElementById("collection_display_div")
-          var hide_seeds = document.getElementById("hide_seeds").checked
+          var hide_seeds = document.getElementById("hide_seeds").checked;
+          let show_palettes = document.getElementById("show_palettes").checked;
           while (collection_div.lastChild) {collection_div.removeChild(collection_div.lastChild);}
           var seed_string = document.getElementById("seed_collection").value.split(" ").join("").replace(/(^,)|(,$)|"/g, '');
           // This and the next line both "verify"--sloppy workaround for people putting !namedseeds in this field
@@ -319,7 +308,7 @@
           //var collection_width_elem = document.getElementsByName('collection_width');
           document.getElementById("title").title = "You have " + collection.length + " seeds and " + getSeedPoints() + " seed points!";
           for(var i=0; i<collection.length; i++){
-              sort_intervals.push(setTimeout(add_collection_entry, i, collection_div, i, collection[i], hide_seeds));
+              sort_intervals.push(setTimeout(add_collection_entry, i, collection_div, i, collection[i], hide_seeds, show_palettes));
           }
       }
 
@@ -357,7 +346,7 @@
       });
     }
 
-    async function create_collection_entry(offset, seed, hide_seed){
+    async function create_collection_entry(offset, seed, hide_seed, show_palette){
       var id = offset;
       var entry = document.createElement('div');
       entry.id = id;
@@ -386,7 +375,7 @@
         alert("You seem to have a malformed seed! Seeds are 10 characters long, but got \""+seed+"\". Skipping!");
       }
       else {
-        var plant_canvas = await gen_plant(decode_plant_data(seed)); // Maybe I should just scale the plants up in gen_plant...
+        var plant_canvas = await gen_plant(decode_plant_data(seed), show_palette); // Maybe I should just scale the plants up in gen_plant...
         scale_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
       }}
       label.htmlFor = id;
@@ -404,8 +393,8 @@
     }
 
     // Exists solely to smooth use of setTimeout.
-    async function add_collection_entry(parent, offset, seed, hide_seed){
-      child = await create_collection_entry(offset, seed, hide_seed);
+    async function add_collection_entry(parent, offset, seed, hide_seed, show_palette){
+      child = await create_collection_entry(offset, seed, hide_seed, show_palette);
       parent.appendChild(child);
     }
 
@@ -441,9 +430,13 @@
           text_output.innerText = "Name: " + item_name + "\nArtist: " + reformatted_named[item_name]["artist"]
       } else {
           color_msg = ""
-          for(category of ["foliage_palette", "feature_palette", "accent_palette"]){
-            let link_color = "#"+plant_data[category][0];
-            color_msg += ("<a href='javascript:forceFilter(-1, " + raw_plant_data[category] + ");' style='text-decoration-color: " + link_color + "'><span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["categories"]+"<\a><\span> ");
+          if(plant_data["foliage"] == 160){
+            color_msg += "This seed is malformed"
+          } else {
+            for(category of ["foliage_palette", "feature_palette", "accent_palette"]){
+              let link_color = "#"+plant_data[category][0];
+              color_msg += ("<a href='javascript:forceFilter(-1, " + raw_plant_data[category] + ");' style='text-decoration-color: " + link_color + "'><span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["categories"]+"<\a><\span> ");
+            }
           }
           text_output.innerHTML = ("Name: "+all_foliage[plant_data["foliage"]]["name"]+
           "<br>Artist: "+all_foliage[plant_data["foliage"]]["artist"]+
