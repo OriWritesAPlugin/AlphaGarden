@@ -3,6 +3,7 @@ import json
 import math
 import os
 import requests
+import subprocess  # used to run pngcrush
 import time
 
 from PIL import Image
@@ -13,8 +14,9 @@ DATA_FILE = "src/gen_plant.js"
 OUTPATH = "images"
 
 
-fetch_out = [#"all_foliage",
-             "reformatted_named"]
+fetch_out = ["all_foliage",
+             #"reformatted_named"
+            ]
 
 
 def extract_json_from_js_var(var_name):
@@ -49,7 +51,9 @@ def assemble_spritesheet_from_list(var_name):
         # For some godforsaken reason I didn't always standardize my filesizes, so we gotta do some dancing
         width, height = sprite.size
         spritesheet.paste(sprite, (x_offset + (SPRITE_DIMENSION - width)//2, y_offset + (SPRITE_DIMENSION - height)))
-    spritesheet.save(f"{OUTPATH}/{var_name}.png")
+    spritesheet.save(f"{OUTPATH}/{var_name}-uncrushed.png")
+    subprocess.run([os.path.expanduser("~/misc_tools/pngcrush/pngcrush"), f"{OUTPATH}/{var_name}-uncrushed.png", f"{OUTPATH}/{var_name}.png"])
+
 
 
 if __name__ == "__main__":

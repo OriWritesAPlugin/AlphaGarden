@@ -274,7 +274,10 @@
         // When there are (num) squares revealed, there should be idx_of(num)+1 plants revealed. If not, add another plant.
         // Making it a dict certainly looks a bit silly, but it does make the later code very clean.
         // TODO: Javascript has a list comprehension equivalent (I think?), so clean this up.
-        const plants_revealed_at = {5: 1, 10: 2, 14: 3, 18: 4, 22: 5, 25: 6, 29: 7, 33: 8, 37: 9, 40: 10, 43: 11, 46: 12, 49: 13};
+        const plants_revealed_at_per_size = {3: {9: 1},
+                                             5: {7: 1, 14: 2, 20: 3, 25: 4},
+                                             7: {9: 1, 16: 2, 23: 3, 30: 4, 36: 5, 41: 6, 45: 7, 49: 8}}
+        var plants_revealed_at;
 
         const icons = [
            "https://i.imgur.com/GSNkSxm.png",
@@ -471,6 +474,7 @@
         }
 
         function generate_board(size, board_challenge_code, rarity_override=null) {
+            plants_revealed_at = plants_revealed_at_per_size[size];
             if(board_challenge_code != current_challenge_code){
                 setAvailableChallengeListFromCode(board_challenge_code);
                 current_challenge_code = board_challenge_code;
