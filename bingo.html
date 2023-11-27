@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="utf-8"/>
+    <head>
+        <title>Coli Bingo [EG]</title>
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
+        <link rel="stylesheet" type="text/css"  href="nature.css" />
+        <link rel="icon" href="https://i.imgur.com/zevR9Uz.png">
+    </head>
+    <body onload="do_setup()">
+        <a href="index.html" class="index_link"><--Home</a>
+        <div class='center-parent'>
+          <label id="smaller-title"><b>Coli Bingo</b></label>
+          <br>
+          <div class='inline-flex-parent' style="text-align: center; align-content: center; justify-content: center; width:auto" id="settings_div"></div>
+          <p id="bingo_seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> earned yet!</p>
+        </div>
+        <div id="board_div" class='center-parent'></div>
+        <div class='center-parent'><br><span id="bingo_hint" style="margin: 10px;"></span></div>
+        <div id="bingo_plant_container_div" class='center-parent'><div id=bingo_plant_div class=bingo_plant_box></div>Congratulations!</div>
+    </body>
+    <script src="built/gen_plant.js"></script>
+    <script src="built/bingo.js"></script>
+    <script src="built/shared.js"></script>
+    <script type="text/javascript">
+
+    // consts don't show up in window[] accesses for reasons
+    var bingo_size_options = ["3", "5", "7"];
+    var bingo_difficulty_options = ["Easy", "Medium", "Hard", "Pain"];
+    var current_difficulty = "Medium";
+    var current_nightmode = true;
+    var current_hints = true;
+    var current_icons = false;
+    var challenge_code;
+    var board_size;
+    var bingo_foliage_palettes, bingo_feature_palettes, bingo_accent_palettes, bingo_bases;
+
+    function gen_cycle_button(target_var, min_width=null){
+        let button = document.createElement("div");
+        button.id = target_var.charAt(0).toUpperCase() + target_var.slice(1);
+        button.className = "bingo_button";
+        button.onclick = cycle_list_value.bind(button, button.id, target_var);
+        button.textContent = "["+button.id+": "+window["current_"+target_var]+"]";
+        if (min_width != null){
+          button.style.minWidth=min_width;
+        }
+        return button
+    }
+
+    function cycle_list_value(elem_id, target_var){
+        let target_list = window["bingo_"+target_var+"_options"];
+        let target_elem = document.getElementById(elem_id);
+        let target = window["current_"+target_var];
+        let next_pos = target_list.indexOf(target) + 1;
+        if(next_pos == target_list.length){
+            next_pos = 0;
+        }
+        window["current_"+target_var] = target_list[next_pos];
+        target_elem.textContent = "["+elem_id+": "+target_list[next_pos]+"]";
+        generate_overgrowth_board();
+    }
+
+    function gen_toggle_button(target_var, target_func){
+        let button = document.createElement("div");
+        button.id = target_var.charAt(0).toUpperCase() + target_var.slice(1);
+        button.className = "bingo_button";
+        button.onclick = cycle_toggle_value.bind(button, button.id, target_var, target_func);
+        button.textContent = "["+button.id+": "+bool_to_text(window["current_"+target_var])+"]";
+        return button
+    }
+
+    function gen_func_button(text, target_func){
+        let button = document.createElement("div");
+        button.id = text;
+        button.className = "bingo_button";
+        button.onclick = target_func;
+        button.textContent = "["+text+"]";
+        return button
+    }
+
+    function bool_to_text(bool){
+        if(bool){return "ON";}
+        else{return "OFF";}
+    }
+
+    function cycle_toggle_value(elem_id, target_var, target_func){
+        let target_elem = document.getElementById(elem_id);
+        window["current_"+target_var] = !window["current_"+target_var];
+        target_elem.textContent = "["+elem_id+": "+bool_to_text(window["current_"+target_var])+"]";
+        target_func();
+    }
+
+    function generate_overgrowth_board() {
+        generate_board(parseInt(current_size), current_difficulty);
+    }
+
+    function toggle_dark_mode(color) {
+       if(current_nightmode){
+           document.body.style.background = "#201920";
+           document.body.style.color = "#DFC48C";
+       } else {
+           document.body.style.background = "linear-gradient(to right, #093028, #227251)";
+           document.body.style.color = "#FFFFFF";
+       }
+    }
+
+    function calculateBingoSeedChances(){
+            let foliage_palettes_odds = {};
+            let feature_palettes_odds = {};
+            let accent_palettes_odds = {};
+            let base_odds = {};
+            for(palette of Object.keys(palettes_by_category)){
+                if(document.getElementById("palette_deselect_"+palette).checked){
+                    foliage_palettes_odds[palette] = foliage_palettes_base_odds[palette];
+                    feature_palettes_odds[palette] = feature_palettes_base_odds[palette];
+                    accent_palettes_odds[palette] = accent_palettes_base_odds[palette];
+                }
+            }
+            for(base_type of Object.keys(foliage_by_category)){
+                if(document.getElementById("foliage_deselect_"+base_type).checked){
+                    base_odds[base_type] = foliage_base_odds[base_type];
+                }
+            }
+            bingo_foliage_palettes = assemble_choice_list_given_odds(palettes_by_category, foliage_palettes_odds);
+            bingo_feature_palettes = assemble_choice_list_given_odds(palettes_by_category, feature_palettes_odds);
+            bingo_accent_palettes = assemble_choice_list_given_odds(palettes_by_category, accent_palettes_odds);
+            bingo_bases = assemble_choice_list_given_odds(foliage_by_category, base_odds);
+    }
+
+    function update_uncheckable(e){
+        let uncheckable = document.getElementById("uncheckable_counter");
+        let total = 0;
+        if(document.getElementById("difficulty_select_normal").checked){ total += 1;}
+        else if(document.getElementById("difficulty_select_harder").checked){ total += 3;}
+        else if(document.getElementById("difficulty_select_hardest").checked){ total += 5;}
+        if(document.getElementById("size_select_5x5").checked){ total += 1;}
+        else if(document.getElementById("size_select_7x7").checked){ total += 2;}
+
+        let foliage_checked = 0;
+        let foliage_options = document.getElementById("foliage_category_checkbox_div").children;
+        for(let i=0; i < foliage_options.length; i++){
+            if(foliage_options[i].checked){foliage_checked ++;}
+        }
+        // Stop someone from unchecking the last category (more relevant for palettes)
+        if(foliage_checked == 0 && e.target.id.startsWith("foliage_deselect_")){
+            e.target.checked == true;
+            foliage_checked = 1;
+        }
+        total -= (Object.keys(foliage_by_category).length - foliage_checked);
+
+        let palette_checked = 0;
+        let palette_options = document.getElementById("palette_category_checkbox_div").children;
+        for(let i=0; i < palette_options.length; i++){
+            if(palette_options[i].checked){palette_checked ++;}
+        }
+        if(palette_checked == 0 && e.target.id.startsWith("palette_deselect_")){
+            e.target.checked = true;
+            palette_checked = 1;
+        }
+        total -= (Object.keys(palettes_by_category).length - palette_checked);
+        document.getElementById("uncheck_counter").textContent = "Can uncheck: "+total;
+        let accept_button = document.getElementById("settings_accept_button");
+        if(total < 0){
+            accept_button.classList.add("disabled");
+            accept_button.setAttribute("tabindex", -1);
+        } else {
+            accept_button.classList.remove("disabled");
+            accept_button.setAttribute("tabindex", 0);
+        }
+    }
+
+    function gen_bingo_option_div(title, radio_name, options, checked_idx, onclick=false, break_between_options=false) {
+        let new_div = document.createElement("div");
+        new_div.classList.add('radio-button');
+        let new_header = document.createElement("h3");
+        new_header.textContent = title;
+        new_header.classList.add("bingo-settings-title");
+        new_div.appendChild(new_header);
+        for(let i=0; i<options.length; i++){
+            if(onclick) { addRadioButton(new_div, radio_name, options[i], i==checked_idx, update_uncheckable) }
+            else { addRadioButton(new_div, radio_name, options[i], i==0) }
+            if(break_between_options){new_div.appendChild(document.createElement("br"))};
+        }
+        return new_div;
+    }
+
+    // A question: why do we make this entirely in JS instead of making some in the HTML and hiding it?
+    // An answer: because I got lost in the JS sauce and forgot that was an option until later
+    function launch_config_dialogue() {
+        let modal = document.createElement("div");
+        modal.classList.add("block_window");
+        let modal_display = document.createElement("div");
+        modal_display.classList.add("bingo-popup");
+        document.body.appendChild(modal);
+        let header = document.createElement("h2");
+        header.textContent = "Bingo Configuration";
+        modal_display.appendChild(header);
+        side_by_side_div = document.createElement("div");
+        side_by_side_div.classList.add("side-by-side");
+        modal_display.appendChild(side_by_side_div);
+        
+        let options_display = document.createElement("div");
+        options_display.classList.add("garden_util_box");
+        options_display.appendChild(gen_bingo_option_div("Difficulty", "difficulty_select", ["normal", "harder", "hardest"], 0, true, false));
+        options_display.appendChild(gen_bingo_option_div("Size", "size_select", ["3x3", "5x5", "7x7"], 1, true, false));
+        options_display.appendChild(gen_bingo_option_div("Added Challenges", "challenge_select", ["none", "elemental fest", "NoTN", "minor fest"], 0, false, true));
+        side_by_side_div.appendChild(options_display)
+
+        let spacer_div = document.createElement("div");
+        spacer_div.style.width = "5%";
+        side_by_side_div.appendChild(spacer_div)
+
+        let uncheck_div = document.createElement("div");
+        uncheck_div.classList.add("garden_util_box");
+        uncheck_div.style.textAlign = "left";
+        let uncheck_counter = document.createElement("h3");
+        uncheck_counter.textContent = "Can uncheck: 2";
+        uncheck_counter.classList.add("bingo-settings-title");
+        uncheck_counter.id = "uncheck_counter";
+        uncheck_div.appendChild(uncheck_counter);
+        side_by_side_uncheck_div = document.createElement("div");
+        side_by_side_uncheck_div.style.display = "flex";
+        uncheck_div.appendChild(side_by_side_uncheck_div);
+        let foliage_category_div = document.createElement("div");
+        foliage_category_div.id = "foliage_category_checkbox_div"
+        for(category of Object.keys(foliage_by_category)){
+          makeSortCheckmark("foliage_deselect_", category, foliage_category_div, true);
+        }
+        for(child of foliage_category_div.children){
+            child.onclick = update_uncheckable;
+        }
+        side_by_side_uncheck_div.appendChild(foliage_category_div);
+
+        let palette_category_div = document.createElement("div");
+        palette_category_div.id = "palette_category_checkbox_div"
+        for(palette of Object.keys(palettes_by_category)){
+          makeSortCheckmark("palette_deselect_", palette, palette_category_div, true);
+        }
+        for(child of palette_category_div.children){
+            child.onclick = update_uncheckable;
+        }
+        side_by_side_uncheck_div.appendChild(palette_category_div);
+        
+        side_by_side_div.appendChild(uncheck_div);
+
+        let button_container = document.createElement("div");
+        button_container.style.padding = "20px";
+        button_container.style.width = "50%";
+        let accept_button = document.createElement("input");
+        accept_button.type = "button";
+        accept_button.onclick = function() {completeSetup(); document.body.removeChild(modal);};
+        accept_button.value = "Accept";
+        accept_button.id = "settings_accept_button";
+        accept_button.classList.add("chunky_fullwidth");
+        button_container.appendChild(accept_button);
+        modal_display.appendChild(button_container);
+        modal.appendChild(modal_display);
+    }
+
+    function setBoardInfo(){
+        diff = getRadioValue("difficulty_select");
+        extra = bingo_challenge_extras[getRadioValue("challenge_select")];
+        code = difficulties[diff];
+        code = code.concat(extra);
+        if(diff == "Harder") {  // extra-long set of challenges, crowds out the special ones
+            code = code.concat(extra);
+        }
+        challenge_code = code;
+        board_size = Number(getRadioValue("size_select").split("x").slice(0, 1));
+    }
+
+    function do_setup(){
+        preload_plants();
+        launch_config_dialogue();
+        toggle_dark_mode();
+        settings_div = document.getElementById("settings_div");
+        settings_div.appendChild(gen_func_button("Configure", launch_config_dialogue));
+        settings_div.appendChild(gen_toggle_button("nightmode", toggle_dark_mode));
+        settings_div.appendChild(gen_toggle_button("icons", toggle_extra_icons));
+        settings_div.appendChild(gen_func_button("New Board", relaunchBoard));
+        settings_div.appendChild(gen_func_button("Export", export_bingo_onclick));
+        settings_div.appendChild(gen_func_button("Import", import_bingo_onclick));
+        toggle_extra_icons();
+        toggle_hints();
+    }
+
+    function relaunchBoard(){
+        generate_board(board_size, challenge_code);
+    }
+
+    function completeSetup(){
+        setBoardInfo();
+        calculateBingoSeedChances();
+        generate_board(board_size, challenge_code);
+    }
+    </script>
+</html>

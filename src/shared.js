@@ -280,6 +280,76 @@ async function resize_for_garden(name_of_image, sourceURL){
 }
 
 
+function addRadioButton(parent, name, label, checked, onclick=null) {
+  let radio_button = document.createElement('input');
+  radio_button.setAttribute('type', 'radio');
+  radio_button.setAttribute('name', name);
+  let id = name + "_" + label;
+  radio_button.id = id;
+  radio_button.checked = checked;
+  radio_button.value = label;
+  let radio_button_label = document.createElement('label');
+  radio_button_label.setAttribute('for', id);
+  radio_button_label.textContent = label;
+  radio_button_label.classList.add("unselectable");
+  if(onclick != null){
+    radio_button.onclick = onclick;
+  }
+  parent.appendChild(radio_button);
+  parent.appendChild(radio_button_label);
+}
+
+
+function getRadioValue(name) {
+  var ele = document.getElementsByName(name);
+  for(i = 0; i < ele.length; i++) {
+      if(ele[i].checked) {return ele[i].value};
+  }
+}
+
+
+function makeSortCheckmark(prefix, name, parent, checked=false) {
+  let checkbox = document.createElement('input');
+  checkbox.type = "checkbox";
+  checkbox.value = name;
+  checkbox.id = prefix+name;
+  checkbox.checked = checked
+  label = document.createElement("label");
+  label.setAttribute("for", checkbox.id);
+  label.innerHTML = name;
+  label.classList.add("unselectable");
+  label.style.marginRight = "15px";
+  parent.appendChild(checkbox);
+  parent.appendChild(label);
+  parent.appendChild(document.createElement("br"));
+}
+
+
+// Radiobuttons are weird and cursed
+// https://stackoverflow.com/questions/118693/how-do-you-dynamically-create-a-radio-button-in-javascript-that-works-in-all-bro
+function makeRadioButtonCursed(name, label, checked, onclick=false) {
+  let id = name + "_" + label;
+  function makeRadioButtonViaDiv(){
+    var radioHtml = '<input type="radio" id="' + id + ' "name="' + name + '"';
+    if ( checked ) {
+        radioHtml += ' checked="checked"';
+    }
+    if ( onclick ) {
+        radioHtml += ' onclick=' + onclick;
+    }
+    radioHtml += '/>';
+    var radioFragment = document.createElement('div');
+    radioFragment.innerHTML = radioHtml;
+    return radioFragment.firstChild;
+  }
+  let radio_button_label = document.createElement('label');
+  radio_button_label.setAttribute('for', id);
+  radio_button_label.setAttribute('value', label);
+  radio_button_label.appendChild(makeRadioButtonViaDiv());
+  return radio_button_label;
+}
+
+
 function getBase64(file) {
     return new Promise(function(resolve) {
       var reader = new FileReader();
