@@ -355,17 +355,32 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
   
 .radio-button input[type="radio"] {
     display: none;
-  }      
-  .radio-button label {
-    display: inline-block;
-    color: #DFC48C;
-    padding: 4px 11px;
-    cursor: pointer;
-  }      
-  .radio-button input[type="radio"]:checked+label {
-    color: #fff;
-    font-weight: bold;
-  }
+  } 
+     
+.radio-button label {
+display: inline-block;
+color: #DFC48C;
+padding: 4px 11px;
+cursor: pointer;
+}      
+.radio-button input[type="radio"]:checked+label {
+color: #fff;
+font-weight: bold;
+}
+
+.splice-check input[type="checkbox"] {
+    display: none;
+  } 
+     
+.splice-check label {
+display: inline-block;
+color: #1a88d1;
+padding: 4px 11px;
+cursor: pointer;
+}      
+.splice-check input[type="checkbox"]:checked+label {
+    color: #d1941a;
+}
 
 .collection_box {
     display: flex;

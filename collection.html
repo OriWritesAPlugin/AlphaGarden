@@ -13,7 +13,7 @@
             <div id="collection_horiz_div", class="collection_row">
               <div id=seed_collection_display_container_spacer class=garden_util_box style="width:20%; min-width: 100px; border-width: 0px"></div>
                 <div id=seed_info_div class=garden_util_box_fixed style="text-align: left; left: 0.5%">
-                  <input type="button" class="chunky_fullwidth" value="Sort" onClick="doFilter()">
+                  <input type="button" class="chunky_fullwidth" value="Sort/Refresh" onClick="doFilter()">
                   <h3>Sort By</h2>
                   <input type="radio" id="none_opt" name="sort_order" value="None" checked>
                   <label for="none_opt">Nothing</label><br>
@@ -36,7 +36,7 @@
                   <label for="show_palettes">Palettes</label>
                 </div>
               <div id=seed_collection_display_container class=garden_util_box style="width:60%; border: none">
-                  <label for="seed_collection">Manually add seeds:</label>
+                  <span id="seedstuff_tally" title="Convert unwanted seeds to raw seedstuff using the Recycle option">Current raw seedstuff: 0</span>
                   <input type="text" id="seed_collection" name="seed_collection" size="4" placeholder="Click here and paste!", style="min-width: 292px;">
                   <input type="button" class="chunky_wrap" value="Add seeds" onClick="display_collection()">
                   <div id="collection_display_div" class="collection_display"></div>
@@ -65,9 +65,21 @@
                     <div style="height: 10%"><input id="do_recycle_button" type="button" class="chunky_wrap" onclick='launch_recycle_dialogue()' value="Recycle seeds"></input></div>
                     <div style="max-height: 90%; overflow-y: scroll"><div id="recycle_display_div" class="collection_display"></div></div>
                 </div>
-                <div id=mutate_div class=garden_util_box hidden>
-                  <div>
-                  </div>
+                <div id=mutate_div class=garden_util_box style="height: 70%" hidden>
+                    <div id="mutate_plant_containers" style="height: 96px; display:flex; justify-content: center">
+                      <div id="first_splice" data-seed="" style="width: 96px; border-width: thin; border-style:solid; border-color: #1a88d1"></div>
+                      <div id="spacer_div"style="width: 10%;"></div>
+                      <div id="second_splice" data-seed="" style="width: 96px; border-width: thin; border-style:solid; border-color: #d1941a"></div>
+                    </div>
+                    <div><canvas id="mutate_preview_canvas" width="128" height="128"></canvas></div>
+                    <div id="color_cycle_panel"></div>
+                    <div id="splice_panel" class=splice-check style="display: none; flex-direction: column" hidden>
+                      <input id="splice_select_foliage" type="checkbox" onclick="update_splice()"></input><label for="splice_select_foliage" class=unselectable>Base</label>
+                      <input id="splice_select_foliage_palette" type="checkbox" onclick="update_splice()" checked></input><label for="splice_select_foliage_palette" class=unselectable>Foliage</label>
+                      <input id="splice_select_feature_palette" type="checkbox" onclick="update_splice()" checked></input><label for="splice_select_feature_palette" class=unselectable>Feature</label>
+                      <input id="splice_select_accent_palette" type="checkbox" onclick="update_splice()" checked></input><label for="splice_select_accent_palette" class=unselectable>Accent</label>
+                      <input id="splice_claim_button" type="button" value="claim splice" class="chunky_fullwidth" onclick="claim_splice()"></input>
+                    </div>
                 </div>
               </div>
             </div>
@@ -102,8 +114,13 @@
         a.download = "seed_collection_" + new Date().toJSON().slice(0,10) + ".txt";
         a.click();
         addSeedPoints(Math.min(days_since_backup * backup_sp_per_day, max_sp_for_backup));
+        updateSeedPoints();
         localStorage["last_backup"] = new Date();
         document.getElementById("backup_button").value="Backup";
+      }
+
+      function updateSeedPoints(){
+        document.getElementById("seedstuff_tally").textContent = "Current raw seedstuff: "+ getSeedPoints();
       }
 
       // Really just a "find the first instance and snip" method
@@ -139,6 +156,135 @@
         let entry = await create_collection_entry(parent.children.length, seed, document.getElementById("hide_seeds").checked, document.getElementById("show_palettes").checked);
         entry.onclick = function(){parent.removeChild(entry)};
         parent.appendChild(entry);   
+      }
+
+      // The force option is used to clear all other seeds, it's how we select the child after a mutation operation.
+      async function prep_mutate_seed(seed, force=false){
+        let first_splice = document.getElementById("first_splice");
+        let second_splice = document.getElementById("second_splice");
+
+        if(force){
+          if(first_splice.children.length > 0){first_splice.removeChild(first_splice.children[0]); first_splice.setAttribute("data-seed", "")}
+          if(second_splice.children.length > 0){second_splice.removeChild(second_splice.children[0]); second_splice.setAttribute("data-seed", "")}
+        }
+
+        async function setup_splice(parent){
+          parent.setAttribute("data-seed", seed);
+          let entry = await create_collection_entry(parent.id=="second_splice", seed, document.getElementById("hide_seeds").checked, document.getElementById("show_palettes").checked);
+          entry.style.borderWidth = 0;
+          if(parent.children.length > 0){
+            parent.removeChild(parent.children[0]);
+          }
+          parent.appendChild(entry);
+          entry.onclick = function(){parent.removeChild(entry); parent.setAttribute("data-seed", ""); update_mutate()};
+        }
+
+        if(first_splice.children.length == 0){
+          await setup_splice(first_splice);
+        }
+        // If first or both set
+         else {
+          if(first_splice.getAttribute("data-seed")==seed){ return; }  // prevent double-select
+          await setup_splice(second_splice);}
+
+        update_mutate();
+      }
+
+      async function draw_preview(canvas_element, seed_data){
+        let plant_canvas = await gen_plant(seed_data, document.getElementById("show_palettes").checked);
+        var preview_canvas = document.getElementById(canvas_element);
+        var preview_ctx = preview_canvas.getContext("2d");
+        preview_ctx.imageSmoothingEnabled = false;
+        preview_ctx.clearRect(0, 0, preview_canvas.width, preview_canvas.height);
+        preview_ctx.drawImage(plant_canvas, 0, 0, preview_canvas.width, preview_canvas.height);
+      }
+
+      function update_mutate(){
+        if(document.getElementById("first_splice").children.length == 1 && document.getElementById("second_splice").children.length == 1){
+          document.getElementById("color_cycle_panel").style.display = "none";  // I'd prefer to use hidden, but it's overwritten by display
+          document.getElementById("splice_panel").style.display = "flex";
+          update_splice();
+        } else {
+          document.getElementById("splice_panel").style.display = "none";  // I'd prefer to use hidden, but it's overwritten by display
+          document.getElementById("color_cycle_panel").style.display = "flex";
+          update_cycle();
+        }
+      }
+
+      async function update_cycle(){
+        let orig_seed;
+        let was_first;
+        if(document.getElementById("first_splice").getAttribute("data-seed") != ""){
+          orig_seed = document.getElementById("first_splice").getAttribute("data-seed");
+          was_first = true;
+        } else if(document.getElementById("second_splice").getAttribute("data-seed") != ""){
+          orig_seed = document.getElementById("second_splice").getAttribute("data-seed");
+          was_first = false;
+        } else {
+          var preview_canvas = document.getElementById("mutate_preview_canvas");
+          var preview_ctx = preview_canvas.getContext("2d");
+          preview_ctx.clearRect(0, 0, preview_canvas.width, preview_canvas.height);
+          document.getElementById("color_cycle_panel").innerHTML = "";
+          return;  
+        }
+        plant_data = decode_plant_data(orig_seed);
+        let cycle_panel = document.getElementById("color_cycle_panel");
+        draw_preview("mutate_preview_canvas", plant_data);
+        let orig_foliage = plant_data["foliage_palette"]; 
+        let orig_feature = plant_data["feature_palette"]; 
+        let orig_accent = plant_data["accent_palette"];
+
+        async function create_shuffled_seed(foliage_palette, feature_palette, accent_palette){
+          plant_data["foliage_palette"] = foliage_palette;
+          plant_data["feature_palette"] = feature_palette;
+          plant_data["accent_palette"] = accent_palette;
+          entry = await create_collection_entry(0, encode_plant_data_v2(plant_data), false, true);
+          entry.children[0].textContent = "2 rs";
+          entry.onclick = function(e){
+            if(getSeedPoints() >= 2){
+              removeSeedFromCollection(orig_seed);
+              addSeedPoints(-2);
+              updateSeedPoints();
+              collectSeed(e.target.getAttribute("data-seed"));
+              prep_mutate_seed(e.target.getAttribute("data-seed"), true);
+              display_collection();
+            }
+          }
+          cycle_panel.appendChild(entry);
+        }
+
+        cycle_panel.innerHTML = "";  // Clear prior children
+        await create_shuffled_seed(orig_accent, orig_foliage, orig_feature);
+        await create_shuffled_seed(orig_feature, orig_accent, orig_foliage);
+        await create_shuffled_seed(orig_accent, orig_feature, orig_foliage);
+      }
+
+      function update_splice(){
+        let first_seed_data = decode_plant_data(document.getElementById("first_splice").getAttribute("data-seed"));
+        let second_seed_data = decode_plant_data(document.getElementById("second_splice").getAttribute("data-seed"));
+        let merged_seed_data = {};
+        function set_data(field_name) {
+          if(!document.getElementById("splice_select_" + field_name).checked){
+            merged_seed_data[field_name] = first_seed_data[field_name];
+          } else {
+            merged_seed_data[field_name] = second_seed_data[field_name];
+          }
+        }
+        set_data("foliage"); set_data("foliage_palette"); set_data("feature_palette"); set_data("accent_palette");
+        merged_seed_data["complex_feature"] = first_seed_data["complex_feature"];
+        merged_seed_data["simple_feature"] = first_seed_data["simple_feature"];
+        let new_seed = encode_plant_data_v2(merged_seed_data);
+        draw_preview("mutate_preview_canvas", merged_seed_data);
+        document.getElementById("mutate_preview_canvas").setAttribute("data-seed", new_seed);
+      }
+
+      function claim_splice(){
+          removeSeedFromCollection(document.getElementById("first_splice").getAttribute("data-seed"));
+          removeSeedFromCollection(document.getElementById("second_splice").getAttribute("data-seed"));
+          new_seed = document.getElementById("mutate_preview_canvas").getAttribute("data-seed");
+          collectSeed(new_seed);
+          prep_mutate_seed(new_seed, true);
+          display_collection();
       }
 
       function copy_selection() {
@@ -203,7 +349,7 @@
           found = removeSeedFromCollection(seed);
           if(found){ earned_sp += 1};
         }
-        if(claim_sp) { addSeedPoints(earned_sp); }
+        if(claim_sp) { addSeedPoints(earned_sp); updateSeedPoints();}
         seed_list.innerHTML = '';  // Remove all children
         display_collection();
         return earned_sp;
@@ -438,9 +584,9 @@
               color_msg += ("<a href='javascript:forceFilter(-1, " + raw_plant_data[category] + ");' style='text-decoration-color: " + link_color + "'><span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["categories"]+"<\a><\span> ");
             }
           }
-          text_output.innerHTML = ("Name: "+all_foliage[plant_data["foliage"]]["name"]+
-          "<br>Artist: "+all_foliage[plant_data["foliage"]]["artist"]+
-          "<br>Type: <a href='javascript:forceFilter(" + plant_data["foliage"] + ", -1);'>"+all_foliage[plant_data["foliage"]]["categories"]+"<\a>"+
+          text_output.innerHTML = "Name: "+"<a href='javascript:forceFilter(" + plant_data["foliage"] + ", -1);'>"+all_foliage[plant_data["foliage"]]["name"]+"<\a>";
+          text_output.innerHTML += ("<br>Artist: "+all_foliage[plant_data["foliage"]]["artist"]+
+          "<br>Type: "+all_foliage[plant_data["foliage"]]["categories"]+
           "<br>Colors: " + color_msg);
           //"<br>Colors: <a href='javascript:forceFilter(-1, " + plant_data["foliage_palette"] + ");'>"+all_palettes[raw_plant_data["foliage_palette"]]["categories"]+"<\a>");
       }//text_output.innerText = `Base: ${raw_plant_data["foliage"]}`+"\n"+`Simple Feature: ${raw_plant_data["simple_feature"]}`+"\n"+`Complex Feature: ${raw_plant_data["complex_feature"]}`;
@@ -463,6 +609,7 @@
         if(days_since_backup > 0){
           document.getElementById("backup_button").value = "Backup (+"+Math.min(days_since_backup*backup_sp_per_day, max_sp_for_backup)+" sp)";
         }
+        updateSeedPoints();
     }
   </script>
 </body>
