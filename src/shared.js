@@ -64,7 +64,7 @@ function addSeedPoints(amount_to_add){
 
 function getSeedPoints(){
   if (localStorage.seed_points == undefined) {
-    localStorage.seed_points = 0;
+    localStorage.seed_points = 10;
   }
   return Number(localStorage.seed_points);
 }
