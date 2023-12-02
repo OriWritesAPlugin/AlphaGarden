@@ -553,7 +553,8 @@ async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, c
     }
 }
 async function place_foliage(img_idx, ctx) {
-    ctx.drawImage(refs["foliage" + img_idx.toString()], 0, 0);
+    let img = await refs["foliage" + img_idx.toString()];
+    ctx.drawImage(img, 0, 0);
 }
 async function preload_plants() {
     // TODO: Replace with spritesheet
@@ -582,25 +583,35 @@ function preload_single_image(url) {
            .then(response => response.blob())
            .then(blob => createImageBitmap(blob));*/
 }
-async function preload_spritesheet(name, URL, count) {
-    let img = await preload_single_image(URL);
+async function load_sprite_from_spritesheet(img, offset) {
     let canvas = document.createElement("canvas");
     canvas.width = 32;
     canvas.height = 32;
     let ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, 32, 32);
+    // All spritesheets are 10 wide, N tall
+    source_offset_y = Math.floor(offset / 10) * 32;
+    source_offset_x = (offset % 10) * 32;
+    ctx.drawImage(img, source_offset_x, source_offset_y, 32, 32, 0, 0, 32, 32);
+    let new_img = new Image;
+    new_img.src = canvas.toDataURL();
+    await new_img.decode();
+    return new_img;
+}
+async function preload_spritesheet(name, URL, count) {
+    /**loading = document.createElement("h1");
+    loading.textContent = "loading "+name+"...";
+    loading.style.position = "fixed";
+    loading.style.right = "40%";
+    loading.style.top = "50%";
+    document.body.appendChild(loading);**/
+    let img = await preload_single_image(URL);
     offset = 0;
     while (offset < count) {
-        ctx.clearRect(0, 0, 32, 32);
-        // All spritesheets are 10 wide, N tall
-        source_offset_y = Math.floor(offset / 10) * 32;
-        source_offset_x = (offset % 10) * 32;
-        ctx.drawImage(img, source_offset_x, source_offset_y, 32, 32, 0, 0, 32, 32);
-        let new_img = new Image;
-        new_img.src = canvas.toDataURL();
-        await new_img.decode();
-        refs[name + offset.toString()] = new_img;
+        refs[name + offset.toString()] = load_sprite_from_spritesheet(img, offset);
         offset++;
     }
+    //document.body.removeChild(loading);
 }
 function random_from_list(list, prng = null) {
     if (prng == null) {
