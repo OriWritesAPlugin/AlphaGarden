@@ -633,19 +633,24 @@ async function load_sprite_from_spritesheet(img, offset){
 }
 
 async function preload_spritesheet(name, URL, count){
-    /**loading = document.createElement("h1");
-    loading.textContent = "loading "+name+"...";
-    loading.style.position = "fixed";
-    loading.style.right = "40%";
-    loading.style.top = "50%";
-    document.body.appendChild(loading);**/
+    let is_firefox = navigator.userAgent.match(/firefox|fxious/i);
+    // Firefox is significantly faster, doesn't need a load.
+    // Not sure if all chromium are affected, but chrome's super slow (~3sec vs ~instant)
+    if(!!window.chrome){
+        loading = document.createElement("h1");
+        loading.textContent = "loading "+name+"...";
+        loading.style.position = "fixed";
+        loading.style.right = "40%";
+        loading.style.top = "50%";
+        document.body.appendChild(loading);
+    }
     let img = await preload_single_image(URL);
     offset = 0
     while(offset < count){
         refs[name+offset.toString()] = load_sprite_from_spritesheet(img, offset)
         offset ++;
     }
-    //document.body.removeChild(loading);
+    if(!!window.chrome) {document.body.removeChild(loading)};
 }
 
 
