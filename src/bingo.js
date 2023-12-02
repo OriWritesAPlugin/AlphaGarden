@@ -11,20 +11,19 @@
             "h": {"description": "Venue elem familiar", "points": 200, "category": "coli", "full": "Get a familiar that, as a coli enemy, has an element matching the venue's. If in doubt, pick the element you think matches the venue aesthetic!"},
             "i": {"description": "Swipp or Bald item", "points": 50, "category": "coli", "full": "Get any item that's used in a Swipp or Baldwin trade"},
             "j": {"description": "5+ DISTINCT items", "points": 200, "category": "coli", "full": "Get 5+ DIFFERENT items (counted as 5+ squares in the post-battle loot screen) from a single battle"},
-            "k": {"description": "Get something green", "points": 100, "category": "coli", "full": "Get any item that's mostly green, such as a green plant, a green scarf, a greenish-colored fish..."},
+            "k": {"description": "Get a green item", "points": 100, "category": "coli", "full": "Find an item that's mostly green, such as a green plant, a green scarf, a greenish-colored fish..."},
             "l": {"description": "Openable", "points": 100, "category": "coli", "full": "Get any item that you open up to receive more loot, like a fishscale basket"},
             "m": {"description": "Captcha", "points": 100, "category": "coli", "full": "Run into a coli captcha (you don't need to pass it)"},
             "n": {"description": "Any battle stone", "points": 100, "category": "coli", "full": "Get ANY battle stone whatsoever"},
             "o": {"description": "Health potion", "points": 150, "category": "coli", "full": "Get ANY of the potions (but not a tincture)"},
             "p": {"description": "3x 1 item", "points": 200, "category": "coli", "full": "Get 3 of the SAME item (so a 3 on at least one item box in the post-battle loot screen)"},
             "q": {"description": "Free space", "points": 0, "category": "neutral", "full": "Claim me!"},
-            "r": {"description": "Spend 5 min in coli", "points": 200, "category": "coli", "full": "Spend 5 minutes coli-ing; doesn't \"stack\" with other time squares (5+15=20 minutes total)"},
+            "r": {"description": "Get a flower", "points": 100, "category": "coli", "full": "Get any item that could be considered a flower, be it food, material, apparel, etc."},
             "s": {"description": "Get something brown", "points": 100, "category": "coli", "full": "Get any item that's mostly brown, such as a brown rock, a brownish granola bar, a brown otter..."},
             "t": {"description": "5+ items", "points": 100, "category": "coli", "full": "Get 5+ TOTAL items (so if you add up the item counts in the post-battle loot screen, you get at least 5)"},
             "u": {"description": "Battle enemy + palette swap", "points": 100, "category": "coli", "full": "Battle both (or at least 2) versions of an enemy in the same battle (like a dryad + autumn dryad)"},
             "v": {"description": "Get something red", "points": 100, "category": "coli", "full": "Get any item that's mostly red, such as a slash battlestone, a red flower..."},
             "w": {"description": "Item + its recolor", "points": 100, "category": "coli", "full": "Get an item and its color variant in the same battle (like a micro deer + dwarf fawn)"},
-            "x": {"description": "Get a flower", "points": 100, "category": "coli", "full": "Get any item that could be considered a flower, be it food, material, apparel, etc."},
                       }, "m": {
             "a": {"description": "Any apparel", "points": 350, "category": "coli", "full": "Get any apparel, such as Veteran's Eye Scar"},
             "b": {"description": "Boss fight", "points": 250, "category": "coli", "full": "Fight any boss. You don't have to win!"},
@@ -257,9 +256,17 @@
             "q": {"description": "Fest currency", "points": 100, "category": "fest", "full": "Get at least one piece of fest currency. Nearly a free space (I hope!)"},
             "r": {"description": "5 battles, no fest", "points": 100, "category": "fest", "full": "Go 5 battles with no fest currency or chests"},
                     }, "n": {
-            "a": {"description": "NOTN test quare", "points": 100, "category": "notn", "full": "whee!"},
+            "a": {"description": "Get a strange chest", "points": 100, "category": "notn", "full": "Congrats!"},
+            "b": {"description": "2 chests in 3 battles", "points": 100, "category": "notn", "full": "2 chests in a battle also counts!"},
+            "c": {"description": "4 different NotN items", "points": 100, "category": "notn", "full": "Food, mats, and chesets count. Must all be from 1 battle!"},
+            "d": {"description": "Get 2x of a NotN item", "points": 100, "category": "notn", "full": "Including chests!"},
+            "e": {"description": "Get NotN from non-NotN", "points": 100, "category": "notn", "full": "Get a NotN drop from an enemy pack with no NotN enemies"},
+            "f": {"description": "3 different NotN packs", "points": 100, "category": "notn", "full": "Fight 3 different arrangements of enemies that contain NotN enemies in one venue"},
+            "g": {"description": "NotN crit", "points": 100, "category": "notn", "full": "Get a crit while fighting a NotN enemy"},
                     }, "l": {
-            "a": {"description": "minor fest test quare", "points": 100, "category": "lesser_fest", "full": "whee!"},
+            "a": {"description": "Exactly 1 currency", "points": 100, "category": "lesser_fest", "full": "Get just 1 piece of currency"},
+            "b": {"description": "2 'currencies' at once", "points": 100, "category": "lesser_fest", "full": "Get two different currencies (ex: broken arrow and shield) or themed food"},
+            "c": {"description": "Currency >= enemies", "points": 100, "category": "lesser_fest", "full": "Get as much currency (or more) than there are enemies"},
         }};
 
         const difficulties = {"normal": ["e","m"],
@@ -274,9 +281,9 @@
         // When there are (num) squares revealed, there should be idx_of(num)+1 plants revealed. If not, add another plant.
         // Making it a dict certainly looks a bit silly, but it does make the later code very clean.
         // TODO: Javascript has a list comprehension equivalent (I think?), so clean this up.
-        const plants_revealed_at_per_size = {3: {9: 1},
+        const plants_revealed_at_per_size = {3: {8: 1},
                                              5: {7: 1, 14: 2, 20: 3, 25: 4},
-                                             7: {9: 1, 16: 2, 23: 3, 30: 4, 36: 5, 41: 6, 45: 7, 49: 8}}
+                                             7: {8: 1, 15: 2, 22: 3, 28: 4, 34: 5, 39: 6, 44: 7, 49: 8}}
         var plants_revealed_at;
 
         const icons = [
@@ -552,7 +559,7 @@
               bingo_square.style.background = "none";
               bingo_square.lastChild.style.opacity = 1;
             }
-            var body = document.getElementsByTagName("BODY")[0];
+            update_squares_til_if_present();
             now_has_bingo = has_bingo();
             if(now_has_bingo != had_bingo_last_turn){  // our bingo state has changed
                 had_bingo_last_turn = now_has_bingo;
@@ -565,6 +572,19 @@
             } else if(!now_has_bingo){
               shimmer_bingo_borders(bingo_border_color, "#b1f2c0", row, col);
             }
+        }
+
+        function update_squares_til_if_present(){
+          if(!document.getElementById("squares_til_seed")) { return; }
+          let seed_at = "-";
+          let size = current_board.length;
+          for(let i=num_squares_revealed+1; i<=size*size; i++){
+            if(i in plants_revealed_at_per_size[size]){
+              seed_at = i-num_squares_revealed;
+              break;
+            }
+          }
+          document.getElementById("squares_til_seed").textContent = "Squares til the next plant: "+seed_at;
         }
 
         function transition_all_bingo_borders(color, origin_row, origin_column){
