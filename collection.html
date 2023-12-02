@@ -43,29 +43,29 @@
               </div>
               <div id="seed_collection_utility_spacer" class=garden_util_box style="width:20%; min-width: 100px; border-width: 0px"></div>
               <div id=seed_collection_utility_container class=garden_util_box_fixed style="right: 0.5%">
-                <div id="utility_button_box" style="height: 25%">
+                <div id="utility_button_box">
                   <input id="analyze_button" type="button" title="Choose a seed to view info about it" class="chunky_fullwidth active" onclick='changeSelectedFunction("analyze")' value="Analyze"></input></br>
                   <input id="select_button" type="button" title="Choose seeds to copy them their text to your clipboard (for making gardens). Click a chosen seed to deselect. You can select seeds multiple times!" class="chunky_fullwidth" onclick='changeSelectedFunction("select")' value="Select"></input></br>
                   <input id="mutate_button" type="button" title="Choose seeds to splice or color-cycle" class="chunky_fullwidth" onclick='changeSelectedFunction("mutate")' value="Mutate"></input></br>
                   <input id="recycle_button" type="button" title="Choose seeds to remove from your collection (has confirmation dialogue)" class="chunky_fullwidth" onclick='changeSelectedFunction("recycle")' value="Recycle"></input>
                   <input id="backup_button" type="button" title="Back up your seed collection to your computer. Do it early and often! :) You get 3 rs per day for it (max 15)" class="chunky_fullwidth" onclick='doBackup()' value="Backup"></input>
                 </div>
-                <div id=analyze_div class=garden_util_box style="height: 70%">
+                <div id=analyze_div class=garden_util_box style="height: 60vh">
                   <div>
                     <canvas id="analysis_preview_canvas" width="128" height="128"></canvas><br>
                     <canvas id="analysis_output_canvas" width="64" height="64"></canvas><br>
                   </div>
                   <span id="analysis_output_text"></span>
                 </div>
-                <div id=select_div class=garden_util_box style="height: 70%" hidden>
+                <div id=select_div class=garden_util_box style="height: 60vh" hidden>
                     <div style="height: 10%"><input id="select_seed_copy_button" type="button" class="chunky_wrap" value="Copy seedtext" onclick='copy_selection()'></input></div>
                     <div style="max-height: 90%; overflow-y: scroll"><div id="selection_display_div" class="collection_display"></div></div>
                 </div>
-                <div id=recycle_div class=garden_util_box style="height: 70%" hidden>
+                <div id=recycle_div class=garden_util_box style="height: 60vh" hidden>
                     <div style="height: 10%"><input id="do_recycle_button" type="button" class="chunky_wrap" onclick='launch_recycle_dialogue()' value="Recycle seeds"></input></div>
                     <div style="max-height: 90%; overflow-y: scroll"><div id="recycle_display_div" class="collection_display"></div></div>
                 </div>
-                <div id=mutate_div class=garden_util_box style="height: 70%" hidden>
+                <div id=mutate_div class=garden_util_box style="height: 60vh" hidden>
                     <div id="mutate_plant_containers" style="height: 96px; display:flex; justify-content: center">
                       <div id="first_splice" data-seed="" style="width: 96px; border-width: thin; border-style:solid; border-color: #1a88d1"></div>
                       <div id="spacer_div"style="width: 10%;"></div>

@@ -351,6 +351,7 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     height: 85%;
     min-width: 100px;
     position:fixed;
+    overflow-y: scroll;
 }
   
 .radio-button input[type="radio"] {
