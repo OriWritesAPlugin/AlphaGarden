@@ -377,6 +377,8 @@ display: inline-block;
 color: #1a88d1;
 padding: 4px 11px;
 cursor: pointer;
+font-size: 1rem;
+font-weight: bold;
 }      
 .splice-check input[type="checkbox"]:checked+label {
     color: #d1941a;
@@ -464,6 +466,9 @@ input[type="text"].position_div {
         left: 10%;
         top: 0%;
     }
+    input.chunky_fullwidth {
+        font-size: 1rem;
+    }
 }
 
 @media (max-width: 50vh) {
@@ -476,6 +481,13 @@ input[type="text"].position_div {
             left: 5%;
             top: 0%;
         }
+}
+
+@media (max-width: 80em) {
+    .bingo-popup {
+        width: 80%;
+        left: 10%;
+    }
 }
 
 

@@ -2,7 +2,7 @@
 <html>
     <meta charset="utf-8"/>
     <head>
-        <title>Utilities [EG]</title>
+        <title>Collection [EG]</title>
         <link rel="stylesheet" type="text/css"  href="shared.css" />
         <link rel="icon" href="https://i.imgur.com/13AXCvH.png">
     </head>
@@ -37,7 +37,7 @@
                 </div>
               <div id=seed_collection_display_container class=garden_util_box style="width:60%; border: none">
                   <span id="seedstuff_tally" title="Convert unwanted seeds to raw seedstuff using the Recycle option">Current raw seedstuff: 0</span>
-                  <input type="text" id="seed_collection" name="seed_collection" size="4" placeholder="Click here and paste!", style="min-width: 292px;">
+                  <input type="text" id="seed_collection" name="seed_collection" size="4" placeholder="Click here and paste!", style="width: 95%; margin: 5px;">
                   <input type="button" class="chunky_wrap" value="Add seeds" onClick="display_collection()">
                   <div id="collection_display_div" class="collection_display"></div>
               </div>
@@ -46,7 +46,7 @@
                 <div id="utility_button_box" style="height: 25%">
                   <input id="analyze_button" type="button" title="Choose a seed to view info about it" class="chunky_fullwidth active" onclick='changeSelectedFunction("analyze")' value="Analyze"></input></br>
                   <input id="select_button" type="button" title="Choose seeds to copy them their text to your clipboard (for making gardens). Click a chosen seed to deselect. You can select seeds multiple times!" class="chunky_fullwidth" onclick='changeSelectedFunction("select")' value="Select"></input></br>
-                  <input id="mutate_button" type="button" title="Choose seeds to merge or mutate" class="chunky_fullwidth" onclick='changeSelectedFunction("mutate")' value="Mutate"></input></br>
+                  <input id="mutate_button" type="button" title="Choose seeds to splice or color-cycle" class="chunky_fullwidth" onclick='changeSelectedFunction("mutate")' value="Mutate"></input></br>
                   <input id="recycle_button" type="button" title="Choose seeds to remove from your collection (has confirmation dialogue)" class="chunky_fullwidth" onclick='changeSelectedFunction("recycle")' value="Recycle"></input>
                   <input id="backup_button" type="button" title="Back up your seed collection to your computer. Do it early and often! :) You get 3 rs per day for it (max 15)" class="chunky_fullwidth" onclick='doBackup()' value="Backup"></input>
                 </div>
@@ -72,13 +72,17 @@
                       <div id="second_splice" data-seed="" style="width: 96px; border-width: thin; border-style:solid; border-color: #d1941a"></div>
                     </div>
                     <div><canvas id="mutate_preview_canvas" width="128" height="128"></canvas></div>
-                    <div id="color_cycle_panel"></div>
+                    <div id="color_cycle_div" style="display: flex; flex-direction: column">
+                      <div id="color_cycle_panel" style="display: flex; justify-content: center; height: 100px; flex-direction: row"></div>
+                      <span>Select one plant to rotate and swap around its colors, at the cost of 2 raw seedstuff per swap. Select another plant to splice instead.</span>
+                    </div>
                     <div id="splice_panel" class=splice-check style="display: none; flex-direction: column" hidden>
                       <input id="splice_select_foliage" type="checkbox" onclick="update_splice()"></input><label for="splice_select_foliage" class=unselectable>Base</label>
                       <input id="splice_select_foliage_palette" type="checkbox" onclick="update_splice()" checked></input><label for="splice_select_foliage_palette" class=unselectable>Foliage</label>
                       <input id="splice_select_feature_palette" type="checkbox" onclick="update_splice()" checked></input><label for="splice_select_feature_palette" class=unselectable>Feature</label>
                       <input id="splice_select_accent_palette" type="checkbox" onclick="update_splice()" checked></input><label for="splice_select_accent_palette" class=unselectable>Accent</label>
                       <input id="splice_claim_button" type="button" value="claim splice" class="chunky_fullwidth" onclick="claim_splice()"></input>
+                      <span>Splice two plants together, using the buttons above to control which plant contributes which trait. Claiming will remove the two spliced plants and add the result. Clicking one of the spliced plants removes it.</span>
                     </div>
                 </div>
               </div>
@@ -201,12 +205,12 @@
 
       function update_mutate(){
         if(document.getElementById("first_splice").children.length == 1 && document.getElementById("second_splice").children.length == 1){
-          document.getElementById("color_cycle_panel").style.display = "none";  // I'd prefer to use hidden, but it's overwritten by display
+          document.getElementById("color_cycle_div").style.display = "none";  // I'd prefer to use hidden, but it's overwritten by display
           document.getElementById("splice_panel").style.display = "flex";
           update_splice();
         } else {
           document.getElementById("splice_panel").style.display = "none";  // I'd prefer to use hidden, but it's overwritten by display
-          document.getElementById("color_cycle_panel").style.display = "flex";
+          document.getElementById("color_cycle_div").style.display = "flex";
           update_cycle();
         }
       }
@@ -306,7 +310,7 @@
         modal_display.classList.add("popup");
         document.body.appendChild(modal);
         let textbox = document.createElement("text");
-        textbox.textContent = "You're about to recycle " + document.getElementById("recycle_display_div").children.length + " seed(s). These will be recycled into seed points at a rate of 1 SP per seed found (so don't worry if you accidentally specified duplicates). If you're ready, hit the 'Claim SP' button. If these seeds were added to your collection by mistake and you just want to remove them, hit the 'Delete' button instead!";
+        textbox.textContent = "You're about to recycle " + document.getElementById("recycle_display_div").children.length + " seed(s). These will be recycled into raw seedstuff at a rate of 1 SP per seed found (so don't worry if you accidentally specified duplicates). If you're ready, hit the 'Claim SP' button. If these seeds were added to your collection by mistake and you just want to remove them, hit the 'Delete' button instead!";
         let button_container = document.createElement("div");
         button_container.style.padding = "20px";
         let cancel_button = document.createElement("input");
@@ -322,7 +326,7 @@
           cancel_button.value = "Done!";
           textbox.textContent = message;
         }
-        claim_button.onclick = function() {earned = recycle_seeds(true); delayedExit("You now have " + getSeedPoints() + " seed points (" + earned + " more than before)")};
+        claim_button.onclick = function() {earned = recycle_seeds(true); delayedExit("You now have " + getSeedPoints() + " raw seedstuff (" + earned + " more than before)")};
         claim_button.value = "Claim SP";
         claim_button.classList.add("chunky_fullwidth");
         let remove_button = document.createElement("input");
@@ -452,7 +456,7 @@
           collection = get_seed_collection_sorted_by(collection, sort_order);
           if(collection.length > 0){ analyze_seed(collection[0]); }
           //var collection_width_elem = document.getElementsByName('collection_width');
-          document.getElementById("title").title = "You have " + collection.length + " seeds and " + getSeedPoints() + " seed points!";
+          document.getElementById("title").title = "You have " + collection.length + " seeds and " + getSeedPoints() + " raw seedstuff!";
           for(var i=0; i<collection.length; i++){
               sort_intervals.push(setTimeout(add_collection_entry, i, collection_div, i, collection[i], hide_seeds, show_palettes));
           }

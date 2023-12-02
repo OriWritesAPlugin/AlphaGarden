@@ -10,8 +10,8 @@
     <body onload="do_preload()" style="background: #201920; display:flex; flex-direction:column; justify-content:center;">
         <a href="index.html" class="index_link"><--Home</a>
         <h1 id="title">Seed Swap</h1>
-        <h2 id="subtitle">Trade in your seed points for seeds! You get seed points by recycling unwanted seeds in the Collection. New seeds every day!</h2>
-        <h3 id="sp_count" style="text-align: center;">Current seed points: 0</h3>
+        <h2 id="subtitle">Trade in your raw seedstuff for seeds! You get raw seedstuff by recycling unwanted seeds in the Collection. New seeds every day!</h2>
+        <h3 id="sp_count" style="text-align: center;">Current raw seedstuff: 0</h3>
           <div id="content_div" class='center-parent' style="text-align: center">
           <p id="seeds_earned">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> claimed yet<br></p>
           </div>
@@ -79,8 +79,19 @@
                 if (palette_1 == palette_2) { specials_text += palette_1 + " "} else {
                     specials_text += palette_1 +" and " + palette_2 + " ";
                 }
-                if (foliage_1 == foliage_2) { specials_text += foliage_1 + "s" } else {
-                    specials_text += foliage_1 +"s and " + foliage_2 + "s";
+                let foliage_text_1, foliage_text_2;
+                if (foliage_1 == "foliage" || foliage_1 == "grass"){
+                    foliage_text_1 = foliage_1;
+                } else {
+                    foliage_text_1 = foliage_1 + "s";
+                }
+                if (foliage_2 == "foliage" || foliage_2 == "grass"){
+                    foliage_text_2 = foliage_2;
+                } else {
+                    foliage_text_2 = foliage_2 + "s";
+                }
+                if (foliage_1 == foliage_2) { specials_text += foliage_text_1 } else {
+                    specials_text += foliage_text_1 + " and " + foliage_text_2;
                 }
                 foliage_set = foliage_by_category[foliage_1].concat(foliage_by_category[foliage_2]);
                 palette_set = palettes_by_category[palette_1].concat(palettes_by_category[palette_2]);
@@ -121,7 +132,7 @@
             label.className = 'todo_plant_label';
             label.style.position = "relative";
             label.style.top = "5%";
-            let label_text = price.toString()+" seeds";
+            let label_text = price.toString()+" rs";
             label.appendChild(document.createTextNode(label_text));
             label.style.verticalAlign = "top";
             swap_square.appendChild(label);
@@ -152,7 +163,7 @@
         }
 
         function updateSeedPointTotal(){
-            document.getElementById("sp_count").textContent = "Current seed points: " + getSeedPoints();
+            document.getElementById("sp_count").textContent = "Current raw seedstuff: " + getSeedPoints();
         }
 
         async function do_preload() {
