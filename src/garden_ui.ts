@@ -100,7 +100,7 @@ class LayerDiv {
   }
 
   buildEditButton(){
-    let editButton = document.createElement("input");
+    let editButton = <HTMLButtonElement> document.createElement("input");
     editButton.type = "button";
     editButton.className = "chunky_wrap";
     editButton.value = "✎";
@@ -110,7 +110,7 @@ class LayerDiv {
   }
 
   buildDeleteButton(){
-    let deleteButton = document.createElement("input");
+    let deleteButton = <HTMLButtonElement> document.createElement("input");
     deleteButton.type = "button";
     deleteButton.className = "chunky_wrap";
     deleteButton.value = "✕";
@@ -271,7 +271,7 @@ class GardenLayerDiv extends LayerDiv {
   }
 
   buildSwapButton(){
-    let swapButton = document.createElement("input");
+    let swapButton = <HTMLButtonElement> document.createElement("input");
     swapButton.type = "button";
     swapButton.className = "chunky_wrap";
     swapButton.value = "☆";  // ★

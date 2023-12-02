@@ -6,7 +6,7 @@
         <link rel="stylesheet" type="text/css"  href="shared.css" />
         <link rel="icon" href="https://i.imgur.com/fRqhbd7.png">
     </head>
-    <body onload="do_preload()">
+    <body onload="preloadSeedTester()">
         <a href="index.html" class="index_link"><--Home</a>
         <h1 id="title">Sprite Tester</h1>
         <h2 id="subtitle">Test plant bases and catalog items to see how they'll look.</h2>
@@ -41,28 +41,37 @@
         </div>
         <span id="seed_list" style="display: none"></span>
     </body>
-    <script src="gen_plant.js"></script>
-    <script src="shared.js"></script>
-    <script src="gen_garden.js"></script>
+    <script src="built/gen_plant.js"></script>
+    <script src="built/gen_garden.js"></script>
+    <script src="built/shared.js"></script>
+    <script src="built/garden_layers.js"></script>
+    <script src="built/garden_ui.js"></script>
+    <script src="built/drag_and_drop.js"></script>
     <script type="text/javascript">
        const add_plant_idx = all_foliage.length;  // We can only ever test one plant at a time using this patched-together system.
        const add_catalog_name = "temporaryTestItem";
+       var gm;
 
-      // I'm mid-refactor right now, please don't judge me (though you'd be right to)
+       async function preloadSeedTester(){
+          await do_preload_initial();
+          gm = new LayerManager(document.getElementById("output_canvas"), "");
+          gm.toggleVisibility();
+       }
+
       async function genTestGarden(){
-        let modified_seed_list = document.getElementById("partial_seed_list").value.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");
+        let modified_seed_list = sortAndVerifySeedList(document.getElementById("partial_seed_list").value);
         let num_to_gen = document.getElementById("seed_quantity").value;
         let seeds_to_add = [];
         if(document.getElementById("plant_seed").checked){
           all_named[add_catalog_name] = "";
-          all_foliage[add_plant_idx] = document.getElementById("image_injector").value;
-          override_foliage = [add_plant_idx];
+          all_foliage[add_plant_idx] = {"source": document.getElementById("image_injector").value};
+          refs["foliage"+[add_plant_idx]] = await preload_single_image(all_foliage[add_plant_idx]["source"]);
           for(let i=0; i<num_to_gen; i++){
-            let new_seed = encode_plant_data_v2(gen_plant_data(7));
-            seeds_to_add.push(new_seed);
+            let new_data = gen_plant_data(7);
+            new_data["foliage"] = add_plant_idx;
+            //alert(new_data["complex_feature"]);
+            seeds_to_add.push(encode_plant_data_v2(new_data));
           }
-          var promise = preload_single_image(lists_to_load[0][add_plant_idx]);
-          refs[lists_to_load[0][add_plant_idx]] = await promise;
           override_foliage = [];
         }
         else {
@@ -78,8 +87,7 @@
             modified_seed_list.splice(Math.floor(Math.random()*(modified_seed_list.length-1))+1, 0, seeds_to_add[i]);
           }
         }
-        document.getElementById("seed_list").value = modified_seed_list.join(",");
-        gen_randogarden();
+        gm.regenActiveGarden(modified_seed_list.join());
       }
     </script>
     </body>

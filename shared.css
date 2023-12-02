@@ -17,6 +17,13 @@ a[name=lightmode]{
     color: #FFF4DC
 }
 
+img {
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
+}
+
 input[type=text],
 select {
     width: 100%;
@@ -60,7 +67,7 @@ input[name=dream_desc]{
     background-color: #2F252D;
 }
 
-input.chunky, input.chunky_wrap {
+input.chunky, input.chunky_wrap, input.chunky_fullwidth {
     width: 400px;
     font-family: monospace, Verdana, sans-serif;
     border-radius: 5px;
@@ -77,10 +84,26 @@ input.chunky_wrap {
     width: auto;
 }
 
+input.chunky_fullwidth {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+input.chunky_fullwidth:active, input.chunky_fullwidth.active {
+    background-color: #3F353D;
+}
+
 .center-parent{
     text-align: center;
     width: 95%;
     margin: 0 auto;
+}
+
+.directory-img{
+    width: 32px;
+    height: auto;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .inline-flex-parent {
@@ -188,6 +211,15 @@ input.chunky_wrap {
     user-select: none;
 }
 
+.disabled{
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 0.65;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
 #dream_warnings {
     font-size: 16px;
 }
@@ -220,7 +252,6 @@ input.chunky_wrap {
 #smaller-title {
     text-align: center;
     font-size: 24px;
-    color: #DFC48C;
 }
 #subtitle {
     text-align: center;
@@ -292,13 +323,19 @@ input.chunky_wrap {
     margin: 0px 1% 0px 1%;
     overflow: hidden;
 }
-.collection_row {
+.collection_row, .collection_display {
    display: flex;
    justify-content: center;
    align-content: center;
 }
 
-.garden_util_box {
+.collection_display {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, max-content));
+    width: 100%;
+}
+
+.garden_util_box, .garden_util_box_fixed {
     align-items: center;
     justify-content: center;
     flex-direction:column;
@@ -309,6 +346,43 @@ input.chunky_wrap {
     padding: 20px;
 }
 
+.garden_util_box_fixed {
+    width:18.8%;
+    height: 85%;
+    min-width: 100px;
+    position:fixed;
+}
+  
+.radio-button input[type="radio"] {
+    display: none;
+  } 
+     
+.radio-button label {
+display: inline-block;
+color: #DFC48C;
+padding: 4px 11px;
+cursor: pointer;
+}      
+.radio-button input[type="radio"]:checked+label {
+color: #fff;
+font-weight: bold;
+}
+
+.splice-check input[type="checkbox"] {
+    display: none;
+  } 
+     
+.splice-check label {
+display: inline-block;
+color: #1a88d1;
+padding: 4px 11px;
+cursor: pointer;
+font-size: 1rem;
+font-weight: bold;
+}      
+.splice-check input[type="checkbox"]:checked+label {
+    color: #d1941a;
+}
 
 .collection_box {
     display: flex;
@@ -327,6 +401,7 @@ input.chunky_wrap {
 
 .collection_label {
   word-wrap: break-word;
+  white-space: nowrap;
   padding: 0.6vh;
   font-size: 12px;
 }
@@ -341,13 +416,13 @@ input[type="text"].position_div {
 
 .name_div {padding: 5px 4px 3px 0px; width: 200px; text-align: right; border: none; color:white; margin: 0px; height: 100%; background: #272127;}
 
-.directory_link, .index_link {font-size: 18px; line-height:1.4; text-decoration:none; margin-left: 5px;}
+.directory_link, .index_link {font-size: 22px; line-height:1.4; text-decoration:none; margin-left: 5px;}
 
 .directory_link:hover, .index_link:hover {text-decoration:underline}
 
 .index_link { position: fixed; top: 0; left: 0;}
 
-.popup {
+.popup, .bingo-popup {
   position: fixed;
   border-radius:20px;
   box-shadow: 0 0 35px rgba(0, 0, 0, 0.2);
@@ -363,6 +438,72 @@ input[type="text"].position_div {
   justify-content: center;
   display: flex;
   flex-direction: column;
+  font-size: 1.2rem;
+  z-index: 1;
+}
+
+.bingo-popup {
+    width: 40%;
+    left: 30%;
+    top: 10%;
+}
+
+.side-by-side {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+@media (max-height: 500px) {
+    .bingo-popup {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-height: 800px) {
+    .bingo-popup {
+        width: 80%;
+        left: 10%;
+        top: 0%;
+    }
+    input.chunky_fullwidth {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 50vh) {
+        .side-by-side {
+            flex-direction: column;
+        }
+        .bingo-popup {
+            font-size: 3rem;
+            width: 90%;
+            left: 5%;
+            top: 0%;
+        }
+}
+
+@media (max-width: 80em) {
+    .bingo-popup {
+        width: 80%;
+        left: 10%;
+    }
+}
+
+
+.bingo-settings-title {
+    text-align: center;
+    margin-bottom: 0px;
+    margin-top: 10px;
+}
+
+.block_window {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(100, 100, 100, 0.5);
+  top: 0px;
+  left: 0px;
+  position: fixed;
 }
 
 .scaled_preview_container{
