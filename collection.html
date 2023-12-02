@@ -598,7 +598,7 @@
 
     async function do_preload() {
         await preload_plants();
-        await preload_named();
+        //await preload_named();
         display_collection();
         base_sort_div = document.getElementById("base_sort_categories_div");
         for(category of Object.keys(foliage_by_category)){
