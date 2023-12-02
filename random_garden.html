@@ -31,11 +31,26 @@
             </br></br>
             <input type="button" class="chunky_wrap" value="Scramble" onClick="scramble_randogarden()">
             <input type="button" class="chunky_wrap" value="Reroll ground" onClick="place_ground(scramble_ground=true)">
-            <input type="button" class="chunky_wrap" value="Claim" onClick="claim_garden()">
+            <input type="button" class="chunky_wrap" value="Claim" onClick="claim_garden()"></br>
+            <input type="button" class="chunky_wrap" value="TEMP NEW: Random from collection!" onClick="random_from_collection()">
         </div>
     </body>
+    <script src="built/shared.js"></script>
     <script src="gen_plant.js"></script>
     <script src="shared.js"></script>
     <script src="gen_garden.js"></script>
+
+    <script type="text/javascript">
+        function random_from_collection(){
+            let collection = getSeedCollection();
+            let num_plants = Math.random() * (12 - 3) + 3;
+            let chosen_seeds = [];
+            for(let i=0; i<num_plants; i++){
+                chosen_seeds.push(collection[Math.floor(Math.random() * collection.length)]);
+            }
+            document.getElementById("seed_list").textContent = chosen_seeds.join(", ");
+            gen_randogarden();
+        }
+    </script>
     </body>
 </html>
