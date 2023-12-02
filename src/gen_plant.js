@@ -423,8 +423,8 @@ var reformatted_named = {
     }
     // END reformatted_named
 
-var FOLIAGE_SPRITESHEET = "https://github.com/OriWritesAPlugin/AlphaGarden/blob/master/images/all_foliage.png";
-var NAMED_SPRITESHEET = "https://github.com/OriWritesAPlugin/AlphaGarden/blob/master/images/reformatted_named.png";
+var FOLIAGE_SPRITESHEET = "https://raw.githubusercontent.com/OriWritesAPlugin/AlphaGarden/master/images/all_foliage.png";
+var NAMED_SPRITESHEET = "https://raw.githubusercontent.com/OriWritesAPlugin/AlphaGarden/master/images/reformatted_named.png";
 
 override_foliage = [];
 

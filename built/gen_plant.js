@@ -405,8 +405,8 @@ var reformatted_named = {
     "spoonbill": { "artist": "HurricaneWinds", "source": "https://i.imgur.com/Rtj4qvX.png", "offset": 130 }
 };
 // END reformatted_named
-var FOLIAGE_SPRITESHEET = "https://github.com/OriWritesAPlugin/AlphaGarden/blob/master/images/all_foliage.png";
-var NAMED_SPRITESHEET = "https://github.com/OriWritesAPlugin/AlphaGarden/blob/master/images/reformatted_named.png";
+var FOLIAGE_SPRITESHEET = "https://raw.githubusercontent.com/OriWritesAPlugin/AlphaGarden/master/images/all_foliage.png";
+var NAMED_SPRITESHEET = "https://raw.githubusercontent.com/OriWritesAPlugin/AlphaGarden/master/images/reformatted_named.png";
 override_foliage = [];
 temp_boost_foliage = [];
 all_features = ["https://i.imgur.com/G4h84Ht.png", "https://i.imgur.com/vXQYMkL.png", "https://i.imgur.com/p1ipMdS.png", "https://i.imgur.com/UUFJO7h.png", "https://i.imgur.com/IyaeNvt.png", "https://i.imgur.com/NXRWexZ.png", "https://i.imgur.com/VwMnyDB.png", "https://i.imgur.com/mLfzmM8.png", "https://i.imgur.com/zcXm5Op.png", "https://i.imgur.com/Osvq1V0.png", "https://i.imgur.com/iPK9aJ7.png", "https://i.imgur.com/3SpYgDN.png", "https://i.imgur.com/6MRuqb7.png", "https://i.imgur.com/jrYQjIW.png"];
