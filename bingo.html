@@ -18,6 +18,7 @@
         <div id="board_div" class='center-parent'></div>
         <div class='center-parent'><br><span id="bingo_hint" style="margin: 10px;"></span></div>
         <div id="bingo_plant_container_div" class='center-parent'><div id=bingo_plant_div class=bingo_plant_box></div>Congratulations!</div>
+        <span id="squares_til_seed" style="position: fixed; right: 1%; bottom: 1%" hidden>Squares til the next plant:</span>
     </body>
     <script src="built/gen_plant.js"></script>
     <script src="built/bingo.js"></script>
@@ -262,6 +263,7 @@
         extra = bingo_challenge_extras[getRadioValue("challenge_select")];
         code = difficulties[diff];
         code = code.concat(extra);
+        code = code.concat(extra); // Bonus weighting for the special challenges
         if(diff == "Harder") {  // extra-long set of challenges, crowds out the special ones
             code = code.concat(extra);
         }
@@ -292,6 +294,8 @@
         setBoardInfo();
         calculateBingoSeedChances();
         generate_board(board_size, challenge_code);
+        update_squares_til_if_present();
+        document.getElementById("squares_til_seed").removeAttribute("hidden");
     }
     </script>
 </html>
