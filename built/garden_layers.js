@@ -112,11 +112,12 @@ class GardenPlacedItem extends GardenItem {
     offsetSpecified; // Whether the offset was provided by the user (so don't scramble it!)
     canvas;
     heightCategory;
-    constructor(identity, type, offset, canvas, height) {
+    constructor(identity, type, offset, canvas, height, offsetSpecified) {
         super(identity, type);
         this.offset = offset;
         this.canvas = canvas;
         this.heightCategory = height;
+        this.offsetSpecified = offsetSpecified;
     }
     async place(place_onto_canvas) {
         let place_onto_ctx = place_onto_canvas.getContext("2d");
@@ -214,9 +215,11 @@ class GardenLayer extends Layer {
         let canvas;
         let percent_pos = identity.indexOf('%');
         let percent_val = null;
+        let custom_pos = false;
         if (percent_pos > -1) {
             percent_val = parseFloat(identity.slice(percent_pos + 1)) / 100;
             identity = identity.slice(0, percent_pos);
+            custom_pos = true;
         }
         if (identity.startsWith("#")) {
             type = GardenItemType.Overlay;
@@ -242,7 +245,7 @@ class GardenLayer extends Layer {
         if (percent_pos == null) {
             percent_val = Math.random();
         }
-        return new GardenPlacedItem(identity, type, percent_val, canvas, height);
+        return new GardenPlacedItem(identity, type, percent_val, canvas, height, custom_pos);
     }
     /**
     Figure out something's GardenItemHeightCategory based on its first fully-transparent row.
@@ -281,7 +284,7 @@ class GardenLayer extends Layer {
         ctxGround.imageSmoothingEnabled = false;
         ctxGround.clearRect(0, 0, this.canvasGround.width, this.canvasGround.height);
         let colorData = decode_plant_data(this.groundPaletteSeed);
-        let newPalette = all_palettes[colorData["foliage_palette"]].concat(all_palettes[colorData["accent_palette"]]).concat(all_palettes[colorData["feature_palette"]]);
+        let newPalette = all_palettes[colorData["foliage_palette"]]["palette"].concat(all_palettes[colorData["accent_palette"]]["palette"]).concat(all_palettes[colorData["feature_palette"]]["palette"]);
         let recoloredGround = replace_color_palette_single_image(overall_palette, newPalette, await refs[available_ground_base[this.ground]]);
         let recoloredGroundCover = replace_color_palette_single_image(overall_palette, newPalette, await refs[available_ground[this.groundCover]]);
         // Draw everything but the groundcover. We keep going til we're fully off the canvas
@@ -386,7 +389,7 @@ class DecorLayer extends Layer {
     }
     async update() {
         let colorData = decode_plant_data(this.contentPaletteSeed);
-        this.palette = all_palettes[colorData["foliage_palette"]].concat(all_palettes[colorData["accent_palette"]]).concat(all_palettes[colorData["feature_palette"]]);
+        this.palette = all_palettes[colorData["foliage_palette"]]["palette"].concat(all_palettes[colorData["accent_palette"]]["palette"]).concat(all_palettes[colorData["feature_palette"]]["palette"]);
         this.clearCanvas();
         await this.placeDecor();
     }

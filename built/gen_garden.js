@@ -377,13 +377,13 @@ async function scramble_tileable_palette() {
                 ground_palette[palette_type] = base_foliage_palette;
             }
             else {
-                ground_palette[palette_type] = all_palettes[possible_ground_palettes[palette_type][0]];
+                ground_palette[palette_type] = all_palettes[possible_ground_palettes[palette_type][0]]["palette"];
             }
         }
         else {
             // Try to avoid picking the same one twice
             for (let allowed_attempts = 20; allowed_attempts > 0; allowed_attempts--) {
-                let temp_palette = all_palettes[random_from_list(possible_ground_palettes[palette_type])];
+                let temp_palette = all_palettes[random_from_list(possible_ground_palettes[palette_type])]["palette"];
                 if (JSON.stringify(temp_palette) != JSON.stringify(palette)) {
                     ground_palette[palette_type] = temp_palette;
                     break;
@@ -897,32 +897,4 @@ async function do_preload_initial() {
     for (const img of tileables) {
         refs[img] = await preload_single_image(img);
     }
-    // preload_all_images();
-}
-async function preload_spritesheet(name, URL, count) {
-    img = await preload_single_image(URL);
-    let canvas = document.createElement("canvas");
-    canvas.width = 32;
-    canvas.height = 32;
-    let ctx = canvas.getContext("2d");
-    offset = 0;
-    while (offset < count) {
-        ctx.clearRect(0, 0, 32, 32);
-        // All spritesheets are 10 wide, N tall
-        source_offset_y = Math.floor(offset / 10) * 32;
-        source_offset_x = (offset % 10) * 32;
-        ctx.drawImage(img, source_offset_x, source_offset_y, 32, 32, 0, 0, 32, 32);
-        let new_img = new Image;
-        new_img.src = canvas.toDataURL();
-        refs[name + offset.toString()] = new_img;
-        offset++;
-    }
-}
-// An experimental method that pulls images from spritesheets instead of individually.
-// Should greatly decrease load time and make color profile stripping easier.
-// Please don't ask why I didn't do this to start with, I think it was for contributor
-// sprite ownership reasons, but now I've automated generating the spritesheet so it'll
-// still allow things to be snipped out if folks like.
-function preload_from_spritesheet() {
-    return;
 }
