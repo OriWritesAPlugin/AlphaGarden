@@ -310,7 +310,7 @@
         modal_display.classList.add("popup");
         document.body.appendChild(modal);
         let textbox = document.createElement("text");
-        textbox.textContent = "You're about to recycle " + document.getElementById("recycle_display_div").children.length + " seed(s). These will be recycled into raw seedstuff at a rate of 1 SP per seed found (so don't worry if you accidentally specified duplicates). If you're ready, hit the 'Claim SP' button. If these seeds were added to your collection by mistake and you just want to remove them, hit the 'Delete' button instead!";
+        textbox.textContent = "You're about to recycle " + document.getElementById("recycle_display_div").children.length + " seed(s). These will be recycled into raw seedstuff at a rate of 1 raw seedstuff per seed found (so don't worry if you accidentally specified duplicates). If you're ready, hit the 'Claim RS' button. If these seeds were added to your collection by mistake and you just want to remove them, hit the 'Delete' button instead!";
         let button_container = document.createElement("div");
         button_container.style.padding = "20px";
         let cancel_button = document.createElement("input");
@@ -327,12 +327,12 @@
           textbox.textContent = message;
         }
         claim_button.onclick = function() {earned = recycle_seeds(true); delayedExit("You now have " + getSeedPoints() + " raw seedstuff (" + earned + " more than before)")};
-        claim_button.value = "Claim SP";
+        claim_button.value = "Claim RS";
         claim_button.classList.add("chunky_fullwidth");
         let remove_button = document.createElement("input");
         remove_button.type = "button";
         remove_button.onclick = function() {recycle_seeds(false); delayedExit("Removed errant seeds. Thank you for your honesty!")};
-        remove_button.value = "Delete (no SP)";
+        remove_button.value = "Delete (no RS)";
         remove_button.classList.add("chunky_fullwidth");
         button_container.appendChild(textbox);
         button_container.appendChild(document.createElement("br"));
@@ -611,7 +611,7 @@
         if(localStorage["last_backup"] == undefined) { localStorage["last_backup"] = new Date()}
         days_since_backup = Math.round((+new Date() - +new Date(localStorage["last_backup"]))/8.64e7);
         if(days_since_backup > 0){
-          document.getElementById("backup_button").value = "Backup (+"+Math.min(days_since_backup*backup_sp_per_day, max_sp_for_backup)+" sp)";
+          document.getElementById("backup_button").value = "Backup (+"+Math.min(days_since_backup*backup_sp_per_day, max_sp_for_backup)+" rs)";
         }
         updateSeedPoints();
     }
