@@ -52,6 +52,8 @@ Frigate: Waving pennant (149)
 
 HurricaneWinds: Lupine (150)
 
+Rat & Reaver of the Bearskull Collective: grand geode (158), deep geode (159)
+
 
 Other Assets
 ------------

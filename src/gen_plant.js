@@ -191,11 +191,7 @@ var all_foliage = [
         {"artist": "Oranitha", "name": "alien cactus", "categories": ["succulent"], "source": "https://i.imgur.com/LlmBQcI.png"},
         {"artist": "Rat & Reaver of the Bearskull collective", "name": "grand geode", "categories": ["rock"], "source": "https://i.imgur.com/IcEfMHF.png"},
         {"artist": "Rat & Reaver of the Bearskull collective", "name": "deep geode", "categories": ["rock"], "source": "https://i.imgur.com/cbnv85f.png"},
-        {"artist": "Oranitha", "name": "I AM ERROR", "categories": [], "source": "https://i.imgur.com/U1qlGFl.png"},
-        {"artist": "Rat & Reaver of the Bearskull collective", "name": "firepit", "categories": ["construct"], "source": "https://i.imgur.com/PCVSiPQ.png"},
-        {"artist": "Rat & Reaver of the Bearskull collective", "name": "leafa", "categories": ["foliage"], "source": "https://i.imgur.com/hY0zErA.png"},
-        {"artist": "Rat & Reaver of the Bearskull collective", "name": "scarecrow", "categories": ["rare"], "source": "https://i.imgur.com/9fgLOCo.png"},
-        {"artist": "Rat & Reaver of the Bearskull collective", "name": "signpost", "categories": ["construct"], "source": "https://i.imgur.com/UeZhEnu.png"}
+        {"artist": "Oranitha", "name": "I AM ERROR", "categories": [], "source": "https://i.imgur.com/U1qlGFl.png"}
     ]
     // END all_foliage
 

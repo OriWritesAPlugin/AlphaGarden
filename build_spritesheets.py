@@ -15,7 +15,7 @@ OUTPATH = "images"
 
 
 fetch_out = ["all_foliage",
-             #"reformatted_named"
+             "reformatted_named"
             ]
 
 
