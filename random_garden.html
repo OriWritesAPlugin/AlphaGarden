@@ -48,7 +48,7 @@
             for(let i=0; i<num_plants; i++){
                 chosen_seeds.push(collection[Math.floor(Math.random() * collection.length)]);
             }
-            document.getElementById("seed_list").textContent = chosen_seeds.join(", ");
+            document.getElementById("seed_list").value = chosen_seeds.join(", ");
             gen_randogarden();
         }
     </script>
