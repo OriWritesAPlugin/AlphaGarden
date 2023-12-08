@@ -31,9 +31,9 @@
                   <div id="palette_sort_categories_div"></div>
                   <h3>Display</h2>
                   <input id="hide_seeds" type="checkbox" value="Hide seeds">
-                  <label for="hide_seeds">Numbers</label>
+                  <label for="hide_seeds" class="unselectable">Numbers</label>
                   <input id="show_palettes" type="checkbox">
-                  <label for="show_palettes">Palettes</label>
+                  <label for="show_palettes" class="unselectable">Palettes</label>
                 </div>
               <div id=seed_collection_display_container class=garden_util_box style="width:60%; border: none">
                   <span id="seedstuff_tally" title="Convert unwanted seeds to raw seedstuff using the Recycle option">Current raw seedstuff: 0</span>
@@ -52,6 +52,7 @@
                 </div>
                 <div id=analyze_div class=garden_util_box style="min-height: 60vh">
                   <div>
+                    <label id="analysis_preview_canvas_label" for="analysis_preview_canvas"></label><br>
                     <canvas id="analysis_preview_canvas" width="128" height="128"></canvas><br>
                     <canvas id="analysis_output_canvas" width="64" height="64"></canvas><br>
                   </div>
@@ -571,6 +572,7 @@
           var plant_canvas = await gen_plant(raw_plant_data); // Maybe I should just scale the plants up in gen_plant...
       }
       var preview_canvas = document.getElementById("analysis_preview_canvas");
+      document.getElementById("analysis_preview_canvas_label").textContent = seed_string;
       var preview_ctx = preview_canvas.getContext("2d");
       preview_ctx.clearRect(0, 0, preview_canvas.width, preview_canvas.height);
       preview_ctx.imageSmoothingEnabled = false;
