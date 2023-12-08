@@ -75,7 +75,7 @@ var all_foliage = [
         {"artist": "Oranitha", "name": "flowering scrubgrass", "categories": ["grass"], "source": "https://i.imgur.com/Wtmyg00.png"},
         {"artist": "Oranitha", "name": "urn", "categories": ["construct"], "source": "https://i.imgur.com/k7FDQzk.png"},
         {"artist": "Oranitha", "name": "lodgepole pine", "categories": ["tree"], "source": "https://i.imgur.com/hnTjsH8.png"},
-        {"artist": "Oranitha", "name": "", "categories": ["construct"], "source": "https://i.imgur.com/yIZJ19G.png"},
+        {"artist": "Oranitha", "name": "little lamppost", "categories": ["construct"], "source": "https://i.imgur.com/yIZJ19G.png"},
         {"artist": "Oranitha", "name": "mushlets", "categories": ["mushroom"], "source": "https://i.imgur.com/mQaUMgT.png"},
         {"artist": "Oranitha", "name": "kelp", "categories": ["aquatic"], "source": "https://i.imgur.com/t2NAP7b.png"},
         {"artist": "Oranitha", "name": "coral", "categories": ["aquatic"], "source": "https://i.imgur.com/abzacy8.png"},
@@ -121,7 +121,7 @@ var all_foliage = [
         {"artist": "Xaotician", "name": "wild desert rose", "categories": ["tree"], "source": "https://i.imgur.com/qT4F8Wh.png"},
         {"artist": "Xaotician", "name": "barrel cactus", "categories": ["succulent"], "source": "https://i.imgur.com/0j5Khpm.png"},
         {"artist": "Xaotician", "name": "dracaena cinnibari", "categories": ["tree"], "source": "https://i.imgur.com/NhefjfV.png"},
-        {"artist": "Xaotician", "name": "Australian grass tree", "categories": ["tree"], "source": "https://i.imgur.com/C95Je1X.png"},
+        {"artist": "Xaotician", "name": "Australian grass tree", "categories": ["foliage"], "source": "https://i.imgur.com/C95Je1X.png"},
         {"artist": "Xaotician", "name": "small feathery fern", "categories": ["foliage"], "source": "https://i.imgur.com/UkOY96i.png"},
         {"artist": "Xaotician", "name": "feathery fern", "categories": ["foliage"], "source": "https://i.imgur.com/0Fml1MI.png"},
         {"artist": "Xaotician", "name": "venus flytrap", "categories": ["foliage"], "source": "https://i.imgur.com/N8Blg9w.png"},
@@ -547,6 +547,7 @@ palettes_by_category = assemble_categories("all_palettes");
 foliage_palettes_base_odds = assemble_base_odds(palettes_by_category, 2);
 foliage_palettes_base_odds["foliar"] = 5;
 foliage_palettes_base_odds["bold"] = 1;
+//foliage_palettes_base_odds["test"] = 99;
 feature_palettes_base_odds = assemble_base_odds(palettes_by_category, 2);
 feature_palettes_base_odds["earthen"] = 5;
 feature_palettes_base_odds["pastel"] = 3;
