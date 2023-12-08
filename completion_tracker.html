@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="utf-8"/>
+    <head>
+        <title>Completion Tracker</title>
+        <link rel="stylesheet" type="text/css"  href="nature.css" />
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
+        <link rel="icon" href="https://i.imgur.com/ufm0hIO.png">
+    </head>
+    <body onload="do_preload()" style="background: #201920; display:flex; flex-direction:column; justify-content:center;">
+        <a href="index.html" class="index_link"><--Home</a>
+        <h1 id="title">Completion Tracker</h1>
+        <h2 id="subtitle">View the bases you've discovered! Refresh to see a new color scheme (drawn from palettes you've discovered)</h2>
+          <div id="content_div" class='center-parent' style="text-align: center; width: 95%">
+          </div>
+    </body>
+    <script src="built/gen_plant.js"></script>
+    <script src="built/bingo.js"></script>
+    <script src="built/shared.js"></script>
+    <script type="text/javascript">
+
+        owned_bases = new Set();
+        owned_palettes = new Set();
+        seed_list = getSeedCollection();
+        for(seed of seed_list){
+            let seed_data = decode_plant_data(seed);
+            owned_bases.add(seed_data["foliage"]);
+            owned_palettes.add(seed_data["foliage_palette"]);
+            owned_palettes.add(seed_data["feature_palette"]);
+            owned_palettes.add(seed_data["accent_palette"]);
+        }
+        let selected_palettes = [4, 14, 40];
+        let owned_palettes_list = Array.from(owned_palettes);
+        selected_palettes[0] = owned_palettes_list[Math.floor(Math.random()*owned_palettes_list.length)];
+        selected_palettes[1] = owned_palettes_list[Math.floor(Math.random()*owned_palettes_list.length)];
+        selected_palettes[2] = owned_palettes_list[Math.floor(Math.random()*owned_palettes_list.length)];
+        console.log(selected_palettes);
+
+        for(name of Object.keys(foliage_by_category)){
+            console.log(name + ": " + foliage_by_category[name].length);
+        }
+
+        async function gen_divs() {
+            let parent = document.getElementById("content_div");
+            for(category of Object.keys(foliage_by_category)){
+                let new_row = document.createElement('div');
+                let row_heading = document.createElement('h3');
+                new_row.className = "collection_display";
+                row_heading.textContent = category;
+                parent.appendChild(row_heading);
+                parent.appendChild(new_row);
+                for(let j=0; j<foliage_by_category[category].length; j++){
+                    let id = category + "_" + j;
+                    await add_swap_square(new_row, j, id, foliage_by_category[category][j]);
+                }
+            }
+        }
+
+        // Largely similar to bingo squares
+        async function add_swap_square(parent, column_offset, id, base_to_use){
+            let swap_square = document.createElement('div');
+            swap_square.id = id;
+            swap_square.className = 'bingo_box';
+            swap_square.style.display = "inline";  // to align the label
+            swap_square.style.borderStyle = "none";
+            swap_square.style.marginBottom = "5px;"
+            let plant_data = gen_plant_data(0);
+            let data_url = 'https://i.imgur.com/QhY0vOF.png';
+            if(owned_bases.has(base_to_use)){
+                plant_data["foliage"] = base_to_use;
+                console.log(selected_palettes);
+                plant_data["foliage_palette"] = selected_palettes[0];
+                plant_data["feature_palette"] = selected_palettes[1];
+                plant_data["accent_palette"] = selected_palettes[2];
+                let seed = encode_plant_data_v2(plant_data);
+                data_url = await drawPlantForSquare(seed);
+            }
+            swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
+            parent.appendChild(swap_square);
+            return id;
+        }
+
+        /**        async function add_swap_square(parent, column_offset, id, price, day, previously_claimed){
+            let swap_square = document.createElement('div');
+            swap_square.id = id;
+            swap_square.className = 'bingo_box';
+            if(!previously_claimed){
+                swap_square.addEventListener("click", claim_swap);
+                swap_square.addEventListener('touchend', function(e){
+                        claim_swap(e);
+                        e.preventDefault();
+                    })
+            }
+            swap_square.setAttribute("data-price", price);
+            swap_square.style.display = "inline";  // to align the label
+            let plant_data = gen_plant_data(0);
+            plant_data["foliage"] = 105;
+            let seed = encode_plant_data_v2(plant_data);
+            let data_url = await drawPlantForSquare(seed);
+            swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
+            swappable_seeds[id] = seed;
+            parent.appendChild(swap_square);
+            return id;
+        }**/
+
+        function mark_swap_claimed(id){
+            var bingo_square = document.getElementById(id);
+            bingo_square.style.opacity = 0.2;  // Make label translucent
+            bingo_square.innerHTML = "Claimed!";
+            bingo_square = bingo_square.cloneNode(true);  // Kill the event listeners
+        }
+
+        async function claim_swap(e){
+            var id = e.target.id;
+            var price = e.target.getAttribute("data-price");
+            let seed_points = getSeedPoints();
+            if(swapped_seeds.indexOf(swappable_seeds[id]) == -1 && seed_points >= price){
+                mark_swap_claimed(id);
+                swapped_seeds.push(swappable_seeds[id]);
+                document.getElementById("seeds_earned").innerHTML = swapped_seeds.join(", ");
+                collectSeed(swappable_seeds[id]);
+            }
+        }
+
+        async function do_preload() {
+            await preload_plants();
+            await gen_divs();
+        }
+    </script>
+    </body>
+</html>
