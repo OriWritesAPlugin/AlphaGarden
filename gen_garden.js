@@ -77,11 +77,11 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
                }
            }
         }
+        possible_ground_palettes = {"foliage": [], "feature": [], "accent": []};
     }
     // With all the wildcards handled, proceed to drawing the actual garden.
     var canvas = document.getElementById("output_canvas");
     var ctx = canvas.getContext("2d");
-    possible_ground_palettes = {"foliage": [], "feature": [], "accent": []};
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     // What does it mean if someone changes their option for smart spacing, then scrambles?
     // Functionally it's nonsense, and no one toggles smart spacing off, so we just scramble.
