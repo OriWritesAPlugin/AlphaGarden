@@ -359,7 +359,7 @@ function assembleRewardList(size) {
             plant_data = genWithBingoModifiedSeedChances();
         }
         else {
-            plant_data = gen_plant_data(rarity, forced_random_seed);
+            plant_data = gen_plant_data(0, forced_random_seed);
         }
         reward_seeds.push(encode_plant_data_v2(plant_data));
     }
@@ -442,9 +442,20 @@ function has_bingo() {
     }
     return bingo;
 }
-function generate_board_info(size, rarity_override = null) {
+function generate_board_info(size, seed_override = null) {
     var challenges = drawChallengesForBoard(size);
-    [rewards, bingo_reward] = assembleRewardList(size);
+    if (seed_override == null) {
+        [rewards, bingo_reward] = assembleRewardList(size);
+    }
+    else {
+        rewards = [];
+        for (let i = size * size; i > 0; i--) {
+            if (i in plants_revealed_at) {
+                rewards[i] = seed_override.pop();
+            }
+        }
+        bingo_reward = seed_override.pop();
+    }
     for (var i = 0; i < size; i++) {
         current_board.push([]);
         for (var j = 0; j < size; j++) {
@@ -478,14 +489,14 @@ function draw_board() {
         document.getElementById("bingo_seed_list").innerHTML = revealed_seeds.join(", ");
     }
 }
-function generate_board(size, board_challenge_code, rarity_override = null) {
+function generate_board(size, board_challenge_code, seed_override = null) {
     plants_revealed_at = plants_revealed_at_per_size[size];
     if (board_challenge_code != current_challenge_code) {
         setAvailableChallengeListFromCode(board_challenge_code);
         current_challenge_code = board_challenge_code;
     }
     clear_board();
-    generate_board_info(size, rarity_override);
+    generate_board_info(size, seed_override);
     draw_board();
 }
 // Reveal a plant in a square (either within the board or the "bonus bingo plant"
@@ -493,12 +504,12 @@ function generate_board(size, board_challenge_code, rarity_override = null) {
 // Returns a dataURL to set as an image someplace.
 async function genSeedForSquare(forced_random_offset = 0) {
     rarity = 0;
-    if (forced_random_seed == null) {
-        plant_data = gen_plant_data(rarity);
+    if (forced_random_offset == null) {
+        plant_data = gen_plant_data(0);
     }
     else {
         // ONLY for forced_random seed generation, the bingo seed needs to increment num_plants_revealed
-        plant_data = gen_plant_data(rarity, forced_random_seed + String(num_plants_revealed + bingo_plant_generated));
+        plant_data = gen_plant_data(0, forced_random_offset + String(num_plants_revealed + bingo_plant_generated));
     }
     return encode_plant_data_v2(plant_data);
 }
