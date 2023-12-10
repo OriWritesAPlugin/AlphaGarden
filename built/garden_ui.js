@@ -1,7 +1,7 @@
 /** This module holds the UI logic for garden creation. **/
-const PROPERTIES = { "base": { "defaultPalette": "CoHC9CNzEt", "mainColor": "#FF0000", "secondColor": "#AA0000", "accentColor": "#FFAA00", "icon": "▒" },
-    "garden": { "defaultPalette": "CoHC9CNzEt", "mainColor": "#1C2121", "secondColor": "#151818", "accentColor": "#273831", "icon": "⚘" },
-    "decor": { "defaultPalette": "CoHC9CNzEt", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains", "accentColor": "#3D362B", "icon": "ꕔ" },
+const PROPERTIES = { "base": { "defaultPalette": "CunEjC0JFV", "mainColor": "#FF0000", "secondColor": "#AA0000", "accentColor": "#FFAA00", "icon": "▒" },
+    "garden": { "defaultPalette": "CunEjC0JFV", "mainColor": "#1C2121", "secondColor": "#151818", "accentColor": "#273831", "icon": "⚘" },
+    "decor": { "defaultPalette": "CunEjC0JFV", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains", "accentColor": "#3D362B", "icon": "ꕔ" },
     "overlay": { "mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "☾" },
     "celestial": { "defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "icon": "☁" } }; // old overlay: 1F191A
 class LayerDiv {
