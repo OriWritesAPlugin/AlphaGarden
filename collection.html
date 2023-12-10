@@ -101,6 +101,10 @@
       var days_since_backup;
       const backup_sp_per_day = 3;
       const max_sp_for_backup = 15;
+      var first_chunk_on_last_sort = getSeedCollectionAsString().slice(0, 50);
+      window.addEventListener("storage", () => {
+        checkIfRefreshNeeded();
+      });
 
       function doSeedOnclick(e){
         let seed = e.target.getAttribute('data-seed');
@@ -109,6 +113,12 @@
         else if (selected_function == "select"){ select_seed(seed); }
         else if (selected_function == "recycle"){ prep_recycle_seed(seed); }
         else if (selected_function == "mutate"){ prep_mutate_seed(seed); }
+      }
+
+      function checkIfRefreshNeeded(){
+        if(getSeedCollectionAsString().slice(0, 50) != first_chunk_on_last_sort){
+          display_collection();
+        }
       }
 
       function doBackup(){
@@ -437,6 +447,7 @@
       function display_collection() {
           //clear what's already in there
           cancelOngoingSort();
+          first_chunk_on_last_sort = getSeedCollectionAsString().slice(0, 50);
           sort_intervals = [];
           var collection_div = document.getElementById("collection_display_div")
           var hide_seeds = document.getElementById("hide_seeds").checked;
