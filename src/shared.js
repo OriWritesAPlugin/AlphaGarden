@@ -87,6 +87,20 @@ function getSeedCollection(){
   return collection.split(",");
 }
 
+function getGoodieCollection(){
+  if (localStorage.goodie_collection == undefined) {
+    localStorage.goodie_collection = ["nigel"];
+  }
+  return localStorage.goodie_collection.split(",");
+}
+
+function collectGoodie(goodie_name){
+  if (localStorage.goodie_collection == undefined) {
+    getGoodieCollection();  // Initialize
+  }
+  localStorage.goodie_collection = goodie_name + "," + localStorage.goodie_collection;
+}
+
 
 // Used mostly in the collection, parses a list of seeds, splitting it into named and unnamed
 function sortAndVerifySeedList(raw_list){

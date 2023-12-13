@@ -5,14 +5,57 @@
         <title>Completion Tracker</title>
         <link rel="stylesheet" type="text/css"  href="nature.css" />
         <link rel="stylesheet" type="text/css"  href="shared.css" />
-        <link rel="icon" href="https://i.imgur.com/ufm0hIO.png">
+        <link rel="icon" href="https://i.imgur.com/eAJt95n.png">
     </head>
     <body onload="do_preload()" style="background: #201920; display:flex; flex-direction:column; justify-content:center;">
         <a href="index.html" class="index_link"><--Home</a>
         <h1 id="title">Completion Tracker</h1>
-        <h2 id="subtitle">View the bases you've discovered! Refresh to see a new color scheme (drawn from palettes you've discovered)</h2>
-          <div id="content_div" class='center-parent' style="text-align: center; width: 95%">
+        <h2 id="subtitle">View a summary of everything you've collected</h2>
+        <input type="button" id="show_bases_button" class="chunky_fullwidth active" value="Bases" onclick="show_collection_category('bases')"></input>
+        <input type="button" id="show_palettes_button" class="chunky_fullwidth" value="Palettes" onclick="show_collection_category('palettes')"></input>
+        <input type="button" id="show_goodies_button" class="chunky_fullwidth" value="Goodies" onclick="show_collection_category('goodies')"></input>
+          <div id="base_div" class='center-parent' style="text-align: center; width: 95%;">
+            <div id="base_info_div" style="display: flex; width: 70%; position: relative; left: 20%">
+              <div>
+                <canvas id="palette_canvas" width=128 height=96></canvas><br>
+                <input id="reroll_bases_palette" type="button" class="chunky_fullwidth" value="Reroll" onclick="gen_base_divs(true)"></input>
+              </div>
+              <div style="margin: 15px; text-align: left">
+                <p>View the bases you've discovered! Reroll to see a new color scheme (drawn from palettes you've discovered)</p><br>
+              </div>
+            </div>
+            <div id="base_content_div"></div>
           </div>
+
+          <div id="palette_div" class='center-parent' style="text-align: center; width: 95%;" hidden>
+            <div id="palette_info_div" style="display: flex; width: 70%; position: relative; left: 20%">
+              <div>
+                <canvas id="palette_canvas_2" width=128 height=96></canvas><br>
+              </div>
+              <div style="margin: 15px; text-align: left">
+                <p>View the palettes you've discovered! Click them to build a palette for the base viewer</p><br>
+              </div>
+            </div>
+            <div id="palette_content_div"></div>
+          </div>
+          <div id="" class='center-parent' style="text-align: center; width: 95%"></div>
+
+          <div id="goodie_div" class='center-parent' style="text-align: center; width: 95%;" hidden>
+            <div id="goodie_info_div" style="display: flex; width: 70%; position: relative; left: 20%">
+              <div>
+                <canvas id="goodie_canvas" width=128 height=128></canvas><br>
+                <input id="goodie_claim_button" type="button" class="chunky_fullwidth" value="Claim" style="opacity: 0"></input>
+              </div>
+              <div style="margin: 15px; text-align: left">
+                <span id="goodie_name"></span><br><br>
+                <span id="goodie_desc">View your collection of goodies! Click them to show info and unlock them. You can use them as seeds in gardens by putting a ! before their name (ex: !nigel)</span><br><br>
+                <span id="goodie_earn"></span><br><br>
+                <span id="goodie_cost"></span><br>
+              </div>
+            </div>
+            <div id="goodie_content_div"></div>
+          </div>
+          <div id="" class='center-parent' style="text-align: center; width: 95%"></div>
     </body>
     <script src="built/gen_plant.js"></script>
     <script src="built/bingo.js"></script>
@@ -31,29 +74,107 @@
         }
         let selected_palettes = [4, 14, 40];
         let owned_palettes_list = Array.from(owned_palettes);
-        selected_palettes[0] = owned_palettes_list[Math.floor(Math.random()*owned_palettes_list.length)];
-        selected_palettes[1] = owned_palettes_list[Math.floor(Math.random()*owned_palettes_list.length)];
-        selected_palettes[2] = owned_palettes_list[Math.floor(Math.random()*owned_palettes_list.length)];
-        console.log(selected_palettes);
 
-        for(name of Object.keys(foliage_by_category)){
-            console.log(name + ": " + foliage_by_category[name].length);
+        function randomizeSelectedPalettes(){
+          selected_palettes[0] = owned_palettes_list[Math.floor(Math.random()*owned_palettes_list.length)];
+          selected_palettes[1] = owned_palettes_list[Math.floor(Math.random()*owned_palettes_list.length)];
+          selected_palettes[2] = owned_palettes_list[Math.floor(Math.random()*owned_palettes_list.length)];
+        }
+        randomizeSelectedPalettes();
+
+        async function gen_base_divs(reroll_palettes=false) {
+          if(reroll_palettes){
+            randomizeSelectedPalettes();
+          }
+          let parent = document.getElementById("base_content_div");
+          parent.innerHTML = "";
+          for(category of Object.keys(foliage_by_category)){
+              let new_row = document.createElement('div');
+              let row_heading = document.createElement('h3');
+              new_row.className = "collection_display";
+              row_heading.textContent = category;
+              parent.appendChild(row_heading);
+              parent.appendChild(new_row);
+              for(let j=0; j<foliage_by_category[category].length; j++){
+                  let id = category + "_" + j;
+                  await add_swap_square(new_row, j, id, foliage_by_category[category][j]);
+              }
+          }
+          drawPalettePreview("palette_canvas");
         }
 
-        async function gen_divs() {
-            let parent = document.getElementById("content_div");
-            for(category of Object.keys(foliage_by_category)){
-                let new_row = document.createElement('div');
-                let row_heading = document.createElement('h3');
-                new_row.className = "collection_display";
-                row_heading.textContent = category;
-                parent.appendChild(row_heading);
-                parent.appendChild(new_row);
-                for(let j=0; j<foliage_by_category[category].length; j++){
-                    let id = category + "_" + j;
-                    await add_swap_square(new_row, j, id, foliage_by_category[category][j]);
-                }
+        function drawPalettePreview(id) {
+          canvas = document.getElementById(id);
+          ctx = canvas.getContext("2d");
+          var img=new Image();
+          img.src="https://i.imgur.com/rSLWUqw.png";  // palette preview image
+          img.crossOrigin = "anonymous"
+          img.onload = function() {
+              ctx.imageSmoothingEnabled= false
+              ctx.scale(2,2);
+              ctx.drawImage(img, 0, 0);
+              var new_overall_palette = all_palettes[selected_palettes[0]]["palette"].concat(all_palettes[selected_palettes[2]]["palette"]).concat(all_palettes[selected_palettes[1]]["palette"]);
+              replace_color_palette(overall_palette, new_overall_palette, ctx, 128, 96);
+              ctx.scale(0.5,0.5);
+          };
+        }
+
+
+        async function gen_palette_divs() {
+          let parent = document.getElementById("palette_content_div");
+          parent.innerHTML = '';
+          for(category of Object.keys(palettes_by_category)){
+            let new_row = document.createElement('div');
+            let row_heading = document.createElement('h3');
+            new_row.className = "collection_display";
+            new_row.style.gridTemplateColumns = "repeat(auto-fill, minmax(100px, max-content))";
+            row_heading.textContent = category;
+            parent.appendChild(row_heading);
+            parent.appendChild(new_row);
+            for(let i=0; i<palettes_by_category[category].length; i++){
+              //let palette = all_palettes[horrid_list[i][1]]["palette"];
+              let palette_redirect = palettes_by_category[category][i];
+              addPalette(new_row, palette_redirect);
             }
+            drawPalettePreview("palette_canvas_2");
+          }
+        }
+
+
+        async function gen_goodie_divs() {
+          goodieCollection = new Set(getGoodieCollection());
+          let parent = document.getElementById("goodie_content_div");
+          parent.innerHTML = '';
+          let completion_row = document.createElement('div');
+          completion_row.className = "collection_display";
+          completion_row.style.gridTemplateColumns = "repeat(auto-fill, minmax(100px, max-content))";
+
+          let buy_row = document.createElement('div');
+          buy_row.className = "collection_display";
+          buy_row.style.gridTemplateColumns = "repeat(auto-fill, minmax(100px, max-content))";
+
+          buy_explanation = document.createElement('h3');
+          buy_explanation.innerHTML = "Items below this text don't count towards completion percentage"
+
+          completion = new Set();
+          buy = new Set();
+          for(name of Object.keys(reformatted_named)){
+            if(Object.hasOwn(reformatted_named[name], "earn")){
+              completion.add(name);
+            } else if (Object.hasOwn(reformatted_named[name], "buy")) {
+              buy.add(name);
+            }
+          }
+
+          parent.appendChild(completion_row);
+          parent.appendChild(buy_explanation);
+          parent.appendChild(buy_row);
+          for(name of completion){
+            add_goodie_square(completion_row, name);
+          }
+          for(name of buy){
+            add_goodie_square(buy_row, name);
+          }
         }
 
         // Largely similar to bingo squares
@@ -68,7 +189,6 @@
             let data_url = 'https://i.imgur.com/QhY0vOF.png';
             if(owned_bases.has(base_to_use)){
                 plant_data["foliage"] = base_to_use;
-                console.log(selected_palettes);
                 plant_data["foliage_palette"] = selected_palettes[0];
                 plant_data["feature_palette"] = selected_palettes[1];
                 plant_data["accent_palette"] = selected_palettes[2];
@@ -80,52 +200,176 @@
             return id;
         }
 
-        /**        async function add_swap_square(parent, column_offset, id, price, day, previously_claimed){
-            let swap_square = document.createElement('div');
-            swap_square.id = id;
-            swap_square.className = 'bingo_box';
-            if(!previously_claimed){
-                swap_square.addEventListener("click", claim_swap);
-                swap_square.addEventListener('touchend', function(e){
-                        claim_swap(e);
-                        e.preventDefault();
-                    })
+        // Largely similar to bingo squares
+        async function add_goodie_square(parent, name){
+            let goodie_square = document.createElement('div');
+            goodie_square.id = name+"_goodie_square";
+            goodie_square.className = 'bingo_box';
+            goodie_square.style.display = "inline";  // to align the label
+            goodie_square.style.borderStyle = "none";
+            goodie_square.style.marginBottom = "5px;"
+            let work_canvas = await gen_named(name);
+            let canvas = document.createElement("canvas");
+            canvas.width = 96;
+            canvas.height = 96;
+            scale_ctx = canvas.getContext("2d");
+            scale_ctx.imageSmoothingEnabled = false;
+            scale_ctx.drawImage(work_canvas, 0, 0, 96, 96);
+            goodie_square.style.background = 'url(' + canvas.toDataURL() + ')  no-repeat center center';
+            if(!goodieCollection.has(name)){
+              goodie_square.style.opacity = 0.15;
             }
-            swap_square.setAttribute("data-price", price);
-            swap_square.style.display = "inline";  // to align the label
-            let plant_data = gen_plant_data(0);
-            plant_data["foliage"] = 105;
-            let seed = encode_plant_data_v2(plant_data);
-            let data_url = await drawPlantForSquare(seed);
-            swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
-            swappable_seeds[id] = seed;
-            parent.appendChild(swap_square);
-            return id;
-        }**/
-
-        function mark_swap_claimed(id){
-            var bingo_square = document.getElementById(id);
-            bingo_square.style.opacity = 0.2;  // Make label translucent
-            bingo_square.innerHTML = "Claimed!";
-            bingo_square = bingo_square.cloneNode(true);  // Kill the event listeners
+            goodie_square.onclick = function(){setGoodieDisplay(name)};
+            parent.appendChild(goodie_square);
         }
 
-        async function claim_swap(e){
-            var id = e.target.id;
-            var price = e.target.getAttribute("data-price");
-            let seed_points = getSeedPoints();
-            if(swapped_seeds.indexOf(swappable_seeds[id]) == -1 && seed_points >= price){
-                mark_swap_claimed(id);
-                swapped_seeds.push(swappable_seeds[id]);
-                document.getElementById("seeds_earned").innerHTML = swapped_seeds.join(", ");
-                collectSeed(swappable_seeds[id]);
+        async function setGoodieDisplay(goodie_name){
+          info = reformatted_named[goodie_name];
+          document.getElementById("goodie_name").innerHTML = "Name: " + goodie_name;
+          document.getElementById("goodie_desc").innerHTML = "<i>"+info["desc"];
+          if(Object.hasOwn(info, "buy")) {
+            document.getElementById("goodie_cost").innerHTML = "Buy: " + info["buy"];
+          } else {
+            document.getElementById("goodie_cost").innerHTML = "";
+          }
+          if(Object.hasOwn(info, "earn")) {
+            if(info["earn"] == "Conservation set"){
+              document.getElementById("goodie_earn").innerHTML = "Earn: This item's part of the conservation set, go <a href=conservation_set.html>here</a> to learn how to earn them!"
+            } else {
+              document.getElementById("goodie_earn").innerHTML = "Earn: " + info["earn"];
             }
+          } else {
+            document.getElementById("goodie_earn").innerHTML = "";
+          }
+          // Comedy
+          if(goodieCollection.has(goodie_name)){
+            document.getElementById("goodie_claim_button").style.opacity = 0;
+            document.getElementById("goodie_claim_button").onclick = function(){return};
+          } else {
+            document.getElementById("goodie_claim_button").style.opacity = 1;
+            document.getElementById("goodie_claim_button").onclick = claim_selected_goodie;
+          }
+          let work_canvas = await gen_named(goodie_name);
+          let canvas = document.getElementById("goodie_canvas");
+          canvas.width = 128;
+          canvas.height = 128;
+          scale_ctx.clearRect(0, 0, 128, 128);
+          scale_ctx = canvas.getContext("2d");
+          scale_ctx.imageSmoothingEnabled = false;
+          scale_ctx.drawImage(work_canvas, 0, 0, 128, 128);
+        }
+
+        function show_collection_category(to_reveal){
+          bases = document.getElementById("base_div");
+          palettes = document.getElementById("palette_div");
+          goodies = document.getElementById("goodie_div");
+          bases_button = document.getElementById("show_bases_button");
+          palettes_button = document.getElementById("show_palettes_button");
+          goodies_button = document.getElementById("show_goodies_button");
+          bases.setAttribute("hidden", "hidden");
+          palettes.setAttribute("hidden", "hidden");
+          goodies.setAttribute("hidden", "hidden");
+          bases_button.classList.remove("active");
+          palettes_button.classList.remove("active");
+          goodies_button.classList.remove("active");
+          if(to_reveal == "bases"){
+            gen_base_divs();
+            bases.removeAttribute("hidden");
+            bases_button.classList.add("active");
+          } else if(to_reveal == "palettes"){
+            gen_palette_divs();
+            palettes.removeAttribute("hidden");
+            palettes_button.classList.add("active");
+          } else {
+            gen_goodie_divs();
+            goodies.removeAttribute("hidden");
+            goodies_button.classList.add("active");
+          }
         }
 
         async function do_preload() {
             await preload_plants();
-            await gen_divs();
+            await gen_base_divs();
+            preload_named();
         }
+
+      function addPalette(parent, palette_redirect){
+        let palette_div = document.createElement("div");
+        palette_div.style.width = "100px";
+        palette_div.style.height = "25px";
+        data_url = "https://i.imgur.com/Hh8Nmck.png"
+        if(owned_palettes.has(palette_redirect)){
+            let palette = all_palettes[palette_redirect]["palette"];
+            canvas = document.createElement("canvas");
+            canvas.width = 100;
+            canvas.height = 25;
+            canvas.background = "#FFFFFF";
+            let ctx = canvas.getContext("2d");
+            for(let i=0; i<4; i++){
+            ctx.fillStyle = "#"+palette[i];
+            ctx.fillRect(25*i, 0, 25+25*i, 25);
+            }
+            data_url = canvas.toDataURL();
+            palette_div.onclick = function() {
+              selected_palettes.unshift(palette_redirect);
+              selected_palettes.pop();
+              drawPalettePreview("palette_canvas_2");
+            }
+        }
+        palette_div.style.background = 'url(' + data_url + ')  no-repeat center center';
+        parent.appendChild(palette_div);
+      }
+
+      function regenWithPalette(palette){
+        seeds = gm.activeGardenDiv.layer.seedList;
+        for(let i=0; i<seeds.length; i++){
+          let seed = seeds[i];
+          let percent_pos = seed.indexOf('%');
+          percent_val = "";
+          if(percent_pos > 0){
+            percent_val = seed.slice(percent_pos );
+            seed = seed.slice(0, percent_pos);
+          }
+          let data = decode_plant_data(seed);
+          data["foliage_palette"] = palette;
+          data["feature_palette"] = palette;
+          data["accent_palette"] = palette;
+          seeds[i] = encode_plant_data_v2(data) + percent_val;
+        }
+        tintedRegen(seeds);
+      }
+
+      function claim_selected_goodie(){
+        goodie_name = document.getElementById("goodie_name").innerHTML.split(" ")[1];
+        collectGoodie(goodie_name);
+        setGoodieDisplay(goodie_name, true);
+        document.getElementById(goodie_name+"_goodie_square").style.opacity = 1;
+        document.getElementById("goodie_claim_button").style.opacity = 0;
+        document.getElementById("goodie_claim_button").onclick = function(){return;}
+
+        goodieCollection = new Set(getGoodieCollection());
+      }
+
+      /**document.getElementById("palette_text").addEventListener('click', function(){
+        palette = document.getElementById("palette_text");
+        redirect = palette.getAttribute("data-offset");
+        new_palette = palette.value.split(",");
+        all_palettes[redirect]["palette"] = new_palette;
+        setPalette(document.getElementById("palette_"+redirect), new_palette);
+        regenWithPalette(redirect);
+      });**/
+
+      function tintedRegen(seed_list){
+        gm.setHeight(parseInt(document.getElementById("garden_height").value));
+        gm.setWidth(parseInt(document.getElementById("garden_width").value));
+        gm.regenActiveGarden(seed_list.toString());
+      }
+
+      function doThisRegen(){
+        gm.setHeight(parseInt(document.getElementById("garden_height").value));
+        gm.setWidth(parseInt(document.getElementById("garden_width").value));
+        gm.regenActiveGarden(document.getElementById("seed_list").value);
+      }     
     </script>
     </body>
 </html>
