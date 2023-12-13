@@ -48,6 +48,7 @@
               </div>
               <div style="margin: 15px; text-align: left">
                 <span id="goodie_name"></span><br><br>
+                <span id="goodie_artist"></span><br><br>
                 <span id="goodie_desc">View your collection of goodies! Click them to show info and unlock them. You can use them as seeds in gardens by putting a ! before their name (ex: !nigel)</span><br><br>
                 <span id="goodie_earn"></span><br><br>
                 <span id="goodie_cost"></span><br>
@@ -226,6 +227,7 @@
         async function setGoodieDisplay(goodie_name){
           info = reformatted_named[goodie_name];
           document.getElementById("goodie_name").innerHTML = "Name: " + goodie_name;
+          document.getElementById("goodie_artist").innerHTML = "Artist: " + info["artist"];
           document.getElementById("goodie_desc").innerHTML = "<i>"+info["desc"];
           if(Object.hasOwn(info, "buy")) {
             document.getElementById("goodie_cost").innerHTML = "Buy: " + info["buy"];
