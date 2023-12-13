@@ -128,9 +128,12 @@
         let d = new Date();
         a.download = "seed_collection_" + new Date().toJSON().slice(0,10) + ".txt";
         a.click();
-        addSeedPoints(Math.min(days_since_backup * backup_sp_per_day, max_sp_for_backup));
-        updateSeedPoints();
-        localStorage["last_backup"] = new Date();
+        let rewarded_points = Math.min(days_since_backup * backup_sp_per_day, max_sp_for_backup);
+        if(rewarded_points > 0){
+          addSeedPoints(rewarded_points);
+          updateSeedPoints();
+          localStorage["last_backup"] = new Date();
+        }
         document.getElementById("backup_button").value="Backup";
       }
 
