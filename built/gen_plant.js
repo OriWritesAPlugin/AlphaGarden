@@ -181,16 +181,21 @@ var all_foliage = [
     { "artist": "Oranitha", "name": "chaos kelp", "categories": ["aquatic"], "source": "https://i.imgur.com/pn3p8UY.png" },
     { "artist": "Oranitha", "name": "orb cluster", "categories": ["construct"], "source": "https://i.imgur.com/kyORogL.png" },
     { "artist": "Oranitha", "name": "alien cactus", "categories": ["succulent"], "source": "https://i.imgur.com/LlmBQcI.png" },
-    { "artist": "Rat & Reaver of the Bearskull collective", "name": "grand geode", "categories": ["rock"], "source": "https://i.imgur.com/IcEfMHF.png" },
-    { "artist": "Rat & Reaver of the Bearskull collective", "name": "deep geode", "categories": ["rock"], "source": "https://i.imgur.com/cbnv85f.png" },
-    { "artist": "Oranitha", "name": "I AM ERROR", "categories": [], "source": "https://i.imgur.com/U1qlGFl.png" } /**,
-    {"artist": "Oranitha", "name": "century plant", "categories": ["succulent"], "source": "https://i.imgur.com/haldzXm.png"},
-    {"artist": "Oranitha", "name": "cairn", "categories": ["rock"], "source": "https://i.imgur.com/ek1pZLj.png"},
-    {"artist": "Oranitha", "name": "pointed stone", "categories": ["rock"], "source": "https://i.imgur.com/KsXLcP0.png"},
-    {"artist": "RedRevival", "name": "god's head vachellia", "categories": ["tree"], "source": "https://i.imgur.com/LQI1nOE.png"},
-    {"artist": "RedRevival", "name": "fluffy reed", "categories": ["grass"], "source": "https://i.imgur.com/DmmYJoM.png"},
-    {"artist": "RedRevival", "name": "mandragora", "categories": ["flower"], "source": "https://i.imgur.com/LDcdn0f.png"},
-    {"artist": "Oranitha", "name": "angled rock", "categories": ["rock"], "source": "https://i.imgur.com/qjFXwnr.png"}**/
+    { "artist": "Rat & Reaver of the Felspring collective", "name": "grand geode", "categories": ["rock"], "source": "https://i.imgur.com/IcEfMHF.png" },
+    { "artist": "Rat & Reaver of the Felspring collective", "name": "deep geode", "categories": ["rock"], "source": "https://i.imgur.com/cbnv85f.png" },
+    { "artist": "Oranitha", "name": "I AM ERROR", "categories": [], "source": "https://i.imgur.com/U1qlGFl.png" },
+    { "artist": "Oranitha", "name": "century plant", "categories": [], "source": "https://i.imgur.com/haldzXm.png" },
+    { "artist": "Oranitha", "name": "cairn", "categories": [], "source": "https://i.imgur.com/ek1pZLj.png" },
+    { "artist": "Oranitha", "name": "pointed stone", "categories": [], "source": "https://i.imgur.com/KsXLcP0.png" },
+    { "artist": "RedRevival", "name": "god's head vachellia", "categories": ["tree"], "source": "https://i.imgur.com/LQI1nOE.png" },
+    { "artist": "RedRevival", "name": "fluffy reed", "categories": ["grass"], "source": "https://i.imgur.com/DmmYJoM.png" },
+    { "artist": "RedRevival", "name": "mandragora", "categories": ["flower"], "source": "https://i.imgur.com/LDcdn0f.png" },
+    { "artist": "Oranitha", "name": "angled rock", "categories": [], "source": "https://i.imgur.com/qjFXwnr.png" },
+    { "artist": "Rat & Reaver of the Felspring collective", "name": "tall corn", "categories": ["foliage"], "source": "https://i.imgur.com/xXVUKvX.png" },
+    { "artist": "Rat & Reaver of the Felspring collective", "name": "whimsymelon", "categories": ["foliage"], "source": "https://i.imgur.com/bykT82i.png" },
+    { "artist": "AngryMothNoises", "name": "potted eel", "categories": ["aquatic"], "source": "https://i.imgur.com/aqBx6RF.png" },
+    { "artist": "AngryMothNoises", "name": "hydrangea", "categories": ["shrub"], "source": "https://i.imgur.com/bznTRSu.png" },
+    { "artist": "Oranitha", "name": "umbrella chanterelle", "categories": [], "source": "https://i.imgur.com/QOQfk9O.png" }
 ];
 // END all_foliage
 // The above marker and similar are used to make Python automation easier, I use it to build fresh spritesheets without needing to
@@ -413,7 +418,7 @@ var reformatted_named = {
 };
 // END reformatted_named
 var FOLIAGE_SPRITESHEET = "https://raw.githubusercontent.com/OriWritesAPlugin/AlphaGarden/master/images/all_foliage.png";
-FOLIAGE_SPRITESHEET = "https://i.imgur.com/eAdirFB.png";
+//FOLIAGE_SPRITESHEET = "https://i.imgur.com/P18j0kW.png";
 var NAMED_SPRITESHEET = "https://raw.githubusercontent.com/OriWritesAPlugin/AlphaGarden/master/images/reformatted_named.png";
 override_foliage = [];
 temp_boost_foliage = [];

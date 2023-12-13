@@ -40,7 +40,7 @@ Note: plant numbers are 0-indexed to correspond to encoded plant info
 
 Xaotician: Saguaro (64), baobab (72), acacia (73), mini acacia (74), giant echinacea (75), summon chaos groundcover (81), branching flower shrub (82), tilted spotted mushroom (83), desert rose (86), desert rose (wild) (87), barrel cactus (88), dracaena cinnibari (89), Australian grass tree (90), feathery ferns (91, 92), venus flytrap (93), fallen log (94), trellis (95), planting bench (96), giant candle (100), giant ink cap (106), potted plant with summoned flowers (107), viney arch (147), feral bonsai (151)
 
-RedRevival: Giant gem tree (65), giant tree (67), berry bush (76), prickly pears (84, 85), bluebell (99), showy oxytropis (139), organ pipe cactus (148)
+RedRevival: Giant gem tree (65), giant tree (67), berry bush (76), prickly pears (84, 85), bluebell (99), showy oxytropis (139), organ pipe cactus (148), god's head vachellia (164), fluffy reed (165), mandragora (166)
 
 FoxyCipher: Bleeding heart (101)
 
@@ -52,7 +52,9 @@ Frigate: Waving pennant (149)
 
 HurricaneWinds: Lupine (150)
 
-Rat & Reaver of the Bearskull Collective: grand geode (158), deep geode (159)
+Rat & Reaver of the Felspring Collective: grand geode (158), deep geode (159), tall corn (168), whimsymelon (169)
+
+AngryMothNoises: potted eel (170), hydrangea (171)
 
 
 Other Assets
