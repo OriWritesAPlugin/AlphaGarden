@@ -88,7 +88,11 @@ all_foliage = ["https://i.imgur.com/PabdLnL.png", "https://i.imgur.com/WN2m2Aa.p
             
                "https://i.imgur.com/mrELvLA.png",  "https://i.imgur.com/okGXTzn.png", "https://i.imgur.com/nLv8jTq.png",
                "https://i.imgur.com/pn3p8UY.png", "https://i.imgur.com/kyORogL.png", "https://i.imgur.com/LlmBQcI.png",
-               "https://i.imgur.com/IcEfMHF.png", "https://i.imgur.com/cbnv85f.png", "https://i.imgur.com/U1qlGFl.png"];
+               "https://i.imgur.com/IcEfMHF.png", "https://i.imgur.com/cbnv85f.png", "https://i.imgur.com/U1qlGFl.png",
+               "https://i.imgur.com/haldzXm.png", "https://i.imgur.com/ek1pZLj.png", "https://i.imgur.com/KsXLcP0.png",
+               "https://i.imgur.com/LQI1nOE.png", "https://i.imgur.com/DmmYJoM.png", "https://i.imgur.com/LDcdn0f.png",
+               "https://i.imgur.com/qjFXwnr.png", "https://i.imgur.com/xXVUKvX.png", "https://i.imgur.com/bykT82i.png",
+               "https://i.imgur.com/aqBx6RF.png", "https://i.imgur.com/bznTRSu.png", "https://i.imgur.com/QOQfk9O.png"];
 
 var all_named = {"nigel": "https://i.imgur.com/zYolkmE.png", "vine_supporter": "https://i.imgur.com/72uDqMq.png", "root_supporter": "https://i.imgur.com/y9eN0Ae.png",
              "bone_supporter": "https://i.imgur.com/EzL4aw0.png", "stone_supporter": "https://i.imgur.com/xyB8zjm.png",
