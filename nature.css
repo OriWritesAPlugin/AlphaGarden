@@ -1,12 +1,6 @@
 @charset "utf-8";
 body {
-    font-size: 2vh;
-    font-family: sans-serif;
-    color: #FFFFFF;
-    background: #134e5e; /* fallback for old browsers */
-    background: linear-gradient(to right, #093028, #227251); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     line-height: 1.2;
-    background-color: #441100;
     min-width: 550px;
     background-attachment: fixed;
     /* transition: background 0.5s linear; // horrible white flash of death, why*/ 
@@ -26,11 +20,6 @@ a {
     margin: 0 auto;
 }
 
-.inline-flex-parent {
-    display: inline-flex;
-    width: 80%;
-}
-
 #inline-spacer-div {
     width: 3%;
 }
@@ -47,8 +36,8 @@ a {
     justify-content: center;
     flex-direction:column;
     text-align:center;
-    width: 12vh;
-    height: 12vh;
+    width: 7rem;
+    height: 7rem;
     min-width: 75px;
     min-height: 75px;
     border-color: #71b280;

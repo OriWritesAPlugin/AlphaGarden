@@ -12,13 +12,14 @@
         <div class='center-parent'>
           <label id="smaller-title"><b>Coli Bingo</b></label>
           <br>
-          <div class='inline-flex-parent' style="text-align: center; align-content: center; justify-content: center; width:auto" id="settings_div"></div>
+          <div class='inline-flex-parent' style="justify-content: center" id="settings_div"></div>
           <p id="bingo_seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> earned yet!</p>
         </div>
         <div id="board_div" class='center-parent'></div>
-        <div class='center-parent'><br><span id="bingo_hint" style="margin: 10px;"></span></div>
+        <!-- Custom styling on the bingo_hint is to make squares_til_seed visible on high zooms-->
+        <div class='center-parent' style="min-height: 4rem"><br><span id="bingo_hint" style="margin: 10px;"></span></div>
         <div id="bingo_plant_container_div" class='center-parent'><div id=bingo_plant_div class=bingo_plant_box></div>Congratulations!</div>
-        <span id="squares_til_seed" style="position: fixed; right: 1%; bottom: 1%" hidden>Squares til the next plant:</span>
+        <span id="squares_til_seed" style="position: fixed; right: 1%; bottom: 1%;" hidden>Squares til the next plant:</span>
     </body>
     <script src="built/gen_plant.js"></script>
     <script src="built/bingo.js"></script>
@@ -195,6 +196,7 @@
         document.body.appendChild(modal);
         let header = document.createElement("h2");
         header.textContent = "Bingo Configuration";
+        header.style.textAlign = "center";
         modal_display.appendChild(header);
         side_by_side_div = document.createElement("div");
         side_by_side_div.classList.add("side-by-side");
@@ -246,11 +248,13 @@
 
         let button_container = document.createElement("div");
         button_container.style.padding = "20px";
-        button_container.style.width = "50%";
+        button_container.style.display = "flex";
+        button_container.style.justifyContent = "center";
         let accept_button = document.createElement("input");
         accept_button.type = "button";
         accept_button.onclick = function() {completeSetup(); document.body.removeChild(modal);};
         accept_button.value = "Accept";
+        accept_button.style.width = "50%";
         accept_button.id = "settings_accept_button";
         accept_button.classList.add("chunky_fullwidth");
         button_container.appendChild(accept_button);

@@ -59,16 +59,16 @@
         modal = document.createElement("div");
         modal.classList.add("bingo-popup");
         modal.style.padding = "2vh";
+        modal.style.textAlign = "center";
         explanatory_text = document.createElement("span");
         explanatory_text.id = "explanatory_text";
         grid = document.createElement("div");
-        grid.classList.add("collection_display");
-        grid.style.maxWidth = "500px";
+        grid.id = "self_care_plant_selector";
         for(let i=0; i<choose_from; i++){
             await add_self_care_square(grid, i);
         }
-        grid.style.marginTop = "2vh";
-        grid.style.marginBottom = "2vh";
+        button_container = document.createElement("div");
+        button_container.classList.add("center-what-i-hold");
         accept_button = document.createElement("input");
         accept_button.type = "button";
         accept_button.value = "Ready!";
@@ -79,7 +79,8 @@
         accept_button.classList.add("chunky_wrap");
         modal.appendChild(explanatory_text);
         modal.appendChild(grid);
-        modal.appendChild(accept_button);
+        button_container.appendChild(accept_button);
+        modal.appendChild(button_container);
         document.body.appendChild(modal);
         update_remaining();
     }
