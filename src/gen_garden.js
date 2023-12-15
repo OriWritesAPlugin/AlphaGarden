@@ -10,7 +10,7 @@ const available_ground_base = {"grass": "https://i.imgur.com/lUDZfla.png",
                                "chunky dirt": "https://i.imgur.com/Q5WSQ4g.png", "glossy": "https://i.imgur.com/JNt11PZ.png",
                                "gravel": "https://i.imgur.com/kKLKBFO.png", "none": "https://i.imgur.com/Hq3VDgi.png",
                                "cracked": "https://i.imgur.com/dHWuGGN.png", "clumpy dirt": "https://i.imgur.com/MsIbnoa.png",
-                               "brick": "https://i.imgur.com/coV4D2G.png"};
+                               "brick": "https://i.imgur.com/coV4D2G.png", "muck": "https://i.imgur.com/i197DEJ.png"};
 const available_overlay_colors = {"blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
                                   "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2"}
 // REMEMBER: TOP DOWN
@@ -37,7 +37,9 @@ const available_midgrounds = {"none": {},
                               "tall_trunks": {"bottom": "https://i.imgur.com/zAN3vHZ.png", "middle": "https://i.imgur.com/zAN3vHZ.png"},
                               "cavern": {"bottom": "https://i.imgur.com/7SArM0E.png", "top": "https://i.imgur.com/goBTb7l.png"},
                               "hills": {"bottom": "https://i.imgur.com/AQrEUqZ.png"},
-                              "mountains": {"bottom": "https://i.imgur.com/gD89HDc.png"}};
+                              "mountains": {"bottom": "https://i.imgur.com/gD89HDc.png"},
+                              "vines": {"top": "https://i.imgur.com/Rqu0SKM.png"},
+                              "waterfall": {"bottom": "https://i.imgur.com/7x4BfQZ.png", "middle": "https://i.imgur.com/7x4BfQZ.png", "top": "https://i.imgur.com/Xs2MviO.png"}};
 
 // TODO: merge available_ground into this once I do the UI refactor.
 const available_tileables = available_midgrounds;

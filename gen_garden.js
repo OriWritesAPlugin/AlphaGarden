@@ -31,7 +31,9 @@ const available_midgrounds = {"none": {},
                               "tall_trunks": {"bottom": "https://i.imgur.com/zAN3vHZ.png", "middle": "https://i.imgur.com/zAN3vHZ.png"},
                               "cavern": {"bottom": "https://i.imgur.com/7SArM0E.png", "top": "https://i.imgur.com/goBTb7l.png"},
                               "hills": {"bottom": "https://i.imgur.com/AQrEUqZ.png"},
-                              "mountains": {"bottom": "https://i.imgur.com/gD89HDc.png"}};
+                              "mountains": {"bottom": "https://i.imgur.com/gD89HDc.png"},
+                              "vines": {"top": "https://i.imgur.com/Rqu0SKM.png"},
+                              "waterfall": {"bottom": "https://i.imgur.com/7x4BfQZ.png", "middle": "https://i.imgur.com/7x4BfQZ.png"}};
 
 // TODO: merge available_ground into this once I do the UI refactor.
 const available_tileables = available_midgrounds;
