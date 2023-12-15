@@ -90,6 +90,7 @@
             </div>
         </div>
       </body>
+    <script src="built/data.js"></script>
     <script src="built/gen_plant.js"></script>
     <script src="built/gen_garden.js"></script>
     <script src="built/shared.js"></script>
@@ -473,7 +474,8 @@
           //var collection_width_elem = document.getElementsByName('collection_width');
           document.getElementById("title").title = "You have " + collection.length + " seeds and " + getSeedPoints() + " raw seedstuff!";
           for(var i=0; i<collection.length; i++){
-              sort_intervals.push(setTimeout(add_collection_entry, i, collection_div, i, collection[i], hide_seeds, show_palettes));
+            // The +10 is to avoid the first few plants mixing themselves around
+              sort_intervals.push(setTimeout(add_collection_entry, i+10, collection_div, i, collection[i], hide_seeds, show_palettes));
           }
       }
 
