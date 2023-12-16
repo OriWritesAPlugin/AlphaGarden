@@ -262,7 +262,11 @@
           entry.children[0].textContent = "2 rs";
           entry.onclick = function(e){
             if(getSeedPoints() >= 2){
-              removeSeedFromCollection(orig_seed);
+              gotten = removeSeedFromCollection(orig_seed);
+              if(!gotten){
+                alert("Couldn't find the seed you're rotating in your collection! Palette rotation cancelled.");
+                return;
+              }
               addSeedPoints(-2);
               updateSeedPoints();
               collectSeed(e.target.getAttribute("data-seed"));
@@ -299,8 +303,15 @@
       }
 
       function claim_splice(){
-          removeSeedFromCollection(document.getElementById("first_splice").getAttribute("data-seed"));
-          removeSeedFromCollection(document.getElementById("second_splice").getAttribute("data-seed"));
+          gotten = removeSeedFromCollection(document.getElementById("first_splice").getAttribute("data-seed"));
+          gotten_2 = removeSeedFromCollection(document.getElementById("second_splice").getAttribute("data-seed"));
+          if(!(gotten && gotten_2)) {
+            alert("At least one of the seeds used in this splice couldn't be found in your collection. Found seed (if any) refunded and splice cancelled!");
+            if(gotten){collectSeed(document.getElementById("first_splice").getAttribute("data-seed"))};
+            if(gotten_2){collectSeed(document.getElementById("first_splice").getAttribute("data-seed"))};
+            display_collection();
+            return;
+          }
           new_seed = document.getElementById("mutate_preview_canvas").getAttribute("data-seed");
           collectSeed(new_seed);
           prep_mutate_seed(new_seed, true);
