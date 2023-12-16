@@ -109,6 +109,7 @@
 
       function doSeedOnclick(e){
         let seed = e.target.getAttribute('data-seed');
+        if(seed == null) { return; }
         // There's probably some function passing refactor I could do
         if (selected_function == "analyze"){ analyze_seed(seed); }
         else if (selected_function == "select"){ select_seed(seed); }
