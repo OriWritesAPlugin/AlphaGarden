@@ -325,7 +325,14 @@ var all_palettes = [["aed740", "76c935", "50aa37", "2f902b"], ["a2ac4d", "8f974a
                     { "palette": ['f0d9ee', 'e0c0e4', 'bd9ad5', '9379bd'], "categories": [] },
                     { "palette": ['d798f3', 'da6ace', 'ca3b97', 'a22152'], "categories": [] },
                     { "palette": ['d4f1d7', 'c4e47b', 'e9db5d', 'ef924b'], "categories": [] },
-                    { "palette": ['ffe0b5', 'eea383', 'db5754', 'ca2e55'], "categories": [] }];
+                    { "palette": ['ffe0b5', 'eea383', 'db5754', 'ca2e55'], "categories": [] },
+                    { "palette": ['f6f6f6', 'cccccc', 'aaaaaa', '888888'], "categories": ["strange"]},
+                    { "palette": ['444e63', '718c93', 'aed0c0', 'ecffdd'], "categories": ["strange"]},
+                    { "palette": ['c6f4da', '9fe1bf', '77cda6', '55b79a'], "categories": ["pastel"]},
+                    //{"palette": ['1f113e', '1b0e36', '120928', '01020d'], "categories": ["dark", "celestial"]},
+                    //{"palette": ['ddd1ff', 'ccb5ff', 'c68ef6', 'bd6bf1'], "categories": ["pastel"]},
+                    //{"palette": ['339324', 'adef94', '46d01b', '21372a'], "categories": ["strange"]},
+                    { "palette": ['c4a163', 'a05846', '7a2740', '50044d'], "categories": ["celestial"]}];
 
 // There's three types of palette:
 // Foliage: Generally the bulk of a plant. Greens and browns are most common
