@@ -46,6 +46,8 @@
     <script type="text/javascript">
         function random_from_collection(){
             let collection = getSeedCollection();
+            let goodies = getGoodieCollection();
+            collection.push(...goodies.map(function(x){ return "!"+x;}));
             let num_plants = Math.random() * (12 - 3) + 3;
             let chosen_seeds = [];
             for(let i=0; i<num_plants; i++){
