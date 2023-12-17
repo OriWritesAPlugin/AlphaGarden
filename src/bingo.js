@@ -260,11 +260,13 @@
             "b": {"description": "2 chests in 3 battles", "points": 100, "category": "notn", "full": "2 chests in a battle also counts!"},
             "c": {"description": "4 different NotN items", "points": 100, "category": "notn", "full": "Food, mats, and chesets count. Must all be from 1 battle!"},
             "d": {"description": "Get 2x of a NotN item", "points": 100, "category": "notn", "full": "Including chests!"},
-            "e": {"description": "Get NotN from non-NotN", "points": 100, "category": "notn", "full": "Get a NotN drop from an enemy pack with no NotN enemies"},
+            "e": {"description": "Get chest from non-NotN", "points": 100, "category": "notn", "full": "Get a NotN chest from an enemy pack with no NotN enemies"},
             "f": {"description": "3 different NotN packs", "points": 100, "category": "notn", "full": "Fight 3 different arrangements of enemies that contain NotN enemies in one venue"},
             "g": {"description": "NotN gourmet", "points": 100, "category": "notn", "full": "Get 5 different NotN foods (can be across several battles)"},
             "h": {"description": "3+ NotN and plot", "points": 100, "category": "notn", "full": "Get 3+ NotN items (can have dupes) and imagine a jape, plot, or invention that'd use all of them"},
-            "i": {"description": "MIMIC!", "points": 100, "category": "notn", "full": "Get a NotN enemy and mimic its pose and expression. Like janky yoga."}
+            "i": {"description": "MIMIC!", "points": 100, "category": "notn", "full": "Get a NotN enemy and mimic its pose and expression. Like janky yoga."},
+            "j": {"description": "3+ items from a boss", "points": 100, "category": "notn", "full": "This one would be awful if it wasn't NotN, eh?"},
+            "k": {"description": "genre swap!", "points": 100, "category": "notn", "full": "In the spirit of NotN chaos, change your own surroundings. Music genre, where you're sitting to grind..."}
                     }, "l": {
             "a": {"description": "Exactly 1 currency", "points": 100, "category": "lesser_fest", "full": "Get just 1 piece of currency"},
             "b": {"description": "2 'currencies' at once", "points": 100, "category": "lesser_fest", "full": "Get two different currencies (ex: broken arrow and shield) or themed food"},
