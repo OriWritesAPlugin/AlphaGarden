@@ -52,7 +52,7 @@ Frigate: Waving pennant (149)
 
 HurricaneWinds: Lupine (150)
 
-Rat & Reaver of the Felspring Collective: grand geode (158), deep geode (159), tall corn (168), whimsymelon (169)
+Rat & Reaver of the Felspring Collective: grand geode (158), deep geode (159), tall corn (168), whimsymelon (169), suspicious bush (176), suspicious bench (177)
 
 AngryMothNoises: potted eel (170), hydrangea (171)
 
