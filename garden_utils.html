@@ -8,8 +8,8 @@
     </head>
     <body onload="do_preload()">
         <a href="index.html" class="index_link"><--Home</a>
-        <h1 id="title">Garden Utilities</h1>
-        <h2 id="subtitle">Various tools for working with the plants</h2>
+        <h1 id="title">Utilities</h1>
+        <h2 id="subtitle">Misc. tools for earning and managing plants</h2>
         <div id=content_div>
             <div id="attempt_at_organizing_div", class="collection_row">
                 <div id=plantmix_div class=garden_util_box>
@@ -67,19 +67,25 @@
             </div>
         </div>
     </body>
+    <script src="built/data.js"></script>
     <script src="built/gen_plant.js"></script>
     <script src="built/gen_garden.js"></script>
     <script type="text/javascript">
         var img_loadup = []
         var last_child_seed;
 
+        async function do_preload() {
+            await preload_plants();
+            await preload_named();
+        }
+
         // Used for the prompt generator
-        const prompts = ["Hopes for the future are no substitute for acts in the present", "Kindness doesn't always come easily", "There is an end to this",
+        const prompts = ["Kindness doesn't always come easily", "There is an end to this", "Face me", "I didn't forget. Did you?", "Lessons learned long ago",
                          "None but you can see it through", "Your light is a beacon", "Dreams may become reality, even the weird ones", "You are not broken", "Rest a little",
                          "You did your best", "You reap what you sow", "Welcome peace while it lasts", "Forgiveness does not entitle forgetfulness",
                          "You did good!", "Your confidence is earned", "This was a long time coming", "Are you tired?", "You're an inspiration", "They'll remember you",
                          "You'll meet a mysterious stranger", "Discovery awaits", "All is not as it seems", "Your acts have been witnessed",
-                         "Good things come to those who act", "There is a lightness in the air", "Shadows waver", "All is not lost", "Are you forgetting anything?",
+                         "There is a lightness in the air", "Shadows waver", "All is not lost", "Are you forgetting anything?",
                          "Are you fit to rule?", "Are we obligated to act?", "The weak meet the strong", "Pack extra socks", "The road stretches ahead",
                          "The wind brings fresh news", "You hold the key", "A lull in the storm", "The storm is building", "The storm breaks", "The woods may help",
                          "Better safe than sorry", "An ounce of prevention's worth a pound of cure", "There is a delicate balance to things", "Hello, friend!",
@@ -201,25 +207,35 @@
             var seed_string = document.getElementById("seed_to_read").value.split(" ").join("").replace(/(^,)|(,$)|"/g, '');
             var canvas = document.getElementById("analysis_output_canvas");
             var ctx = canvas.getContext("2d");
-            var raw_plant_data = decode_plant_data(seed_string);
-            var plant_data = parse_plant_data_improved(raw_plant_data);
-            var img=new Image();
-            img.src="https://i.imgur.com/rSLWUqw.png";  // palette preview image
-            img.crossOrigin = "anonymous"
-            img.onload = function() {
-                ctx.drawImage(img, 0, 0);
-                var new_overall_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);
-                replace_color_palette(overall_palette, new_overall_palette, ctx, 64, 64);
-            };
-            var plant_canvas = await gen_plant(raw_plant_data); // Maybe I should just scale the plants up in gen_plant...
+            if(seed_string[0] == "!"){
+                item_name = seed_string.slice(1);
+                var plant_canvas = await gen_named(item_name);
+                canvas.setAttribute("hidden", "hidden");
+            } else {
+                canvas.removeAttribute("hidden");
+                var raw_plant_data = decode_plant_data(seed_string);
+                var plant_data = parse_plant_data(raw_plant_data);
+                var img=new Image();
+                img.src="https://i.imgur.com/rSLWUqw.png";  // palette preview image
+                img.crossOrigin = "anonymous"
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0);
+                    var new_overall_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);
+                    replace_color_palette(overall_palette, new_overall_palette, ctx, 64, 64);
+                };
+                var plant_canvas = await gen_plant(raw_plant_data); // Maybe I should just scale the plants up in gen_plant...
+            }
             var preview_canvas = document.getElementById("analysis_preview_canvas");
             var preview_ctx = preview_canvas.getContext("2d");
             preview_ctx.clearRect(0, 0, preview_canvas.width, preview_canvas.height);
             preview_ctx.imageSmoothingEnabled = false;
             preview_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
             var text_output = document.getElementById("analysis_output_text");
-            text_output.innerText = "Name: "+reformatted_foliage[raw_plant_data["foliage"]]["name"]+"\nArtist: "+reformatted_foliage[raw_plant_data["foliage"]]["artist"]+"\nType: "+reformatted_foliage[raw_plant_data["foliage"]]["categories"];
-            //text_output.innerText = `Base: ${raw_plant_data["foliage"]}`+"\n"+`Simple Feature: ${raw_plant_data["simple_feature"]}`+"\n"+`Complex Feature: ${raw_plant_data["complex_feature"]}`;
+            if(seed_string[0] == "!"){
+                text_output.innerText = "Name: " + item_name + "\nArtist: " + reformatted_named[item_name]["artist"]
+            } else {
+                text_output.innerText = "Name: "+all_foliage[plant_data["foliage"]]["name"]+"\nArtist: "+all_foliage[plant_data["foliage"]]["artist"]+"\nType: "+all_foliage[plant_data["foliage"]]["categories"];
+            }//text_output.innerText = `Base: ${raw_plant_data["foliage"]}`+"\n"+`Simple Feature: ${raw_plant_data["simple_feature"]}`+"\n"+`Complex Feature: ${raw_plant_data["complex_feature"]}`;
         }
 
         async function display_collection() {
@@ -309,11 +325,6 @@
         entry.style.background = 'url(' + scale_canvas.toDataURL() + ')  no-repeat bottom center';
         parent.appendChild(entry);
       }
-
-
-        async function do_preload() {
-            await do_preload_initial();
-        }
     </script>
     </body>
 </html>

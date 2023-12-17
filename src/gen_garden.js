@@ -10,7 +10,7 @@ const available_ground_base = {"grass": "https://i.imgur.com/lUDZfla.png",
                                "chunky dirt": "https://i.imgur.com/Q5WSQ4g.png", "glossy": "https://i.imgur.com/JNt11PZ.png",
                                "gravel": "https://i.imgur.com/kKLKBFO.png", "none": "https://i.imgur.com/Hq3VDgi.png",
                                "cracked": "https://i.imgur.com/dHWuGGN.png", "clumpy dirt": "https://i.imgur.com/MsIbnoa.png",
-                               "brick": "https://i.imgur.com/coV4D2G.png"};
+                               "brick": "https://i.imgur.com/coV4D2G.png", "muck": "https://i.imgur.com/i197DEJ.png"};
 const available_overlay_colors = {"blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
                                   "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2"}
 // REMEMBER: TOP DOWN
@@ -37,7 +37,9 @@ const available_midgrounds = {"none": {},
                               "tall_trunks": {"bottom": "https://i.imgur.com/zAN3vHZ.png", "middle": "https://i.imgur.com/zAN3vHZ.png"},
                               "cavern": {"bottom": "https://i.imgur.com/7SArM0E.png", "top": "https://i.imgur.com/goBTb7l.png"},
                               "hills": {"bottom": "https://i.imgur.com/AQrEUqZ.png"},
-                              "mountains": {"bottom": "https://i.imgur.com/gD89HDc.png"}};
+                              "mountains": {"bottom": "https://i.imgur.com/gD89HDc.png"},
+                              "vines": {"top": "https://i.imgur.com/Rqu0SKM.png"},
+                              "waterfall": {"bottom": "https://i.imgur.com/7x4BfQZ.png", "middle": "https://i.imgur.com/7x4BfQZ.png", "top": "https://i.imgur.com/Xs2MviO.png"}};
 
 // TODO: merge available_ground into this once I do the UI refactor.
 const available_tileables = available_midgrounds;
@@ -375,12 +377,12 @@ async function scramble_tileable_palette(){
               // Of course, this gives you bright green sand...but it -is- essentially an error state.
               ground_palette[palette_type] = base_foliage_palette;
           } else {
-              ground_palette[palette_type] = all_palettes[possible_ground_palettes[palette_type][0]];
+              ground_palette[palette_type] = all_palettes[possible_ground_palettes[palette_type][0]]["palette"];
           }
         } else {
           // Try to avoid picking the same one twice
           for(let allowed_attempts=20; allowed_attempts>0; allowed_attempts--){
-            let temp_palette = all_palettes[random_from_list(possible_ground_palettes[palette_type])];
+            let temp_palette = all_palettes[random_from_list(possible_ground_palettes[palette_type])]["palette"];
             if(JSON.stringify(temp_palette) != JSON.stringify(palette)){
               ground_palette[palette_type] = temp_palette;
               break;
@@ -874,10 +876,13 @@ async function do_preload() {
 }
 
 
+
+
 // This is the only portion that needs run for the new layer-based interface, so for now they live in parallel.
 async function do_preload_initial() {
     // Get all the tileable images. We use a set because some tileables have the same bottom and middle (like tree trunks)
-    refs["foliage"] = await preload_spritesheet("foliage", FOLIAGE_SPRITESHEET, all_foliage.length);
+    // refs["foliage"] = await preload_spritesheet("foliage", FOLIAGE_SPRITESHEET, all_foliage.length);
+    await preload_plants();
     refs["named"] = await preload_single_image(NAMED_SPRITESHEET);
     tileables = new Set();
     for (const key in available_ground){
@@ -895,34 +900,4 @@ async function do_preload_initial() {
     for (const img of tileables){
       refs[img] = await preload_single_image(img);
     }
-    preload_all_images();
-}
-
-async function preload_spritesheet(name, URL, count){
-    img = await preload_single_image(URL);
-    let canvas = document.createElement("canvas");
-    canvas.width = 32;
-    canvas.height = 32;
-    let ctx = canvas.getContext("2d");
-    offset = 0
-    while(offset < count){
-        ctx.clearRect(0, 0, 32, 32);
-        // All spritesheets are 10 wide, N tall
-        source_offset_y = Math.floor(offset/10)*32;
-        source_offset_x = (offset % 10)*32;
-        ctx.drawImage(img, source_offset_x, source_offset_y, 32, 32, 0, 0, 32, 32);
-        let new_img = new Image;
-        new_img.src = canvas.toDataURL();
-        refs[name+offset.toString()] = new_img;
-        offset ++;
-    }
-}
-
-// An experimental method that pulls images from spritesheets instead of individually.
-// Should greatly decrease load time and make color profile stripping easier.
-// Please don't ask why I didn't do this to start with, I think it was for contributor
-// sprite ownership reasons, but now I've automated generating the spritesheet so it'll
-// still allow things to be snipped out if folks like.
-function preload_from_spritesheet() {
-    return;
 }

@@ -8,22 +8,21 @@ all_challenges = { "e": {
         "f": { "description": "Any familiar", "points": 100, "category": "coli", "full": "Get any familiar" },
         "g": { "description": "Neutral elem familiar", "points": 200, "category": "coli", "full": "Get a familiar that, as a coli enemy, is neutral element" },
         "h": { "description": "Venue elem familiar", "points": 200, "category": "coli", "full": "Get a familiar that, as a coli enemy, has an element matching the venue's. If in doubt, pick the element you think matches the venue aesthetic!" },
-        "i": { "description": "Swipp or Bald item", "points": 50, "category": "coli", "full": "Get any item that's used in a Swipp or Baldwin trade" },
+        "i": { "description": "Goal item", "points": 50, "category": "coli", "full": "Pick any item you can get from your current venue that you actively want (ex: Swipp items, flower you collect). Get one!" },
         "j": { "description": "5+ DISTINCT items", "points": 200, "category": "coli", "full": "Get 5+ DIFFERENT items (counted as 5+ squares in the post-battle loot screen) from a single battle" },
-        "k": { "description": "Get something green", "points": 100, "category": "coli", "full": "Get any item that's mostly green, such as a green plant, a green scarf, a greenish-colored fish..." },
+        "k": { "description": "Get a green item", "points": 100, "category": "coli", "full": "Find an item that's mostly green, such as a green plant, a green scarf, a greenish-colored fish..." },
         "l": { "description": "Openable", "points": 100, "category": "coli", "full": "Get any item that you open up to receive more loot, like a fishscale basket" },
         "m": { "description": "Captcha", "points": 100, "category": "coli", "full": "Run into a coli captcha (you don't need to pass it)" },
         "n": { "description": "Any battle stone", "points": 100, "category": "coli", "full": "Get ANY battle stone whatsoever" },
         "o": { "description": "Health potion", "points": 150, "category": "coli", "full": "Get ANY of the potions (but not a tincture)" },
         "p": { "description": "3x 1 item", "points": 200, "category": "coli", "full": "Get 3 of the SAME item (so a 3 on at least one item box in the post-battle loot screen)" },
-        "q": { "description": "Free space", "points": 0, "category": "neutral", "full": "Claim me! :]" },
-        "r": { "description": "Spend 5 min in coli", "points": 200, "category": "coli", "full": "Spend 5 minutes coli-ing; doesn't \"stack\" with other time squares (5+15=20 minutes total)" },
+        "q": { "description": "Free space", "points": 0, "category": "neutral", "full": "Claim me!" },
+        "r": { "description": "Get a flower", "points": 100, "category": "coli", "full": "Get any item that could be considered a flower, be it food, material, apparel, etc." },
         "s": { "description": "Get something brown", "points": 100, "category": "coli", "full": "Get any item that's mostly brown, such as a brown rock, a brownish granola bar, a brown otter..." },
         "t": { "description": "5+ items", "points": 100, "category": "coli", "full": "Get 5+ TOTAL items (so if you add up the item counts in the post-battle loot screen, you get at least 5)" },
         "u": { "description": "Battle enemy + palette swap", "points": 100, "category": "coli", "full": "Battle both (or at least 2) versions of an enemy in the same battle (like a dryad + autumn dryad)" },
         "v": { "description": "Get something red", "points": 100, "category": "coli", "full": "Get any item that's mostly red, such as a slash battlestone, a red flower..." },
         "w": { "description": "Item + its recolor", "points": 100, "category": "coli", "full": "Get an item and its color variant in the same battle (like a micro deer + dwarf fawn)" },
-        "x": { "description": "Get a flower", "points": 100, "category": "coli", "full": "Get any item that could be considered a flower, be it food, material, apparel, etc." },
     }, "m": {
         "a": { "description": "Any apparel", "points": 350, "category": "coli", "full": "Get any apparel, such as Veteran's Eye Scar" },
         "b": { "description": "Boss fight", "points": 250, "category": "coli", "full": "Fight any boss. You don't have to win!" },
@@ -31,7 +30,7 @@ all_challenges = { "e": {
         "d": { "description": "Berserk or scholar stone", "points": 450, "category": "coli", "full": "Get the berserk battle stone or scholar battle stone" },
         "e": { "description": "Elemental attack stone", "points": 250, "category": "coli", "full": "Get ANY elemental attack stone, such as Sear or Mana Bolt" },
         "f": { "description": "Gene", "points": 500, "category": "coli", "full": "Get ANY gene scroll, modern or ancient" },
-        "g": { "description": "3x Swipp or Bald item", "points": 300, "category": "coli", "full": "Get 3 Swipp and/or Baldwin items in a single battle. They can (but don't have to) all be the same item" },
+        "g": { "description": "3x goal item", "points": 300, "category": "coli", "full": "Pick any item you can get from your current venue that you actively want (ex: Swipp items, flower you collect). Get 3 of it in the same battle!" },
         "h": { "description": "Skin or skin crate", "points": 450, "category": "coli", "full": "Get a skin or anything you open to receive a skin, including crates and chests" },
         "i": { "description": "Scroll of renaming", "points": 400, "category": "coli", "full": "Get a scroll of renaming (remember: you can check the game database for drop locations)" },
         "j": { "description": "Vista", "points": 450, "category": "coli", "full": "Get any vista! Getting one out of a NotN chest counts (so long as you won the chest in the coli)" },
@@ -52,6 +51,10 @@ all_challenges = { "e": {
         "y": { "description": "All drops are food", "points": 200, "category": "coli", "full": "EVERY item that drops from a battle is food, and at least one item drops" },
         "z": { "description": "Clear a + shape", "points": 200, "category": "coli", "full": "Clear a square plus the square above, below, left, and right of it. Can be anywhere on the board" },
         "aa": { "description": "Every enemy drops food", "points": 200, "category": "coli", "full": "Get a number of enemy-specific food items greater than or equal to the number of enemies you fought" },
+        "ab": { "description": "Stretch them joints", "points": 200, "category": "coli", "full": "Wrists especially!" },
+        "ac": { "description": "Move a bit", "points": 200, "category": "coli", "full": "Physically move yourself, ex: pacing around the room" },
+        "ad": { "description": "Rest your eyes!", "points": 200, "category": "coli", "full": "Look at something at least 20 feet away for at least 20 seconds" },
+        "ae": { "description": "Bio check", "points": 200, "category": "coli", "full": "Do you need water? Are you hungry? Any other needs to tend?" },
     }, "h": {
         "a": { "description": "Boss familiar", "points": 3000, "category": "coli", "full": "Get a boss enemy as a familiar" },
         "b": { "description": "Wing or body apparel", "points": 2500, "category": "coli", "full": "Get any piece of apparel that goes on the wings or body, like a date plumed cover or green lace waist frill" },
@@ -71,7 +74,7 @@ all_challenges = { "e": {
         "p": { "description": "Head, limb, or tail apparel", "points": 1200, "category": "coli", "full": "Get any piece of apparel that goes on the head, limb, or tail, like a soft pink fillet" },
         "q": { "description": "Clan element familiar", "points": 1200, "category": "coli", "full": "Get a familiar that, as a coli enemy, has an element matching your clan's" },
         "r": { "description": "7+ DISTINCT items", "points": 800, "category": "coli", "full": "Get 7+ DIFFERENT items (counted as 7+ squares in the post-battle loot screen) from a single battle" },
-        "s": { "description": "3+ different food types", "points": 800, "category": "coli", "full": "Get food from at least 3 of the 4 FR food categories (plant, seafood, etc) from a single battle" },
+        "s": { "description": "3+ different foods", "points": 800, "category": "coli", "full": "Get at least 3 different food items from a single battle" },
         "t": { "description": "5+ items of different colors", "points": 800, "category": "coli", "full": "Get 5+ items in 1 battle that are broadly all different colors (a pink flower, a blue flower, etc...)" },
         "u": { "description": "Clan elem battle stone", "points": 1000, "category": "coli", "full": "Get a battle stone with an element matching your clan's, such as Leaf Bolt or a Natural Might Fragment for a Nature clan" },
         "w": { "description": "Familiar of favorite color", "points": 500, "category": "coli", "full": "Get a familiar that is, broadly speaking, your favorite color" },
@@ -232,28 +235,52 @@ all_challenges = { "e": {
         "ds": { "description": "Seek quiet", "points": 100, "category": "self-care", "full": "Take a break from whatever noise/stimulation is around you by seeking some quiet" },
         "dt": { "description": "Check finances", "points": 100, "category": "self-care", "full": "Check in with your account, credit card, etc. Especially check for any unexpected recurring purchases. This one's a free space if you check in with them often enough to know offhand" },
         "du": { "decription": "Confront an anxious task", "points": 100, "category": "self-care", "full": "Is there something in the immediate future that's making you a bit anxious? An email you're really not looking forward to sending, an appointment you're nervous to make, something you know you need to look into but are hesitant to? If you know you'll need to do it and it's on your mind, causing anxiety, you might be able to remove some weight from your shoulders by getting it done!" },
+    }, "f": {
+        "a": { "description": "Exactly 1 fest currency", "points": 100, "category": "fest", "full": "Get one single piece of fest currency from a battle" },
+        "b": { "description": "Fest currency from all", "points": 100, "category": "fest", "full": "Get a piece of fest currency from every enemy in the battle" },
+        "c": { "description": "Get a fest chest", "points": 100, "category": "fest", "full": "Get a fest chest!" },
+        "d": { "description": "Currency back to back", "points": 100, "category": "fest", "full": "Get two battles in a row that drop currency" },
+        "e": { "description": "3 elem/neut battles in a row", "points": 100, "category": "fest", "full": "Get 3 battles in a row that have at least 1 neutral or fest-element enemy" },
+        "f": { "description": "Currency from boss", "points": 100, "category": "fest", "full": "Earn a piece of currency from a boss" },
+        "g": { "description": "Get a festive drop", "points": 100, "category": "fest", "full": "Get something from a battle that ISN'T currency, but feels themed to the fest. A chunk of ore, a potted plant..." },
+        "h": { "description": "All enemies element", "points": 100, "category": "fest", "full": "Fight a battle where all enemies are the fest's element" },
+        "i": { "description": "All enemies neutral", "points": 100, "category": "fest", "full": "Fight a battle where all enemies are neutral element" },
+        "j": { "description": "5 currency in 5 fights", "points": 100, "category": "fest", "full": "in the space of 5 battles, earn 5 pieces of fest currency" },
+        "k": { "description": "Get the wrong chest", "points": 100, "category": "fest", "full": "Get a non-fest skin crate. Better luck next time!" },
+        "l": { "description": "Fest elem familiar", "points": 100, "category": "fest", "full": "Get a familiar matching the fest's element" },
+        "m": { "description": "3x elem/neut, no currency", "points": 100, "category": "fest", "full": "Win a fight with 3 fest-element and/or neutral enemies, but get no currency :(" },
+        "n": { "description": "Prize, but no fest", "points": 100, "category": "fest", "full": "Win apparel, a scene, expensive battlestone, or other rare item and no currency" },
+        "o": { "description": "Fest battlestone", "points": 100, "category": "fest", "full": "Get a battlestone matching the element of the festival" },
+        "p": { "description": "Get 20 currency", "points": 100, "category": "fest", "full": "Earn at least 20 fest currency in total" },
+        "q": { "description": "Fest currency", "points": 100, "category": "fest", "full": "Get at least one piece of fest currency. Nearly a free space (I hope!)" },
+        "r": { "description": "5 battles, no fest", "points": 100, "category": "fest", "full": "Go 5 battles with no fest currency or chests" },
+    }, "n": {
+        "a": { "description": "Get a strange chest", "points": 100, "category": "notn", "full": "Congrats!" },
+        "b": { "description": "2 chests in 3 battles", "points": 100, "category": "notn", "full": "2 chests in a battle also counts!" },
+        "c": { "description": "4 different NotN items", "points": 100, "category": "notn", "full": "Food, mats, and chesets count. Must all be from 1 battle!" },
+        "d": { "description": "Get 2x of a NotN item", "points": 100, "category": "notn", "full": "Including chests!" },
+        "e": { "description": "Get NotN from non-NotN", "points": 100, "category": "notn", "full": "Get a NotN drop from an enemy pack with no NotN enemies" },
+        "f": { "description": "3 different NotN packs", "points": 100, "category": "notn", "full": "Fight 3 different arrangements of enemies that contain NotN enemies in one venue" },
+        "g": { "description": "NotN crit", "points": 100, "category": "notn", "full": "Get a crit while fighting a NotN enemy" },
+    }, "l": {
+        "a": { "description": "Exactly 1 currency", "points": 100, "category": "lesser_fest", "full": "Get just 1 piece of currency" },
+        "b": { "description": "2 'currencies' at once", "points": 100, "category": "lesser_fest", "full": "Get two different currencies (ex: broken arrow and shield) or themed food" },
+        "c": { "description": "Currency >= enemies", "points": 100, "category": "lesser_fest", "full": "Get as much currency (or more) than there are enemies" },
     } };
-// `fixed_rarity`: The rarity of plants doesn't grow as you uncover more squares
-const difficulties = { "Easy": { "challenge_set": ["e", "e", "m"], "starting_rarity": 0, "fixed_rarity": false },
-    "Medium": { "challenge_set": ["e", "m", "m"], "starting_rarity": 3, "fixed_rarity": false },
-    "Hard": { "challenge_set": ["e", "m", "h"], "starting_rarity": 6, "fixed_rarity": false },
-    "Pain": { "challenge_set": ["m", "h"], "starting_rarity": 8, "fixed_rarity": false },
-    "Self-Care": { "challenge_set": ["s"], "starting_rarity": 7, "fixed_rarity": true },
-    "Self-Care Extra": { "challenge_set": ["u"], "starting_rarity": 7, "fixed_rarity": true } };
-all_difficulty_sets = assemble_difficulty_sets();
+const difficulties = { "normal": ["e", "m"],
+    "harder": ["e", "m", "m", "h"],
+    "hardest": ["m", "h"],
+    "Self-Care": ["s"],
+    "Self-Care Extra": ["u"] };
+const bingo_challenge_extras = { "none": [], "NotN": ["n"], "elemental fest": ["f"], "minor fest": ["l"] };
 const slot_max_retries = 15; // how many times to retry having a non-duplicate challenge before allowing duplicates
 // When there are (num) squares revealed, there should be idx_of(num)+1 plants revealed. If not, add another plant.
 // Making it a dict certainly looks a bit silly, but it does make the later code very clean.
 // TODO: Javascript has a list comprehension equivalent (I think?), so clean this up.
-const plants_revealed_at = { 3: 1, 7: 2, 11: 3, 15: 4, 20: 5, 25: 6, 30: 7, 35: 8, 41: 9, 47: 10, 49: 11 };
-// "At difficulty <Easy>, the first plant is rarity <Easy>[starting_rarity]. It feeds this pattern:
-// 0 0
-// 1 1 1
-// 2 2 2 2
-// 3 3 3 3 3
-// 4 4 4 4 4 4...
-// This holds something like "Easy": {1: 0, ...} to 7 "rows". I have no idea why I'd ever have 2+3...+8=35 plants on one board, but hey.
-const plant_rarity_lookup = calc_rarity_progression();
+const plants_revealed_at_per_size = { 3: { 8: 1 },
+    5: { 7: 1, 14: 2, 20: 3, 25: 4 },
+    7: { 8: 1, 15: 2, 22: 3, 28: 4, 34: 5, 39: 6, 44: 7, 49: 8 } };
+var plants_revealed_at;
 const icons = [
     "https://i.imgur.com/GSNkSxm.png",
     "https://i.imgur.com/TuZ3QXY.png",
@@ -277,103 +304,72 @@ var rewards = {}; // the seeds to be rewarded, excepting the special bingo seed
 var bingo_reward; // the special bingo seed reward
 var had_bingo_last_turn = false; // used to skip re-running bingo display code if our status hasn't changed
 var bingo_plant_data_url = null; // used both to store the bingo plant and check if we've had bingo in the past
+const max_unique_challenge_attempts = 15; // Max number of retries allowed when trying to avoid duplicates
+var bingo_foliage_palettes = foliage_palettes_base_odds;
+var bingo_feature_palettes = feature_palettes_base_odds;
+var bingo_accent_palettes = accent_palettes_base_odds;
+var bingo_bases = foliage_base_odds;
+var current_challenge_code = null;
+var challenge_list = [];
 function randomFromArray(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-function calc_rarity_progression() {
-    var lookup = {};
-    const num_rows = 8;
-    // TODO: There's obviously a way to calculate this,..fun later, let's get it working for now.
-    current_plant_num = 1;
-    for (difficulty in difficulties) {
-        lookup[difficulty] = {};
-        // Fixed_rarity difficulties don't follow the rarity "growth".
-        if (difficulties[difficulty]["fixed_rarity"]) {
-            // TODO: There's also probably a list comprehension-like construct.
-            for (var i = 1; i < 36; i++) {
-                lookup[difficulty][i] = difficulties[difficulty]["starting_rarity"];
-            }
-            continue;
-        }
-        // Non-fixed rarity follows the pattern documented at `plant_rarity_lookup`   
-        var current_rarity = difficulties[difficulty]["starting_rarity"];
-        for (var i = 1; i < num_rows; i++) {
-            // The +1 here is because the pattern is 0, 0, 1, 1, 1...., not 0, 1, 1...
-            for (var j = 0; j < i + 1; j++) {
-                lookup[difficulty][current_plant_num] = current_rarity;
-                current_plant_num++;
-            }
-            current_rarity++;
-        }
-        current_plant_num = 1;
-    }
-    return lookup;
-}
-function assemble_difficulty_sets() {
-    var all_names = {};
-    for (const challenge_difficulty in all_challenges) {
-        all_names[challenge_difficulty] = [];
-        for (const challenge_name in all_challenges[challenge_difficulty]) {
-            all_names[challenge_difficulty].push(challenge_difficulty + challenge_name);
+function setAvailableChallengeListFromCode(categories_code) {
+    challenge_list = [];
+    for (entry of categories_code) {
+        // for ex: every entry in all_challenges[e], give back e-a, e-b, e-c...
+        if (entry) {
+            challenge_list = challenge_list.concat(Object.keys(all_challenges[entry]).map(function (subcode) { return entry + "-" + subcode; }));
         }
     }
-    var all_difficulty_sets = {};
-    for (const board_difficulty in difficulties) {
-        all_difficulty_sets[board_difficulty] = [];
-        for (var i = 0; i < difficulties[board_difficulty]["challenge_set"].length; i++) {
-            difficulty_instance = difficulties[board_difficulty]["challenge_set"][i];
-            all_difficulty_sets[board_difficulty] = all_difficulty_sets[board_difficulty].concat(all_names[difficulty_instance]);
+}
+function drawChallengesForBoard(size) {
+    let chosen_already = new Set();
+    let challenges = [];
+    let choice, attempts;
+    for (let i = 0; i < size * size; i++) {
+        attempts = 0;
+        choice = randomFromArray(challenge_list);
+        while (attempts < max_unique_challenge_attempts && chosen_already.has(choice)) {
+            choice = randomFromArray(challenge_list);
+            attempts++;
         }
-    }
-    return all_difficulty_sets;
-}
-function getRadioValue(name) {
-    var ele = document.getElementsByName(name);
-    for (i = 0; i < ele.length; i++) {
-        if (ele[i].checked)
-            return ele[i].value;
-    }
-}
-/* Gawkily randomize in place */
-function shuffleArray(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-}
-function assemble_challenge_list(size, difficulty) {
-    initial_challenge_list = all_difficulty_sets[difficulty];
-    var challenges = [];
-    while (challenges.length < size * size) {
-        shuffleArray(initial_challenge_list);
-        challenges = challenges.concat(initial_challenge_list);
+        challenges.push(choice);
+        chosen_already.add(choice);
     }
     return challenges;
 }
-function assemble_reward_list(num_squares) {
-    let rewards = {};
-    let reward_list = [];
-    let num_to_reward = 0;
-    for (let i = 1; i < num_squares; i++) {
+function genWithBingoModifiedSeedChances() {
+    return { "foliage": random_from_foliage(bingo_bases),
+        "simple_feature": random_from_list(simple_features),
+        "complex_feature": random_from_list(complex_features),
+        "foliage_palette": random_from_list(bingo_foliage_palettes),
+        "feature_palette": random_from_list(bingo_feature_palettes),
+        "accent_palette": random_from_list(bingo_accent_palettes) };
+}
+function assembleRewardList(size) {
+    let reward_seeds = [];
+    let num_rewards, plant_data;
+    for (let i = 0; i < size * size; i++) {
         if (i in plants_revealed_at) {
-            num_to_reward++;
+            num_rewards = plants_revealed_at[i];
         }
     }
-    // The +1 is for the bingo seed
-    for (let j = 0; j <= num_to_reward + 1; j++) {
-        rarity = plant_rarity_lookup[current_difficulty][j];
+    num_rewards++; // bingo plant
+    for (let i = 0; i < num_rewards + 1; i++) {
         if (forced_random_seed == null) {
-            plant_data = gen_plant_data(rarity);
+            plant_data = genWithBingoModifiedSeedChances();
         }
         else {
-            plant_data = gen_plant_data(rarity, forced_random_seed + String(j + bingo_plant_generated));
+            plant_data = gen_plant_data(0, forced_random_seed);
         }
-        reward_list.push(encode_plant_data_v2(plant_data));
+        reward_seeds.push(encode_plant_data_v2(plant_data));
     }
-    for (let i = num_squares; i > 0; i--) {
+    let rewards = [];
+    for (let i = size * size; i > 0; i--) {
         if (i in plants_revealed_at) {
-            rewards[i] = reward_list.pop();
+            rewards[i] = reward_seeds.pop();
         }
     }
-    return [rewards, reward_list.pop()];
+    return [rewards, reward_seeds.pop()];
 }
 function clear_board() {
     var board = document.getElementById("board_div");
@@ -446,10 +442,20 @@ function has_bingo() {
     }
     return bingo;
 }
-function generate_board_info(size, difficulty, rarity_override = null) {
-    current_difficulty = difficulty; // Make it globally available (not huge on this)
-    var challenges = assemble_challenge_list(size, difficulty);
-    [rewards, bingo_reward] = assemble_reward_list(size * size);
+function generate_board_info(size, seed_override = null) {
+    var challenges = drawChallengesForBoard(size);
+    if (seed_override == null) {
+        [rewards, bingo_reward] = assembleRewardList(size);
+    }
+    else {
+        rewards = [];
+        for (let i = size * size; i > 0; i--) {
+            if (i in plants_revealed_at) {
+                rewards[i] = seed_override.pop();
+            }
+        }
+        bingo_reward = seed_override.pop();
+    }
     for (var i = 0; i < size; i++) {
         current_board.push([]);
         for (var j = 0; j < size; j++) {
@@ -480,25 +486,30 @@ function draw_board() {
         }
     }
     if (revealed_seeds.length > 0) {
-        document.getElementById("seed_list").innerHTML = revealed_seeds.join(", ");
+        document.getElementById("bingo_seed_list").innerHTML = revealed_seeds.join(", ");
     }
 }
-function generate_board(size, difficulty, rarity_override = null) {
+function generate_board(size, board_challenge_code, seed_override = null) {
+    plants_revealed_at = plants_revealed_at_per_size[size];
+    if (board_challenge_code != current_challenge_code) {
+        setAvailableChallengeListFromCode(board_challenge_code);
+        current_challenge_code = board_challenge_code;
+    }
     clear_board();
-    generate_board_info(size, difficulty);
+    generate_board_info(size, seed_override);
     draw_board();
 }
 // Reveal a plant in a square (either within the board or the "bonus bingo plant"
 // Handles the work of generating the plant itself and adding the seed to the pile.
 // Returns a dataURL to set as an image someplace.
 async function genSeedForSquare(forced_random_offset = 0) {
-    rarity = plant_rarity_lookup[current_difficulty][num_plants_revealed];
-    if (forced_random_seed == null) {
-        plant_data = gen_plant_data(rarity);
+    rarity = 0;
+    if (forced_random_offset == null) {
+        plant_data = gen_plant_data(0);
     }
     else {
         // ONLY for forced_random seed generation, the bingo seed needs to increment num_plants_revealed
-        plant_data = gen_plant_data(rarity, forced_random_seed + String(num_plants_revealed + bingo_plant_generated));
+        plant_data = gen_plant_data(0, forced_random_offset + String(num_plants_revealed + bingo_plant_generated));
     }
     return encode_plant_data_v2(plant_data);
 }
@@ -538,7 +549,8 @@ async function toggle_status(e, generate_rewards = true) {
                     square_info['reward'] = { "type": "seed", "value": await genSeedForSquare() };
                 }
                 revealed_seeds.push(square_info['reward']["value"]);
-                document.getElementById("seed_list").innerHTML = revealed_seeds.join(", ");
+                document.getElementById("bingo_seed_list").innerHTML = revealed_seeds.join(", ");
+                collectSeed(square_info['reward']["value"]);
             }
         }
         if (current_icons && generate_rewards && square_info["reward"]["type"] == "none") {
@@ -560,9 +572,9 @@ async function toggle_status(e, generate_rewards = true) {
         bingo_square.style.background = "none";
         bingo_square.lastChild.style.opacity = 1;
     }
-    var body = document.getElementsByTagName("BODY")[0];
+    update_squares_til_if_present();
     now_has_bingo = has_bingo();
-    if (now_has_bingo != had_bingo_last_turn) {
+    if (now_has_bingo != had_bingo_last_turn) { // our bingo state has changed
         had_bingo_last_turn = now_has_bingo;
         await setBingoPlantVisibility(now_has_bingo);
         if (now_has_bingo) {
@@ -575,6 +587,20 @@ async function toggle_status(e, generate_rewards = true) {
     else if (!now_has_bingo) {
         shimmer_bingo_borders(bingo_border_color, "#b1f2c0", row, col);
     }
+}
+function update_squares_til_if_present() {
+    if (!document.getElementById("squares_til_seed")) {
+        return;
+    }
+    let seed_at = "-";
+    let size = current_board.length;
+    for (let i = num_squares_revealed + 1; i <= size * size; i++) {
+        if (i in plants_revealed_at_per_size[size]) {
+            seed_at = i - num_squares_revealed;
+            break;
+        }
+    }
+    document.getElementById("squares_til_seed").textContent = "Squares til the next plant: " + seed_at;
 }
 function transition_all_bingo_borders(color, origin_row, origin_column) {
     var root_delay = 70; // in milliseconds
@@ -599,7 +625,8 @@ async function setBingoPlantVisibility(show_plant) {
         if (bingo_plant_data_url == null) {
             bingo_plant_data_url = await drawPlantForSquare(bingo_reward);
             revealed_seeds.push(bingo_reward);
-            document.getElementById("seed_list").innerHTML = revealed_seeds.join(", ");
+            document.getElementById("bingo_seed_list").innerHTML = revealed_seeds.join(", ");
+            collectSeed(bingo_reward);
         }
         target_div.style.background = 'url(' + bingo_plant_data_url + ')  no-repeat center center';
         parent_div.style.display = "block";
@@ -656,7 +683,7 @@ function add_bingo_square(parent, column, row, challenge_name) {
     var label = document.createElement('label');
     var challenge;
     try {
-        challenge = all_challenges[challenge_name[0]][challenge_name.slice(1)];
+        challenge = all_challenges[challenge_name.split("-")[0]][challenge_name.split("-")[1]];
     }
     catch (error) {
         challenge = { "description": challenge_name }; // For custom challenges
@@ -711,7 +738,7 @@ function toggle_hints() {
         document.getElementById("bingo_hint").style.visibility = "hidden";
     }
 }
-// Attempts to make the save data more copy-pasteable 
+// Attempts to make the save data more copy-pasteable
 function minify_squares(to_minify) {
     minified_board = [];
     for (let i = 0; i < to_minify.length; i++) {

@@ -40,6 +40,89 @@ function claimCanvas(canvas){
 }
 
 
+function collectSeed(seed){
+  let seeds = sortAndVerifySeedList(seed);
+  if (seeds.length == 0){
+    return;
+  }
+    else if (localStorage.seed_collection == undefined) {
+    localStorage.seed_collection = seeds;
+  } else {
+    localStorage.seed_collection = seeds + "," + localStorage.seed_collection;
+  }
+}
+
+
+function addSeedPoints(amount_to_add){
+  if (localStorage.seed_points == undefined) {
+    localStorage.seed_points = amount_to_add;
+  } else {
+    localStorage.seed_points = Number(localStorage.seed_points) + amount_to_add;
+  }
+}
+
+
+function getSeedPoints(){
+  if (localStorage.seed_points == undefined) {
+    localStorage.seed_points = 10;
+  }
+  return Number(localStorage.seed_points);
+}
+
+
+// Niche method for find-replace, you probably want its neighbor
+function getSeedCollectionAsString(){
+  if (localStorage.seed_collection == undefined) {
+    return "";
+  }
+  return localStorage.seed_collection;
+}
+
+
+function getSeedCollection(){
+  collection = getSeedCollectionAsString();
+  if (collection == "") {
+    return [];
+  }
+  return collection.split(",");
+}
+
+function getGoodieCollection(){
+  if (localStorage.goodie_collection == undefined) {
+    localStorage.goodie_collection = ["nigel"];
+  }
+  return localStorage.goodie_collection.split(",");
+}
+
+function collectGoodie(goodie_name){
+  if (localStorage.goodie_collection == undefined) {
+    getGoodieCollection();  // Initialize
+  }
+  localStorage.goodie_collection = goodie_name + "," + localStorage.goodie_collection;
+}
+
+
+// Used mostly in the collection, parses a list of seeds, splitting it into named and unnamed
+function sortAndVerifySeedList(raw_list){
+  true_seeds = [];
+  if(raw_list.length == 0){
+    return true_seeds;
+  }
+  split_seeds = raw_list.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");;
+  for(seed of split_seeds){
+    if(seed.startsWith("!")){
+      continue;  // we skip these here
+    }
+    else if(seed.length != 10){
+      alert("You seem to have a malformed seed! Seeds are 10 characters long, but got \""+seed+"\". Skipping!");
+    } else {
+      true_seeds.push(seed);
+    }
+  }
+  return true_seeds;
+}
+
+
 // Returns true if there's a non-transparent pixel in `row` in ImageData `image_data`. Row is 0-indexed.
 // Modified from https://stackoverflow.com/questions/11796554/automatically-crop-html5-canvas-to-contents
 function hasPixelInRow(image_data, row, width=32){
@@ -59,6 +142,7 @@ function shuffleArray(arr) {
     const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
+  return arr;
 }
 
 function get_overlay_color_from_name(color, alpha){
@@ -208,6 +292,76 @@ async function resize_for_garden(name_of_image, sourceURL){
     preview_context.imageSmoothingEnabled = false;
     preview_context.drawImage(refs[refURL], 0, 0, 64, 64);
     return preview_canvas.toDataURL(temp_img.type);
+}
+
+
+function addRadioButton(parent, name, label, checked, onclick=null) {
+  let radio_button = document.createElement('input');
+  radio_button.setAttribute('type', 'radio');
+  radio_button.setAttribute('name', name);
+  let id = name + "_" + label;
+  radio_button.id = id;
+  radio_button.checked = checked;
+  radio_button.value = label;
+  let radio_button_label = document.createElement('label');
+  radio_button_label.setAttribute('for', id);
+  radio_button_label.textContent = label;
+  radio_button_label.classList.add("unselectable");
+  if(onclick != null){
+    radio_button.onclick = onclick;
+  }
+  parent.appendChild(radio_button);
+  parent.appendChild(radio_button_label);
+}
+
+
+function getRadioValue(name) {
+  var ele = document.getElementsByName(name);
+  for(i = 0; i < ele.length; i++) {
+      if(ele[i].checked) {return ele[i].value};
+  }
+}
+
+
+function makeSortCheckmark(prefix, name, parent, checked=false) {
+  let checkbox = document.createElement('input');
+  checkbox.type = "checkbox";
+  checkbox.value = name;
+  checkbox.id = prefix+name;
+  checkbox.checked = checked
+  label = document.createElement("label");
+  label.setAttribute("for", checkbox.id);
+  label.innerHTML = name;
+  label.classList.add("unselectable");
+  label.style.marginRight = "15px";
+  parent.appendChild(checkbox);
+  parent.appendChild(label);
+  parent.appendChild(document.createElement("br"));
+}
+
+
+// Radiobuttons are weird and cursed
+// https://stackoverflow.com/questions/118693/how-do-you-dynamically-create-a-radio-button-in-javascript-that-works-in-all-bro
+function makeRadioButtonCursed(name, label, checked, onclick=false) {
+  let id = name + "_" + label;
+  function makeRadioButtonViaDiv(){
+    var radioHtml = '<input type="radio" id="' + id + ' "name="' + name + '"';
+    if ( checked ) {
+        radioHtml += ' checked="checked"';
+    }
+    if ( onclick ) {
+        radioHtml += ' onclick=' + onclick;
+    }
+    radioHtml += '/>';
+    var radioFragment = document.createElement('div');
+    radioFragment.innerHTML = radioHtml;
+    return radioFragment.firstChild;
+  }
+  let radio_button_label = document.createElement('label');
+  radio_button_label.setAttribute('for', id);
+  radio_button_label.setAttribute('value', label);
+  radio_button_label.appendChild(makeRadioButtonViaDiv());
+  return radio_button_label;
 }
 
 

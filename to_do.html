@@ -5,11 +5,13 @@
     <head>
         <title>To-Do [EG]</title>
         <link rel="stylesheet" type="text/css"  href="nature.css" />
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
         <link rel="icon" href="https://i.imgur.com/SIQJ3U0.png">
         <style>
         body {
             background: #2f1847; /* fallback for old browsers */
-            background: linear-gradient(to right, #240f3a, #572f5f); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            background: linear-gradient(to right, #201920, #291e29);
+            /*background: linear-gradient(to right, #240f3a, #572f5f); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
         }
         .bingo_box {
             border-color: #cfa8ca;
@@ -20,7 +22,7 @@
     <body onload="do_setup()">
         <a href="index.html" class="index_link"><--Home</a>
         <div class='center-parent'>
-          <p id="seed_list" style="margin: 0">Thanks for using the To-Do List! More <a href="https://www1.flightrising.com/forums/adopt/3112071">plants</a> appear as you go. The "hint" prompts are 100% optional. Good luck! :D</p>
+          <p id="todo_seed_list" style="margin: 0">Thanks for using the To-Do List! More <a href="https://www1.flightrising.com/forums/adopt/3112071">plants</a> appear as you go. The "hint" prompts are 100% optional. Good luck! :D</p>
         </div>
         <div class='center-parent' style="display: flex; justify-content: center">
         <div id="plant_div_1" class='bingo_row' style="width: 10%; flex-direction: column; display:inline-block; vertical-align: top;"></div>
@@ -28,8 +30,10 @@
         <div id="task_div"><ul id="task_ul" class="ul_no_bullets"></ul></div></div>
         <div id="plant_div_2" class='bingo_row' style="width: 10%; flex-direction: column; display:inline-block; vertical-align: top;"></div>
     </body>
-    <script src="gen_plant.js"></script>
-    <script src="bingo.js"></script>
+    <script src="built/data.js"></script>
+    <script src="built/gen_plant.js"></script>
+    <script src="built/bingo.js"></script>
+    <script src="built/shared.js"></script>
     <script type="text/javascript">
 
     const d = new Date();
@@ -57,10 +61,10 @@
                              "Have you got any birthdays or anniversaries coming up?");
 
     async function do_setup(){
-        await preload_all_images();
+        await preload_plants();
         await generate_list();
         await activateList();
-        generate_list();
+        await generate_list();
     }
 
     // Despite any sane person's reasoning, this does not actually generate the checkbox list.
@@ -154,6 +158,7 @@
       let total_tasks = task_sets_generated * num_tasks;
       if(e.target.checked){
         seeds_earned.push([e.target.id, seeds_generated[document.getElementById(e.target.id+"_reward").value-1]])
+        collectSeed(seeds_generated[document.getElementById(e.target.id+"_reward").value-1]);
       } else {
         seeds_earned = seeds_earned.filter(function(v){ return v[0] != e.target.id; });
       }
@@ -161,7 +166,7 @@
       if(seeds_earned.length > 0){
         msg = seeds_earned.map(earned => earned[1]).join(", ");
       }
-      document.getElementById("seed_list").innerHTML = msg;
+      document.getElementById("todo_seed_list").innerHTML = msg;
       // We generate an extra set out so people can notetake
       if(seeds_earned.length == total_tasks-num_tasks){
         activateList();
@@ -250,6 +255,7 @@
 
     // Take a bunch of random samples of the plant's color
     // Return as RGB for mathing. Ignore transparent pixels.
+    // Gets us around the thing where not all bases use all palettes
     function samplePlantColor(i){
         let sample_canvas = plant_canvases[i];
         let sample_ctx = sample_canvas.getContext("2d");

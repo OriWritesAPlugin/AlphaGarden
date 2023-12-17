@@ -1,8 +1,8 @@
 /** This module holds the UI logic for garden creation. **/
 
-const PROPERTIES = {"base": {"defaultPalette": "CoHC9CNzEt", "mainColor": "#FF0000", "secondColor": "#AA0000", "accentColor": "#FFAA00", "icon": "▒"},
-                    "garden": {"defaultPalette": "CoHC9CNzEt", "mainColor": "#1C2121", "secondColor": "#151818", "accentColor": "#273831", "icon": "⚘"},
-                    "decor": {"defaultPalette": "CoHC9CNzEt", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains", "accentColor": "#3D362B", "icon": "ꕔ"},
+const PROPERTIES = {"base": {"defaultPalette": "CunEjC0KIh", "mainColor": "#FF0000", "secondColor": "#AA0000", "accentColor": "#FFAA00", "icon": "▒"},
+                    "garden": {"defaultPalette": "CunEjC0KIh", "mainColor": "#1C2121", "secondColor": "#151818", "accentColor": "#273831", "icon": "⚘"},
+                    "decor": {"defaultPalette": "CunEjC0KIh", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains", "accentColor": "#3D362B", "icon": "ꕔ"},
                     "overlay": {"mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "☾"},
                     "celestial": {"defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "icon": "☁"}}// old overlay: 1F191A
 
@@ -100,7 +100,7 @@ class LayerDiv {
   }
 
   buildEditButton(){
-    let editButton = document.createElement("input");
+    let editButton = <HTMLButtonElement> document.createElement("input");
     editButton.type = "button";
     editButton.className = "chunky_wrap";
     editButton.value = "✎";
@@ -110,7 +110,7 @@ class LayerDiv {
   }
 
   buildDeleteButton(){
-    let deleteButton = document.createElement("input");
+    let deleteButton = <HTMLButtonElement> document.createElement("input");
     deleteButton.type = "button";
     deleteButton.className = "chunky_wrap";
     deleteButton.value = "✕";
@@ -271,7 +271,7 @@ class GardenLayerDiv extends LayerDiv {
   }
 
   buildSwapButton(){
-    let swapButton = document.createElement("input");
+    let swapButton = <HTMLButtonElement> document.createElement("input");
     swapButton.type = "button";
     swapButton.className = "chunky_wrap";
     swapButton.value = "☆";  // ★

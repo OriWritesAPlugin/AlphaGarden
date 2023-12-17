@@ -31,7 +31,9 @@ const available_midgrounds = {"none": {},
                               "tall_trunks": {"bottom": "https://i.imgur.com/zAN3vHZ.png", "middle": "https://i.imgur.com/zAN3vHZ.png"},
                               "cavern": {"bottom": "https://i.imgur.com/7SArM0E.png", "top": "https://i.imgur.com/goBTb7l.png"},
                               "hills": {"bottom": "https://i.imgur.com/AQrEUqZ.png"},
-                              "mountains": {"bottom": "https://i.imgur.com/gD89HDc.png"}};
+                              "mountains": {"bottom": "https://i.imgur.com/gD89HDc.png"},
+                              "vines": {"top": "https://i.imgur.com/Rqu0SKM.png"},
+                              "waterfall": {"bottom": "https://i.imgur.com/7x4BfQZ.png", "middle": "https://i.imgur.com/7x4BfQZ.png"}};
 
 // TODO: merge available_ground into this once I do the UI refactor.
 const available_tileables = available_midgrounds;
@@ -77,11 +79,11 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
                }
            }
         }
+        possible_ground_palettes = {"foliage": [], "feature": [], "accent": []};
     }
     // With all the wildcards handled, proceed to drawing the actual garden.
     var canvas = document.getElementById("output_canvas");
     var ctx = canvas.getContext("2d");
-    possible_ground_palettes = {"foliage": [], "feature": [], "accent": []};
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     // What does it mean if someone changes their option for smart spacing, then scrambles?
     // Functionally it's nonsense, and no one toggles smart spacing off, so we just scramble.
@@ -369,12 +371,12 @@ async function scramble_tileable_palette(){
               // Of course, this gives you bright green sand...but it -is- essentially an error state.
               ground_palette[palette_type] = base_foliage_palette;
           } else {
-              ground_palette[palette_type] = all_palettes[possible_ground_palettes[palette_type][0]];
+              ground_palette[palette_type] = all_palettes[possible_ground_palettes[palette_type][0]]["palette"];
           }
         } else {
           // Try to avoid picking the same one twice
           for(let allowed_attempts=20; allowed_attempts>0; allowed_attempts--){
-            let temp_palette = all_palettes[random_from_list(possible_ground_palettes[palette_type])];
+            let temp_palette = all_palettes[random_from_list(possible_ground_palettes[palette_type])]["palette"];
             if(JSON.stringify(temp_palette) != JSON.stringify(palette)){
               ground_palette[palette_type] = temp_palette;
               break;

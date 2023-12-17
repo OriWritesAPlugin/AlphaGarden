@@ -33,7 +33,8 @@
         <div class='center-parent'><br><span id="bingo_hint" style="margin: 10px;"></span></div>
         <div id="bingo_plant_container_div" class='center-parent'><div id=bingo_plant_div class=bingo_plant_box></div>Fantastic work!!</div>
     </body>
-    <script src="gen_plant.js"></script>
+    <script src="built/data.js"></script>
+    <script src="built/gen_plant.js"></script>
     <script src="bingo.js"></script>
     <script type="text/javascript">
     const d = new Date();
@@ -44,7 +45,7 @@
     var forced_random_seed = d.getDate().toString()+d.getMonth().toString()+d.getFullYear().toString()+"extracare_salt";
 
     function do_setup(){
-        preload_all_images();
+        preload_plants();
         generate_board(5, "Self-Care Extra", 7);
         toggle_extra_icons();
         toggle_hints();
