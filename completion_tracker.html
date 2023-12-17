@@ -74,10 +74,11 @@
             owned_palettes.add(seed_data["feature_palette"]);
             owned_palettes.add(seed_data["accent_palette"]);
         }
-        let selected_palettes = [4, 14, 40];
+        let selected_palettes = [0, 20, 19];
         let owned_palettes_list = Array.from(owned_palettes);
 
         function randomizeSelectedPalettes(){
+          if(owned_palettes_list.length == 0) { return; }
           selected_palettes[0] = owned_palettes_list[Math.floor(Math.random()*owned_palettes_list.length)];
           selected_palettes[1] = owned_palettes_list[Math.floor(Math.random()*owned_palettes_list.length)];
           selected_palettes[2] = owned_palettes_list[Math.floor(Math.random()*owned_palettes_list.length)];
