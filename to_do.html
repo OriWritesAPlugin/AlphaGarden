@@ -10,7 +10,8 @@
         <style>
         body {
             background: #2f1847; /* fallback for old browsers */
-            background: linear-gradient(to right, #240f3a, #572f5f); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            background: linear-gradient(to right, #201920, #291e29);
+            /*background: linear-gradient(to right, #240f3a, #572f5f); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
         }
         .bingo_box {
             border-color: #cfa8ca;
@@ -21,7 +22,7 @@
     <body onload="do_setup()">
         <a href="index.html" class="index_link"><--Home</a>
         <div class='center-parent'>
-          <p id="seed_list" style="margin: 0">Thanks for using the To-Do List! More <a href="https://www1.flightrising.com/forums/adopt/3112071">plants</a> appear as you go. The "hint" prompts are 100% optional. Good luck! :D</p>
+          <p id="todo_seed_list" style="margin: 0">Thanks for using the To-Do List! More <a href="https://www1.flightrising.com/forums/adopt/3112071">plants</a> appear as you go. The "hint" prompts are 100% optional. Good luck! :D</p>
         </div>
         <div class='center-parent' style="display: flex; justify-content: center">
         <div id="plant_div_1" class='bingo_row' style="width: 10%; flex-direction: column; display:inline-block; vertical-align: top;"></div>
@@ -165,7 +166,7 @@
       if(seeds_earned.length > 0){
         msg = seeds_earned.map(earned => earned[1]).join(", ");
       }
-      document.getElementById("seed_list").innerHTML = msg;
+      document.getElementById("todo_seed_list").innerHTML = msg;
       // We generate an extra set out so people can notetake
       if(seeds_earned.length == total_tasks-num_tasks){
         activateList();
