@@ -175,8 +175,8 @@ var all_foliage = [
     { "artist": "Oranitha", "name": "bulbous cactus", "categories": ["succulent"], "source": "https://i.imgur.com/6MxvqX9.png" },
     { "artist": "Oranitha", "name": "marker tablet", "categories": ["construct"], "source": "https://i.imgur.com/X7crH2b.png" },
     { "artist": "Oranitha", "name": "giant twinflower", "categories": ["flower"], "source": "https://i.imgur.com/JglXWHa.png" },
-    { "artist": "Rat & Reaver of the Felspring collective", "name": "suspicious bush", "categories": ["shrub"], "source": "https://i.imgur.com/ejACFPc.png" },
-    { "artist": "Rat & Reaver of the Felspring collective", "name": "suspicious bench", "categories": ["construct"], "source": "https://i.imgur.com/lF4kM12.png" }
+    { "artist": "Felspring", "name": "suspicious bush", "categories": ["shrub"], "source": "https://i.imgur.com/ejACFPc.png" },
+    { "artist": "Felspring", "name": "suspicious bench", "categories": ["construct"], "source": "https://i.imgur.com/lF4kM12.png" }
 ];
 // END all_foliage
 // The above marker and similar are used to make Python automation easier, I use it to build fresh spritesheets without needing to
