@@ -262,7 +262,9 @@
             "d": {"description": "Get 2x of a NotN item", "points": 100, "category": "notn", "full": "Including chests!"},
             "e": {"description": "Get NotN from non-NotN", "points": 100, "category": "notn", "full": "Get a NotN drop from an enemy pack with no NotN enemies"},
             "f": {"description": "3 different NotN packs", "points": 100, "category": "notn", "full": "Fight 3 different arrangements of enemies that contain NotN enemies in one venue"},
-            "g": {"description": "NotN crit", "points": 100, "category": "notn", "full": "Get a crit while fighting a NotN enemy"},
+            "g": {"description": "NotN gourmet", "points": 100, "category": "notn", "full": "Get 5 different NotN foods (can be across several battles)"},
+            "h": {"description": "3+ NotN and plot", "points": 100, "category": "notn", "full": "Get 3+ NotN items (can have dupes) and imagine a jape, plot, or invention that'd use all of them"},
+            "i": {"description": "MIMIC!", "points": 100, "category": "notn", "full": "Get a NotN enemy and mimic its pose and expression. Like janky yoga."}
                     }, "l": {
             "a": {"description": "Exactly 1 currency", "points": 100, "category": "lesser_fest", "full": "Get just 1 piece of currency"},
             "b": {"description": "2 'currencies' at once", "points": 100, "category": "lesser_fest", "full": "Get two different currencies (ex: broken arrow and shield) or themed food"},
