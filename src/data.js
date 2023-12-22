@@ -1,3 +1,5 @@
+const PALETTE_PREVIEW_IMG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABhGlDQ1BJQ0MgcHJvZmlsZQAAeJx9kT1Iw1AUhU/TSkUqCnYQcchQnSyIijhqFYpQIdQKrTqYvPQPmjQkKS6OgmvBwZ/FqoOLs64OroIg+APi6OSk6CIl3pcUWsR4wyMf591zeO8+QGhUmGaFxgFNt810MiFmc6ti+BUh9NMXQERmljEnSSn41tc99VHdxXmWf9+f1avmLQYEROJZZpg28Qbx9KZtcN4njrKSrBKfE4+ZdEDiR64rHr9xLros8MyomUnPE0eJxWIHKx3MSqZGPEUcUzWd8oWsxyrnLc5apcZa5+Q3jOT1lWWu0xpGEotYggQRCmooowIbcfrrpFhI037Cxz/k+iVyKeQqg5FjAVVokF0/+Bv8nq1VmJzwkiIJoOvFcT5GgPAu0Kw7zvex4zRPgOAzcKW3/dUGMPNJer2txY6Avm3g4rqtKXvA5Q4w+GTIpuxKQVpCoQC8n9Ez5YCBW6BnzZtbax+nD0CGZpW6AQ4OgdEiZa/73Lu7c27/9rTm9wPpzXJwpfyhAgAAAAZiS0dEAP8A/wD/oL2nkwAAAKRJREFUeNrt2LEKglAAhWHtyXphbeodGhqiRRBCiooIBClbszdwOVt+/35QPr3LLetmPRVBu9cnmRfteRXtu/sY7bOn/0EAAAAAAAAAAAAAAAAAAGCJle/qFN0H3I5d9AKP9hrtn+HeEQAAAAAAAAAAAAAAAAAAAEu8D/iO++g+YBo22RcYttG+vxz8AQAAAAAAAAAAAAAAAAAAAIAkSZIkSdJ8P1ZuIEgoNj6sAAAAAElFTkSuQmCC"
+
 var all_foliage = [
     {"artist": "Oranitha", "name": "tall stalk", "categories": ["flower"], "source": "https://i.imgur.com/PabdLnL.png"}, 
     {"artist": "Oranitha", "name": "short stalk", "categories": ["flower"], "source": "https://i.imgur.com/WN2m2Aa.png"},

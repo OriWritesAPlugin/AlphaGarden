@@ -110,7 +110,7 @@
           canvas = document.getElementById(id);
           ctx = canvas.getContext("2d");
           var img=new Image();
-          img.src="https://i.imgur.com/rSLWUqw.png";  // palette preview image
+          img.src=PALETTE_PREVIEW_IMG;
           img.crossOrigin = "anonymous"
           img.onload = function() {
               ctx.imageSmoothingEnabled= false

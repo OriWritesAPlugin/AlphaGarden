@@ -590,7 +590,7 @@
           var raw_plant_data = decode_plant_data(seed_string);
           var plant_data = parse_plant_data(raw_plant_data);
           var img=new Image();
-          img.src="https://i.imgur.com/rSLWUqw.png";  // palette preview image
+          img.src=PALETTE_PREVIEW_IMG;
           img.crossOrigin = "anonymous"
           img.onload = function() {
               ctx.drawImage(img, 0, 0);
