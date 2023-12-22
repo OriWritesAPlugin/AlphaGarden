@@ -218,7 +218,9 @@ async function gen_randogarden(reuse_and_scramble_positions = false) {
     if (ground_palette["foliage"] == null) {
         scramble_tileable_palette();
     }
-    place_tileable(midground);
+    if (midground != undefined) {
+        place_tileable(midground);
+    }
     // Wait for logic to complete and place plants and etc. (this is how we maintain a layering order)
     for (var i = 0; i < components_to_place.length; i++) {
         if (i == 0 && background_overlay != null) {
@@ -577,7 +579,7 @@ async function get_canvas_for_named_component(name) {
     var work_ctx = work_canvas.getContext("2d");
     work_canvas.width = work_canvas_size;
     work_canvas.height = work_canvas_size;
-    place_image_at_coords_with_chance(all_named[name], [[Math.floor(work_canvas_size / 2), work_canvas_size - 1]], work_ctx, 1, true);
+    place_image_at_coords_with_chance("named" + reformatted_named[name]["offset"], [[Math.floor(work_canvas_size / 2), work_canvas_size - 1]], work_ctx, 1, true);
     return work_canvas;
 }
 function get_rgb_from_overlay_name(color) {
@@ -882,7 +884,8 @@ async function do_preload_initial() {
     // Get all the tileable images. We use a set because some tileables have the same bottom and middle (like tree trunks)
     // refs["foliage"] = await preload_spritesheet("foliage", FOLIAGE_SPRITESHEET, all_foliage.length);
     await preload_plants();
-    refs["named"] = await preload_single_image(NAMED_SPRITESHEET);
+    await preload_named();
+    //refs["named"] = await preload_single_image(NAMED_SPRITESHEET);
     tileables = new Set();
     for (const key in available_ground) {
         tileables.add(available_ground[key]);
