@@ -14,8 +14,9 @@ DATA_FILE = "src/data.js"
 OUTPATH = "images"
 
 
-fetch_out = ["all_foliage",
-             "reformatted_named"
+fetch_out = [#"all_foliage",
+             #"reformatted_named",
+             "available_ground_base"
             ]
 
 
@@ -32,7 +33,7 @@ def extract_json_from_js_var(var_name):
             json_string += line
     formatted = json.loads(json_string)
     # One of them is weird because it's much easier to have it as a dict in js
-    if var_name == "reformatted_named":
+    if var_name in ("reformatted_named", "available_ground_base"):
         return [y for y in formatted.values()]
     return formatted        
 
@@ -62,6 +63,8 @@ def assemble_spritesheet_from_list(var_name):
         sedstr = f'/var FOLIAGE_SPRITESHEET/c\ var FOLIAGE_SPRITESHEET = "data:image/png;base64,{encoded}";'
     elif(var_name == "reformatted_named"):
         sedstr = f'/var NAMED_SPRITESHEET/c\ var NAMED_SPRITESHEET = "data:image/png;base64,{encoded}";'
+    elif(var_name == "available_ground_base"):
+        sedstr = f'/var GROUND_BASE_SPRITESHEET/c\ var GROUND_BASE_SPRITESHEET = "data:image/png;base64,{encoded}";'
     else:
         raise ValueError(f"sedstr is unconfigured for {var_name}!")
     subprocess.run(["sed", "-i", sedstr, os.path.abspath("./src/data.js")])

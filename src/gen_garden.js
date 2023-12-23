@@ -1,16 +1,5 @@
 var img_loadup = [];
 var current_ground = "grass [palette]";
-const available_ground = {"grass [palette]": "https://i.imgur.com/yPNa3WB.png", "sand": "https://i.imgur.com/Ejupy26.png",
-                          "sand [palette]": "https://i.imgur.com/Rzr07Ev.png", "none": "https://i.imgur.com/Hq3VDgi.png",
-                          "riverbed": "https://i.imgur.com/68dUehJ.png",
-                          "snow": "https://i.imgur.com/ljWMvBo.png", "dirt": "https://i.imgur.com/CqQDCgC.png",
-                          //"forgive me [palette]": "https://i.imgur.com/hpvghNN.png",
-                          "eyeball": "https://i.imgur.com/aoPg4Wa.png"};
-const available_ground_base = {"grass": "https://i.imgur.com/lUDZfla.png",
-                               "chunky dirt": "https://i.imgur.com/Q5WSQ4g.png", "glossy": "https://i.imgur.com/JNt11PZ.png",
-                               "gravel": "https://i.imgur.com/kKLKBFO.png", "none": "https://i.imgur.com/Hq3VDgi.png",
-                               "cracked": "https://i.imgur.com/dHWuGGN.png", "clumpy dirt": "https://i.imgur.com/MsIbnoa.png",
-                               "brick": "https://i.imgur.com/coV4D2G.png", "muck": "https://i.imgur.com/i197DEJ.png"};
 const available_overlay_colors = {"blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
                                   "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2"}
 // REMEMBER: TOP DOWN
@@ -29,17 +18,6 @@ const available_backgrounds = {"none": [],
                                "sickly": ["#3a392f", "#424134", "#4c4d3a", "#595b41", "#606345", "#6a704a", "#737d4d", "#78854f", "#809552"],
                                "soft sunset": ["#eb8d7c", "#ed9489", "#efa38f", "#f1b296", "#f5c8a3", "#f7d2a9", "#fae0b2", "#fff5c2",],
                                "sunrise": ["#ffd0db", "#ffc7cd", "#fdc3bb", "#fcc8ae", "#fbcda8"]}
-
-// "bottom" is tiled along the bottom of the image. If the height's less than the image height and a "middle"'s provided,
-// "middle" will be tiled up the rest of the way. "top", of course, goes along the top.
-// NOTE: you can only have a "middle" if you also have a base. Otherwise, where would middle start?
-const available_midgrounds = {"none": {},
-                              "tall_trunks": {"bottom": "https://i.imgur.com/zAN3vHZ.png", "middle": "https://i.imgur.com/zAN3vHZ.png"},
-                              "cavern": {"bottom": "https://i.imgur.com/7SArM0E.png", "top": "https://i.imgur.com/goBTb7l.png"},
-                              "hills": {"bottom": "https://i.imgur.com/AQrEUqZ.png"},
-                              "mountains": {"bottom": "https://i.imgur.com/gD89HDc.png"},
-                              "vines": {"top": "https://i.imgur.com/Rqu0SKM.png"},
-                              "waterfall": {"bottom": "https://i.imgur.com/7x4BfQZ.png", "middle": "https://i.imgur.com/7x4BfQZ.png", "top": "https://i.imgur.com/Xs2MviO.png"}};
 
 // TODO: merge available_ground into this once I do the UI refactor.
 const available_tileables = available_midgrounds;
@@ -302,13 +280,17 @@ async function gen_randogarden(reuse_and_scramble_positions=false) {
 async function place_tileable(tileable_name){
     let tile_canvas = document.getElementById("output_canvas");
     let tile_ctx = tile_canvas.getContext("2d");
-    if(available_tileables[tileable_name].hasOwnProperty("bottom")){
-        const bottom_canvas = await get_recolored_with_ground_palette(refs[available_tileables[tileable_name]["bottom"]]);
+    if(available_tileables[tileable_name].hasOwnProperty("bottom") || available_tileables[tileable_name].hasOwnProperty("middle")){
+        if(!available_tileables[tileable_name].hasOwnProperty("bottom")){
+            bottom_canvas = await get_recolored_with_ground_palette(refs[available_tileables[tileable_name]["middle"]]);
+        } else {
+            bottom_canvas = await get_recolored_with_ground_palette(refs[available_tileables[tileable_name]["bottom"]]);
+        }
         tile_along_y(bottom_canvas, tile_ctx, tile_canvas.height-bottom_canvas.height*2);
         // "middle" only has any meaning if there's also a bottom
         if(available_tileables[tileable_name].hasOwnProperty("middle")){
           const middle_canvas = await get_recolored_with_ground_palette(refs[available_tileables[tileable_name]["middle"]]);
-          const bottom_img_height = refs[available_tileables[tileable_name]["bottom"]].height*2;
+          const bottom_img_height = bottom_canvas.height*2;
           const middle_img_height = refs[available_tileables[tileable_name]["middle"]].height*2;
           let current_y = tile_canvas.height - bottom_img_height - middle_img_height;
           while(current_y > -middle_img_height){
@@ -875,23 +857,23 @@ async function do_preload() {
     gen_midground_selection("pick_midground");
 }
 
-
-
+async function preload_ground_bases() {
+    await preload_spritesheet("ground_base", GROUND_BASE_SPRITESHEET, Object.keys(available_ground_base).length);
+}
 
 // This is the only portion that needs run for the new layer-based interface, so for now they live in parallel.
 async function do_preload_initial() {
-    // Get all the tileable images. We use a set because some tileables have the same bottom and middle (like tree trunks)
-    // refs["foliage"] = await preload_spritesheet("foliage", FOLIAGE_SPRITESHEET, all_foliage.length);
     await preload_plants();
     await preload_named();
-    //refs["named"] = await preload_single_image(NAMED_SPRITESHEET);
+    await preload_ground_bases();
     tileables = new Set();
+    // Grounds and midgrounds have variable sizes, so can't be stored in spritesheets
     for (const key in available_ground){
       tileables.add(available_ground[key]);
     }
-    for (const key in available_ground_base){
+    /*for (const key in available_ground_base){
         tileables.add(available_ground_base[key]);
-      }
+      }*/
     for (const key in available_midgrounds){
       for (const subkey in available_midgrounds[key]){
         tileables.add(available_midgrounds[key][subkey]);
