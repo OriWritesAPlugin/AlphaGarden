@@ -1,4 +1,6 @@
 // Contains general utility functions used by multiple pages.
+// Modified version of the Okabe-Ito colorblind palette, replacing black with white due to dark website background
+const OFFSET_COLORS = ["#FFFFFF", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999"]
 
 // Stolen from https://stackoverflow.com/questions/17386707/how-to-check-if-a-canvas-is-blank
 // returns true if every pixel's uint32 representation is 0 (or "blank")
@@ -94,6 +96,43 @@ function getGoodieCollection(){
   return localStorage.goodie_collection.split(",");
 }
 
+function getMarkedBases(){
+  if (localStorage.marked_bases == undefined) {
+    return [];
+  }
+  return localStorage.marked_bases.split(",").map(Number);
+}
+
+// Check if plant_data fulfills any "mark" criteria
+// (which users set up in the completion tracker, lets them tag plants using
+// a certain palette, etc) and adds the corresponding marks.
+async function addMarkings(plant_data, plant_canvas){
+  const ctx = plant_canvas.getContext("2d");
+  let colors = getMarkedPalettes();
+  let draw_offset = 0;
+  for (const palette of ["foliage_palette", "feature_palette", "accent_palette"]){
+    color_offset = colors.indexOf(plant_data[palette]);
+    if(color_offset != -1){
+      ctx.fillStyle = getOffsetColor(color_offset);
+      ctx.fillRect(plant_canvas.width - 4, draw_offset, 4, 4);
+      draw_offset += 4;
+    }
+  }
+  let base_offset = getMarkedBases().indexOf(plant_data["foliage"]);
+  if(base_offset != -1){
+    ctx.fillStyle = getOffsetColor(base_offset);
+    ctx.strokeRect(plant_canvas.width - 4, 0, 4, 4);
+  }
+  return plant_canvas;
+}
+
+function getMarkedPalettes(){
+  if (localStorage.marked_palettes == undefined) {
+    return [];
+  }
+  return localStorage.marked_palettes.split(",").map(Number);
+}
+
 function collectGoodie(goodie_name){
   if (localStorage.goodie_collection == undefined) {
     getGoodieCollection();  // Initialize
@@ -120,6 +159,11 @@ function sortAndVerifySeedList(raw_list){
     }
   }
   return true_seeds;
+}
+
+// Given an index, retrieve the associated color. Color palette loops.
+function getOffsetColor(idx){
+    return OFFSET_COLORS[idx % OFFSET_COLORS.length];
 }
 
 

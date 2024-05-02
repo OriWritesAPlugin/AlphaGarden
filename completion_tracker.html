@@ -19,9 +19,10 @@
               <div>
                 <canvas id="palette_canvas" width=128 height=96></canvas><br>
                 <input id="reroll_bases_palette" type="button" class="chunky_fullwidth" value="Reroll" onclick="gen_base_divs(true)"></input>
+                <!--<input id="mark_bases" type="button" class="chunky_fullwidth" value="Mark" onclick="mark(true)"></input>-->
               </div>
               <div style="margin: 15px; text-align: left">
-                <p>View the bases you've discovered! Reroll to see a new color scheme (drawn from palettes you've discovered)</p><br>
+                <p>View the bases you've discovered! Reroll to see a new color scheme drawn from palettes you've discovered.</p><br>
               </div>
             </div>
             <div id="base_content_div"></div>
@@ -31,9 +32,10 @@
             <div id="palette_info_div" style="display: flex; width: 70%; position: relative; left: 20%">
               <div>
                 <canvas id="palette_canvas_2" width=128 height=96></canvas><br>
+                <input id="mark_palettes" type="button" class="chunky_fullwidth" value="Mark" onclick="mark(false)"></input>
               </div>
               <div style="margin: 15px; text-align: left">
-                <p>View the palettes you've discovered! Click them to build a palette for the base viewer</p><br>
+                <p>View the palettes you've discovered! Click them to build a palette for the base viewer. Click Mark then a palette to toggle a square mark on bingo/swap/etc seeds using that palette.</p><br>
               </div>
             </div>
             <div id="palette_content_div"></div>
@@ -64,6 +66,10 @@
     <script src="built/shared.js"></script>
     <script type="text/javascript">
 
+        marking_bases = false;
+        marking_palettes = false;
+        marked_bases = getMarkedBases();
+        marked_palettes = getMarkedPalettes();
         owned_bases = new Set();
         owned_palettes = new Set();
         seed_list = getSeedCollection();
@@ -91,7 +97,11 @@
           }
           let parent = document.getElementById("base_content_div");
           parent.innerHTML = "";
-          for(category of Object.keys(foliage_by_category)){
+          // We want to ensure that "rare" comes last
+          let categories = Object.keys(foliage_by_category);
+          categories.splice(categories.indexOf("rare"), 1);
+          categories.push("rare");
+          for(category of categories){
               let new_row = document.createElement('div');
               let row_heading = document.createElement('h3');
               new_row.className = "collection_display";
@@ -120,6 +130,14 @@
               replace_color_palette(overall_palette, new_overall_palette, ctx, 128, 96);
               ctx.scale(0.5,0.5);
           };
+        }
+
+        
+        function mark(is_bases) {
+          let target = is_bases? document.getElementById("mark_bases") : document.getElementById("mark_palettes");
+          const sentinel = is_bases? marking_bases : marking_palettes;
+          target.value = sentinel? "Mark" : "Stop Marking";
+          if(is_bases){  marking_bases = !sentinel; } else {  marking_palettes = !sentinel; }
         }
 
 
@@ -188,6 +206,11 @@
             swap_square.style.display = "inline";  // to align the label
             swap_square.style.borderStyle = "none";
             swap_square.style.marginBottom = "5px;"
+            swap_square.style.boxSizing = "border-box";
+            swap_square.style.borderStyle = "solid";
+            let border_offset = marked_bases.indexOf(id);
+            swap_square.style.borderColor = border_offset == -1 ? "transparent" : getOffsetColor(border_offset);
+            swap_square.style.borderWidth = "thick";
             let plant_data = gen_plant_data(0);
             let data_url = 'https://i.imgur.com/QhY0vOF.png';
             if(owned_bases.has(base_to_use)){
@@ -196,9 +219,18 @@
                 plant_data["feature_palette"] = selected_palettes[1];
                 plant_data["accent_palette"] = selected_palettes[2];
                 let seed = encode_plant_data_v2(plant_data);
-                data_url = await drawPlantForSquare(seed);
+                data_url = await drawPlantForSquare(seed, false);
             }
             swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
+            swap_square.onclick = function() {
+              if(marking_bases){
+                let was_marked = swapIsMarked(base_to_use, marked_bases);
+                swap_square.style.borderColor = was_marked? "transparent" : getOffsetColor(marked_bases.indexOf(base_to_use));
+                alert(marked_bases.toString());
+                localStorage.marked_bases = marked_bases.toString();
+                alert(localStorage.marked_bases);
+              }
+            }
             parent.appendChild(swap_square);
             return id;
         }
@@ -264,6 +296,8 @@
         }
 
         function show_collection_category(to_reveal){
+          marking_bases = false;
+          marking_palettes = false;
           bases = document.getElementById("base_div");
           palettes = document.getElementById("palette_div");
           goodies = document.getElementById("goodie_div");
@@ -301,6 +335,12 @@
         let palette_div = document.createElement("div");
         palette_div.style.width = "100px";
         palette_div.style.height = "25px";
+        palette_div.style.boxSizing = "border-box";
+        palette_div.style.borderStyle = "solid";
+        palette_div.style.borderColor = "transparent";
+        let border_offset = marked_palettes.indexOf(palette_redirect);
+        palette_div.style.borderColor = border_offset == -1 ? "transparent" : getOffsetColor(border_offset);
+        palette_div.style.borderWidth = "thick";
         data_url = "https://i.imgur.com/Hh8Nmck.png"
         if(owned_palettes.has(palette_redirect)){
             let palette = all_palettes[palette_redirect]["palette"];
@@ -315,13 +355,49 @@
             }
             data_url = canvas.toDataURL();
             palette_div.onclick = function() {
-              selected_palettes.unshift(palette_redirect);
-              selected_palettes.pop();
-              drawPalettePreview("palette_canvas_2");
+              // Marking mode: "favoriting" palettes
+              if(marking_palettes){
+                let was_marked = swapIsMarked(palette_redirect, marked_palettes);
+                palette_div.style.borderColor = was_marked? "transparent" : getOffsetColor(marked_palettes.indexOf(palette_redirect));
+                localStorage.marked_palettes = marked_palettes.toString();
+              // Not marking, pick them as usual
+              } else {
+                selected_palettes.unshift(palette_redirect);
+                selected_palettes.pop();
+                drawPalettePreview("palette_canvas_2");
+              }
             }
         }
         palette_div.style.background = 'url(' + data_url + ')  no-repeat center center';
         parent.appendChild(palette_div);
+      }
+
+      // Used with Marking Mode. Basically, check if something is in our target list. If it is,
+      // replace with the sentinel value -1 (we use offset to determine color, so the sentinel avoids messing with our colors).
+      // If it isn't present, replace the first instance of the sentinel value with it, or append if no sentinels are present.
+      // If it is, replace it with a sentinel.
+      // Basically it just push/pops without shuffling the list around.
+      // Returns whether the value was marked (present)
+      function swapIsMarked(value, target_list){
+        let was_marked = false;
+        let value_idx = target_list.indexOf(value);
+        if(value_idx == -1){  // It's not present; add to the list
+          // Replace a sentinel value with it, append if there are none.
+          let replacement_idx = target_list.indexOf(-1);
+          if(replacement_idx == -1){
+            target_list.push(value);
+          } else {
+            target_list[replacement_idx] = value;
+          }
+        } else {  // It's present; remove from the list
+          was_marked = true;
+          if(value_idx == (target_list.length - 1)){
+            target_list.pop();
+          } else {
+            target_list[value_idx] = -1;
+          }
+        }
+        return was_marked;
       }
 
       function regenWithPalette(palette){

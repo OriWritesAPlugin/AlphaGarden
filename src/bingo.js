@@ -520,15 +520,21 @@
         }
 
         // Looking quite a bit like quite a bit other code, takes a seed and draws the plant, but here in a bingo square.
-        async function drawPlantForSquare(seed){
-            plant_canvas = await gen_plant(decode_plant_data(seed));
+        async function drawPlantForSquare(seed, draw_markings=true){
+            let plant_data = decode_plant_data(seed);
+            plant_canvas = await gen_plant(plant_data);
             // TODO: This next scaling bit seems incredibly silly
             var scale_canvas = document.createElement("canvas");
             scale_canvas.width = 96;
             scale_canvas.height = 96;
             var scale_ctx = scale_canvas.getContext("2d");
             scale_ctx.imageSmoothingEnabled = false;
-            scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
+            if (draw_markings) {
+              finished_canvas = await addMarkings(plant_data, plant_canvas);
+              scale_ctx.drawImage(finished_canvas, 0, 0, 96, 96);
+            } else {
+              scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
+            }
             return scale_canvas.toDataURL();
         }
 
