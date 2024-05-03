@@ -22,7 +22,7 @@
     <body onload="do_setup()">
         <a href="index.html" class="index_link"><--Home</a>
         <div class='center-parent'>
-          <p id="todo_seed_list" style="margin: 0">Thanks for using the To-Do List! More <a href="https://www1.flightrising.com/forums/adopt/3112071">plants</a> appear as you go. The "hint" prompts are 100% optional. Good luck! :D</p>
+          <p id="todo_seed_list" style="margin: 0">Thanks for using the To-Do List! More <a href="https://www1.flightrising.com/forums/adopt/3112071">plants</a> appear as you go.<br>Use the dropdown to choose which plant you'd like (you're welcome to grab duplicates!). The "hint" prompts are 100% optional. Good luck! :D</p>
         </div>
         <div class='center-parent' style="display: flex; justify-content: center">
         <div id="plant_div_1" class='bingo_row' style="width: 10%; flex-direction: column; display:inline-block; vertical-align: top;"></div>
@@ -221,7 +221,7 @@
     async function genToDoPlant(num_plants_generated, rarity){
         let plant_data = gen_plant_data(rarity, forced_random_seed+String(num_plants_generated));
         seeds_generated.push(encode_plant_data_v2(plant_data));
-        const plant_canvas = await gen_plant(plant_data);
+        const plant_canvas = await addMarkings(plant_data, await gen_plant(plant_data));
         // TODO: This next scaling bit (still) seems incredibly silly
         var scale_canvas = document.createElement("canvas");
         scale_canvas.width = 96;
