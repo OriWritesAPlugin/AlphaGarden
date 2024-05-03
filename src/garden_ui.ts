@@ -3,8 +3,8 @@
 const PROPERTIES = {"base": {"defaultPalette": "CunEjC0KIh", "mainColor": "#FF0000", "secondColor": "#AA0000", "accentColor": "#FFAA00", "icon": "▒"},
                     "garden": {"defaultPalette": "CunEjC0KIh", "mainColor": "#1C2121", "secondColor": "#151818", "accentColor": "#273831", "icon": "⚘"},
                     "decor": {"defaultPalette": "CunEjC0KIh", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains", "accentColor": "#3D362B", "icon": "ꕔ"},
-                    "overlay": {"mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "☾"},
-                    "celestial": {"defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "icon": "☁"}}// old overlay: 1F191A
+                    "overlay": {"mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "⚙"},
+                    "celestial": {"defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "icon": "☾"}}// old overlay: 1F191A
 
 class LayerDiv {
   type: string;
@@ -358,8 +358,11 @@ class CelestialLayerDiv extends LayerDiv {
     // TODO: Typescript is amazing fantastic awesome but the enums might be worth holding off on
     let contentSelect = this.buildGenericDropdown("content", Object.keys(CelestialType).filter(value => isNaN(Number(value))));
     let skyPaletteSelect = this.buildGenericDropdown("skyPalette", Object.keys(available_backgrounds))
+    let [opacityFillIn, opacityLabel] = this.buildGenericFillIn("opacity", "opacity:", this.mainColor, true);
     dropdownDiv.appendChild(contentSelect);
     dropdownDiv.appendChild(skyPaletteSelect);
+    dropdownDiv.appendChild(opacityLabel);
+    dropdownDiv.appendChild(opacityFillIn);
     editDiv.appendChild(dropdownDiv);
     return editDiv;
   }
@@ -375,7 +378,9 @@ class LayerManager {
   layerHolderDiv: HTMLDivElement;
   activeGardenDiv: GardenLayerDiv;
   layers_created = 0;
-  default_width = 500;
+  width = 450;
+  height = 70;
+  scale = 1;
   updateCallback: Function;
   gardenToggleCallback: Function;
   activeGardenSeeds: HTMLTextAreaElement;
@@ -429,6 +434,7 @@ class LayerManager {
   }
 
   async setHeight(height: number){
+    this.height = height;
     this.fullCanvas.height = height;
     this.foreCanvas.height = height;
     this.backCanvas.height = height;
@@ -442,6 +448,7 @@ class LayerManager {
   }
 
   async setWidth(width: number){
+    this.width = width;
     this.fullCanvas.width = width;
     this.foreCanvas.width = width;
     this.backCanvas.width = width;
@@ -454,6 +461,10 @@ class LayerManager {
         layer.setWidth(width);
       }
     }
+  }
+
+  setScale(scale: number){
+    this.scale = scale;
   }
 
   buildLayerButton(type: string, callback: Function){
@@ -470,7 +481,7 @@ class LayerManager {
 
   addLayerAndAnimate(newLayerDiv: LayerDiv, openEditMode: Boolean){
     this.divToLayerMapper[newLayerDiv.selfDiv.id] = newLayerDiv;
-    this.layerHolderDiv.insertBefore(newLayerDiv.selfDiv, this.layerHolderDiv.firstChild);
+    this.layerHolderDiv.appendChild(newLayerDiv.selfDiv);
     if(openEditMode){
       setTimeout(() => {  newLayerDiv.toggleEditMode();}, 10);
     }
@@ -575,7 +586,10 @@ class LayerManager {
       layerDivObj.layer.place(this.foreCanvas, this.backCanvas);
     }
     let fullCtx = this.fullCanvas.getContext("2d");
-    fullCtx.drawImage(this.backCanvas, 0, 0, this.fullCanvas.width, this.fullCanvas.height);
-    fullCtx.drawImage(this.foreCanvas, 0, 0, this.fullCanvas.width, this.fullCanvas.height);
+    this.fullCanvas.height = this.height*this.scale;
+    this.fullCanvas.width = this.width*this.scale;
+    fullCtx.imageSmoothingEnabled = false;
+    fullCtx.drawImage(this.backCanvas, 0, 0, this.width*this.scale, this.height*this.scale);
+    fullCtx.drawImage(this.foreCanvas, 0, 0, this.width*this.scale, this.height*this.scale);
   }
 }
