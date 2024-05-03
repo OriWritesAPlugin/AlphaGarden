@@ -91,7 +91,7 @@
             var id = e.target.id;
             var bingo_square = document.getElementById(id);
             bingo_square.lastChild.style.opacity = 0.2;  // Make label translucent
-            bingo_square.lastChild.innerHTML = "Claimed!";
+            bingo_square.lastChild.innerHTML = "Owned!";
             if(swapped_seeds.indexOf(swappable_seeds[id]) == -1){
               swapped_seeds.push(swappable_seeds[id]);
             }

@@ -37,7 +37,7 @@
             for(let i=0; i<days_to_gen; i++){
                 let d = new Date();
                 d.setDate(d.getDate()-i);
-                claimed_seeds = localStorage["seed_swap_claimed_"+d.getDate()].split(",");
+                claimed_seeds = new Set(getSeedCollection());
                 random_seed = d.getDate().toString()+d.getMonth().toString()+d.getFullYear().toString() + "_shop_salty";
                 let new_text = document.createElement('h3');
                 new_text.innerHTML = text[i] + ("(daily special: " + daily_specials[i][0] + ")");
@@ -47,11 +47,7 @@
                 parent.appendChild(new_row);
                 for(let j=0; j<prices.length; j++){
                     let id = i + "_" + j;
-                    let claimed = claimed_seeds.indexOf(j.toString()) != -1;
-                    await add_swap_square(new_row, j, id, prices[j], i, claimed);
-                    if(claimed){
-                        mark_swap_claimed(id);
-                    }
+                    await add_swap_square(new_row, j, id, prices[j], i);
                 }
             }
         }
@@ -102,17 +98,10 @@
         }
 
         // Largely similar to bingo squares
-        async function add_swap_square(parent, column_offset, id, price, day, previously_claimed){
+        async function add_swap_square(parent, column_offset, id, price, day){
             let swap_square = document.createElement('div');
             swap_square.id = id;
             swap_square.className = 'bingo_box';
-            if(!previously_claimed){
-                swap_square.addEventListener("click", claim_swap);
-                swap_square.addEventListener('touchend', function(e){
-                        claim_swap(e);
-                        e.preventDefault();
-                    })
-            }
             swap_square.setAttribute("data-price", price);
             swap_square.style.display = "inline";  // to align the label
             let plant_data = gen_plant_data(0, random_seed+String(column_offset));
@@ -127,7 +116,6 @@
             let data_url = await drawPlantForSquare(seed);
             swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
             swappable_seeds[id] = seed;
-
             let label = document.createElement('label')
             label.htmlFor = id;
             label.className = 'todo_plant_label';
@@ -138,13 +126,22 @@
             label.style.verticalAlign = "top";
             swap_square.appendChild(label);
             parent.appendChild(swap_square);
+            if(claimed_seeds.has(seed)){
+                mark_swap_claimed(id);
+            } else {
+                swap_square.addEventListener("click", claim_swap);
+                swap_square.addEventListener('touchend', function(e){
+                        claim_swap(e);
+                        e.preventDefault();
+                })
+            }
             return id;
         }
 
         function mark_swap_claimed(id){
             var bingo_square = document.getElementById(id);
             bingo_square.lastChild.style.opacity = 0.2;  // Make label translucent
-            bingo_square.lastChild.innerHTML = "Claimed!";
+            bingo_square.lastChild.innerHTML = "Owned!";
             bingo_square = bingo_square.cloneNode(true);  // Kill the event listeners
         }
 
@@ -157,7 +154,6 @@
                 swapped_seeds.push(swappable_seeds[id]);
                 document.getElementById("seeds_earned").innerHTML = swapped_seeds.join(", ");
                 collectSeed(swappable_seeds[id]);
-                localStorage["seed_swap_claimed_" + (new Date().getDate() - id.split("_")[0])] += "," + id.split("_")[1];
                 addSeedPoints(price * -1);
                 updateSeedPointTotal();
             }
@@ -169,16 +165,6 @@
 
         async function do_preload() {
             let d = (new Date()).getDate();
-            // Cycle date data
-            if( localStorage["seed_swap_claimed_" + d] == undefined ){
-                delete localStorage["seed_swap_claimed_" + (d-3)];
-            }
-            for(let i=0; i<3; i++){
-                access = "seed_swap_claimed_"+(d-i);
-                if( localStorage[access] == undefined) {
-                    localStorage[access] = [];
-                }
-            }
             updateSeedPointTotal();
             await preload_plants();
             await gen_divs();
