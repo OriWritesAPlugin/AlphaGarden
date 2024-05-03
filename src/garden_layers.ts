@@ -401,13 +401,16 @@ class DecorLayer extends Layer{
     this.canvas.width = this.width;
     let tileCtx = this.canvas.getContext("2d");
     tileCtx.imageSmoothingEnabled = false;
-    if(available_tileables[this.content].hasOwnProperty("bottom")){
-        const bottom = await this.recolorOwnTileable("bottom");
+    let bottom;
+    if(available_tileables[this.content].hasOwnProperty("bottom") || available_tileables[this.content].hasOwnProperty("middle")){
+        let acting_bottom = "bottom";
+        if(!available_tileables[this.content].hasOwnProperty("bottom")){ acting_bottom = "middle" };
+        const bottom = await this.recolorOwnTileable(acting_bottom);
         tileAlongY(tileCtx, bottom, this.canvas.height-bottom.height*2, this.width);
         // "middle" only has any meaning if there's also a bottom
         if(available_tileables[this.content].hasOwnProperty("middle")){
           const middle = await this.recolorOwnTileable("middle");
-          const bottom_img_height = refs[available_tileables[this.content]["bottom"]].height*2;
+          const bottom_img_height = refs[available_tileables[this.content][acting_bottom]].height*2;
           const middle_img_height = refs[available_tileables[this.content]["middle"]].height*2;
           let current_y = this.canvas.height - bottom_img_height - middle_img_height;
           while(current_y > -middle_img_height){
@@ -473,18 +476,21 @@ class OverlayLayer extends Layer{
 enum CelestialType {
   Stars,
   Sky_Gradient,
-  Sky_Chunked
+  Sky_Chunked,
+  Fog
 }
 
 class CelestialLayer extends Layer{
   skyPalette: string;
   content: string;
+  opacity: number;
 
   constructor(width: number, height:number, x_offset: number, y_offset: number,
               content: string, skyPalette: string){
     super(width, height, x_offset, y_offset);
     this.content = content;
     this.skyPalette = skyPalette;
+    this.opacity = 1;
   }
 
   update(){
@@ -494,20 +500,14 @@ class CelestialLayer extends Layer{
     let actingPalette: string[];
     let ctx = this.canvas.getContext("2d");
     ctx.imageSmoothingEnabled = false;
+    ctx.globalAlpha = this.opacity;
     if(available_backgrounds.hasOwnProperty(this.skyPalette)){
       actingPalette = available_backgrounds[this.skyPalette]
     } else {
       actingPalette = this.skyPalette.split(",")
     }
     if(type==CelestialType.Sky_Gradient){
-      let grad =  ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-      let step = 1/(actingPalette.length);
-      for(let i=0; i<actingPalette.length-1; i++){
-        grad.addColorStop(i*step, actingPalette[i]);
-      }
-      grad.addColorStop(1, actingPalette[actingPalette.length-1]);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      drawSkyGradient(this.canvas, actingPalette, this.opacity);
     } else if(type==CelestialType.Sky_Chunked){
       let step = 1/(actingPalette.length);
       for(let i=actingPalette.length-1; i>=0; i--){
@@ -516,6 +516,8 @@ class CelestialLayer extends Layer{
       }
     } else if(type==CelestialType.Stars){
       this.generateStarfield(actingPalette[0]);
+    } else if(type==CelestialType.Fog){
+      return;
     }
   }
 
@@ -568,9 +570,16 @@ class CelestialLayer extends Layer{
     ctx.putImageData(main_img, 0, 0);
   }
 
-  // Celestials don't touch the foreground (probably)
-  place_fore(_place_onto_canvas: HTMLCanvasElement) {
-    return
+  place_fore(place_onto_canvas: HTMLCanvasElement) {
+    if(CelestialType[this.content]==CelestialType.Fog){
+      let actingPalette;
+      if(available_backgrounds.hasOwnProperty(this.skyPalette)){
+        actingPalette = available_backgrounds[this.skyPalette]
+      } else {
+        actingPalette = this.skyPalette.split(",")
+      }
+      applyOverlay(place_onto_canvas, actingPalette, this.opacity);
+  }
   }
 }
 
