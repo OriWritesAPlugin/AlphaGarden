@@ -58,7 +58,6 @@
           da_canvas = document.getElementById("output_canvas");
           gm = new LayerManager(da_canvas, document.getElementById("seed_list"));
           gm.toggleVisibility();
-          gm.toggleVisibility(); // We have to run it twice to make it invisible. Don't ask.
           gl = gm.activeGardenDiv.layer;
           document.getElementById("create_garden_organizer").appendChild(gm.selfDiv);
           callOnDrag = gm.updateCallback;  // Horrible little sin on my otherwise (IMO) nice refactor.

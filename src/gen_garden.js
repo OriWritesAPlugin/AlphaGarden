@@ -3,8 +3,7 @@ var current_ground = "grass [palette]";
 const available_overlay_colors = {"blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
                                   "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2"}
 // REMEMBER: TOP DOWN
-const available_backgrounds = {"none": [],
-                               "custom": [],
+const available_backgrounds = {"custom": [],
                                "dusk": ["#424270", "#4c4a73", "#5b5577", "#6f617f", "#7f6d82", "#8f7887", "#a2828a", "#b7938e", "#c29b8d"],
                                "early evening":  ["#4f6f94", "#5a839e", "#6da3ad", "#7eb9b8", "#9ccdbd", "#afdac4", "#c1e4cc", "#d0edd5", "#e0f6e1"],
                                "magically charged": ["#3c085c", "#571170", "#66167a", "#85238f", "#a2319e", "#c550a9", "#f487bc"],

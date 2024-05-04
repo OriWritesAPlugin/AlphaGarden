@@ -357,7 +357,14 @@ class CelestialLayerDiv extends LayerDiv {
     let dropdownDiv = this.buildGenericDiv(this.secondColor);
     // TODO: Typescript is amazing fantastic awesome but the enums might be worth holding off on
     let contentSelect = this.buildGenericDropdown("content", Object.keys(CelestialType).filter(value => isNaN(Number(value))));
-    let skyPaletteSelect = this.buildGenericDropdown("skyPalette", Object.keys(available_backgrounds))
+    let skyPaletteSelect = this.buildGenericDropdown("skyPalette", Object.keys(available_backgrounds));
+    skyPaletteSelect.onchange = async function(){
+      this.layer["skyPalette"]=skyPaletteSelect.value;
+      await this.onEditCallback();
+      if(skyPaletteSelect.value == "custom"){
+        this.get_custom_palette(this.layer, this.onEditCallback);
+      }
+    }.bind(this, "skyPalette");
     let [opacityFillIn, opacityLabel] = this.buildGenericFillIn("opacity", "opacity:", this.mainColor, true);
     dropdownDiv.appendChild(contentSelect);
     dropdownDiv.appendChild(skyPaletteSelect);
@@ -365,6 +372,40 @@ class CelestialLayerDiv extends LayerDiv {
     dropdownDiv.appendChild(opacityFillIn);
     editDiv.appendChild(dropdownDiv);
     return editDiv;
+  }
+
+  get_custom_palette(cl: CelestialLayer, callback: Function) {
+    let modal = document.createElement("div");
+    modal.classList.add("block_window");
+    let modal_display = document.createElement("div");
+    modal_display.classList.add("popup");
+    document.body.appendChild(modal);
+    let textbox = document.createElement("text");
+    textbox.textContent = "Enter a comma-separated list of hex colors. You can also put just one for a solid color, or a seed to use its first palette";
+    let fillIn = document.createElement("input") as HTMLInputElement;
+    fillIn.value = cl.customPalette.toString();
+    fillIn.oninput = async function() {
+      cl.setCustomPalette(fillIn.value);
+      await callback();
+    }
+    let button_container = document.createElement("div");
+    button_container.style.padding = "20px";
+    let accept_button = document.createElement("input");
+    accept_button.type = "button";
+    accept_button.onclick = async function() {
+      cl.setCustomPalette(fillIn.value);
+      document.body.removeChild(modal);
+      await callback();
+    }
+    accept_button.value = "Set Gradient";
+    accept_button.classList.add("chunky_fullwidth");
+    button_container.appendChild(textbox);
+    button_container.appendChild(fillIn);
+    button_container.appendChild(document.createElement("br"));
+    button_container.appendChild(document.createElement("br"));
+    button_container.appendChild(accept_button);
+    modal_display.appendChild(button_container);
+    modal.appendChild(modal_display);
   }
 }
 

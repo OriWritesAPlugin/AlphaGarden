@@ -482,6 +482,7 @@ enum CelestialType {
 
 class CelestialLayer extends Layer{
   skyPalette: string;
+  customPalette: string[];
   content: string;
   opacity: number;
 
@@ -491,6 +492,7 @@ class CelestialLayer extends Layer{
     this.content = content;
     this.skyPalette = skyPalette;
     this.opacity = 1;
+    this.customPalette = ["#192446", "#335366", "#426f7a"];
   }
 
   update(){
@@ -501,10 +503,10 @@ class CelestialLayer extends Layer{
     let ctx = this.canvas.getContext("2d");
     ctx.imageSmoothingEnabled = false;
     ctx.globalAlpha = this.opacity;
-    if(available_backgrounds.hasOwnProperty(this.skyPalette)){
-      actingPalette = available_backgrounds[this.skyPalette]
+    if(this.skyPalette == "custom"){
+      actingPalette = this.customPalette;
     } else {
-      actingPalette = this.skyPalette.split(",")
+      actingPalette = available_backgrounds[this.skyPalette];
     }
     if(type==CelestialType.Sky_Gradient){
       drawSkyGradient(this.canvas, actingPalette, this.opacity);
@@ -573,13 +575,22 @@ class CelestialLayer extends Layer{
   place_fore(place_onto_canvas: HTMLCanvasElement) {
     if(CelestialType[this.content]==CelestialType.Fog){
       let actingPalette;
-      if(available_backgrounds.hasOwnProperty(this.skyPalette)){
+      if(this.skyPalette != "custom"){
         actingPalette = available_backgrounds[this.skyPalette]
       } else {
-        actingPalette = this.skyPalette.split(",")
+        actingPalette = this.customPalette;
       }
       applyOverlay(place_onto_canvas, actingPalette, this.opacity);
+    }
   }
+
+  setCustomPalette(paletteText: string) {
+    if(paletteText.startsWith("#")){
+      this.customPalette = paletteText.toLowerCase().split(" ").join("").split(",");
+    } else {
+      this.customPalette = all_palettes[decode_plant_data(paletteText)["foliage_palette"]]["palette"].map(x => "#" + x);
+    }
+    this.update();
   }
 }
 
