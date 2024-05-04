@@ -288,6 +288,7 @@
         const plants_revealed_at_per_size = {3: {8: 1},
                                              5: {7: 1, 14: 2, 20: 3, 25: 4},
                                              7: {8: 1, 15: 2, 22: 3, 28: 4, 34: 5, 39: 6, 44: 7, 49: 8}};
+        const plants_revealed_at_self_care = {4: 1, 8: 2, 12: 3, 16: 4, 20: 5, 25: 6}
         var plants_revealed_at;
 
         const icons = [
@@ -495,7 +496,11 @@
         }
 
         function generate_board(size, board_challenge_code, seed_override=null) {
-            plants_revealed_at = plants_revealed_at_per_size[size];
+            if(board_challenge_code == "s"){
+              plants_revealed_at = plants_revealed_at_self_care;
+            } else {
+              plants_revealed_at = plants_revealed_at_per_size[size];
+            }
             if(board_challenge_code != current_challenge_code){
                 setAvailableChallengeListFromCode(board_challenge_code);
                 current_challenge_code = board_challenge_code;
