@@ -293,7 +293,7 @@ async function imageFromPopup(parent, name_of_image, callback){
         if(urlTaker.files == null){
             preview.src = await resize_for_garden(name_of_image, urlTaker.value);
         } else {
-            handleImage(urlTaker.files, name_of_image, preview);
+            await handleImage(urlTaker.files, name_of_image, preview);
         }
     })
     urlTaker.addEventListener("paste", function(event) {
@@ -307,7 +307,7 @@ async function imageFromPopup(parent, name_of_image, callback){
       }
     })
     confirm_button.addEventListener("click", function() {
-        parent.removeChild(form);
+        parent.removeChild(form); 
         // we got here by interrupting initial garden generation; restart it
         callback();
     })

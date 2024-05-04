@@ -584,7 +584,7 @@ class LayerManager {
            let cleaned_seed = seeds[i].split("%")[0];
            if(!all_named.hasOwnProperty(cleaned_seed)){
                imageFromPopup(document.body, cleaned_seed, callback.bind(seedList))
-               return;
+               return [];
            }
        }
     }
@@ -594,7 +594,7 @@ class LayerManager {
   async regenActiveGarden(seedList: string){
     let parsedSeedList;
     if(seedList){
-      parsedSeedList = this.parseSeedList(seedList, this.regenActiveGarden.bind(seedList));
+      parsedSeedList = this.parseSeedList(seedList, this.regenActiveGarden.bind(this, seedList));
     } else {
       parsedSeedList = [];
     }

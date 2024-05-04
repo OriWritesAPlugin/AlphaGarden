@@ -261,7 +261,7 @@ async function imageFromPopup(parent, name_of_image, callback) {
             preview.src = await resize_for_garden(name_of_image, urlTaker.value);
         }
         else {
-            handleImage(urlTaker.files, name_of_image, preview);
+            await handleImage(urlTaker.files, name_of_image, preview);
         }
     });
     urlTaker.addEventListener("paste", function (event) {

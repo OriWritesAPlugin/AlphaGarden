@@ -564,7 +564,8 @@ async function get_canvas_for_named_component(name) {
     var work_ctx = work_canvas.getContext("2d");
     work_canvas.width = work_canvas_size;
     work_canvas.height = work_canvas_size;
-    place_image_at_coords_with_chance("named" + reformatted_named[name]["offset"], [[Math.floor(work_canvas_size / 2), work_canvas_size - 1]], work_ctx, 1, true);
+    name = name.startsWith("*") ? name + "_wildcard_data_url" : "named" + reformatted_named[name]["offset"];
+    place_image_at_coords_with_chance(name, [[Math.floor(work_canvas_size / 2), work_canvas_size - 1]], work_ctx, 1, true);
     return work_canvas;
 }
 function get_rgb_from_overlay_name(color) {
