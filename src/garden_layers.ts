@@ -343,9 +343,6 @@ class GardenLayer extends Layer{
   update(){
     this.clearCanvas();
     let ctx = this.canvas.getContext("2d");
-    if(Math.random() > 0.6){
-      ctx.filter = "blur(0.5px)";
-    }
     ctx.drawImage(this.canvasGarden, 0, 6, this.canvasGarden.width, this.canvasGarden.height);
     ctx.drawImage(this.canvasGround, 0, 0, this.canvasGround.width, this.canvasGround.height);
   }
