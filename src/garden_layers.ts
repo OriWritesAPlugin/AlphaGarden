@@ -33,6 +33,7 @@ abstract class Layer {
   canvas: HTMLCanvasElement;
   height: number;
   isActive: boolean;  // We hold this, but the layer manager's the one that needs it. Only gardens can be active (for now?)
+  scale: number;
 
   constructor(width: number, height:number, x_offset: number, y_offset: number) {
     this.canvas = document.createElement("canvas");
@@ -43,12 +44,14 @@ abstract class Layer {
     this.width = width;
     this.height = height;
     this.isActive = false;
+    this.scale = 1;
   }
 
   place_fore(place_onto_canvas: HTMLCanvasElement) {
     let place_onto_ctx = place_onto_canvas.getContext("2d");
+    place_onto_ctx.imageSmoothingEnabled = false;  // In case of scaling
     place_onto_ctx.drawImage(this.canvas, this.x_offset, this.y_offset*-1,
-                             this.width, this.height);
+                             this.width*this.scale, this.height*this.scale);
   }
 
   place_back(place_onto_canvas: HTMLCanvasElement) {
@@ -188,7 +191,7 @@ class GardenLayer extends Layer{
   ground: string;
 
   constructor(width: number, height:number, x_offset: number, y_offset: number, seedList: string[],
-              groundPaletteSeed: string, groundCover: string, ground: string){
+              groundPaletteSeed: string, groundCover: string, ground: string, scale:number){
     super(width, height, x_offset, y_offset);
     this.seedList = seedList;
     this.generateContent();
@@ -340,6 +343,9 @@ class GardenLayer extends Layer{
   update(){
     this.clearCanvas();
     let ctx = this.canvas.getContext("2d");
+    if(Math.random() > 0.6){
+      ctx.filter = "blur(0.5px)";
+    }
     ctx.drawImage(this.canvasGarden, 0, 6, this.canvasGarden.width, this.canvasGarden.height);
     ctx.drawImage(this.canvasGround, 0, 0, this.canvasGround.width, this.canvasGround.height);
   }
@@ -353,10 +359,11 @@ class GardenLayer extends Layer{
     let place_onto_ctx = place_onto_canvas.getContext("2d");
     // We place at the BOTTOM of the image, so the y_offset usually moves things upwards.
     // That's because folks are more likely to want sky than ground, and positive y "feels" better somehow
-    // The double LAYER_HEIGHT is to account first for the height allowed for plants, then for the padding height
+    // The LAYER_HEIGHT math is to account first for the height allowed for plants, then for the padding height
     // that allows for y offsets equal to the height of the canvas (see setHeight)
-    place_onto_ctx.drawImage(this.canvas, this.x_offset, this.height-LAYER_HEIGHT*2-this.y_offset,
-                             this.width, this.height);
+    place_onto_ctx.imageSmoothingEnabled = false;
+    place_onto_ctx.drawImage(this.canvas, this.x_offset, this.height - LAYER_HEIGHT*(1+this.scale) - this.y_offset,
+                             this.width*this.scale, this.height*this.scale);
   }
 
   setHeight(height: number){
@@ -601,7 +608,7 @@ Some day I, too, will be able to structuredClone()
 **/
 function cloneGardenLayer(gardenLayer: GardenLayer){
   // Empty seed list to start so we don't waste time regenerating canvases
-  let newGarden = new GardenLayer(gardenLayer.width, gardenLayer.height, gardenLayer.x_offset, gardenLayer.y_offset, [], gardenLayer.groundPaletteSeed, gardenLayer.groundCover, gardenLayer.ground);
+  let newGarden = new GardenLayer(gardenLayer.width, gardenLayer.height, gardenLayer.x_offset, gardenLayer.y_offset, [], gardenLayer.groundPaletteSeed, gardenLayer.groundCover, gardenLayer.ground, 1);
   newGarden.smart_coords = gardenLayer.smart_coords;
   newGarden.content = gardenLayer.content;
   newGarden.canvasGarden = gardenLayer.canvasGarden;

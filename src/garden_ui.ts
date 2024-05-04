@@ -174,7 +174,7 @@ class LayerDiv {
   }
 
   buildPositionDiv(){
-    const pairs = [["x_offset", "x:"], ["y_offset", "y:"], ["width", "<br>width:"]];
+    const pairs = [["x_offset", "x:"], ["y_offset", "y:"], ["width", "<br>width:"], ["scale", "scale:"]];
     let holdDiv = this.buildGenericDiv(this.mainColor);
     holdDiv.style.display = "inline-block";
     holdDiv.style.height = "auto";
@@ -327,7 +327,8 @@ class OverlayLayerDiv extends LayerDiv {
     let editDiv = document.createElement("div");
     editDiv.className = "layer_div";
     editDiv.style.backgroundColor = this.secondColor;
-    let leftOptionsDiv = this.buildOptionsHolderDiv();
+    editDiv.innerHTML = "Effects layer under construction! The overlay stuff was moved to the celestial (blue moon) tab, pick \"fog\".<br><br>Eventually, I want this to handle decor like picture frames"
+    /*let leftOptionsDiv = this.buildOptionsHolderDiv();
     let rightOptionsDiv = this.buildOptionsHolderDiv();
     let [_fillInCast, label] = this.buildGenericFillIn("color", "color:", this.mainColor);
     let fillIn = _fillInCast as HTMLInputElement;
@@ -340,7 +341,7 @@ class OverlayLayerDiv extends LayerDiv {
     rightOptionsDiv.appendChild(label2);
     rightOptionsDiv.appendChild(fillIn2);
     editDiv.appendChild(leftOptionsDiv);
-    editDiv.appendChild(rightOptionsDiv);
+    editDiv.appendChild(rightOptionsDiv);*/
     return editDiv;
   }
 }
@@ -457,7 +458,7 @@ class LayerManager {
     this.selfDiv.appendChild(this.buildLayerButton("overlay", this.makeOverlayLayer));
     this.selfDiv.appendChild(this.layerHolderDiv);
     // Usually we await. Can't in the constructor, so we do it a little funky
-    let newGardenLayer = new GardenLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, [], PROPERTIES["garden"]["defaultPalette"], "grass [palette]", "clumpy dirt");
+    let newGardenLayer = new GardenLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, [], PROPERTIES["garden"]["defaultPalette"], "grass [palette]", "clumpy dirt", 1);
     let newGardenLayerDiv = new GardenLayerDiv(newGardenLayer, this.get_id(), this.updateCallback, this.gardenToggleCallback);
     this.activeGardenDiv = newGardenLayerDiv;
     newGardenLayerDiv.setActiveGarden();
@@ -531,7 +532,7 @@ class LayerManager {
   }
 
   async makeGardenLayer(openEditMode=true){
-    let newGardenLayer = new GardenLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, [], PROPERTIES["garden"]["defaultPalette"], "grass [palette]", "clumpy dirt");
+    let newGardenLayer = new GardenLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, [], PROPERTIES["garden"]["defaultPalette"], "grass [palette]", "clumpy dirt", 1);
     let newGardenLayerDiv = new GardenLayerDiv(newGardenLayer, this.get_id(), this.updateCallback, this.gardenToggleCallback);
     await newGardenLayer.updateMain();
     await newGardenLayer.updateGround();
