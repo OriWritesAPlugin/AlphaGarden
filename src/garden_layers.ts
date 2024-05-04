@@ -363,7 +363,7 @@ class GardenLayer extends Layer{
                              this.width*this.scale, this.height*this.scale);
   }
 
-  setHeight(height: number){
+  async setHeight(height: number){
     // All the + LAYER_HEIGHT is to create a canvas large enough for someone to y_offset all the way to the top of the screen.
     // If we had it exactly equal to the expected canvas size, there'd be LAYER_HEIGHT of empty space at the bottom if they tried.
     this.height = height + LAYER_HEIGHT;
@@ -371,8 +371,8 @@ class GardenLayer extends Layer{
     this.canvasGround.height = height + LAYER_HEIGHT;
     // The partner to that is the main garden being stacked on top of the ground and never needing to care about height
     this.canvasGarden.height = LAYER_HEIGHT;
-    this.updateMain();  // TODO: Investigate why this call is required, garden disappears without it but it shouldn't?
-    this.updateGround();
+    await this.updateMain();  // TODO: Investigate why this call is required, garden disappears without it but it shouldn't?
+    await this.updateGround();
   }
 
   async setWidth(width: number){

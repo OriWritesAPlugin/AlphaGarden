@@ -44,7 +44,7 @@ RedRevival: Giant gem tree (65), giant tree (67), berry bush (76), prickly pears
 
 FoxyCipher: Bleeding heart (101)
 
-gardening: planter_box (202)
+gardening: planter_box (192)
 
 Natron: North Africa set, 113-129: rhizophora m. (113), cypress (114), tamarix g. (115), papyrus (116), Hyphaene thebaica (117), (118), Pistacia khinjuk (119), wild Mediterranean cypress (120), salam tree (121), caper bush (122), (123), (124), (125), haloxylon (126), vachellia m (127), (128), silphium (129)
 
