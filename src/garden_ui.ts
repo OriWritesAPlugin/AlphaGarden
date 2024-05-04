@@ -259,6 +259,11 @@ class GardenLayerDiv extends LayerDiv {
     dropdownDiv.appendChild(groundCoverSelect);
     dropdownDiv.appendChild(groundSelect);
     let [fillIn, label] = this.buildGenericFillIn("groundPaletteSeed", "colors:", this.mainColor);
+    fillIn.onchange = async function(){
+      this.layer.groundPaletteSeed=(<HTMLInputElement>fillIn).value;
+      await this.layer.updateGround();
+      this.onEditCallback();
+    }.bind(this);
     dropdownDiv.appendChild(label);
     dropdownDiv.appendChild(fillIn);
     dropdownDiv.style.display = "inline-block"
@@ -377,7 +382,7 @@ class CelestialLayerDiv extends LayerDiv {
 
   get_custom_palette(cl: CelestialLayer, callback: Function) {
     let modal = document.createElement("div");
-    modal.classList.add("block_window");
+    //modal.classList.add("block_window");
     let modal_display = document.createElement("div");
     modal_display.classList.add("popup");
     document.body.appendChild(modal);

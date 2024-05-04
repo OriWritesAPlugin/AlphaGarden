@@ -375,12 +375,12 @@ class GardenLayer extends Layer{
     this.updateGround();
   }
 
-  setWidth(width: number){
+  async setWidth(width: number){
     this.width = width;
     this.canvas.width = width;
     this.canvasGround.width = width;
     this.canvasGarden.width = width;
-    this.updateMain();
+    await this.updateMain();
     this.updateGround();
   }
 }
