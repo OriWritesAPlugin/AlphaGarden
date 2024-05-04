@@ -108,13 +108,14 @@ class LayerDiv {
         deleteButton.type = "button";
         deleteButton.className = "chunky_wrap";
         deleteButton.value = "✕";
-        deleteButton.addEventListener('click', function () {
-            delete this.layer;
-            document.getElementById(this.id).remove();
-            this.onEditCallback();
-        }.bind(this));
+        deleteButton.addEventListener('click', function () { this.doDelete(); }.bind(this));
         deleteButton.style.backgroundColor = this.accentColor;
         return deleteButton;
+    }
+    doDelete() {
+        delete this.layer;
+        document.getElementById(this.id).remove();
+        this.onEditCallback();
     }
     buildGenericDropdown(target, optionList) {
         let selectBox = document.createElement("select");
@@ -442,6 +443,15 @@ class LayerManager {
         this.divToLayerMapper[newGardenLayerDiv.selfDiv.id] = newGardenLayerDiv;
         this.layerHolderDiv.insertBefore(newGardenLayerDiv.selfDiv, this.layerHolderDiv.firstChild);
     }
+    clearAllButActive() {
+        for (let id of Object.keys(this.divToLayerMapper)) {
+            let layerDiv = this.divToLayerMapper[id];
+            if (!layerDiv.layer.isActive) {
+                layerDiv.doDelete();
+                delete this.divToLayerMapper[id];
+            }
+        }
+    }
     toggleVisibility() {
         this.isVisible = !this.isVisible;
         if (!this.isVisible) {
@@ -509,8 +519,8 @@ class LayerManager {
         await newGardenLayer.updateGround();
         return this.addLayerAndAnimate(newGardenLayerDiv, openEditMode);
     }
-    async makeDecorLayer(openEditMode = true) {
-        let newDecorLayer = new DecorLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, PROPERTIES["decor"]["defaultContent"], PROPERTIES["decor"]["defaultPalette"]);
+    async makeDecorLayer(openEditMode = true, content = PROPERTIES["decor"]["defaultContent"], palette = PROPERTIES["decor"]["defaultPalette"]) {
+        let newDecorLayer = new DecorLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, content, palette);
         let newDecorLayerDiv = new DecorLayerDiv(newDecorLayer, this.get_id(), this.updateCallback);
         await newDecorLayer.update();
         return this.addLayerAndAnimate(newDecorLayerDiv, openEditMode);
@@ -520,8 +530,8 @@ class LayerManager {
         let newOverlayLayerDiv = new OverlayLayerDiv(newOverlayLayer, this.get_id(), this.updateCallback);
         return this.addLayerAndAnimate(newOverlayLayerDiv, openEditMode);
     }
-    async makeCelestialLayer(openEditMode = true) {
-        let newCelestialLayer = new CelestialLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, PROPERTIES["celestial"]["defaultContent"], PROPERTIES["celestial"]["defaultPalette"]);
+    async makeCelestialLayer(openEditMode = true, type = PROPERTIES["celestial"]["defaultContent"], palette = PROPERTIES["celestial"]["defaultPalette"], opacity = 1) {
+        let newCelestialLayer = new CelestialLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, type, palette, opacity);
         let newCelestialLayerDiv = new CelestialLayerDiv(newCelestialLayer, this.get_id(), this.updateCallback);
         newCelestialLayer.update();
         return this.addLayerAndAnimate(newCelestialLayerDiv, openEditMode);

@@ -186,6 +186,9 @@ function drawSkyGradient(canvas, actingPalette, opacity) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     return canvas;
 }
+function getRandomKeyFromObj(obj) {
+    return Object.keys(obj)[Math.floor(Math.random() * Object.keys(obj).length)];
+}
 async function applyOverlay(stencil_canvas, palette, opacity) {
     let stencil_ctx = stencil_canvas.getContext("2d");
     let return_canvas = document.createElement("canvas");

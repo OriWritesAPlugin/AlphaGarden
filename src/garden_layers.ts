@@ -491,11 +491,11 @@ class CelestialLayer extends Layer{
   opacity: number;
 
   constructor(width: number, height:number, x_offset: number, y_offset: number,
-              content: string, skyPalette: string){
+              content: string, skyPalette: string, opacity: number){
     super(width, height, x_offset, y_offset);
     this.content = content;
     this.skyPalette = skyPalette;
-    this.opacity = 1;
+    this.opacity = opacity;
     this.customPalette = ["#192446", "#335366", "#426f7a"];
   }
 
