@@ -3,21 +3,22 @@ var current_ground = "grass [palette]";
 const available_overlay_colors = { "blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
     "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2" };
 // REMEMBER: TOP DOWN
-const available_backgrounds = { "none": [],
-    "custom": [],
+const available_backgrounds = { "custom": [],
     "dusk": ["#424270", "#4c4a73", "#5b5577", "#6f617f", "#7f6d82", "#8f7887", "#a2828a", "#b7938e", "#c29b8d"],
     "early evening": ["#4f6f94", "#5a839e", "#6da3ad", "#7eb9b8", "#9ccdbd", "#afdac4", "#c1e4cc", "#d0edd5", "#e0f6e1"],
+    "forest murk": ["#fef4c9", "#8e9a7b", "#567654", "#1d2e22"],
     "magically charged": ["#3c085c", "#571170", "#66167a", "#85238f", "#a2319e", "#c550a9", "#f487bc"],
     "midday": ["#74a3c7", "#91c2e7", "#a8def6", "#b7e6fb", "#d5f2f8", "#ecfdfd"],
     "night": ["#000304", "#000407", "#00070c", "#000910", "#010c14", "#02111d"],
     "overcast": ["#c2c7c7", "#c9c8c7", "#d1cec9", "#d9d1c4", "#e1d6ca", "#e9ddc7", "#e7d7b5"],
     "predawn": ["#071b24", "#0a2630", "#0e3241", "#0e3e49", "#114b51", "#1a5a5b", "#226763", "#358375"],
     "purple night": ["#0a0618", "#0c071c", "#110823", "#150a29", "#1d0b32", "#290d3e", "#370f4b", "#561160"],
+    "rainy": ["#879aa1", "#677a81", "#5d7076", "#56696f", "#4d5f65", "#46585f", "#2a3e44"],
     "rose dusk": ["#4d2b40", "#532d45", "#5f324d", "#723756", "#843c63", "#964269", "#9c4667", "#a84864", "#b94860"],
     "shallow water": ["#29abbe", "#237d99", "#1b6380", "#145a70", "#0f5061", "#0c4b5a", "#09434e"],
     "sickly": ["#3a392f", "#424134", "#4c4d3a", "#595b41", "#606345", "#6a704a", "#737d4d", "#78854f", "#809552"],
     "soft sunset": ["#eb8d7c", "#ed9489", "#efa38f", "#f1b296", "#f5c8a3", "#f7d2a9", "#fae0b2", "#fff5c2",],
-    "sunrise": ["#ffd0db", "#ffc7cd", "#fdc3bb", "#fcc8ae", "#fbcda8"] };
+    "sunrise": ["#ffd0db", "#ffc7cd", "#fdc3bb", "#fcc8ae", "#fbcda8", "#fde795"] };
 // TODO: merge available_ground into this once I do the UI refactor.
 const available_tileables = available_midgrounds;
 var custom_background_colors = [];

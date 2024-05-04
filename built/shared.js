@@ -1,4 +1,6 @@
 // Contains general utility functions used by multiple pages.
+// Modified version of the Okabe-Ito colorblind palette, replacing black with white due to dark website background
+const OFFSET_COLORS = ["#FFFFFF", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999"];
 // Stolen from https://stackoverflow.com/questions/17386707/how-to-check-if-a-canvas-is-blank
 // returns true if every pixel's uint32 representation is 0 (or "blank")
 function isCanvasBlank(canvas) {
@@ -77,6 +79,40 @@ function getGoodieCollection() {
     }
     return localStorage.goodie_collection.split(",");
 }
+function getMarkedBases() {
+    if (localStorage.marked_bases == undefined) {
+        return [];
+    }
+    return localStorage.marked_bases.split(",").map(Number);
+}
+// Check if plant_data fulfills any "mark" criteria
+// (which users set up in the completion tracker, lets them tag plants using
+// a certain palette, etc) and adds the corresponding marks.
+async function addMarkings(plant_data, plant_canvas) {
+    const ctx = plant_canvas.getContext("2d");
+    let colors = getMarkedPalettes();
+    let draw_offset = 0;
+    for (const palette of ["foliage_palette", "feature_palette", "accent_palette"]) {
+        color_offset = colors.indexOf(plant_data[palette]);
+        if (color_offset != -1) {
+            ctx.fillStyle = getOffsetColor(color_offset);
+            ctx.fillRect(plant_canvas.width - 4, draw_offset, 4, 4);
+            draw_offset += 4;
+        }
+    }
+    let base_offset = getMarkedBases().indexOf(plant_data["foliage"]);
+    if (base_offset != -1) {
+        ctx.fillStyle = getOffsetColor(base_offset);
+        ctx.strokeRect(plant_canvas.width - 4, 0, 4, 4);
+    }
+    return plant_canvas;
+}
+function getMarkedPalettes() {
+    if (localStorage.marked_palettes == undefined) {
+        return [];
+    }
+    return localStorage.marked_palettes.split(",").map(Number);
+}
 function collectGoodie(goodie_name) {
     if (localStorage.goodie_collection == undefined) {
         getGoodieCollection(); // Initialize
@@ -103,6 +139,10 @@ function sortAndVerifySeedList(raw_list) {
         }
     }
     return true_seeds;
+}
+// Given an index, retrieve the associated color. Color palette loops.
+function getOffsetColor(idx) {
+    return OFFSET_COLORS[idx % OFFSET_COLORS.length];
 }
 // Returns true if there's a non-transparent pixel in `row` in ImageData `image_data`. Row is 0-indexed.
 // Modified from https://stackoverflow.com/questions/11796554/automatically-crop-html5-canvas-to-contents
@@ -133,29 +173,50 @@ function get_overlay_color_from_name(color, alpha) {
     rgb_code.push(255 * alpha);
     return rgb_code;
 }
-async function applyOverlay(place_onto_canvas, color, opacity) {
-    let place_onto_ctx = place_onto_canvas.getContext("2d");
-    let color_canvas = document.createElement("canvas");
-    let color_ctx = color_canvas.getContext("2d");
-    color_canvas.width = place_onto_canvas.width;
-    color_canvas.height = place_onto_canvas.height;
-    let rgb_code = get_overlay_color_from_name(color, opacity);
+function drawSkyGradient(canvas, actingPalette, opacity) {
+    let ctx = canvas.getContext("2d");
+    ctx.globalAlpha = opacity;
+    let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    let step = 1 / (actingPalette.length);
+    for (let i = 0; i < actingPalette.length - 1; i++) {
+        grad.addColorStop(i * step, actingPalette[i]);
+    }
+    grad.addColorStop(1, actingPalette[actingPalette.length - 1]);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    return canvas;
+}
+async function applyOverlay(stencil_canvas, palette, opacity) {
+    let stencil_ctx = stencil_canvas.getContext("2d");
+    let return_canvas = document.createElement("canvas");
+    let return_ctx = return_canvas.getContext("2d");
+    let pick_canvas = document.createElement("canvas");
+    let pick_ctx = pick_canvas.getContext("2d");
+    return_canvas.width, pick_canvas.width = stencil_canvas.width;
+    return_canvas.height, pick_canvas.height = stencil_canvas.height;
+    if (!Array.isArray(palette)) {
+        palette = [get_overlay_color_from_name(palette, opacity)];
+    }
+    pick_canvas = drawSkyGradient(pick_canvas, palette, opacity);
+    return_canvas.width = stencil_canvas.width;
+    return_canvas.height = stencil_canvas.height;
     // With our color info loaded, we apply the color itself to its own canvas
-    let main_imgData = place_onto_ctx.getImageData(0, 0, color_canvas.width, color_canvas.height).data;
-    let color_img = color_ctx.getImageData(0, 0, color_canvas.width, color_canvas.height);
-    let color_imgData = color_img.data;
+    let main_imgData = stencil_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height).data;
+    let pick_imgData = pick_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height).data;
+    let return_img = return_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height);
+    let return_imgData = return_img.data;
     // Loops through bytes and only place color if the area below has some alpha.
     for (var i = 0; i < main_imgData.length; i += 4) {
         if (main_imgData[i + 3] > 0) {
-            color_imgData[i] = rgb_code[0];
-            color_imgData[i + 1] = rgb_code[1];
-            color_imgData[i + 2] = rgb_code[2];
-            color_imgData[i + 3] = rgb_code[3];
+            return_imgData[i] = pick_imgData[i];
+            return_imgData[i + 1] = pick_imgData[i + 1];
+            return_imgData[i + 2] = pick_imgData[i + 2];
+            return_imgData[i + 3] = pick_imgData[i + 3];
         }
     }
-    color_ctx.putImageData(color_img, 0, 0);
-    place_onto_ctx.drawImage(color_canvas, 0, 0);
-    return ({ "canvas": color_canvas, "x_pos": 0, "y_pos": 0, "width": color_canvas.width, "height": color_canvas.height });
+    return_ctx.putImageData(return_img, 0, 0);
+    stencil_ctx.drawImage(return_canvas, 0, 0);
+    return ({ "canvas": return_canvas, "x_pos": 0, "y_pos": 0, "width": return_canvas.width, "height": return_canvas.height });
 }
 // tile an image left to right across a canvas at some y
 // optionally, offset them all to the left (or right, if you prefer) to

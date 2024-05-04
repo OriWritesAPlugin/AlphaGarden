@@ -29,6 +29,7 @@ class Layer {
     canvas;
     height;
     isActive; // We hold this, but the layer manager's the one that needs it. Only gardens can be active (for now?)
+    scale;
     constructor(width, height, x_offset, y_offset) {
         this.canvas = document.createElement("canvas");
         this.canvas.width = width;
@@ -38,10 +39,12 @@ class Layer {
         this.width = width;
         this.height = height;
         this.isActive = false;
+        this.scale = 1;
     }
     place_fore(place_onto_canvas) {
         let place_onto_ctx = place_onto_canvas.getContext("2d");
-        place_onto_ctx.drawImage(this.canvas, this.x_offset, this.y_offset * -1, this.width, this.height);
+        place_onto_ctx.imageSmoothingEnabled = false; // In case of scaling
+        place_onto_ctx.drawImage(this.canvas, this.x_offset, this.y_offset * -1, this.width * this.scale, this.height * this.scale);
     }
     place_back(place_onto_canvas) {
         let place_onto_ctx = place_onto_canvas.getContext("2d");
@@ -160,7 +163,7 @@ class GardenLayer extends Layer {
     groundPaletteSeed;
     groundCover;
     ground;
-    constructor(width, height, x_offset, y_offset, seedList, groundPaletteSeed, groundCover, ground) {
+    constructor(width, height, x_offset, y_offset, seedList, groundPaletteSeed, groundCover, ground, scale) {
         super(width, height, x_offset, y_offset);
         this.seedList = seedList;
         this.generateContent();
@@ -324,9 +327,10 @@ class GardenLayer extends Layer {
         let place_onto_ctx = place_onto_canvas.getContext("2d");
         // We place at the BOTTOM of the image, so the y_offset usually moves things upwards.
         // That's because folks are more likely to want sky than ground, and positive y "feels" better somehow
-        // The double LAYER_HEIGHT is to account first for the height allowed for plants, then for the padding height
+        // The LAYER_HEIGHT math is to account first for the height allowed for plants, then for the padding height
         // that allows for y offsets equal to the height of the canvas (see setHeight)
-        place_onto_ctx.drawImage(this.canvas, this.x_offset, this.height - LAYER_HEIGHT * 2 - this.y_offset, this.width, this.height);
+        place_onto_ctx.imageSmoothingEnabled = false;
+        place_onto_ctx.drawImage(this.canvas, this.x_offset, this.height - LAYER_HEIGHT * (1 + this.scale) - this.y_offset, this.width * this.scale, this.height * this.scale);
     }
     setHeight(height) {
         // All the + LAYER_HEIGHT is to create a canvas large enough for someone to y_offset all the way to the top of the screen.
@@ -339,12 +343,12 @@ class GardenLayer extends Layer {
         this.updateMain(); // TODO: Investigate why this call is required, garden disappears without it but it shouldn't?
         this.updateGround();
     }
-    setWidth(width) {
+    async setWidth(width) {
         this.width = width;
         this.canvas.width = width;
         this.canvasGround.width = width;
         this.canvasGarden.width = width;
-        this.updateMain();
+        await this.updateMain();
         this.updateGround();
     }
 }
@@ -364,13 +368,19 @@ class DecorLayer extends Layer {
         this.canvas.width = this.width;
         let tileCtx = this.canvas.getContext("2d");
         tileCtx.imageSmoothingEnabled = false;
-        if (available_tileables[this.content].hasOwnProperty("bottom")) {
-            const bottom = await this.recolorOwnTileable("bottom");
+        let bottom;
+        if (available_tileables[this.content].hasOwnProperty("bottom") || available_tileables[this.content].hasOwnProperty("middle")) {
+            let acting_bottom = "bottom";
+            if (!available_tileables[this.content].hasOwnProperty("bottom")) {
+                acting_bottom = "middle";
+            }
+            ;
+            const bottom = await this.recolorOwnTileable(acting_bottom);
             tileAlongY(tileCtx, bottom, this.canvas.height - bottom.height * 2, this.width);
             // "middle" only has any meaning if there's also a bottom
             if (available_tileables[this.content].hasOwnProperty("middle")) {
                 const middle = await this.recolorOwnTileable("middle");
-                const bottom_img_height = refs[available_tileables[this.content]["bottom"]].height * 2;
+                const bottom_img_height = refs[available_tileables[this.content][acting_bottom]].height * 2;
                 const middle_img_height = refs[available_tileables[this.content]["middle"]].height * 2;
                 let current_y = this.canvas.height - bottom_img_height - middle_img_height;
                 while (current_y > -middle_img_height) {
@@ -430,14 +440,19 @@ var CelestialType;
     CelestialType[CelestialType["Stars"] = 0] = "Stars";
     CelestialType[CelestialType["Sky_Gradient"] = 1] = "Sky_Gradient";
     CelestialType[CelestialType["Sky_Chunked"] = 2] = "Sky_Chunked";
+    CelestialType[CelestialType["Fog"] = 3] = "Fog";
 })(CelestialType || (CelestialType = {}));
 class CelestialLayer extends Layer {
     skyPalette;
+    customPalette;
     content;
+    opacity;
     constructor(width, height, x_offset, y_offset, content, skyPalette) {
         super(width, height, x_offset, y_offset);
         this.content = content;
         this.skyPalette = skyPalette;
+        this.opacity = 1;
+        this.customPalette = ["#192446", "#335366", "#426f7a"];
     }
     update() {
         this.clearCanvas();
@@ -446,21 +461,15 @@ class CelestialLayer extends Layer {
         let actingPalette;
         let ctx = this.canvas.getContext("2d");
         ctx.imageSmoothingEnabled = false;
-        if (available_backgrounds.hasOwnProperty(this.skyPalette)) {
-            actingPalette = available_backgrounds[this.skyPalette];
+        ctx.globalAlpha = this.opacity;
+        if (this.skyPalette == "custom") {
+            actingPalette = this.customPalette;
         }
         else {
-            actingPalette = this.skyPalette.split(",");
+            actingPalette = available_backgrounds[this.skyPalette];
         }
         if (type == CelestialType.Sky_Gradient) {
-            let grad = ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-            let step = 1 / (actingPalette.length);
-            for (let i = 0; i < actingPalette.length - 1; i++) {
-                grad.addColorStop(i * step, actingPalette[i]);
-            }
-            grad.addColorStop(1, actingPalette[actingPalette.length - 1]);
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            drawSkyGradient(this.canvas, actingPalette, this.opacity);
         }
         else if (type == CelestialType.Sky_Chunked) {
             let step = 1 / (actingPalette.length);
@@ -471,6 +480,9 @@ class CelestialLayer extends Layer {
         }
         else if (type == CelestialType.Stars) {
             this.generateStarfield(actingPalette[0]);
+        }
+        else if (type == CelestialType.Fog) {
+            return;
         }
     }
     generateStarfield(accentColor) {
@@ -533,9 +545,26 @@ class CelestialLayer extends Layer {
         }
         ctx.putImageData(main_img, 0, 0);
     }
-    // Celestials don't touch the foreground (probably)
-    place_fore(_place_onto_canvas) {
-        return;
+    place_fore(place_onto_canvas) {
+        if (CelestialType[this.content] == CelestialType.Fog) {
+            let actingPalette;
+            if (this.skyPalette != "custom") {
+                actingPalette = available_backgrounds[this.skyPalette];
+            }
+            else {
+                actingPalette = this.customPalette;
+            }
+            applyOverlay(place_onto_canvas, actingPalette, this.opacity);
+        }
+    }
+    setCustomPalette(paletteText) {
+        if (paletteText.startsWith("#")) {
+            this.customPalette = paletteText.toLowerCase().split(" ").join("").split(",");
+        }
+        else {
+            this.customPalette = all_palettes[decode_plant_data(paletteText)["foliage_palette"]]["palette"].map(x => "#" + x);
+        }
+        this.update();
     }
 }
 /**
@@ -545,7 +574,7 @@ Some day I, too, will be able to structuredClone()
 **/
 function cloneGardenLayer(gardenLayer) {
     // Empty seed list to start so we don't waste time regenerating canvases
-    let newGarden = new GardenLayer(gardenLayer.width, gardenLayer.height, gardenLayer.x_offset, gardenLayer.y_offset, [], gardenLayer.groundPaletteSeed, gardenLayer.groundCover, gardenLayer.ground);
+    let newGarden = new GardenLayer(gardenLayer.width, gardenLayer.height, gardenLayer.x_offset, gardenLayer.y_offset, [], gardenLayer.groundPaletteSeed, gardenLayer.groundCover, gardenLayer.ground, 1);
     newGarden.smart_coords = gardenLayer.smart_coords;
     newGarden.content = gardenLayer.content;
     newGarden.canvasGarden = gardenLayer.canvasGarden;

@@ -284,6 +284,7 @@ const slot_max_retries = 15; // how many times to retry having a non-duplicate c
 const plants_revealed_at_per_size = { 3: { 8: 1 },
     5: { 7: 1, 14: 2, 20: 3, 25: 4 },
     7: { 8: 1, 15: 2, 22: 3, 28: 4, 34: 5, 39: 6, 44: 7, 49: 8 } };
+const plants_revealed_at_self_care = { 4: 1, 8: 2, 12: 3, 16: 4, 20: 5, 25: 6 };
 var plants_revealed_at;
 const icons = [
     "https://i.imgur.com/GSNkSxm.png",
@@ -494,7 +495,12 @@ function draw_board() {
     }
 }
 function generate_board(size, board_challenge_code, seed_override = null) {
-    plants_revealed_at = plants_revealed_at_per_size[size];
+    if (board_challenge_code == "s") {
+        plants_revealed_at = plants_revealed_at_self_care;
+    }
+    else {
+        plants_revealed_at = plants_revealed_at_per_size[size];
+    }
     if (board_challenge_code != current_challenge_code) {
         setAvailableChallengeListFromCode(board_challenge_code);
         current_challenge_code = board_challenge_code;
@@ -518,15 +524,22 @@ async function genSeedForSquare(forced_random_offset = 0) {
     return encode_plant_data_v2(plant_data);
 }
 // Looking quite a bit like quite a bit other code, takes a seed and draws the plant, but here in a bingo square.
-async function drawPlantForSquare(seed) {
-    plant_canvas = await gen_plant(decode_plant_data(seed));
+async function drawPlantForSquare(seed, draw_markings = true) {
+    let plant_data = decode_plant_data(seed);
+    plant_canvas = await gen_plant(plant_data);
     // TODO: This next scaling bit seems incredibly silly
     var scale_canvas = document.createElement("canvas");
     scale_canvas.width = 96;
     scale_canvas.height = 96;
     var scale_ctx = scale_canvas.getContext("2d");
     scale_ctx.imageSmoothingEnabled = false;
-    scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
+    if (draw_markings) {
+        finished_canvas = await addMarkings(plant_data, plant_canvas);
+        scale_ctx.drawImage(finished_canvas, 0, 0, 96, 96);
+    }
+    else {
+        scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
+    }
     return scale_canvas.toDataURL();
 }
 async function toggle_status(e, generate_rewards = true) {

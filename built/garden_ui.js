@@ -2,8 +2,8 @@
 const PROPERTIES = { "base": { "defaultPalette": "CunEjC0KIh", "mainColor": "#FF0000", "secondColor": "#AA0000", "accentColor": "#FFAA00", "icon": "▒" },
     "garden": { "defaultPalette": "CunEjC0KIh", "mainColor": "#1C2121", "secondColor": "#151818", "accentColor": "#273831", "icon": "⚘" },
     "decor": { "defaultPalette": "CunEjC0KIh", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains", "accentColor": "#3D362B", "icon": "ꕔ" },
-    "overlay": { "mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "☾" },
-    "celestial": { "defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "icon": "☁" } }; // old overlay: 1F191A
+    "overlay": { "mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "⚙" },
+    "celestial": { "defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "icon": "☾" } }; // old overlay: 1F191A
 class LayerDiv {
     type;
     selfDiv;
@@ -166,7 +166,7 @@ class LayerDiv {
         return [fillIn, label];
     }
     buildPositionDiv() {
-        const pairs = [["x_offset", "x:"], ["y_offset", "y:"], ["width", "<br>width:"]];
+        const pairs = [["x_offset", "x:"], ["y_offset", "y:"], ["width", "<br>width:"], ["scale", "scale:"]];
         let holdDiv = this.buildGenericDiv(this.mainColor);
         holdDiv.style.display = "inline-block";
         holdDiv.style.height = "auto";
@@ -246,6 +246,11 @@ class GardenLayerDiv extends LayerDiv {
         dropdownDiv.appendChild(groundCoverSelect);
         dropdownDiv.appendChild(groundSelect);
         let [fillIn, label] = this.buildGenericFillIn("groundPaletteSeed", "colors:", this.mainColor);
+        fillIn.onchange = async function () {
+            this.layer.groundPaletteSeed = fillIn.value;
+            await this.layer.updateGround();
+            this.onEditCallback();
+        }.bind(this);
         dropdownDiv.appendChild(label);
         dropdownDiv.appendChild(fillIn);
         dropdownDiv.style.display = "inline-block";
@@ -305,20 +310,21 @@ class OverlayLayerDiv extends LayerDiv {
         let editDiv = document.createElement("div");
         editDiv.className = "layer_div";
         editDiv.style.backgroundColor = this.secondColor;
-        let leftOptionsDiv = this.buildOptionsHolderDiv();
+        editDiv.innerHTML = "Effects layer under construction! The overlay stuff was moved to the celestial (blue moon) tab, pick \"fog\".<br><br>Eventually, I want this to handle decor like picture frames";
+        /*let leftOptionsDiv = this.buildOptionsHolderDiv();
         let rightOptionsDiv = this.buildOptionsHolderDiv();
         let [_fillInCast, label] = this.buildGenericFillIn("color", "color:", this.mainColor);
-        let fillIn = _fillInCast;
+        let fillIn = _fillInCast as HTMLInputElement;
         fillIn.value = PROPERTIES["overlay"]["defaultColor"];
         leftOptionsDiv.appendChild(label);
         leftOptionsDiv.appendChild(fillIn);
         let [_fillIn2Cast, label2] = this.buildGenericFillIn("opacity", "alpha:", this.mainColor, true);
-        let fillIn2 = _fillIn2Cast;
-        fillIn2.value = "" + PROPERTIES["overlay"]["defaultOpacity"];
+        let fillIn2 = _fillIn2Cast as HTMLInputElement;
+        fillIn2.value = ""+PROPERTIES["overlay"]["defaultOpacity"];
         rightOptionsDiv.appendChild(label2);
         rightOptionsDiv.appendChild(fillIn2);
         editDiv.appendChild(leftOptionsDiv);
-        editDiv.appendChild(rightOptionsDiv);
+        editDiv.appendChild(rightOptionsDiv);*/
         return editDiv;
     }
 }
@@ -334,10 +340,53 @@ class CelestialLayerDiv extends LayerDiv {
         // TODO: Typescript is amazing fantastic awesome but the enums might be worth holding off on
         let contentSelect = this.buildGenericDropdown("content", Object.keys(CelestialType).filter(value => isNaN(Number(value))));
         let skyPaletteSelect = this.buildGenericDropdown("skyPalette", Object.keys(available_backgrounds));
+        skyPaletteSelect.onchange = async function () {
+            this.layer["skyPalette"] = skyPaletteSelect.value;
+            await this.onEditCallback();
+            if (skyPaletteSelect.value == "custom") {
+                this.get_custom_palette(this.layer, this.onEditCallback);
+            }
+        }.bind(this, "skyPalette");
+        let [opacityFillIn, opacityLabel] = this.buildGenericFillIn("opacity", "opacity:", this.mainColor, true);
         dropdownDiv.appendChild(contentSelect);
         dropdownDiv.appendChild(skyPaletteSelect);
+        dropdownDiv.appendChild(opacityLabel);
+        dropdownDiv.appendChild(opacityFillIn);
         editDiv.appendChild(dropdownDiv);
         return editDiv;
+    }
+    get_custom_palette(cl, callback) {
+        let modal = document.createElement("div");
+        //modal.classList.add("block_window");
+        let modal_display = document.createElement("div");
+        modal_display.classList.add("popup");
+        document.body.appendChild(modal);
+        let textbox = document.createElement("text");
+        textbox.textContent = "Enter a comma-separated list of hex colors. You can also put just one for a solid color, or a seed to use its first palette";
+        let fillIn = document.createElement("input");
+        fillIn.value = cl.customPalette.toString();
+        fillIn.oninput = async function () {
+            cl.setCustomPalette(fillIn.value);
+            await callback();
+        };
+        let button_container = document.createElement("div");
+        button_container.style.padding = "20px";
+        let accept_button = document.createElement("input");
+        accept_button.type = "button";
+        accept_button.onclick = async function () {
+            cl.setCustomPalette(fillIn.value);
+            document.body.removeChild(modal);
+            await callback();
+        };
+        accept_button.value = "Set Gradient";
+        accept_button.classList.add("chunky_fullwidth");
+        button_container.appendChild(textbox);
+        button_container.appendChild(fillIn);
+        button_container.appendChild(document.createElement("br"));
+        button_container.appendChild(document.createElement("br"));
+        button_container.appendChild(accept_button);
+        modal_display.appendChild(button_container);
+        modal.appendChild(modal_display);
     }
 }
 // This big box of layers that goes on the right and lets you make more.
@@ -350,7 +399,9 @@ class LayerManager {
     layerHolderDiv;
     activeGardenDiv;
     layers_created = 0;
-    default_width = 500;
+    width = 450;
+    height = 70;
+    scale = 1;
     updateCallback;
     gardenToggleCallback;
     activeGardenSeeds;
@@ -384,7 +435,7 @@ class LayerManager {
         this.selfDiv.appendChild(this.buildLayerButton("overlay", this.makeOverlayLayer));
         this.selfDiv.appendChild(this.layerHolderDiv);
         // Usually we await. Can't in the constructor, so we do it a little funky
-        let newGardenLayer = new GardenLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, [], PROPERTIES["garden"]["defaultPalette"], "grass [palette]", "clumpy dirt");
+        let newGardenLayer = new GardenLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, [], PROPERTIES["garden"]["defaultPalette"], "grass [palette]", "clumpy dirt", 1);
         let newGardenLayerDiv = new GardenLayerDiv(newGardenLayer, this.get_id(), this.updateCallback, this.gardenToggleCallback);
         this.activeGardenDiv = newGardenLayerDiv;
         newGardenLayerDiv.setActiveGarden();
@@ -401,6 +452,7 @@ class LayerManager {
         }
     }
     async setHeight(height) {
+        this.height = height;
         this.fullCanvas.height = height;
         this.foreCanvas.height = height;
         this.backCanvas.height = height;
@@ -413,6 +465,7 @@ class LayerManager {
         }
     }
     async setWidth(width) {
+        this.width = width;
         this.fullCanvas.width = width;
         this.foreCanvas.width = width;
         this.backCanvas.width = width;
@@ -425,6 +478,9 @@ class LayerManager {
                 layer.setWidth(width);
             }
         }
+    }
+    setScale(scale) {
+        this.scale = scale;
     }
     buildLayerButton(type, callback) {
         let layerButton = document.createElement("input");
@@ -439,7 +495,7 @@ class LayerManager {
     }
     addLayerAndAnimate(newLayerDiv, openEditMode) {
         this.divToLayerMapper[newLayerDiv.selfDiv.id] = newLayerDiv;
-        this.layerHolderDiv.insertBefore(newLayerDiv.selfDiv, this.layerHolderDiv.firstChild);
+        this.layerHolderDiv.appendChild(newLayerDiv.selfDiv);
         if (openEditMode) {
             setTimeout(() => { newLayerDiv.toggleEditMode(); }, 10);
         }
@@ -447,7 +503,7 @@ class LayerManager {
         return newLayerDiv;
     }
     async makeGardenLayer(openEditMode = true) {
-        let newGardenLayer = new GardenLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, [], PROPERTIES["garden"]["defaultPalette"], "grass [palette]", "clumpy dirt");
+        let newGardenLayer = new GardenLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, [], PROPERTIES["garden"]["defaultPalette"], "grass [palette]", "clumpy dirt", 1);
         let newGardenLayerDiv = new GardenLayerDiv(newGardenLayer, this.get_id(), this.updateCallback, this.gardenToggleCallback);
         await newGardenLayer.updateMain();
         await newGardenLayer.updateGround();
@@ -536,7 +592,10 @@ class LayerManager {
             layerDivObj.layer.place(this.foreCanvas, this.backCanvas);
         }
         let fullCtx = this.fullCanvas.getContext("2d");
-        fullCtx.drawImage(this.backCanvas, 0, 0, this.fullCanvas.width, this.fullCanvas.height);
-        fullCtx.drawImage(this.foreCanvas, 0, 0, this.fullCanvas.width, this.fullCanvas.height);
+        this.fullCanvas.height = this.height * this.scale;
+        this.fullCanvas.width = this.width * this.scale;
+        fullCtx.imageSmoothingEnabled = false;
+        fullCtx.drawImage(this.backCanvas, 0, 0, this.width * this.scale, this.height * this.scale);
+        fullCtx.drawImage(this.foreCanvas, 0, 0, this.width * this.scale, this.height * this.scale);
     }
 }
