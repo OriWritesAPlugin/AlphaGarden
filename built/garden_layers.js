@@ -217,6 +217,10 @@ class GardenLayer extends Layer {
         let type;
         let canvas;
         let percent_pos = identity.indexOf('%');
+        let is_flipped = identity.endsWith("<");
+        if (is_flipped) {
+            identity = identity.slice(0, identity.length - 1);
+        }
         let percent_val = null;
         let custom_pos = false;
         if (percent_pos > -1) {
@@ -243,6 +247,15 @@ class GardenLayer extends Layer {
         else {
             type = GardenItemType.Seed;
             canvas = await get_canvas_for_plant(identity);
+        }
+        if (is_flipped) {
+            let flip_canvas = document.createElement("canvas");
+            flip_canvas.width = canvas.width;
+            flip_canvas.height = canvas.height;
+            let ctx = flip_canvas.getContext("2d");
+            ctx.setTransform(-1, 0, 0, 1, canvas.width, 0);
+            ctx.drawImage(canvas, 0, 0);
+            canvas = flip_canvas;
         }
         let height = await this.classifyHeight(canvas);
         if (percent_pos == null) {
