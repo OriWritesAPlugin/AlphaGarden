@@ -870,9 +870,9 @@ async function preload_ground_bases() {
 }
 // This is the only portion that needs run for the new layer-based interface, so for now they live in parallel.
 async function do_preload_initial() {
+    await preload_ground_bases(); // Chrome demands this come first
     await preload_plants();
     await preload_named();
-    await preload_ground_bases();
     tileables = new Set();
     // Grounds and midgrounds have variable sizes, so can't be stored in spritesheets
     for (const key in available_ground) {
