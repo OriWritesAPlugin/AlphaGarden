@@ -15,7 +15,7 @@ OUTPATH = "images"
 
 
 fetch_out = [#"all_foliage",
-             #"reformatted_named",
+             "reformatted_named",
              "available_ground_base"
             ]
 
@@ -41,6 +41,7 @@ def assemble_spritesheet_from_list(var_name):
     json_list = extract_json_from_js_var(var_name)
     num_rows = math.ceil(len(json_list)/SPRITES_PER_ROW)
     spritesheet = Image.new("RGBA",(SPRITES_PER_ROW * SPRITE_DIMENSION, num_rows * SPRITE_DIMENSION))
+    sprite_calc_info = []
     for idx, sprite_info in enumerate(json_list):
         if idx % 10 == 0:
             print(f"Finished {idx} of {var_name}")
@@ -50,6 +51,12 @@ def assemble_spritesheet_from_list(var_name):
         sprite = Image.open(io.BytesIO(response.content))
         # For some godforsaken reason I didn't always standardize my filesizes, so we gotta do some dancing
         width, height = sprite.size
+        bounding_box = sprite.getbbox()
+        if(bounding_box is None):
+            sprite_calc_info.append({"w": width, "h": height, "wc": width/2})
+        else:
+            left, upper, right, _ = sprite.getbbox()
+            sprite_calc_info.append({"w": right - left, "h": height-upper, "wc": (right + left)/2})
         spritesheet.paste(sprite, (x_offset + (SPRITE_DIMENSION - width)//2, y_offset + (SPRITE_DIMENSION - height)))
     spritesheet.save(f"{OUTPATH}/{var_name}-uncrushed.png")
     subprocess.run([os.path.expanduser("~/misc_tools/pngcrush/pngcrush"), f"{OUTPATH}/{var_name}-uncrushed.png", f"{OUTPATH}/{var_name}.png"])
@@ -60,8 +67,12 @@ def assemble_spritesheet_from_list(var_name):
         print(f"using indexed for {var_name}")
         encoded = indexed_base64_val
     if(var_name == "all_foliage"):
+        sedstr = f'/var FOLIAGE_SPRITE_DATA/c\ var FOLIAGE_SPRITE_DATA = {sprite_calc_info}'
+        subprocess.run(["sed", "-i", sedstr, os.path.abspath("./src/data.js")])
         sedstr = f'/var FOLIAGE_SPRITESHEET/c\ var FOLIAGE_SPRITESHEET = "data:image/png;base64,{encoded}";'
     elif(var_name == "reformatted_named"):
+        sedstr = f'/var NAMED_SPRITE_DATA/c\ var NAMED_SPRITE_DATA = {sprite_calc_info}'
+        subprocess.run(["sed", "-i", sedstr, os.path.abspath("./src/data.js")])
         sedstr = f'/var NAMED_SPRITESHEET/c\ var NAMED_SPRITESHEET = "data:image/png;base64,{encoded}";'
     elif(var_name == "available_ground_base"):
         sedstr = f'/var GROUND_BASE_SPRITESHEET/c\ var GROUND_BASE_SPRITESHEET = "data:image/png;base64,{encoded}";'

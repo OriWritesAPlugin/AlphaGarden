@@ -557,7 +557,7 @@ class LayerManager {
   }
 
   async makeDecorLayer(openEditMode=true, content=PROPERTIES["decor"]["defaultContent"], palette=PROPERTIES["decor"]["defaultPalette"]){
-    let newDecorLayer = new DecorLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, content, palette)
+    let newDecorLayer = new DecorLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, content, palette, 1)
     let newDecorLayerDiv = new DecorLayerDiv(newDecorLayer, this.get_id(), this.updateCallback);
     await newDecorLayer.update();
     return this.addLayerAndAnimate(newDecorLayerDiv, openEditMode);
@@ -565,13 +565,13 @@ class LayerManager {
 
   async makeOverlayLayer(openEditMode=true){
     let newOverlayLayer = new OverlayLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, PROPERTIES["overlay"]["defaultColor"],
-                                           PROPERTIES["overlay"]["default_opacity"], false)
+                                           PROPERTIES["overlay"]["default_opacity"], false, 1)
     let newOverlayLayerDiv = new OverlayLayerDiv(newOverlayLayer, this.get_id(), this.updateCallback);
     return this.addLayerAndAnimate(newOverlayLayerDiv, openEditMode);
   }
 
   async makeCelestialLayer(openEditMode=true, type=PROPERTIES["celestial"]["defaultContent"], palette=PROPERTIES["celestial"]["defaultPalette"], opacity=1){
-    let newCelestialLayer = new CelestialLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, type, palette, opacity);
+    let newCelestialLayer = new CelestialLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, type, palette, opacity, 1);
     let newCelestialLayerDiv = new CelestialLayerDiv(newCelestialLayer, this.get_id(), this.updateCallback);
     newCelestialLayer.update();
     return this.addLayerAndAnimate(newCelestialLayerDiv, openEditMode);
@@ -581,7 +581,7 @@ class LayerManager {
     var seeds = seedList.split(" ").join("").replace(/[\r\n]+/gm,'').replace(/(^,)|(,$)/g, '').split(",");
     for(let i=0; i<seeds.length; i++){
        if(seeds[i][0] == "*"){
-           let cleaned_seed = seeds[i].split("%")[0];
+           let cleaned_seed = seeds[i].split("%")[0].replace("<","");
            if(!all_named.hasOwnProperty(cleaned_seed)){
                imageFromPopup(document.body, cleaned_seed, callback.bind(seedList))
                return [];

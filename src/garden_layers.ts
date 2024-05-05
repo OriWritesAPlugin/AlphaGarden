@@ -35,7 +35,7 @@ abstract class Layer {
   isActive: boolean;  // We hold this, but the layer manager's the one that needs it. Only gardens can be active (for now?)
   scale: number;
 
-  constructor(width: number, height:number, x_offset: number, y_offset: number) {
+  constructor(width: number, height:number, x_offset: number, y_offset: number, scale: number) {
     this.canvas = document.createElement("canvas");
     this.canvas.width = width;
     this.canvas.height = height;
@@ -44,7 +44,7 @@ abstract class Layer {
     this.width = width;
     this.height = height;
     this.isActive = false;
-    this.scale = 1;
+    this.scale = scale;
   }
 
   place_fore(place_onto_canvas: HTMLCanvasElement) {
@@ -80,6 +80,10 @@ abstract class Layer {
     this.canvas.width = width;
     this.width = width;
     this.update();
+  }
+
+  getSaveData(){
+    return {};
   }
 
   abstract update(): void;
@@ -122,6 +126,10 @@ abstract class GardenItem {
   }
 
   abstract place(place_onto_canvas: HTMLCanvasElement): void;
+
+  getSeed(){
+    return this.identity;
+  }
 }
 
 /**
@@ -134,21 +142,27 @@ mind when you think "thing to put in a garden".
 class GardenPlacedItem extends GardenItem{
   offset: number;  // fraction of the way across the canvas to put it. .7 = 70%, near the right
   offsetSpecified: Boolean;  // Whether the offset was provided by the user (so don't scramble it!)
-  canvas: HTMLCanvasElement;
+  canvas: Promise<HTMLCanvasElement>;
   heightCategory: GardenItemHeightCategory;
+  isFlipped: Boolean;
   constructor(identity: string, type:GardenItemType, offset: number,
-              canvas: HTMLCanvasElement, height: GardenItemHeightCategory, offsetSpecified: Boolean) {
+              canvas: Promise<HTMLCanvasElement>, height: GardenItemHeightCategory, offsetSpecified: Boolean, isFlipped: Boolean) {
     super(identity, type);
     this.offset = offset;
     this.canvas = canvas;
     this.heightCategory = height;
     this.offsetSpecified = offsetSpecified;
+    this.isFlipped = isFlipped;
   }
 
   async place(place_onto_canvas: HTMLCanvasElement){
     let place_onto_ctx = place_onto_canvas.getContext("2d");
     place_onto_ctx.imageSmoothingEnabled = false;
-    place_onto_ctx.drawImage(this.canvas, place_onto_canvas.width*this.offset, place_onto_canvas.height-70, GARDEN_ITEM_SIZE*2, GARDEN_ITEM_SIZE*2);
+    place_onto_ctx.drawImage(await this.canvas, place_onto_canvas.width*this.offset, place_onto_canvas.height-70, GARDEN_ITEM_SIZE*2, GARDEN_ITEM_SIZE*2);
+  }
+
+  getSeed(){
+    return this.identity + "%" + (this.offset*100).toFixed(2).toString() + (this.isFlipped? "<" : "");
   }
 }
 
@@ -182,7 +196,7 @@ most of the first functionality you'd think of in a tool like this.
 **/
 class GardenLayer extends Layer{
   seedList: string[];
-  content: Array<Promise<GardenItem>>;
+  content: Array<GardenItem>;
   smart_coords: object;
   canvasGarden: HTMLCanvasElement;
   canvasGround: HTMLCanvasElement;
@@ -192,7 +206,7 @@ class GardenLayer extends Layer{
 
   constructor(width: number, height:number, x_offset: number, y_offset: number, seedList: string[],
               groundPaletteSeed: string, groundCover: string, ground: string, scale:number){
-    super(width, height, x_offset, y_offset);
+    super(width, height, x_offset, y_offset, scale);
     this.seedList = seedList;
     this.generateContent();
     this.canvasGarden = document.createElement("canvas") as HTMLCanvasElement;
@@ -203,6 +217,20 @@ class GardenLayer extends Layer{
     this.ground = ground;
     this.setHeight(height);
     this.setWidth(width);
+  }
+
+  async getSaveData(){
+    return {"type": "garden",
+            "x_offset": this.x_offset,
+            "y_offset": this.y_offset,
+            "width": this.width,
+            "height": this.height,
+            "seedList": this.content.map((entry): string => {return entry.getSeed();}),
+            "groundPaletteSeed": this.groundPaletteSeed,
+            "groundCover": this.groundCover,
+            "ground": this.ground,
+            "scale": this.scale,
+          }
   }
 
   generateContent(){
@@ -243,9 +271,11 @@ class GardenLayer extends Layer{
   }
 
   /** Create a GardenItem from an entry in the seed list (like #blue or GawR7as64e%50) **/
-  async makeGardenItem(identity: string){
+  makeGardenItem(identity: string){
     let type: GardenItemType;
-    let canvas: HTMLCanvasElement;
+    let canvas: Promise<HTMLCanvasElement>;
+    let height;
+    let canvas_func: Function;
     let percent_pos = identity.indexOf('%');
     let is_flipped = identity.endsWith("<");
     if(is_flipped){ identity = identity.slice(0, identity.length-1);}
@@ -262,27 +292,36 @@ class GardenLayer extends Layer{
       return new GardenOverlayItem(identity, type, percent_val)
     } else if(identity.startsWith("!")){
       type = GardenItemType.Catalog;
-      canvas = await get_canvas_for_named_component(identity.slice(1));
+      identity = identity.slice(1);
+      height = this.heightClassFromHeight(NAMED_SPRITE_DATA[reformatted_named[identity]["offset"]]["h"]);
+      canvas_func = get_canvas_for_named_component;
     } else if(identity.startsWith("*")){
       type = GardenItemType.Catalog;
       // Subtle difference: no slice (to avoid name collisions on ex: !crate and *crate)
-      canvas = await get_canvas_for_named_component(identity);
+      // It's not worth making everything async just for the ultra-edge-case of loads of differently-sized wildcards.
+      height = 2;
+      canvas_func = get_canvas_for_named_component;
     } else {
       type = GardenItemType.Seed;
-      canvas = await get_canvas_for_plant(identity);
+      height = this.heightClassFromHeight(FOLIAGE_SPRITE_DATA[decode_plant_data(identity)["foliage"]]["h"]);
+      canvas_func = get_canvas_for_plant;
     }
-    if(is_flipped){
-      let flip_canvas = document.createElement("canvas")
-      flip_canvas.width = canvas.width;
-      flip_canvas.height = canvas.height;
-      let ctx = flip_canvas.getContext("2d");
-      ctx.setTransform(-1,0,0,1,canvas.width, 0);
-      ctx.drawImage(canvas, 0,0);
-      canvas = flip_canvas;
-    }
-    let height = await this.classifyHeight(canvas);
+
+    canvas = canvas_func(identity).then((resolved_canvas) => {
+      if(is_flipped){
+        let flip_canvas = document.createElement("canvas")
+        flip_canvas.width = resolved_canvas.width;
+        flip_canvas.height = resolved_canvas.height;
+        let ctx = flip_canvas.getContext("2d");
+        ctx.setTransform(-1,0,0,1,resolved_canvas.width, 0);
+        ctx.drawImage(resolved_canvas, 0,0);
+        return flip_canvas;
+      }
+      return resolved_canvas;
+    });
+
     if(percent_pos == null){ percent_val = Math.random(); }
-    return new GardenPlacedItem(identity, type, percent_val, canvas, height, custom_pos);
+    return new GardenPlacedItem(type == GardenItemType.Catalog? "!"+identity : identity, type, percent_val, canvas, height, custom_pos, is_flipped);
   }
 
   /**
@@ -292,8 +331,7 @@ class GardenLayer extends Layer{
 
   We go top-down to account for hovering sprites like fish.
   **/
-  async classifyHeight(canvas_promise: HTMLCanvasElement){
-    let canvas = canvas_promise;
+  classifyHeight(canvas: HTMLCanvasElement){
     let image_data = canvas.getContext("2d").getImageData(0,0,canvas.width,canvas.height);
     if(hasPixelInRow(image_data, 32-24, canvas.width)){
         return GardenItemHeightCategory.Tall;
@@ -307,13 +345,17 @@ class GardenLayer extends Layer{
     return GardenItemHeightCategory.Tiny;
   }
 
+  heightClassFromHeight(num: number){
+    // The num-1 is for the case of a height of 32 (0 offset)
+    return Math.ceil((num-1) / 8);
+  }
+
   /** Update the contents of the main canvas, which holds all the plants. **/
   async updateMain(){
     var ctxGarden = this.canvasGarden.getContext("2d");
     ctxGarden.clearRect(0, 0, this.canvasGarden.width, this.canvasGarden.height);
     for(let i=0; i<this.content.length; i++){
-      let gardenItem = await this.content[i];
-      gardenItem.place(this.canvasGarden);
+      await this.content[i].place(this.canvasGarden);
     }
     this.update();
   }
@@ -405,8 +447,8 @@ class DecorLayer extends Layer{
   palette: string[];
 
   constructor(width: number, height:number, x_offset: number, y_offset: number,
-              content: string, contentPaletteSeed: string){
-    super(width, height, x_offset, y_offset);
+              content: string, contentPaletteSeed: string, scale: number){
+    super(width, height, x_offset, y_offset, scale);
     this.content = content;
     this.contentPaletteSeed = contentPaletteSeed;
   }
@@ -464,8 +506,8 @@ class OverlayLayer extends Layer{
   rgbPalette: number[];
 
   constructor(width: number, height:number, x_offset: number, y_offset: number,
-              color: string, opacity: number, affectsBackground: Boolean){
-    super(width, height, x_offset, y_offset);
+              color: string, opacity: number, affectsBackground: Boolean, scale: number){
+    super(width, height, x_offset, y_offset, scale);
     this.color = color;
     this.opacity = opacity;
     this.affectsBackground = affectsBackground;
@@ -502,8 +544,8 @@ class CelestialLayer extends Layer{
   opacity: number;
 
   constructor(width: number, height:number, x_offset: number, y_offset: number,
-              content: string, skyPalette: string, opacity: number){
-    super(width, height, x_offset, y_offset);
+              content: string, skyPalette: string, opacity: number, scale: number){
+    super(width, height, x_offset, y_offset, scale);
     this.content = content;
     this.skyPalette = skyPalette;
     this.opacity = opacity;
