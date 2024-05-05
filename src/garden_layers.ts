@@ -26,6 +26,13 @@ The base, abstract Layer.
 
 Defines the functionality guaranteed by any layer--making, placing, and adjusting dimensions.
 **/
+
+enum LayerType {
+  Garden = 1,
+  Decor = 2,
+  Celestial = 3,
+}
+
 abstract class Layer {
   x_offset: number;
   y_offset: number;
@@ -210,6 +217,7 @@ class GardenLayer extends Layer{
     this.seedList = seedList;
     this.generateContent();
     this.canvasGarden = document.createElement("canvas") as HTMLCanvasElement;
+    this.canvasGarden.height = LAYER_HEIGHT;
     this.canvasGround = document.createElement("canvas") as HTMLCanvasElement;
     // We have a lot more things to set dimensions on than the other layers
     this.groundPaletteSeed = groundPaletteSeed;
@@ -219,18 +227,18 @@ class GardenLayer extends Layer{
     this.setWidth(width);
   }
 
-  async getSaveData(){
-    return {"type": "garden",
-            "x_offset": this.x_offset,
-            "y_offset": this.y_offset,
-            "width": this.width,
-            "height": this.height,
-            "seedList": this.content.map((entry): string => {return entry.getSeed();}),
-            "groundPaletteSeed": this.groundPaletteSeed,
-            "groundCover": this.groundCover,
+  getSaveData(){
+    return {"type": LayerType.Garden,
+            "x": this.x_offset,
+            "y": this.y_offset,
+            "w": this.width,
+            "h": this.height - LAYER_HEIGHT,
+            "seeds": this.content.map((entry): string => {return entry.getSeed();}),
+            "palette": this.groundPaletteSeed,
+            "gcover": this.groundCover,
             "ground": this.ground,
-            "scale": this.scale,
-          }
+            "s": this.scale,
+  }
   }
 
   generateContent(){
@@ -249,12 +257,12 @@ class GardenLayer extends Layer{
   }
 
   /** Use the height of contained GardenPlacedItems to pick (hopefully appealing) spots for them.**/
-  async assignSmartPositions(){
+  assignSmartPositions(){
     Object.values(GardenItemHeightCategory).filter(value => !isNaN(Number(value))).forEach(height => {
       shuffleArray(this.smart_coords[height])
     });
     let assign_offset = [0, 0, 0, 0, 0];
-    for await (let gardenItem of this.content){
+    for(let gardenItem of this.content){
       if((gardenItem instanceof GardenPlacedItem) && !gardenItem.offsetSpecified){
         let placeable = <GardenPlacedItem> gardenItem;
         let height = placeable.heightCategory;
@@ -422,9 +430,7 @@ class GardenLayer extends Layer{
     this.height = height + LAYER_HEIGHT;
     this.canvas.height = height + LAYER_HEIGHT;
     this.canvasGround.height = height + LAYER_HEIGHT;
-    // The partner to that is the main garden being stacked on top of the ground and never needing to care about height
-    this.canvasGarden.height = LAYER_HEIGHT;
-    await this.updateMain();  // TODO: Investigate why this call is required, garden disappears without it but it shouldn't?
+    // The main garden canvas, being stacked on top of the ground, never needs to care about height
     await this.updateGround();
   }
 
@@ -496,6 +502,19 @@ class DecorLayer extends Layer{
   place_back(_place_onto_canvas: HTMLCanvasElement) {
     return
   }
+
+  getSaveData() {
+    return{
+      "type": LayerType.Decor,
+      "x": this.x_offset,
+      "y": this.y_offset,
+      "w": this.width,
+      "h": this.height,
+      "content": this.content,
+      "palette": this.contentPaletteSeed,
+      "s": this.scale
+    }
+  }
 }
 
 ///////////////////////  OVERLAY LAYER   ///////////////////////////////////////
@@ -544,12 +563,12 @@ class CelestialLayer extends Layer{
   opacity: number;
 
   constructor(width: number, height:number, x_offset: number, y_offset: number,
-              content: string, skyPalette: string, opacity: number, scale: number){
+              content: string, skyPalette: string, customPalette: string[], opacity: number, scale: number){
     super(width, height, x_offset, y_offset, scale);
     this.content = content;
     this.skyPalette = skyPalette;
+    this.customPalette = customPalette;
     this.opacity = opacity;
-    this.customPalette = ["#192446", "#335366", "#426f7a"];
   }
 
   update(){
@@ -648,6 +667,16 @@ class CelestialLayer extends Layer{
       this.customPalette = all_palettes[decode_plant_data(paletteText)["foliage_palette"]]["palette"].map(x => "#" + x);
     }
     this.update();
+  }
+
+  getSaveData() {
+    return{
+      "type": LayerType.Celestial,
+      "content": this.content,
+      "palette": this.skyPalette,
+      "cust": this.skyPalette == "custom"? this.customPalette : [],
+      "a": this.opacity
+    }
   }
 }
 

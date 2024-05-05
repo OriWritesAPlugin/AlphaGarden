@@ -19,6 +19,7 @@
         <label for="garden_height">Height:</label> <input class="garden-dim-bar" type="number" id="garden_height" name="garden_height" min="70" value=70>
         <label for="garden_scale">Scale:</label> <input class="garden-dim-bar" type="number" id="garden_scale" name="garden_scale" value=1 step="0.25">
         <input type="button" class="chunky_wrap" value="Randomize" onClick="random_from_collection()">
+        <input type="button" class="chunky_wrap" value="Load" onClick="load()">
         <br><br>
         <div id=content_div>
             </br></br>
@@ -26,7 +27,7 @@
             </br></br>
             <div id="output"><canvas id="output_canvas" width="450" height="70"></canvas></div>
             </br></br>
-            <input type="button" class="chunky_wrap" value="Claim Garden" onClick="claim_garden()">
+            <input type="button" class="chunky_wrap" value="Claim Garden" onClick="claim()">
         </div>
       </div>
     </div>
@@ -62,6 +63,39 @@
           await gm.redraw();
         }
         do_stuff();
+
+        async function load(){
+          let modal = document.createElement("div");
+          modal.classList.add("block_window");
+          let modal_display = document.createElement("div");
+          modal_display.classList.add("popup");
+          document.body.appendChild(modal);
+          let textbox = document.createElement("text");
+          textbox.textContent = "Paste in the savedata for a garden (you get it on the claim screen):";
+          let fillIn = document.createElement("input");
+          let button_container = document.createElement("div");
+          button_container.style.padding = "20px";
+          let accept_button = document.createElement("input");
+          accept_button.type = "button";
+          accept_button.onclick = async function() {
+            let json = JSON.parse(fillIn.value);
+            await gm.loadFromSaveString(fillIn.value);
+            document.getElementById("garden_height").value = json["h"];
+            document.getElementById("garden_width").value = json["w"];
+            document.getElementById("garden_scale").value = json["s"];
+            document.body.removeChild(modal);
+            await doThisRegen();
+          }
+          accept_button.value = "Load";
+          accept_button.classList.add("chunky_fullwidth");
+          button_container.appendChild(textbox);
+          button_container.appendChild(fillIn);
+          button_container.appendChild(document.createElement("br"));
+          button_container.appendChild(document.createElement("br"));
+          button_container.appendChild(accept_button);
+          modal_display.appendChild(button_container);
+          modal.appendChild(modal_display);
+        }
 
         async function random_from_collection(){
             let collection = getSeedCollection();
@@ -103,11 +137,21 @@
             doThisRegen();
         }
 
-      function doThisRegen(){
-        gm.setHeight(parseInt(document.getElementById("garden_height").value));
+      async function doThisRegen(){
+        await gm.setHeight(parseInt(document.getElementById("garden_height").value));
         gm.setWidth(parseInt(document.getElementById("garden_width").value));
         gm.setScale(parseFloat(document.getElementById("garden_scale").value));
         gm.regenActiveGarden(document.getElementById("seed_list").value);
+      }
+
+      function claim(){
+        let new_window = claimCanvas(document.getElementById("output_canvas"));
+        let garden_code_info = new_window.document.createElement('p');
+        garden_code_info.innerHTML = "Garden code: "
+        let garden_code = new_window.document.createElement('p');
+        garden_code.innerHTML = gm.getSaveString();
+        new_window.document.body.appendChild(garden_code_info);
+        new_window.document.body.appendChild(garden_code);
       }
 
     </script>

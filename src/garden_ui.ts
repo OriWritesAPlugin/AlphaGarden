@@ -4,7 +4,7 @@ const PROPERTIES = {"base": {"defaultPalette": "CunEjC0KIh", "mainColor": "#FF00
                     "garden": {"defaultPalette": "CunEjC0KIh", "mainColor": "#1C2121", "secondColor": "#151818", "accentColor": "#273831", "icon": "⚘"},
                     "decor": {"defaultPalette": "CunEjC0KIh", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains", "accentColor": "#3D362B", "icon": "ꕔ"},
                     "overlay": {"mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "⚙"},
-                    "celestial": {"defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "icon": "☾"}}// old overlay: 1F191A
+                    "celestial": {"defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "defaultCustomPalette": ["#192446", "#335366", "#426f7a"], "icon": "☾"}}// old overlay: 1F191A
 
 class LayerDiv {
   type: string;
@@ -502,7 +502,7 @@ class LayerManager {
       if(layerDivObj.layer === undefined){
         continue;
       }
-      layerDivObj.layer.setHeight(height);
+      await layerDivObj.layer.setHeight(height);
     }
   }
 
@@ -548,16 +548,39 @@ class LayerManager {
     return newLayerDiv;
   }
 
-  async makeGardenLayer(openEditMode=true){
-    let newGardenLayer = new GardenLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, [], PROPERTIES["garden"]["defaultPalette"], "grass [palette]", "clumpy dirt", 1);
+  async loadFromSaveString(save_string: string){
+    const save_obj = JSON.parse(save_string);
+    this.clearAllButActive();
+    let layer;
+    //await (<GardenLayer>this.activeGardenDiv.layer).updateMain();
+    //await (<GardenLayer>this.activeGardenDiv.layer).updateGround();
+    //this.setScale(save_string["s"]);
+    for(let i=0; i<save_obj["layers"].length; i++){
+      // Javascript not having true named args will kill me in the end
+      layer = save_obj["layers"][i];
+      if(layer["type"] == LayerType.Garden){
+        await this.makeGardenLayer(false, layer["seeds"], layer["palette"], layer["gCover"], layer["ground"],
+                                   layer["w"], layer["h"], layer["x"], layer["y"], layer["s"]);
+      } else if(layer["type"] == LayerType.Decor){
+        await this.makeDecorLayer(false, layer["content"], layer["palette"], layer["w"], this.fullCanvas.height, layer["x"], layer["y"], layer["s"]);
+      } else if(layer["type"] == LayerType.Celestial){
+        const cust = layer["palette"] == "custom"? layer["cust"] : PROPERTIES["celestial"]["defaultCustomPalette"]
+        await this.makeCelestialLayer(false, layer["content"], layer["palette"], layer["a"], cust);
+      }
+    };
+  }
+
+  async makeGardenLayer(openEditMode=true, seedList=[], palette=PROPERTIES["garden"]["defaultPalette"], groundCover="grass [palette]", ground="clumpy dirt",
+                        width = this.fullCanvas.width, height = this.fullCanvas.height, x_offset = 0, y_offset = 0, scale=1){
+    let newGardenLayer = new GardenLayer(width, height, x_offset, y_offset, seedList, palette, groundCover, ground, scale);
     let newGardenLayerDiv = new GardenLayerDiv(newGardenLayer, this.get_id(), this.updateCallback, this.gardenToggleCallback);
-    await newGardenLayer.updateMain();
-    await newGardenLayer.updateGround();
+    await newGardenLayer.updateMain().then(_ => newGardenLayer.updateGround());
     return this.addLayerAndAnimate(newGardenLayerDiv, openEditMode);
   }
 
-  async makeDecorLayer(openEditMode=true, content=PROPERTIES["decor"]["defaultContent"], palette=PROPERTIES["decor"]["defaultPalette"]){
-    let newDecorLayer = new DecorLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, content, palette, 1)
+  async makeDecorLayer(openEditMode=true, content=PROPERTIES["decor"]["defaultContent"], palette=PROPERTIES["decor"]["defaultPalette"],
+                       width = this.fullCanvas.width, height = this.fullCanvas.height, x_offset = 0, y_offset = 0, scale=1){
+    let newDecorLayer = new DecorLayer(width, height, x_offset, y_offset, content, palette, scale)
     let newDecorLayerDiv = new DecorLayerDiv(newDecorLayer, this.get_id(), this.updateCallback);
     await newDecorLayer.update();
     return this.addLayerAndAnimate(newDecorLayerDiv, openEditMode);
@@ -570,8 +593,10 @@ class LayerManager {
     return this.addLayerAndAnimate(newOverlayLayerDiv, openEditMode);
   }
 
-  async makeCelestialLayer(openEditMode=true, type=PROPERTIES["celestial"]["defaultContent"], palette=PROPERTIES["celestial"]["defaultPalette"], opacity=1){
-    let newCelestialLayer = new CelestialLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, type, palette, opacity, 1);
+  // If you're wondering why palette and customPalette are split -- bad JS "overloading", the customPalette-free form is useful for the randomize button
+  async makeCelestialLayer(openEditMode=true, type=PROPERTIES["celestial"]["defaultContent"], palette=PROPERTIES["celestial"]["defaultPalette"],
+                          opacity=1, customPalette=PROPERTIES["celestial"]["defaultCustomPalette"]){
+    let newCelestialLayer = new CelestialLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, type, palette, customPalette, opacity, 1);
     let newCelestialLayerDiv = new CelestialLayerDiv(newCelestialLayer, this.get_id(), this.updateCallback);
     newCelestialLayer.update();
     return this.addLayerAndAnimate(newCelestialLayerDiv, openEditMode);
@@ -600,12 +625,13 @@ class LayerManager {
     }
     (<GardenLayer>this.activeGardenDiv.layer).seedList = parsedSeedList;
     (<GardenLayer>this.activeGardenDiv.layer).generateContent();
-    await (<GardenLayer>this.activeGardenDiv.layer).assignSmartPositions();
+    (<GardenLayer>this.activeGardenDiv.layer).assignSmartPositions();
     await (<GardenLayer>this.activeGardenDiv.layer).updateMain();
+    await (<GardenLayer>this.activeGardenDiv.layer).updateGround();
     this.redraw();
   }
 
-  swapActiveGarden(){
+  swapActiveGarden(delete_old = false){
     var oldActiveGarden;
     var newActiveGarden;
     for(let i=this.layerHolderDiv.children.length; i>0; i--){
@@ -629,6 +655,14 @@ class LayerManager {
         oldActiveGarden.unsetActiveGarden();
       }
     }
+  }
+
+  getSaveString(){
+    let save_struct = {"version": 0.1, "w": this.width, "h": this.height, "s": this.scale, "layers": []};
+    for(let i=0; i<this.layerHolderDiv.children.length; i++){
+      save_struct["layers"].push(this.divToLayerMapper[this.layerHolderDiv.children[i].id].layer.getSaveData());
+    }
+    return JSON.stringify(save_struct);
   }
 
   redraw(){
