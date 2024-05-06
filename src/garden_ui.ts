@@ -476,6 +476,11 @@ class LayerManager {
   clearAllButActive(){
     for (let id of Object.keys(this.divToLayerMapper) as string[]){
       let layerDiv = this.divToLayerMapper[id];
+      // TODO: See swapActiveGarden(), there's something odd in deletion propagation
+      // While we could probably clean that up "in post", it might be better served as refactor.
+      if(layerDiv.layer === undefined){
+        continue;
+      }
       if(!layerDiv.layer.isActive){
         layerDiv.doDelete();
         delete this.divToLayerMapper[id];
