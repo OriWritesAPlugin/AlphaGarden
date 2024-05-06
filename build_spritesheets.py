@@ -56,7 +56,7 @@ def assemble_spritesheet_from_list(var_name):
             sprite_calc_info.append({"w": width, "h": height, "wc": width/2})
         else:
             left, upper, right, _ = sprite.getbbox()
-            sprite_calc_info.append({"w": right - left, "h": height-upper, "wc": (right + left)/2})
+            sprite_calc_info.append({"w": right - left, "h": height-upper, "wc": (right + left)/2 + left})
         spritesheet.paste(sprite, (x_offset + (SPRITE_DIMENSION - width)//2, y_offset + (SPRITE_DIMENSION - height)))
     spritesheet.save(f"{OUTPATH}/{var_name}-uncrushed.png")
     subprocess.run([os.path.expanduser("~/misc_tools/pngcrush/pngcrush"), f"{OUTPATH}/{var_name}-uncrushed.png", f"{OUTPATH}/{var_name}.png"])
