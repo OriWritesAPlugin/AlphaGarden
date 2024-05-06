@@ -69,6 +69,7 @@
         if(document.getElementById("plant_seed").checked){
           all_named[add_catalog_name] = "";
           all_foliage[add_plant_idx] = {"source": document.getElementById("image_injector").value};
+          FOLIAGE_SPRITE_DATA[add_plant_idx] = {"w": 16, "h": 16, "wc": 16};
           refs["foliage"+[add_plant_idx]] = await preload_single_image(all_foliage[add_plant_idx]["source"]);
           for(let i=0; i<num_to_gen; i++){
             let new_data = gen_plant_data(7);
