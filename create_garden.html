@@ -138,6 +138,19 @@
         }
 
       async function doThisRegen(){
+        // Make sure the user isn't trying to generate without an active garden layer
+        let has_active = false;
+        for(let i=gm.layerHolderDiv.children.length; i>0; i--){
+          // TODO: right now we just free the layer. Should propagate the deletion fully to the manager.
+          let layerDivObj = gm.divToLayerMapper[gm.layerHolderDiv.children[i-1].id];
+          if(!(layerDivObj.layer === undefined) && layerDivObj.layer.isActive){
+            has_active = true; break;
+          }
+        }
+        if(!has_active){
+          alert("WARNING: No active garden layer! Click the star mark on one of the garden (green) layers. If you don't have any, click the green button in the top right.")
+          return;
+        }
         await gm.setHeight(parseInt(document.getElementById("garden_height").value));
         gm.setWidth(parseInt(document.getElementById("garden_width").value));
         gm.setScale(parseFloat(document.getElementById("garden_scale").value));
