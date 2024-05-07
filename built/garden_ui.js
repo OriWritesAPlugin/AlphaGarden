@@ -401,7 +401,7 @@ class LayerManager {
     activeGardenDiv;
     layers_created = 0;
     width = 450;
-    height = 70;
+    height = 80;
     scale = 1;
     updateCallback;
     gardenToggleCallback;

@@ -16,7 +16,7 @@
         <label for="seed_list">Seed list (comma-separated):</label><br>
         <textarea id="seed_list" name="seed_list" size="4" placeholder="Click here and paste!"></textarea><br>
         <label for="quantity">Width:</label> <input class="garden-dim-bar" type="number" id="garden_width" name="quantity" min="64" value=450>
-        <label for="garden_height">Height:</label> <input class="garden-dim-bar" type="number" id="garden_height" name="garden_height" min="70" value=70>
+        <label for="garden_height">Height:</label> <input class="garden-dim-bar" type="number" id="garden_height" name="garden_height" min="70" value=80>
         <label for="garden_scale">Scale:</label> <input class="garden-dim-bar" type="number" id="garden_scale" name="garden_scale" value=1 step="0.25">
         <input type="button" class="chunky_wrap" value="Randomize" onClick="random_from_collection()">
         <input type="button" class="chunky_wrap" value="Load" onClick="load()">
@@ -25,7 +25,7 @@
             </br></br>
             <input type="button" class="chunky" value="&gt;&gt; Generate a garden!&lt;&lt;" onClick="doThisRegen()">
             </br></br>
-            <div id="output"><canvas id="output_canvas" width="450" height="70"></canvas></div>
+            <div id="output"><canvas id="output_canvas" width="450" height="80"></canvas></div>
             </br></br>
             <input type="button" class="chunky_wrap" value="Claim Garden" onClick="claim()">
         </div>
@@ -106,14 +106,21 @@
             let num_plants = Math.random() * (9 - 3) + 1;
             let chosen_seeds = [decorPaletteSeed, groundPaletteSeed];
             for(let i=0; i<num_plants; i++){
-                chosen_seeds.push(collection[Math.floor(Math.random() * collection.length)]);
+                let chosen_seed = collection[Math.floor(Math.random() * collection.length)];
+                if(Math.random() > 0.75){
+                  chosen_seed += "%"+(Math.random()*100-0.1).toFixed(1).toString();
+                }
+                if(Math.random() > 0.75){
+                  chosen_seed += "<";
+                }
+                chosen_seeds.push(chosen_seed);
             }
             document.getElementById("seed_list").value = chosen_seeds.join(", ");
             gm.clearAllButActive();
             let skyPalette = getRandomKeyFromObj(available_backgrounds);
             gl.groundPaletteSeed = groundPaletteSeed;
             if(Math.random() < 0.7){
-              await gm.makeCelestialLayer(false, "Fog", skyPalette, Math.random()*0.5 + 0.1); 
+              await gm.makeCelestialLayer(false, "Fog", skyPalette, (Math.random()*0.5 + 0.1).toFixed(2)); 
             }
             if(Math.random() < 0.7){
               await gm.makeDecorLayer(false, getRandomKeyFromObj(available_tileables), decorPaletteSeed);
