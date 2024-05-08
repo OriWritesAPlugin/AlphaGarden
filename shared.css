@@ -166,6 +166,7 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
 .draggable_layer_div {
     cursor: move;
     user-select: none;
+    height: fit-content;
 }
 
 #layer_manager {

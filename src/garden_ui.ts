@@ -72,7 +72,8 @@ class LayerDiv {
     //genericDiv.id = this.generateId("generic");
     genericDiv.style.cursor = "default";
     genericDiv.style.userSelect = "default";
-    genericDiv.style.width = "fit-content"
+    genericDiv.style.width = "fit-content";
+    genericDiv.style.height = "fit-content";
     return genericDiv;
   }
 
@@ -89,12 +90,12 @@ class LayerDiv {
     this.editMode = !this.editMode;
     if(!this.editMode){
       this.editDiv.style.marginTop = "-18vh";
-      this.selfDiv.style.height = "5vh";
-      this.selfDiv.style.minHeight = "0vh";
+      this.selfDiv.style.height = "2em";
+      //this.selfDiv.style.minHeight = "0vh";
     } else {
       this.editDiv.style.marginTop = "0vh";
-      this.selfDiv.style.minHeight = "fit-content";
-      this.selfDiv.style.height = "18vh";
+      //this.selfDiv.style.minHeight = "fit-content";
+      this.selfDiv.style.height = "12em";
     }
     this.editButton.classList.toggle('active');
   }
