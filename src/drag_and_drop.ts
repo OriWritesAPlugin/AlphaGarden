@@ -2,6 +2,8 @@
 This code is taken almost directly from https://github.com/phuocng/html-dom/, drag-and-drop-element-in-a-list
 
 Thank you, Phuoc!
+
+A scrollY was added to fix a snap-to-top issue on scrolled pages.
 **/
 
 let draggingEle: HTMLElement;
@@ -64,7 +66,7 @@ const draggableLayerMouseMoveHandler = function (e: MouseEvent) {
 
    // Set position for dragging element
    draggingEle.style.position = 'absolute';
-   draggingEle.style.top = `${e.pageY - draggingY}px`;
+   draggingEle.style.top = `${e.pageY - draggingY + window.scrollY}px`;
 
    // The current order
    // prevEle
