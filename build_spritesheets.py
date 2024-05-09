@@ -14,11 +14,17 @@ DATA_FILE = "src/data.js"
 OUTPATH = "images"
 
 
-fetch_out = [#"all_foliage",
-             "reformatted_named",
-             "available_ground_base"
+fetch_out = ["all_foliage",
+             #"reformatted_named",
+             #"available_ground_base"
             ]
 
+def to_rgb(hex):
+    return tuple(int(hex.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+
+base_foliage_palette = set(to_rgb(x) for x in ["#aed740", "#76c935", "#50aa37", "#2f902b"])
+base_accent_palette = set(to_rgb(x) for x in ["fef4cc", "fde47b", "ffd430", "ecb600"])
+base_feature_palette = set(to_rgb(x) for x in ["f3addd", "d87fbc", "c059a0", "aa3384"])
 
 def extract_json_from_js_var(var_name):
     with open(DATA_FILE, "r") as f:
@@ -48,15 +54,23 @@ def assemble_spritesheet_from_list(var_name):
         x_offset = (idx % SPRITES_PER_ROW) * SPRITE_DIMENSION
         y_offset = (math.floor(idx / SPRITES_PER_ROW)) * SPRITE_DIMENSION
         response = requests.get(sprite_info["source"], headers= {"user-agent": "curl/8.1.1", "accept": "*/*"})
-        sprite = Image.open(io.BytesIO(response.content))
+        sprite = Image.open(io.BytesIO(response.content)).convert('RGBA')
         # For some godforsaken reason I didn't always standardize my filesizes, so we gotta do some dancing
         width, height = sprite.size
         bounding_box = sprite.getbbox()
         if(bounding_box is None):
-            sprite_calc_info.append({"w": width, "h": height, "wc": width/2})
+            sprite_calc_info.append({"w": width, "h": height, "wc": width/2, "m": 0})
         else:
             left, upper, right, _ = sprite.getbbox()
-            sprite_calc_info.append({"w": right - left, "h": height-upper, "wc": (right + left)/2 + left})
+            counts = {0: 0, 1: 0, 2:0}
+            for pixel in sprite.getdata():
+                if pixel[:3] in base_foliage_palette:
+                    counts[0] += 1
+                elif pixel[:3] in base_feature_palette:
+                    counts[1] += 1
+                elif pixel[:3] in base_accent_palette:
+                    counts[2] += 1
+            sprite_calc_info.append({"w": right - left, "h": height-upper, "wc": (right + left)/2 + left, "m": max(counts, key=counts.get)})
         spritesheet.paste(sprite, (x_offset + (SPRITE_DIMENSION - width)//2, y_offset + (SPRITE_DIMENSION - height)))
     spritesheet.save(f"{OUTPATH}/{var_name}-uncrushed.png")
     subprocess.run([os.path.expanduser("~/misc_tools/pngcrush/pngcrush"), f"{OUTPATH}/{var_name}-uncrushed.png", f"{OUTPATH}/{var_name}.png"])

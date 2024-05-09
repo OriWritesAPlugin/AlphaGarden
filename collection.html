@@ -24,16 +24,26 @@
                   <input type="radio" id="feature" name="sort_order" value="feature_palette">
                   <label for="feature">Feature Palette</label><br>
                   <input type="radio" id="accent" name="sort_order" value="accent_palette">
-                  <label for="accent">Accent Palette</label>
+                  <label for="accent">Accent Palette</label><br>
+                  <input type="radio" id="main" name="sort_order" value="main_palette">
+                  <label for="main">Main Palette</label>
                   <h3>Show Seeds of Type</h2>
                   <div id="base_sort_categories_div"></div>
                   <h3>With Colors</h2>
+                    <label for="foliage">Any: </label>
+                    <input type="radio" id="any_color" name="color_filter" value=0 checked>
+                    <label for="feature">All: </label>
+                    <input type="radio" id="all_color" name="color_filter" value=1>
+                    <label for="accent">Main: </label>
+                    <input type="radio" id="main_color" name="color_filter" value=2><br><br>
                   <div id="palette_sort_categories_div"></div>
                   <h3>Display</h2>
                   <input id="hide_seeds" type="checkbox" value="Hide seeds">
                   <label for="hide_seeds" class="unselectable">Numbers</label>
                   <input id="show_palettes" type="checkbox">
                   <label for="show_palettes" class="unselectable">Palettes</label>
+                  <input id="rainbow_palettes" type="checkbox">
+                  <label for="rainbow_palettes" class="unselectable">Rainbow</label>
                 </div>
               <div id=seed_collection_display_container class=garden_util_box style="width:60%; border: none">
                   <span id="seedstuff_tally" title="Convert unwanted seeds to raw seedstuff using the Recycle option">Current raw seedstuff: 0</span>
@@ -96,13 +106,20 @@
     <script src="built/shared.js"></script>
     <script type="text/javascript">
 
-      var collection_filter = {"base": new Set(), "foliage_palette": new Set(), "feature_palette": new Set(), "accent_palette": new Set()};
+      var collection_filter = {"base": new Set(), "palette": new Set()};
       var selected_function = "analyze";
       var sort_intervals = [];
       var days_since_backup;
       const backup_sp_per_day = 3;
       const max_sp_for_backup = 15;
+      // Take the average hue of all 4 colors of each palette
+      //const rainbow_offset = all_palettes.map((x, i) => all_palettes[i]["palette"].map(x=>toHue("#"+x)).reduce((a, b) => a + b)/4);
+      const rainbow_offset = all_palettes.map((x, i) => toHue("#"+all_palettes[i]["palette"][1]));
       var first_chunk_on_last_sort = getSeedCollectionAsString().slice(0, 50);
+      // TODO: Potentially nasty refactor: replacing all these palette names with an enum somewhere.
+      const palette_codes = {0: "foliage_palette", 1: "feature_palette", 2: "accent_palette"};
+
+
       window.addEventListener("storage", () => {
         checkIfRefreshNeeded();
       });
@@ -411,18 +428,14 @@
 
       function forceFilter(base, palette){
         collection_filter["base"] = new Set();
-        collection_filter["foliage_palette"] = new Set();
-        collection_filter["feature_palette"] = new Set();
-        collection_filter["accent_palette"] = new Set();
+        collection_filter["palette"] = new Set();
         if(base != -1){
           collection_filter["base"] = new Set([base]);
         }
         if(palette != -1){
           let palette_set = new Set();
           palette_set.add(palette);
-          collection_filter["foliage_palette"] = palette_set;
-          collection_filter["feature_palette"] = palette_set;
-          collection_filter["accent_palette"] = palette_set;
+          collection_filter["palette"] = palette_set;
         }
         display_collection();
       }
@@ -441,9 +454,7 @@
             palettes_by_category[palette_filter.value].forEach((item) => new_palette_set.add(item));
           }
         }
-        collection_filter["foliage_palette"] = new_palette_set;
-        collection_filter["feature_palette"] = new_palette_set;
-        collection_filter["accent_palette"] = new_palette_set;
+        collection_filter["palette"] = new_palette_set;
       }
 
       function applyFilter(filter_name, data_val){
@@ -452,11 +463,21 @@
         return collection_filter[filter_name].has(data_val);
       }
 
-      function passesFilter(plant_data){
+      function passesFilter(plant_data, colorFilterMode){
         if(!applyFilter("base", plant_data["foliage"])) { return false;}
-        if(applyFilter("foliage_palette", plant_data["foliage_palette"])) { return true;}
-        if(applyFilter("feature_palette", plant_data["feature_palette"])) { return true;}
-        if(applyFilter("accent_palette", plant_data["accent_palette"])) { return true;}
+        if(colorFilterMode == 0){  // any
+          if(applyFilter("palette", plant_data["foliage_palette"])) { return true;}
+          if(applyFilter("palette", plant_data["feature_palette"])) { return true;}
+          if(applyFilter("palette", plant_data["accent_palette"])) { return true;}
+        } else if(colorFilterMode == 1){ // all
+          if(applyFilter("palette", plant_data["foliage_palette"]) &&
+             applyFilter("palette", plant_data["feature_palette"]) &&
+             applyFilter("palette", plant_data["accent_palette"])){
+            return true;
+          }
+        } else if(colorFilterMode == 2){ // main
+          return applyFilter("palette", plant_data[palette_codes[FOLIAGE_SPRITE_DATA[plant_data["foliage"]]["m"]]]);
+        }
         return false;
       }
 
@@ -493,18 +514,22 @@
 
     // Take a list of seeds, return them in the order specified (ex: sort by the base "plant")
     function get_seed_collection_sorted_by(collection, sort_key) {
-      let needs_filtered = !(collection_filter["base"].size == 0 &&
-                             collection_filter["foliage_palette"].size == 0 && collection_filter["feature_palette"].size == 0 &&
-                             collection_filter["accent_palette"].size == 0)
+      let needs_filtered = !(collection_filter["base"].size == 0 && collection_filter["palette"].size == 0)
       if(sort_key == "None" && !needs_filtered){ return collection};
       parsed_seeds = {};
       let named_seed_data = {"foliage": 999, "foliage_palette": 999, "feature_palette": 999, "accent_palette": 999}
+      let color_mode = 0;
+      let color_filter_elem = document.getElementsByName('color_filter');
+      for(i = 0; i < color_filter_elem.length; i++) {
+          if(color_filter_elem[i].checked)
+          color_mode = color_filter_elem[i].value;
+      }
       for(let i=0; i<collection.length; i++){
           if(collection[i].startsWith("!")){
             parsed_seeds[collection[i]] = named_seed_data;
           } else {
             let plant_data = decode_plant_data(collection[i]);
-            if (needs_filtered && !passesFilter(plant_data)){
+            if (needs_filtered && !passesFilter(plant_data, color_mode)){
               continue;
             }
             parsed_seeds[collection[i]] = plant_data;
@@ -518,8 +543,16 @@
           }
         collection = filtered_collection;
       }
-        
+
+      let lookup_redirect = document.getElementById("rainbow_palettes").checked? x => rainbow_offset[x] : x => x;
       if(sort_key == "None") { return collection; };
+      if(sort_key == "main_palette") {
+        return collection.sort(function(a, b) {
+          // Look up the base in FOLIAGE_SPRITE_DATA and grab which palette is the main (majority pixels) palette
+          return lookup_redirect(parsed_seeds[a][palette_codes[FOLIAGE_SPRITE_DATA[parsed_seeds[a]["foliage"]]["m"]]])  -
+                 lookup_redirect(parsed_seeds[b][palette_codes[FOLIAGE_SPRITE_DATA[parsed_seeds[b]["foliage"]]["m"]]]);
+        });
+      }
       return collection.sort(function(a, b) {
         return parsed_seeds[a][sort_key] - parsed_seeds[b][sort_key];
       });
