@@ -1,16 +1,16 @@
 // This contains the code for generating a single, random plant badge.
 
 // The colors we'll be replacing. Touch at your peril!
-var base_foliage_palette = ["#aed740", "#76c935", "#50aa37", "#2f902b"];
-var base_accent_palette = ["fef4cc", "fde47b", "ffd430", "ecb600"];
-var base_feature_palette = ["f3addd", "d87fbc", "c059a0", "aa3384"];
-var overall_palette = base_foliage_palette.concat(base_accent_palette).concat(base_feature_palette);
+const base_foliage_palette = ["#aed740", "#76c935", "#50aa37", "#2f902b"];
+const base_accent_palette = ["fef4cc", "fde47b", "ffd430", "ecb600"];
+const base_feature_palette = ["f3addd", "d87fbc", "c059a0", "aa3384"];
+const overall_palette = base_foliage_palette.concat(base_accent_palette).concat(base_feature_palette);
 
 var work_canvas_size = 32;  // in pixels
 
 // A pixel of these colors indicates we should place the corresponding feature type
-var place_complex_feature = "ff943a";
-var place_simple_feature = "e900ff";
+const place_complex_feature = "ff943a";
+const place_simple_feature = "e900ff";
 
 // Holder for all the images we'll need
 var refs = {};

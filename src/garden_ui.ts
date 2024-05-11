@@ -169,7 +169,7 @@ class LayerDiv {
       }
       await this.onEditCallback();
     }.bind(this, target);
-    fillIn.value = this.layer[target];
+    fillIn.value = this.layer[target] == 1? this.layer[target].toPrecision(2) : this.layer[target];
     let label = document.createElement("label") as HTMLLabelElement;
     label.setAttribute("for", fillIn.id);
     label.innerHTML = labelText;
@@ -184,8 +184,8 @@ class LayerDiv {
     holdDiv.style.textAlign = "right";
     for(let i=0; i < pairs.length; i++){
       let [fillIn, label] = this.buildGenericFillIn(pairs[i][0], pairs[i][1], this.secondColor, true);
+      fillIn.style.width = "2em";
       if(pairs[i][0] != "width"){
-        fillIn.style.width = "30%";
         if(pairs[i][0] == "y_offset"){
           this.yOffsetInput = fillIn;
         }

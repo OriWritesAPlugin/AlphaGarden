@@ -119,9 +119,8 @@ a {
     color: #999999;
 }
 
-.fixed-width-selectbox {
-    width: 2.2vw;
-    min-width: 45px;
+.fit-width-selectbox {
+    width: fit-content;
 }
 
 .todo_checkbox {

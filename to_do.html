@@ -109,7 +109,7 @@
           list_item.appendChild(textbox);
           let selectbox = document.createElement("select");
           selectbox.id="task_"+i+"_reward";
-          selectbox.className = "fixed-width-selectbox";
+          selectbox.className = "fit-width-selectbox";
           let selectbox_selection = i-initial_num_tasks+resting_num_plants_revealed+1;  // The ith plant in the set, more or less.
           if(task_sets_generated<2){
               for(let j=resting_num_plants_revealed; j<resting_num_plants_revealed+num_plants; j++){
