@@ -11,6 +11,10 @@ var work_canvas_size = 32;  // in pixels
 // A pixel of these colors indicates we should place the corresponding feature type
 const place_complex_feature = "ff943a";
 const place_simple_feature = "e900ff";
+// A pixel of this color indicates we should place the brightest accent color at 25% alpha (used for glow)
+const place_25a_accent = "c8ffb7";
+// As above, but 10% for a fainter glow
+const place_10a_accent = "9fe389";
 
 // Holder for all the images we'll need
 var refs = {};
@@ -354,19 +358,27 @@ async function gen_plant(plant_data, with_color_key=false) {
     await place_foliage(plant_data["foliage"], work_ctx);
 
     // Figure out where to put each kind of feature, replacing marker pixels as we go
-    let simple_feature_coords = get_marker_coords(place_simple_feature, work_ctx);
-    let complex_feature_coords = get_marker_coords(place_complex_feature, work_ctx);
+    let marker_coords = getSpecialMarkers(work_ctx);
 
-    // Place the features
-    if(simple_feature_coords.length > 0){
-        var place_simple = await place_image_at_coords_with_chance(plant_data["simple_feature"], simple_feature_coords, work_ctx, 0.5);
+    if(marker_coords[place_simple_feature].length > 0 || marker_coords[place_complex_feature].length > 0){
+        replace_color_palette([place_simple_feature, place_complex_feature], [base_foliage_palette[1], base_foliage_palette[1]], work_ctx);
+        // Place the features
+        if(marker_coords[place_simple_feature].length > 0){
+            var place_simple = await place_image_at_coords_with_chance(plant_data["simple_feature"], marker_coords[place_simple_feature], work_ctx, 0.5);
+        }
+        if(marker_coords[place_complex_feature].length > 0){
+            /* Chance that if there's already simple flowers, we keep using that flower
+            if(simple_flower_coords.length == 0 || Math.random()>0.5){
+                flower_url = complex_flowers[Math.floor(Math.random()*complex_flowers.length)];
+            } else {*/
+            var place_complex = await place_image_at_coords_with_chance(plant_data["complex_feature"], marker_coords[place_complex_feature], work_ctx, 0.8, true);
+        }
     }
-    if(complex_feature_coords.length > 0){
-        /* Chance that if there's already simple flowers, we keep using that flower
-        if(simple_flower_coords.length == 0 || Math.random()>0.5){
-            flower_url = complex_flowers[Math.floor(Math.random()*complex_flowers.length)];
-        } else {*/
-        var place_complex = await place_image_at_coords_with_chance(plant_data["complex_feature"], complex_feature_coords, work_ctx, 0.8, true);
+    if(marker_coords[place_25a_accent].length > 0){
+        replace_color_palette([place_25a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.25*255);
+    }
+    if(marker_coords[place_10a_accent].length > 0){
+        replace_color_palette([place_10a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.10*255);
     }
 
     // We do all the recolors at once because Speed?(TM)?
@@ -435,67 +447,60 @@ function replace_color_palette_single_image(old_palette, new_palette, img){
 }
 
 // Palettes MUST be the same length, FYI
-function replace_color_palette(old_palette, new_palette, ctx, work_canvas_width=work_canvas_size, work_canvas_height=work_canvas_size) {
-    var oldRGB, newRGB;
-    // We do some truly hideous hacks because I'm bad at Javascript :)
-    // Basically, we use the r, g, and b as a 3-level key into an object
-    // If we follow it to the bottom and something exists, it's something we replace
-    var paletteSwap = {};
-    for(var i=0; i<old_palette.length; i++){
-        oldRGB = hexToRgb(old_palette[i]);
-        // (cries in defaultdict)
-        // but seriously there might be a better way. As is, this stuff's prolly power word kill for JS devs...
-        if(paletteSwap[oldRGB[0]] == undefined){paletteSwap[oldRGB[0]] = {};}
-        if(paletteSwap[oldRGB[0]][oldRGB[1]] == undefined){paletteSwap[oldRGB[0]][oldRGB[1]] = {};}
-        paletteSwap[oldRGB[0]][oldRGB[1]][oldRGB[2]] = hexToRgb(new_palette[i]);
-    }
+function replace_color_palette(old_palette, new_palette, ctx, work_canvas_width=work_canvas_size, work_canvas_height=work_canvas_size, alpha=null) {
+    const paletteSwap = buildPaletteSwapLookup(old_palette, new_palette);
+    let newRGB;
     // taken from https://stackoverflow.com/questions/16228048/replace-a-specific-color-by-another-in-an-image-sprite
-    var imageData;
+    let imageData;
     imageData = ctx.getImageData(0, 0, work_canvas_width, work_canvas_height);
-    for (var i=0;i<imageData.data.length;i+=4)
+    for (let i=0;i<imageData.data.length;i+=4)
       {
           // god this is painful to look at. I'm sorry.
-          if(paletteSwap[imageData.data[i]] != undefined &&
-             paletteSwap[imageData.data[i]][imageData.data[i+1]] != undefined &&
-             paletteSwap[imageData.data[i]][imageData.data[i+1]][imageData.data[i+2]] != undefined){
+          if(inPaletteSwapLookup(paletteSwap, [imageData.data[i], imageData.data[i+1], imageData.data[i+2]])){
               newRGB = paletteSwap[imageData.data[i]][imageData.data[i+1]][imageData.data[i+2]];
               imageData.data[i]=newRGB[0];
               imageData.data[i+1]=newRGB[1];
               imageData.data[i+2]=newRGB[2];
+              if(alpha != null){ imageData.data[i+3]=alpha};
           }
       }
     // put the data back on the canvas
     ctx.putImageData(imageData,0,0);
 }
 
-function get_marker_coords(marker_hex, ctx) {
-    // Go through an image and find where to place features. Very similar to replace_color().
-    // NOTE: replaces marker pixels with base_foliage ones! This is because we don't always
-    // place features and don't want a pixel escaping.
-    var ret_coords = [];
-    var imageData = ctx.getImageData(0, 0, work_canvas_size, work_canvas_size);
-    [oldRed, oldGreen, oldBlue] = hexToRgb(marker_hex);
-    [newRed, newGreen, newBlue] = hexToRgb(base_foliage_palette[1]);
-    var pixel = 0;
-    for (var i=0;i<imageData.data.length;i+=4)
-      {
-          // is this pixel the old rgb?
-          if(imageData.data[i]==oldRed &&
-             imageData.data[i+1]==oldGreen &&
-             imageData.data[i+2]==oldBlue
-          ){
-              // change to your new rgb
-              imageData.data[i]=newRed;
-              imageData.data[i+1]=newGreen;
-              imageData.data[i+2]=newBlue;
-              // Ready to get a little cursed? Because there's probably a better way to do this, but it's a dumb project so...
-              pixel = i/4;
-              ret_coords.push([pixel%work_canvas_size, Math.floor(pixel/work_canvas_size)]);
-          }
-      }
-    ctx.putImageData(imageData,0,0);
-    return ret_coords
-  }
+// Build a "lookup tree" (implemented as a nested obj) used for checking if some pixel exists in a set of palettes.
+// new_palettes must be the same length as old_palettes, and its corresponding idx'd palette RGB will be the leaf.
+function buildPaletteSwapLookup(old_palettes, new_palettes, leaf_as_rgb=false){
+    let lookup = {};
+    for(let i=0; i<old_palettes.length; i++){
+        old_rgb = hexToRgb(old_palettes[i]);
+        if(lookup[old_rgb[0]] == undefined){lookup[old_rgb[0]] = {};}
+        if(lookup[old_rgb[0]][old_rgb[1]] == undefined){lookup[old_rgb[0]][old_rgb[1]] = {};}
+        lookup[old_rgb[0]][old_rgb[1]][old_rgb[2]] = hexToRgb(new_palettes[i]);
+    }
+    return lookup
+}
+const inPaletteSwapLookup = function(lookup, rgb) {return lookup[rgb[0]] != undefined && lookup[rgb[0]][rgb[1]] != undefined && lookup[rgb[0]][rgb[1]][rgb[2]] != undefined}
+
+function getSpecialMarkers(ctx){
+    const swappables = [place_simple_feature, place_complex_feature, place_25a_accent, place_10a_accent];
+    let lookup = buildPaletteSwapLookup(swappables, swappables);
+    let coords = {};
+    for (const key of swappables) { coords[key] = []; }
+    let rgb;
+    let hexmap = {};
+    for (const key of swappables) { hexmap[hexToRgb(key)] = key; }
+    const imageData = ctx.getImageData(0, 0, work_canvas_size, work_canvas_size);
+    let pixel = 0;
+    for (var i=0;i<imageData.data.length;i+=4){
+        rgb = [imageData.data[i], imageData.data[i+1], imageData.data[i+2]];
+        if(inPaletteSwapLookup(lookup, rgb)){
+            pixel = i/4;
+            coords[hexmap[lookup[rgb[0]][rgb[1]][rgb[2]]]].push([pixel%work_canvas_size, Math.floor(pixel/work_canvas_size)]);
+        }
+    }
+    return coords;
+}
 
 // Same shuffle as bingo.js. TODO: I should add a baselib
 function shuffleArray(arr) {
