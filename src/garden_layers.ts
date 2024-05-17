@@ -216,6 +216,7 @@ class GardenLayer extends Layer{
     super(width, height, x_offset, y_offset, scale);
     this.seedList = seedList;
     this.generateContent();
+    this.assignSmartPositions();
     this.canvasGarden = document.createElement("canvas") as HTMLCanvasElement;
     this.canvasGarden.height = LAYER_HEIGHT;
     this.canvasGround = document.createElement("canvas") as HTMLCanvasElement;

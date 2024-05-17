@@ -565,7 +565,7 @@ class LayerManager {
       // Javascript not having true named args will kill me in the end
       layer = save_obj["layers"][i];
       if(layer["type"] == LayerType.Garden){
-        await this.makeGardenLayer(false, layer["seeds"], layer["palette"], layer["gCover"], layer["ground"],
+        await this.makeGardenLayer(false, layer["seeds"], layer["palette"], layer["gcover"], layer["ground"],
                                    layer["w"], layer["h"], layer["x"], layer["y"], layer["s"]);
       } else if(layer["type"] == LayerType.Decor){
         await this.makeDecorLayer(false, layer["content"], layer["palette"], layer["w"], this.fullCanvas.height, layer["x"], layer["y"], layer["s"]);
@@ -577,7 +577,7 @@ class LayerManager {
   }
 
   async makeGardenLayer(openEditMode=true, seedList=[], palette=PROPERTIES["garden"]["defaultPalette"], groundCover="grass [palette]", ground="clumpy dirt",
-                        width = this.fullCanvas.width, height = this.fullCanvas.height, x_offset = 0, y_offset = 0, scale=1){
+                        width = this.fullCanvas.width/this.scale, height = this.fullCanvas.height/this.scale, x_offset = 0, y_offset = 0, scale=1){
     let newGardenLayer = new GardenLayer(width, height, x_offset, y_offset, seedList, palette, groundCover, ground, scale);
     let newGardenLayerDiv = new GardenLayerDiv(newGardenLayer, this.get_id(), this.updateCallback, this.gardenToggleCallback);
     await newGardenLayer.updateMain().then(_ => newGardenLayer.updateGround());
@@ -585,7 +585,7 @@ class LayerManager {
   }
 
   async makeDecorLayer(openEditMode=true, content=PROPERTIES["decor"]["defaultContent"], palette=PROPERTIES["decor"]["defaultPalette"],
-                       width = this.fullCanvas.width, height = this.fullCanvas.height, x_offset = 0, y_offset = 0, scale=1){
+                       width = this.fullCanvas.width/this.scale, height = this.fullCanvas.height/this.scale, x_offset = 0, y_offset = 0, scale=1){
     let newDecorLayer = new DecorLayer(width, height, x_offset, y_offset, content, palette, scale)
     let newDecorLayerDiv = new DecorLayerDiv(newDecorLayer, this.get_id(), this.updateCallback);
     await newDecorLayer.update();
@@ -593,7 +593,7 @@ class LayerManager {
   }
 
   async makeOverlayLayer(openEditMode=true){
-    let newOverlayLayer = new OverlayLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, PROPERTIES["overlay"]["defaultColor"],
+    let newOverlayLayer = new OverlayLayer(this.fullCanvas.width/this.scale, this.fullCanvas.height/this.scale, 0, 0, PROPERTIES["overlay"]["defaultColor"],
                                            PROPERTIES["overlay"]["default_opacity"], false, 1)
     let newOverlayLayerDiv = new OverlayLayerDiv(newOverlayLayer, this.get_id(), this.updateCallback);
     return this.addLayerAndAnimate(newOverlayLayerDiv, openEditMode);
@@ -602,7 +602,7 @@ class LayerManager {
   // If you're wondering why palette and customPalette are split -- bad JS "overloading", the customPalette-free form is useful for the randomize button
   async makeCelestialLayer(openEditMode=true, type=PROPERTIES["celestial"]["defaultContent"], palette=PROPERTIES["celestial"]["defaultPalette"],
                           opacity=1, customPalette=PROPERTIES["celestial"]["defaultCustomPalette"]){
-    let newCelestialLayer = new CelestialLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, type, palette, customPalette, opacity, 1);
+    let newCelestialLayer = new CelestialLayer(this.fullCanvas.width/this.scale, this.fullCanvas.height/this.scale, 0, 0, type, palette, customPalette, opacity, 1);
     let newCelestialLayerDiv = new CelestialLayerDiv(newCelestialLayer, this.get_id(), this.updateCallback);
     newCelestialLayer.update();
     return this.addLayerAndAnimate(newCelestialLayerDiv, openEditMode);
