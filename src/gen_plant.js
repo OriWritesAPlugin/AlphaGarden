@@ -83,8 +83,8 @@ override_foliage = [];
 
 temp_boost_foliage = [];
 
-var simple_features = [0, 1];
-var complex_features = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+var simple_features = [0, 1, 14];
+var complex_features = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
 // foliar earthen soft bold strange deep
 // metallic celestial verdant senescent
@@ -373,12 +373,15 @@ async function gen_plant(plant_data, with_color_key=false) {
             } else {*/
             var place_complex = await place_image_at_coords_with_chance(plant_data["complex_feature"], marker_coords[place_complex_feature], work_ctx, 0.8, true);
         }
-    }
-    if(marker_coords[place_25a_accent].length > 0){
         replace_color_palette([place_25a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.25*255);
-    }
-    if(marker_coords[place_10a_accent].length > 0){
         replace_color_palette([place_10a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.10*255);
+    } else {  // If we place a feature above, we do the below no matter what, hence the else.
+        if(marker_coords[place_25a_accent].length > 0){
+            replace_color_palette([place_25a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.25*255);
+        }
+        if(marker_coords[place_10a_accent].length > 0){
+            replace_color_palette([place_10a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.10*255);
+        }
     }
 
     // We do all the recolors at once because Speed?(TM)?
