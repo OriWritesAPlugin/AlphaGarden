@@ -316,7 +316,6 @@ var bingo_accent_palettes = accent_palettes_base_odds;
 var bingo_bases = foliage_base_odds;
 var current_challenge_code = null;
 var challenge_list = [];
-function randomFromArray(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function setAvailableChallengeListFromCode(categories_code) {
     challenge_list = [];
     for (entry of categories_code) {

@@ -164,6 +164,7 @@ function shuffleArray(arr) {
     }
     return arr;
 }
+const randomFromArray = (arr) => { return arr[Math.floor(Math.random() * arr.length)]; };
 function get_overlay_color_from_name(color, alpha) {
     color = color.slice(1);
     if (available_overlay_colors.hasOwnProperty(color)) {
