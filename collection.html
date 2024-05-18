@@ -43,7 +43,9 @@
                   <input id="show_palettes" type="checkbox">
                   <label for="show_palettes" class="unselectable">Palettes</label>
                   <input id="rainbow_palettes" type="checkbox">
-                  <label for="rainbow_palettes" class="unselectable">Rainbow</label>
+                  <label for="rainbow_palettes" class="unselectable">Rainbow</label></br>
+                  <input id="showcase_display" type="checkbox">
+                  <label for="showcase_display" class="unselectable">Showcase Mode</label>
                 </div>
               <div id=seed_collection_display_container class=garden_util_box style="width:60%; border: none">
                   <span id="seedstuff_tally" title="Convert unwanted seeds to raw seedstuff using the Recycle option">Current raw seedstuff: 0</span>
@@ -110,6 +112,7 @@
       var selected_function = "analyze";
       var sort_intervals = [];
       var days_since_backup;
+      var showcase_mode;
       const backup_sp_per_day = 3;
       const max_sp_for_backup = 15;
       // Take the average hue of all 4 colors of each palette
@@ -488,6 +491,7 @@
           sort_intervals = [];
           var collection_div = document.getElementById("collection_display_div")
           var hide_seeds = document.getElementById("hide_seeds").checked;
+          showcase_mode = document.getElementById("showcase_display").checked;
           let show_palettes = document.getElementById("show_palettes").checked;
           while (collection_div.lastChild) {collection_div.removeChild(collection_div.lastChild);}
           var seed_string = document.getElementById("seed_collection").value.split(" ").join("").replace(/(^,)|(,$)|"/g, '');
@@ -562,14 +566,15 @@
       var id = offset;
       var entry = document.createElement('div');
       entry.id = id;
-      entry.className = 'collection_box';
+      entry.className = showcase_mode ? 'showcase_collection_box' : 'collection_box';
       entry.setAttribute('data-seed', seed);  // For access with onclick
       entry.onclick = doSeedOnclick;
       var label = document.createElement('label');
       label.style.pointerEvents = "none";
       var scale_canvas = document.createElement("canvas");
-      scale_canvas.width = 66;
-      scale_canvas.height = 66;
+      let final_size = showcase_mode? 32*3 : 64;
+      scale_canvas.width = final_size + 2;
+      scale_canvas.height = final_size + 2;
       var scale_ctx = scale_canvas.getContext("2d");
       scale_ctx.imageSmoothingEnabled = false;
       // Strip any positional info
@@ -582,17 +587,17 @@
         normalization_ctx.imageSmoothingEnabled = false;
         let ref_img = await refs[all_named[seed.slice(1)]];
         normalization_ctx.drawImage(ref_img, 16-ref_img.width/2, 32-ref_img.height);
-        scale_ctx.drawImage(normalization_canvas, 0, 0, 64, 64);
+        scale_ctx.drawImage(normalization_canvas, 0, 0, final_size, final_size);
       } else {
       if(seed.length != 10){
         alert("You seem to have a malformed seed! Seeds are 10 characters long, but got \""+seed+"\". Skipping!");
       }
       else {
         var plant_canvas = await gen_plant(decode_plant_data(seed), show_palette); // Maybe I should just scale the plants up in gen_plant...
-        scale_ctx.drawImage(plant_canvas, 0, 0, 64, 64);
+        scale_ctx.drawImage(plant_canvas, 0, 0, final_size, final_size);
       }}
       label.htmlFor = id;
-      label.className = 'collection_label';
+      label.className = showcase_mode ? 'showcase_collection_label' : 'collection_label';
       if(hide_seed){text_content = offset+1;} else {text_content = seed;}
       label.appendChild(document.createTextNode(text_content));
       let separator = document.createElement("span");

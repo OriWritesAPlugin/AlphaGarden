@@ -358,7 +358,7 @@ font-weight: bold;
     color: #d1941a;
 }
 
-.collection_box {
+.collection_box, .showcase_collection_box {
     display: flex;
     align-items: center;
     /*justify-content: center;  we're gonna try anchoring to the top and letting things wrap...*/
@@ -373,11 +373,21 @@ font-weight: bold;
     background-repeat: no-repeat;
 }
 
-.collection_label {
+.showcase_collection_box {
+    width: 128px;
+    height: 128px;
+    border-style: none;
+}
+
+.collection_label, .showcase_collection_label {
   word-wrap: break-word;
   white-space: nowrap;
   padding: 0.6vh;
   font-size: 0.75rem;
+}
+
+.showcase_collection_label {
+    opacity: 0.25;
 }
 
 .directory_link, .index_link {
@@ -465,4 +475,28 @@ font-weight: bold;
 #seed_list:focus {
   border-color: #DFC48C;
   outline: none;
+}
+
+.wander_choice {
+width: 100%;
+background-color: #2F252D;
+border: none;
+color: #DFC48C;
+border-color: #DFC48C;
+font-size: initial;
+font-family: monospace, Verdana, sans-serif;
+border-style: solid;
+border-radius: 1em;
+padding: 0.75em;
+margin: 0.25em;
+border-color: #000;
+border-width: thin;
+}
+.wander_choice:hover {
+    background-color: #3F353D;
+}
+.wander_choice:disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 0.35;
 }
