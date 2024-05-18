@@ -554,7 +554,7 @@
         });
       }
       return collection.sort(function(a, b) {
-        return parsed_seeds[a][sort_key] - parsed_seeds[b][sort_key];
+        return lookup_redirect(parsed_seeds[a][sort_key]) - lookup_redirect(parsed_seeds[b][sort_key]);
       });
     }
 
