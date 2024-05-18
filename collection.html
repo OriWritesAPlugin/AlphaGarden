@@ -566,6 +566,7 @@
       entry.setAttribute('data-seed', seed);  // For access with onclick
       entry.onclick = doSeedOnclick;
       var label = document.createElement('label');
+      label.style.pointerEvents = "none";
       var scale_canvas = document.createElement("canvas");
       scale_canvas.width = 66;
       scale_canvas.height = 66;
