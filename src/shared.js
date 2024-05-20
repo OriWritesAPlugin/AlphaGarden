@@ -199,6 +199,12 @@ function get_overlay_color_from_name(color, alpha){
     return rgb_code;
 }
 
+function get_hex_from_name(color, alpha){
+  color = color.slice(1);
+  if(available_overlay_colors.hasOwnProperty(color)){ color = available_overlay_colors[color]; }
+  return color;
+}
+
 
 function drawSkyGradient(canvas, actingPalette, opacity){
   let ctx = canvas.getContext("2d");
@@ -229,8 +235,9 @@ async function applyOverlay(stencil_canvas, palette, opacity){
     return_canvas.width, pick_canvas.width = stencil_canvas.width;
     return_canvas.height, pick_canvas.height = stencil_canvas.height;
     if(!Array.isArray(palette)){
-      palette = [get_overlay_color_from_name(palette, opacity)];
+      palette = ["#"+get_hex_from_name(palette, opacity)];
     }
+    console.log(palette);
     pick_canvas = drawSkyGradient(pick_canvas, palette, opacity);
     
     return_canvas.width = stencil_canvas.width;
