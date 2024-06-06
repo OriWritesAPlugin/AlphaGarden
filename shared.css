@@ -400,7 +400,7 @@ font-weight: bold;
 
 .index_link { position: fixed; top: 0; left: 0;}
 
-.popup, .bingo-popup {
+.popup, .bingo-popup, .wildcard-popup {
   position: fixed;
   border-radius:20px;
   box-shadow: 0 0 35px rgba(0, 0, 0, 0.2);
@@ -419,6 +419,13 @@ font-weight: bold;
   overflow-y: scroll;
   z-index: 1;
   margin: auto;
+}
+
+.wildcard-popup{
+  width: 30rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
 }
 
 .side-by-side {

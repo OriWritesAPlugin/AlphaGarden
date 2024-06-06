@@ -124,6 +124,7 @@ async function imageFromPopup(parent, name_of_image, callback){
     helptext.style.textAlign = "center";
     let urlTaker = document.createElement("input");
     urlTaker.style.min_height = "3vh";
+    urlTaker.className = "garden-dim-bar";
     var preview = document.createElement("img");
     let preview_container = document.createElement("div");
     preview_container.className = "scaled_preview_container";
@@ -167,6 +168,7 @@ async function imageFromPopup(parent, name_of_image, callback){
     form.appendChild(confirm_button);
     parent.appendChild(form);
     urlTaker.focus();
+    return form;
 }
 
 // Helper for imageFromPopup, handles image file validation
