@@ -162,6 +162,9 @@ class GardenOverlayItem extends GardenItem {
     place(place_onto_canvas) {
         applyOverlay(place_onto_canvas, this.identity, this.opacity);
     }
+    getSeed() {
+        return this.identity + "%" + (this.opacity * 100).toFixed(2).toString();
+    }
 }
 /**
 A Layer representing a garden.
