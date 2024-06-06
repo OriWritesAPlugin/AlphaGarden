@@ -343,10 +343,10 @@ async function gen_plant(plant_data, with_color_key = false) {
     }
     else { // If we place a feature above, we do the below no matter what, hence the else.
         if (marker_coords[place_25a_accent].length > 0) {
-            replace_color_palette([place_25a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.25 * 255);
+            replace_color_palette([place_25a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.35 * 255);
         }
         if (marker_coords[place_10a_accent].length > 0) {
-            replace_color_palette([place_10a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.10 * 255);
+            replace_color_palette([place_10a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.15 * 255);
         }
     }
     // We do all the recolors at once because Speed?(TM)?
