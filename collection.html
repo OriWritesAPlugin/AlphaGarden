@@ -507,7 +507,7 @@
               sort_order = sort_order_elem[i].value;
           }
           collection = get_seed_collection_sorted_by(collection, sort_order);
-          if(collection.length > 0){ analyze_seed(collection[0]); }
+          if(collection.length > 0 && !document.getElementById("analysis_output_text").innerText){ analyze_seed(collection[0]); }
           //var collection_width_elem = document.getElementsByName('collection_width');
           document.getElementById("title").title = "You have " + collection.length + " seeds and " + getSeedPoints() + " raw seedstuff!";
           for(var i=0; i<collection.length; i++){
@@ -654,7 +654,7 @@
           } else {
             for(category of ["foliage_palette", "feature_palette", "accent_palette"]){
               let link_color = "#"+plant_data[category][0];
-              color_msg += ("<a href='javascript:forceFilter(-1, " + raw_plant_data[category] + ");' style='text-decoration-color: " + link_color + "'><span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["categories"]+"<\a><\span> ");
+              color_msg += ("<a href='javascript:forceFilter(-1, " + raw_plant_data[category] + ");' style='text-decoration-color: " + link_color + "'><span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["name"]+"<\a><\span> ");
             }
           }
           text_output.innerHTML = "Name: "+"<a href='javascript:forceFilter(" + plant_data["foliage"] + ", -1);'>"+all_foliage[plant_data["foliage"]]["name"]+"<\a>";
