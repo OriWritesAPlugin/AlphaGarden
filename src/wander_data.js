@@ -235,7 +235,7 @@ WORLD = {
                           {"text": "Back to the tunnels", "goto": "misc hallway"}]
             },
             "crystalline outpost": {
-              "text": "The tunnel opens into a chamber studded with crystals. A few basic dwellings are scattered here and there, shaped from packed earth and held together by roots. A smattering of crates and instruments marks this as a research outpost. Looks like $PLAYER has been noticed--a dragon rears back to give a cheery wave.",
+              "text": "The tunnel opens into a chamber studded with crystals. A few basic dwellings are scattered here and there, shaped from packed earth and held together by roots. A smattering of crates and instruments marks this as a research outpost. A dragon rears back to give a cheery wave.",
               "backdrop": "crystalline outpost",
               "gives": [["sroot found settlement", 1]],
               "player_pos": [["%14", 2], ["%0", 2]],
@@ -246,7 +246,7 @@ WORLD = {
               ]
             },
             "crystalline firstchat": {
-              "text": "The dragon skitters and leaps forward as $PLAYER approach$PLURALPLAYER. \"Whoa! Hey! Do you have the box?\" They seem to remember themselves, skidding to a halt and arranging their body more neatly. \"Ah! Sorry, sorry, must seem a strange thing to ask if you DON'T have it. We've just been waiting a bit, is all. Welcome to Outpost K4-Qim, though we just like to call it Kuquim. Do you need anything? We don't get many visitors.\"",
+              "text": "The dragon skitters and leaps forward as $PLAYER approach$PLURALPLAYER. \"Whoa! Hey! Do you have the box?\" They seem to remember themselves, skidding to a halt and arranging their body more neatly. \"Ah! Sorry, sorry, must seem a strange thing to ask if you DON'T have it. We've just been waiting a bit, is all. Welcome to Outpost K4-Qim, though we all call it Kuquim. Do you need anything? We don't get many visitors.\"",
               "backdrop": "crystalline outpost zoom",
               "player_pos": ["%14", 2],
               "choices": [{"text": "\"I've got your box right here, actually.\" (hand it over)", "goto": "box delivery", "consumes": [["sroot strange package", 1]]},
@@ -269,7 +269,7 @@ WORLD = {
               {"text": "Say that it was a difficult journey, with the box kept safe only through chutzpah and derring-do", "blocked by": [["sroot depleted fragments", 1]], "after": "\"Oh no! Usually the tunnels aren't so rough.\" They shake their head, sympathetic. \"Well, you're braver than I am, and I'm glad for that. Now, let me show you what all that effort was for...\"", "goto": "box delivered"},
               {"text": "Say that you were accosted and the box was damaged during the fight", "needs": [["sroot depleted fragments", 1]], "goto": "box delivered", "after": "\"Aah! What? Was it one of the protectors? Were you hurt? Was the box??? Here, here, let me take a look!\""},
               {"text": "Say that the box spontaneously exploded in magic at some point", "needs": [["sroot depleted fragments", 1]], "after": "\"IT WHAT?!\" Their tail writhes. \"That could have been disastrous! Thanks be you weren't hurt, or worse! We'll conduct a full investigation to figure out how that happened, I'm so sorry. Let me see if I can find any hints in the test results...\"", "goto": "box delivered"},
-              {"text": "Say that you peeked in the box and, in doing so, released its magic.", "needs": [["sroot depleted fragments", 1]], "after": "\"Oh! Uh. Well. Uh. Thanks for being honest.\" They look a little disappointed, but shake it off. \"I can't say I would've done any different, not really...um. Thanks for not lying about it. Don't worry, that wasn't the really valuable part. Here, let me show you,\"", "goto": "box delivered"},
+              {"text": "Say that you peeked in the box and, in doing so, released its magic.", "needs": [["sroot depleted fragments", 1]], "after": "\"Oh! Uh. Well. Uh. Thanks for being honest...\" They look a little disappointed, but shake it off. \"I can't say I would've done any different, not really, so. Um. Yeah, thanks for not lying about it I guess. Don't worry, that wasn't the really valuable part. Here, let me show you.\"", "goto": "box delivered"},
               ]
             },
             "box delivered": {
@@ -333,7 +333,7 @@ WORLD = {
             "win": {
               "text": "The dragon beckons $PLAYER to the landslide. They lay the reagents in front of it, drawing lines in the dirt with their claw and murmuring a few syllables. \"And that should do it! Oh, by the way--I'm Emri!\" And with that, Emri slams their fist down on the crystal.",
               "backdrop": "landslide",
-              "player_pos": ["%34", 2],
+              "player_pos": ["%34", 1],
               "choices": [
               {"text": "BRACE!", "goto": "winsplosion"},
               {"text": "EMBRACE!", "goto": "winsplosion"},
@@ -343,16 +343,16 @@ WORLD = {
             "winsplosion": {
               "text": "The cave quakes with an explosion of growth. Flashes of green glow brighter than daylight, brighter, brighter...",
               "backdrop": "landslide explosion",
-              "player_pos": ["%34", 4],
+              "player_pos": ["%34", 3],
               "choices": [
               {"text": "AAAAAAAAA", "goto": "win screen"},
               {"text": "HELL YEAAAAAA", "goto": "win screen"}
               ]
             },
             "win screen": {
-              "text": "Congratulations! $PLAYER has completed the demo and (probably) survived to the end. What lies beyond the landslide? More importantly, what other gardens could be built and explored? And what title do you have down there in the bottom left? Thanks for playing, and tell me what you think!",
+              "text": "Congratulations! $PLAYER completed the demo and (probably) survived to the end. What lies beyond the landslide? More importantly, what other gardens could be built and explored (maybe yours)? And what title do you have down there in the bottom left? Thanks for playing, and tell me what you think!",
               "backdrop": "landslide explosion",
-              "player_pos": ["%34", 4],
+              "player_pos": ["%34", 3],
               "choices": [
               ]
             },
@@ -397,16 +397,16 @@ WORLD = {
               "text": ["Beyond the crevice, water rains from someplace high above, carrying smells of sun and nectar. Plants sprout in profusion.", "The space behind the crevice reverberates with the sound of falling water. Plants drip with condensed mist.", "The water pouring into the hollow is transparent as glass where it pools, but turns the air cold and humid where it falls. Fireflies gather around the puddles."],
               "backdrop": "crevice waterfall",
               "gives": [["sroot found waterfall", 4]],
-              "player_pos": [["%6", 3]],
+              "player_pos": [["%6", 5]],
               "choices": [{"text": "Bathe in the waters", "goto": ["crevice bathe"], "title": "who stood beneath the buried waters"},
-                          {"text": "Fill a waterskin", "after": "$THEY hold$PLURAL the skin beneath the flow as the force tries to tear it away. It's filled in no time.", "goto": "crevice waterfall", "gives": [["pure water", 1]], "consumes": [["empty waterskin", 1]], "blocked by": [["pure water", 1]]},
+                          {"text": "Fill a waterskin", "after": "$THEY hold$PLURAL the skin beneath the flow as the force tries to tear it away. It's filled in no time.", "goto": "crevice waterfall", "gives": [["pure water", 1]], "consumes": [["empty waterskin", 1]]},//, "blocked by": [["pure water", 1]]},
                           {"text": "Leave the hollow", "goto": "misc hallway 2"}],
             },
             "crevice bathe": {
               "text": ["$PLAYER enter$PLURALPLAYER the stream. Water hammers $THEIR back, pure, cold, and cleansing."],
               "backdrop": "crevice waterfall",
-              "player_pos": ["%45", 1],
-              "choices": [{"text": "Fill a waterskin", "after": "$THEY hold$PLURAL the skin beneath the flow as the force tries to tear it away. It's filled in no time.", "goto": "crevice waterfall", "gives": [["pure water", 1]], "consumes": [["empty waterskin", 1]], "blocked by": [["pure water", 1]]},
+              "player_pos": ["%45", 5],
+              "choices": [{"text": "Fill a waterskin", "after": "$THEY hold$PLURAL the skin beneath the flow as the force tries to tear it away. It's filled in no time.", "goto": "crevice waterfall", "gives": [["pure water", 1]], "consumes": [["empty waterskin", 1]]},//, "blocked by": [["pure water", 1]]},
                           {"text": "Leave the hollow", "goto": "misc hallway 2"}]
             },
             "crevice stuck": {
@@ -493,15 +493,23 @@ WORLD = {
               "backdrop": "protector cache gone",
               "player_pos": ["%20", 1],
               "choices": [{"text": "Take some resin", "goto": "protector cache gone", "gives": [["sroot resin", 1]], "blocked by": [["sroot resin", 1]], "after": "$PLAYER carve$PLURALPLAYER away a sample of the resin. More flows into place, though it's far too liquid to handle."},
-                          {"text": "Take what's embedded in the largest nodule", "goto": "protector cache gone", "gives": [["sroot evilcrystal", 1], ["health", -10]], "blocked by": [["sroot evilcrystal", 1]], "after": "$PLAYER dig$PLURALPLAYER into the resin, just enough to free what's trapped within. Some sort of crystal? It hurts like nothing else when touched...not more, just different. A strange and otherworldly pain, as if it's digging into something outside $THEIR body. The nearby plants seem to stand a little straighter with the thing removed."},
+                          {"text": "Investigate what's embedded in the largest nodule", "goto": "protector cache crystalwary", "blocked by": [["sroot evilcrystal", 1]]},
                           {"text": "Return to the maze", "goto": "misc hallway 2"}
+                        ],
+            },
+            "protector cache crystalwary": {
+              "text": "$PLAYER dig$PLURALPLAYER into the resin, just enough to see what's trapped within. Some sort of crystal? The resin's already flowing back into the hollow to bury it. The veins definitely originate from the crystal, and the whole assemblage seems...off.",
+              "backdrop": "protector cache gone",
+              "player_pos": ["%25", 1],
+              "choices": [{"text": "Take the crystal", "title": "curse-pricked", "goto": "protector cache gone", "gives": [["sroot evilcrystal", 1], ["health", -10]], "blocked by": [["sroot evilcrystal", 1]], "after": "$PLAYER dig$PLURALPLAYER into the resin, just enough to free what's trapped within. Some sort of crystal? It hurts like nothing else when touched...not more, just different. A strange and otherworldly pain, as if it's digging into something outside $THEIR body. The nearby plants seem to stand a little straighter with the thing removed."},
+                          {"text": "Don't take it", "goto": "protector cache gone"}
                         ],
             },
             "dead end": {
               "text": "The ever-shifting tunnels have ceased their shifting here, at least; the tunnel ends with neither fanfare nor direction.",
               "backdrop": "dead end",
               "player_pos": ["%11", 1],
-              "choices": [{"text": "The wall looks weak. I'll MAKE a way", "gives": [["sroot cache discovered", 1]], "blocked by": [["sroot cache discovered", 2]], "goto": "protector cache", "after": "$PLAYER charge$PLURALPLAYER forwards! When $THEY slam$PLURAL into the wall, the barrier of bark collapses with an awful cracking sound, and $THEY tumble$PLURAL into a chamber beyond..."},
+              "choices": [{"text": "The wall looks weak. I'll MAKE a way", "gives": [["sroot cache discovered", 1], ["health", -3]], "blocked by": [["sroot cache discovered", 2]], "goto": "protector cache", "after": "$PLAYER charge$PLURALPLAYER forwards! When $THEY slam$PLURAL into the wall, the barrier of bark collapses with an awful cracking sound, and $THEY tumble$PLURAL into a chamber beyond..."},
                           {"text": "Inspect the area closely", "title": "root sleuth", "goto": "dead end inspect", "blocked by": [["sroot cache discovered", 1]]},
                           {"hidden": true, "text": "Hold out a totem?", "goto": "protector cache", "needs": [["root protector totem", 1]], "blocked by": [["sroot cache discovered", 1]], "after": "Astonishingly the roots react. Not much, just barely enough space to wiggle through. The space opens up beyond..."},
                           {"text": "Back to the maze then", "goto": "misc hallway"}],
@@ -509,7 +517,7 @@ WORLD = {
             },
             "dead end inspect": {
               "text": "Something seems a little off about this dead end...",
-              "backdrop": "dead end",
+              "backdrop": "$UNCHANGED",
               "player_pos": ["%40", 1],
               "choices": [{"text": "Inspect the floor", "goto": "dead end inspect", "after": "There isn't much leaf litter or other debris on the floor, though many of the hallways are nearly choked with the stuff. What is here is distributed strangely, as if a strong wind had been through."},
                           {"text": "Inspect the plants", "goto": "dead end inspect", "after": "The plants here are fresh and young. Their variety seems somewhat limited compared to elsewhere in the maze, though there's one cluster that seems intentionally planted, going by some clawmarks in the floor."},
