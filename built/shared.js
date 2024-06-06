@@ -208,7 +208,6 @@ async function applyOverlay(stencil_canvas, palette, opacity) {
     if (!Array.isArray(palette)) {
         palette = ["#" + get_hex_from_name(palette, opacity)];
     }
-    console.log(palette);
     pick_canvas = drawSkyGradient(pick_canvas, palette, opacity);
     return_canvas.width = stencil_canvas.width;
     return_canvas.height = stencil_canvas.height;
@@ -250,7 +249,7 @@ function clearCanvas(canvas) {
 // Largely taken from https://soshace.com/the-ultimate-guide-to-drag-and-drop-image-uploading-with-pure-javascript/
 async function imageFromPopup(parent, name_of_image, callback) {
     var form = document.createElement("div");
-    form.className = "popup";
+    form.className = "wildcard-popup";
     let helptext = document.createElement("div");
     helptext.innerHTML = "<h3>" + name_of_image + "</h3>Paste an image (or image URL), or drag-and-drop one from your files:";
     helptext.style.padding = "1vw";
@@ -301,6 +300,7 @@ async function imageFromPopup(parent, name_of_image, callback) {
     form.appendChild(confirm_button);
     parent.appendChild(form);
     urlTaker.focus();
+    return form;
 }
 // Helper for imageFromPopup, handles image file validation
 async function handleImage(files, name_of_image, preview_img) {
