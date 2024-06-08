@@ -199,9 +199,9 @@
         form.appendChild(confirm_button);
       }
 
-      async function do_stuff(){
-        await createCharacter();
-        await do_preload_initial();
+      function do_stuff(){
+        createCharacter();
+        do_preload_initial();
       }
       
       async function do_remaining_stuff(){

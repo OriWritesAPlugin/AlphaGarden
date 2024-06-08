@@ -326,10 +326,8 @@
           }
         }
 
-        async function do_preload() {
-            await preload_plants();
-            await gen_base_divs();
-            preload_named();
+        async function do_preload() {          
+          Promise.all([preload_plants().then(x => (gen_base_divs())), preload_named()])
         }
 
       function addPalette(parent, palette_redirect){

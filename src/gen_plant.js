@@ -36,6 +36,10 @@ const ERROR_PLANT = {"foliage": 160,
 
 var foliage_by_category = {};
 
+// Cache non-component-using plants
+var plant_cache = {};
+var plant_cache_max_size = 30;
+
 function assemble_categories(target_list){
     by_category = {};
     for(let i=0; i<window[target_list].length; i++){
@@ -185,6 +189,7 @@ async function preload_spritesheet(name, URL, count){
         base64img.onerror = function() { base64img.src = BAD_IMG_URL;};
         base64img.src=URL;
     });
+    await img.decode();
     offset = 0
     while(offset < count){
         refs[name+offset.toString()] = load_sprite_from_spritesheet(img, offset)
@@ -347,6 +352,10 @@ Base64 = (function () {
 
 async function gen_plant(plant_data, with_color_key=false) {
     // Returns the image data for a generated plant
+    // First we check cache
+    let seed = encode_plant_data_v2(plant_data);
+    let cachable = true;
+    if(encode_plant_data.hasOwnProperty(seed)){return encode_plant_data(seed);}
     var work_canvas = document.createElement("canvas");
     var work_ctx=work_canvas.getContext("2d");
     plant_data = parse_plant_data(plant_data);
@@ -361,6 +370,7 @@ async function gen_plant(plant_data, with_color_key=false) {
     let marker_coords = getSpecialMarkers(work_ctx);
 
     if(marker_coords[place_simple_feature].length > 0 || marker_coords[place_complex_feature].length > 0){
+        cachable = false;
         replace_color_palette([place_simple_feature, place_complex_feature], [base_foliage_palette[1], base_foliage_palette[1]], work_ctx);
         // Place the features
         if(marker_coords[place_simple_feature].length > 0){
@@ -382,12 +392,21 @@ async function gen_plant(plant_data, with_color_key=false) {
         if(marker_coords[place_10a_accent].length > 0){
             replace_color_palette([place_10a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.15*255);
         }
+
     }
 
     // We do all the recolors at once because Speed?(TM)?
     var new_overall_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);
     replace_color_palette(overall_palette, new_overall_palette, work_ctx);
-
+    if(cachable){
+        let keys = Object.keys(plant_cache);
+        if(keys.length < plant_cache_max_size){
+            plant_cache[seed] = work_canvas;
+        } else {
+            delete plant_cache[keys[ keys.length * Math.random() << 0]];
+            plant_cache[seed] = work_canvas;
+        }
+    }
     // We can draw a canvas directly on another canvas
     return work_canvas;
 }
