@@ -16,7 +16,7 @@
                   <input type="button" class="chunky_fullwidth" value="Sort/Refresh" onClick="doFilter()">
                   <h3>Sort By</h2>
                   <input type="radio" id="none_opt" name="sort_order" value="None" checked>
-                  <label for="none_opt">Time Gotten</label><br>
+                  <label for="none_opt">Chronological</label><br>
                   <input type="radio" id="base" name="sort_order" value="foliage">
                   <label for="base">Base</label><br>
                   <input type="radio" id="foliage" name="sort_order" value="foliage_palette">
@@ -39,9 +39,9 @@
                   <div id="palette_sort_categories_div"></div>
                   <h3>Display</h2>
                   <input id="hide_seeds" type="checkbox" value="Hide seeds">
-                  <label for="hide_seeds" class="unselectable">Numbers</label>
+                  <label for="hide_seeds" class="unselectable">Numbers</label></br>
                   <input id="show_palettes" type="checkbox">
-                  <label for="show_palettes" class="unselectable">Palettes</label>
+                  <label for="show_palettes" class="unselectable">Palettes</label></br>
                   <input id="rainbow_palettes" type="checkbox">
                   <label for="rainbow_palettes" class="unselectable">Rainbow</label></br>
                   <input id="showcase_display" type="checkbox">
@@ -121,6 +121,7 @@
       var first_chunk_on_last_sort = getSeedCollectionAsString().slice(0, 50);
       // TODO: Potentially nasty refactor: replacing all these palette names with an enum somewhere.
       const palette_codes = {0: "foliage_palette", 1: "feature_palette", 2: "accent_palette"};
+      var display_options = getDisplayOptions();
 
 
       window.addEventListener("storage", () => {
@@ -141,6 +142,25 @@
         if(getSeedCollectionAsString().slice(0, 50) != first_chunk_on_last_sort){
           display_collection();
         }
+      }
+
+      function getDisplayOptions(){
+        if (localStorage.seed_collection == undefined) {
+          localStorage.display_options = JSON.stringify({"n":0,"p":0,"r":1,"s":0});
+        }
+        const options = JSON.parse(localStorage.display_options);
+        document.getElementById("hide_seeds").checked = options["n"];
+        document.getElementById("show_palettes").checked = options["p"];
+        document.getElementById("rainbow_palettes").checked = options["r"];
+        document.getElementById("showcase_display").checked = options["s"];
+      }
+
+      function setDisplayOptions(){
+        localStorage.display_options = JSON.stringify({"n": document.getElementById("hide_seeds").checked,
+                                                       "p": document.getElementById("show_palettes").checked,
+                                                       "r": document.getElementById("rainbow_palettes").checked,
+                                                       "s": document.getElementById("showcase_display").checked
+                                                      });
       }
 
       function doBackup(){
@@ -487,6 +507,7 @@
       function display_collection() {
           //clear what's already in there
           cancelOngoingSort();
+          setDisplayOptions();
           first_chunk_on_last_sort = getSeedCollectionAsString().slice(0, 50);
           sort_intervals = [];
           var collection_div = document.getElementById("collection_display_div")
