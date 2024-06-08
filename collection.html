@@ -16,7 +16,7 @@
                   <input type="button" class="chunky_fullwidth" value="Sort/Refresh" onClick="doFilter()">
                   <h3>Sort By</h2>
                   <input type="radio" id="none_opt" name="sort_order" value="None" checked>
-                  <label for="none_opt">Nothing</label><br>
+                  <label for="none_opt">Time Gotten</label><br>
                   <input type="radio" id="base" name="sort_order" value="foliage">
                   <label for="base">Base</label><br>
                   <input type="radio" id="foliage" name="sort_order" value="foliage_palette">
@@ -548,7 +548,7 @@
         collection = filtered_collection;
       }
 
-      let lookup_redirect = document.getElementById("rainbow_palettes").checked? x => rainbow_offset[x] : x => x;
+      let lookup_redirect = document.getElementById("rainbow_palettes").checked && sort_key != "foliage" ? x => rainbow_offset[x] : x => x;
       if(sort_key == "None") { return collection; };
       if(sort_key == "main_palette") {
         return collection.sort(function(a, b) {
