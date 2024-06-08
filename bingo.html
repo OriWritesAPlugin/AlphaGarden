@@ -293,6 +293,7 @@
 
     function relaunchBoard(){
         generate_board(board_size, challenge_code);
+        stashBingoState();
     }
 
     function completeSetup(){
@@ -301,6 +302,11 @@
         generate_board(board_size, challenge_code);
         update_squares_til_if_present();
         document.getElementById("squares_til_seed").removeAttribute("hidden");
+        try {
+            restoreBingoStateIfPresent();
+        } catch (e) {
+            alert("Malformed old bingo state, generating a new board!");
+        }
     }
     </script>
 </html>

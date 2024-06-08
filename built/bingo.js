@@ -603,6 +603,7 @@ async function toggle_status(e, generate_rewards = true) {
     else if (!now_has_bingo) {
         shimmer_bingo_borders(bingo_border_color, "#b1f2c0", row, col);
     }
+    stashBingoState();
 }
 function update_squares_til_if_present() {
     if (!document.getElementById("squares_til_seed")) {
@@ -734,14 +735,27 @@ function export_bingo_onclick() {
     clicked.textContent = "[Copied!]";
     setTimeout(function () { clicked.textContent = "[Export]"; }, 1000);
 }
-function import_bingo_onclick() {
-    let bingo_board = JSON.parse(prompt("Paste in your board:"));
+function import_bingo(bingo_board) {
     clear_board();
     current_board = deminify_squares(bingo_board["squares"]);
     rewards = bingo_board["rewards"];
     bingo_reward = bingo_board["bingo_reward"];
     size = bingo_board["squares"].length;
     draw_board();
+}
+function import_bingo_onclick() {
+    let bingo_board = JSON.parse(prompt("Paste in your board:"));
+    import_bingo(bingo_board);
+}
+function stashBingoState() {
+    localStorage.bingo_state = export_bingo();
+}
+function restoreBingoStateIfPresent() {
+    if (localStorage.bingo_state == undefined) {
+        return false;
+    }
+    import_bingo(JSON.parse(localStorage.bingo_state));
+    return true;
 }
 function toggle_extra_icons() {
     toggleExtraIcons(current_icons);
