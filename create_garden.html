@@ -18,7 +18,7 @@
         <label for="quantity">Width:</label> <input class="garden-dim-bar" type="number" id="garden_width" name="quantity" min="64" value=450>
         <label for="garden_height">Height:</label> <input class="garden-dim-bar" type="number" id="garden_height" name="garden_height" min="70" value=80>
         <label for="garden_scale">Scale:</label> <input class="garden-dim-bar" type="number" id="garden_scale" name="garden_scale" value=1 step="0.25">
-        <input type="button" class="chunky_wrap" value="Randomize" onClick="random_from_collection()">
+        <input type="button" class="chunky_wrap" value="Randomize" id="randomizer" onClick="random_from_collection()">
         <!--<input type="button" class="chunky_wrap" value="Sync Sizes" onClick="sync_sizes()">   waiting until height -->
         <input type="button" class="chunky_wrap" value="Load" onClick="load()">
         <br><br>
@@ -52,6 +52,8 @@
       var da_canvas;
       var da_ctx;
       var gm;
+      var ready_to_random = false;
+      var randomizer_timeout_id;
 
         async function do_stuff(){
           await do_preload_initial();
@@ -108,7 +110,21 @@
           modal.appendChild(modal_display);
         }
 
+        function toggle_random(){
+          button = document.getElementById("randomizer");
+          ready_to_random = !ready_to_random;
+          button.value = ready_to_random? "Click to confirm" : "Randomize";
+        }
+
         async function random_from_collection(){
+            if(!ready_to_random){
+              toggle_random();
+              randomizer_timeout_id = setTimeout(toggle_random, 1000);
+              return;
+            } else {
+              clearTimeout(randomizer_timeout_id);
+              randomizer_timeout_id = setTimeout(toggle_random, 1000);           
+            }
             let collection = getSeedCollection();
             let decorPaletteSeed = collection[Math.floor(Math.random() * collection.length)];
             let groundPaletteSeed = collection[Math.floor(Math.random() * collection.length)];
