@@ -1,17 +1,6 @@
 WORLD = {
   "The Green Forever": {
   "REGIONS": {
-    /*"Evergreen Coast": {
-      "REGIONS": {
-        "Port Waldis": {
-          "SCENES": {
-            "docks": {
-
-            }
-          }
-        }
-      }
-    },*/
     "Blossomjungle": {
       "REGIONS": {
         "Springrover Ruins": {
@@ -128,7 +117,7 @@ WORLD = {
         "Overgrown Root Tunnels": {
           "SCENES": {
             "entry cavern": {
-              "text": ["Welcome to the alpha test! This lets you string gardens together with an ultra-light, vaguely CYOA interface. It's meant to make clans/events explorable, in a sense. I hope you have fun!"],
+              "text": ["Welcome to the alpha test v2! This lets you string gardens together with an ultra-light, vaguely CYOA interface. It's meant to make clans/events explorable, in a sense. I hope you have fun!"],
               "backdrop": "entry cavern",
               "player_pos": [["%7", 3], ["%12", 4]],
               "choices": [{"text": "Onwards to showcase area: worldshards", "goto": "alpine meadow"},
@@ -145,7 +134,7 @@ WORLD = {
               "choices": [{"text": "A good boy", "goto": "entry cavern"}]
             },
             "petted nigel": {
-              "text": "The moment $PLAYER move$PLURAL back towards Nigel, he starts racing around the place in a frenzy of yips, yaps, and flops. Looks like he's still pretty hyped up--don't want to overstimulate him.",
+              "text": "The moment $PLAYER move$PLURALPLAYER back towards Nigel, he starts racing around the place in a frenzy of yips, yaps, and flops. Looks like he's still pretty hyped up--don't want to overstimulate him.",
               "player_pos": ["%15", 4],
               "backdrop": "entry cavern",
               "choices": [{"text": "A solid lad", "goto": "entry cavern"}]
@@ -418,7 +407,7 @@ WORLD = {
                           {"text": "Meditate awhile longer", "goto": "little meditate"}]   
             },
             "crevice": {
-              "text": ["Looks like there's a crack in the living wall. $PLAYER should be able to squeeze through, albeit with some difficulty"],
+              "text": "Looks like there's a crack in the living wall. $PLAYER should be able to squeeze through, albeit with some difficulty.",
               "backdrop": "crevice",
               "player_pos": ["%5", 1],
               "choices": [{"text": "Attempt to squeeze through", "goto": "crevice stuck"},
@@ -554,7 +543,7 @@ WORLD = {
               "choices": [{"text": "Inspect the floor", "goto": "dead end inspect", "after": "There isn't much leaf litter or other debris on the floor, though many of the hallways are nearly choked with the stuff. What is here is distributed strangely, as if a strong wind had been through."},
                           {"text": "Inspect the plants", "goto": "dead end inspect", "after": "The plants here are fresh and young. Their variety seems somewhat limited compared to elsewhere in the maze, though there's one cluster that seems intentionally planted, going by some clawmarks in the floor."},
                           {"text": "Inspect the walls", "goto": "dead end inspect", "after": "The walls are almost warm to the touch, and their bark is thinner. There's a depressed area near a cluster of flowers."},
-                          {"text": "Listen closely", "goto": "dead end inspect", "after": "The dead end is eerily silent. If $PLAYER listen$PLURAL hard enough, $THEY can pick out a very slight rhythmic clacking from behind the far wall."},
+                          {"text": "Listen closely", "goto": "dead end inspect", "after": "The dead end is eerily silent. If $PLAYER listen$PLURALPLAYER hard enough, $THEY can pick out a very slight rhythmic clacking from behind the far wall."},
                           {"text": "There's nothing more to learn here", "goto": "dead end", "gives": [["sroot cache discovered", 1]]}],
             },
             "hallway frog": {

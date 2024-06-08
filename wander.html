@@ -224,7 +224,7 @@
 
       do_stuff();
 
-      async function loadScene(set_dims=true){
+      function loadScene(force_set_dims=false){
         let scene_data = getScreenData();
         document.getElementById("scene_description").innerHTML = makeSubstitutions(scene_data["text"] instanceof Array ? randomFromArray(scene_data["text"]) : scene_data["text"]);
         let choices = [];
@@ -255,14 +255,31 @@
           }
           savestring = JSON.stringify(mod_obj);
         }
-        await gm.loadFromSaveString(savestring);
-        if(set_dims){
+        gm.loadFromSaveString(savestring).then(async (x) => {
+        if(!force_set_dims){
+          let redraw = false;
+          if(gm.scale != BACKDROPS[backdrop]["s"]){
+            gm.setScale(BACKDROPS[backdrop]["s"]);
+            redraw = true;
+          }
+          if(gm.width != BACKDROPS[backdrop]["w"]){
+            gm.setWidth(BACKDROPS[backdrop]["w"]);
+            await gl.updateGround();
+            redraw = true;
+          }
+          if(gm.height != BACKDROPS[backdrop]["h"]){
+            await gm.setHeight(BACKDROPS[backdrop]["h"]);
+            redraw = true;
+          }
+          if(redraw){ gm.redraw(); }
+        } else {
           gm.setWidth(BACKDROPS[backdrop]["w"]);
           gm.setScale(BACKDROPS[backdrop]["s"]);
           await gl.updateGround();
           await gm.setHeight(BACKDROPS[backdrop]["h"]);
           gm.redraw();
         }
+      })
       }
 
       // Helper function, tests whether the inventory contains the named item at the amount required
