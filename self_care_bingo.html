@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--This was created for Nature Dominance, then repurposed for "an endless garden". Don't redistribute or reskin. Thank you!-->
 <html>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1" />
     <head>
         <title>Self-Care Bingo [EG]</title>
         <link rel="stylesheet" type="text/css"  href="nature.css" />
@@ -25,7 +25,7 @@
           <div style="text-align: center">
                <input id="extra_icons" type="checkbox" name="extra_icons" onchange="toggle_extra_icons()" checked> Use extra icons
                <input id="display_hints" type="checkbox" name="display_hints" onchange="toggle_hints()" style="margin-left: 10px;" checked> Display hints
-               <input id="dark_mode" type="checkbox" name="dark_mode" onchange="toggle_dark_mode()" style="margin-left: 10px;"> Dark mode
+               <input id="dark_mode" type="checkbox" name="dark_mode" onchange="toggle_dark_mode()" style="margin-left: 10px;" checked> Dark mode
           </div>
           <p id="bingo_seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> earned yet!</p>
         </div>
@@ -52,7 +52,6 @@
         await preload_plants();
         launch_plant_dialogue();
         toggle_hints();
-        toggle_dark_mode();
         toggle_dark_mode();
     }
 

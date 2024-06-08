@@ -129,11 +129,12 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     text-align: left;
     color: #DFC48C;
     background-color: #2F252D;
-    width: 5vw;
+    width: 5em;
     min-width: 40px;
     margin: 2px 4px 2px 2px;
     border-style: solid;
     border-color: #DFC48C00;
+    font-size: 0.75em;
 }
 
 .garden-dim-bar:focus {
@@ -223,6 +224,7 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
 }
 #content_div {
     display: inline-block;
+    box-sizing: border-box;
     text-align: center;
     width: 100%;
     margin-left: auto;
@@ -301,6 +303,54 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(90px, max-content));
     width: 100%;
+}
+
+#viewport_spacer {
+    box-sizing: border-box;
+    padding: 8px;
+    max-width: 100vw;
+ }
+
+ #base_info_div {
+    display: flex;
+    width: 70%;
+    position: relative;
+    left: 20%
+ }
+
+ @media screen and (max-width: 600px) {
+    #base_info_div {
+        top: 5%;
+        left: 0%;
+        width: 100%;
+    }
+  }
+
+.swap_row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    grid-template-columns: repeat(auto-fill, 112px);
+    margin: auto;
+ }
+
+ .swap_box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction:column;
+    text-align:center;
+    width: 7rem;
+    height: 7rem;
+    min-width: 75px;
+    min-height: 75px;
+    border-color: #71b280;
+    border-style: dashed;
+    border-width: thin;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
 }
 
 #self_care_plant_selector {
@@ -419,6 +469,7 @@ font-weight: bold;
   overflow-y: scroll;
   z-index: 1;
   margin: auto;
+  box-sizing: border-box;
 }
 
 .wildcard-popup{
@@ -427,6 +478,15 @@ font-weight: bold;
   flex-direction: column;
   padding: 1rem;
 }
+
+@media screen and (max-width: 600px) {
+    .popup, .bingo-popup, .wildcard-popup {
+        top: 5%;
+        left: 0%;
+        transform: unset;
+        width: 100vw;
+    }
+  }
 
 .side-by-side {
     display: flex;
@@ -438,15 +498,17 @@ font-weight: bold;
     input.chunky_fullwidth {
         font-size: 1rem;
     }
-
+    #title, #subtitle {
+        font-size: 1em;
+    }  
 }
 
 @media (max-width: 50vh) {
-        body {
-            font-size: 2rem;
-        }
         .side-by-side {
             flex-direction: column;
+        }
+        #title, #subtitle {
+            font-size: 1em;
         }
 }
 

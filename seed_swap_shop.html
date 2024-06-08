@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1" />
     <head>
         <title>Seed Swap</title>
-        <link rel="stylesheet" type="text/css"  href="nature.css" />
         <link rel="stylesheet" type="text/css"  href="shared.css" />
         <link rel="icon" href="https://i.imgur.com/ufm0hIO.png">
     </head>
@@ -12,7 +11,7 @@
         <h1 id="title">Seed Swap</h1>
         <h2 id="subtitle">Trade in your raw seedstuff for seeds! You get raw seedstuff by recycling unwanted seeds in the Collection. New seeds every day!</h2>
         <h3 id="sp_count" style="text-align: center;">Current raw seedstuff: 0</h3>
-          <div id="content_div" class='center-parent' style="text-align: center">
+          <div id="content_div" class='center-parent'>
           <p id="seeds_earned">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> claimed yet<br></p>
           </div>
     </body>
@@ -23,13 +22,14 @@
     <script type="text/javascript">
 
         const days_to_gen = 3;
-        const prices = [1, 2, 2, 4, 4, 5, 4, 4, 2, 2, 1];
+        const prices = [1, 1, 2, 2, 2, 4, 4, 5, 4, 4, 2, 2, 2, 1, 1];
         const d = new Date();
         var random_seed;
         var swappable_seeds = {};
         const text = {0: "Today's offerings ", 1: "Yesterday's offerings ", 2: "Offerings from 2 days ago (disappear tomorrow) "};
         var swapped_seeds = [];
         const daily_specials = gen_daily_specials();
+        const price_colors = {1: "#8CDF8F", 2: "#DFC48C", 4: "#DF8C9C", 5: "#CF8CDF"}
 
 
         async function gen_divs() {
@@ -42,7 +42,7 @@
                 let new_text = document.createElement('h3');
                 new_text.innerHTML = text[i] + ("(daily special: " + daily_specials[i][0] + ")");
                 let new_row = document.createElement('div');
-                new_row.className = "bingo_row";
+                new_row.className = "swap_row";
                 parent.appendChild(new_text);
                 parent.appendChild(new_row);
                 for(let j=0; j<prices.length; j++){
@@ -101,7 +101,7 @@
         async function add_swap_square(parent, column_offset, id, price, day){
             let swap_square = document.createElement('div');
             swap_square.id = id;
-            swap_square.className = 'bingo_box';
+            swap_square.className = 'swap_box';
             swap_square.setAttribute("data-price", price);
             swap_square.style.display = "inline";  // to align the label
             let plant_data = gen_plant_data(0, random_seed+String(column_offset));
@@ -121,6 +121,7 @@
             label.className = 'todo_plant_label';
             label.style.position = "relative";
             label.style.top = "5%";
+            label.style.color = price_colors[price];
             let label_text = price.toString()+" rs";
             label.appendChild(document.createTextNode(label_text));
             label.style.verticalAlign = "top";
