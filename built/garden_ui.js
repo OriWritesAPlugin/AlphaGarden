@@ -16,10 +16,11 @@ class LayerDiv {
     editMode = true;
     layer;
     id;
-    // TODO: BAD KLUDGE! The garden layer needs to be able to redraw itself when two specific fields are changed
-    // Since we're not added to the document until after the layer constructor's called, we can't just getElementById
+    // In order to allow people to sync sizes, we need to be able to feed sizes back into the fields after creation. Bit gross but there you go.
     widthInput;
     yOffsetInput;
+    xOffsetInput;
+    scaleInput;
     // Lets ups propagate changes up to the layer manager
     onEditCallback;
     // TODO: https://htmldom.dev/drag-and-drop-element-in-a-list/
@@ -182,6 +183,12 @@ class LayerDiv {
             if (pairs[i][0] != "width") {
                 if (pairs[i][0] == "y_offset") {
                     this.yOffsetInput = fillIn;
+                }
+                else if (pairs[i][0] == "x_offset") {
+                    this.xOffsetInput = fillIn;
+                }
+                else if (pairs[i][0] == "scale") {
+                    this.scaleInput = fillIn;
                 }
             }
             else {

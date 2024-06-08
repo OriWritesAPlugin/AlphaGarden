@@ -74,6 +74,10 @@ class Layer {
         this.width = width;
         this.update();
     }
+    setScale(scale) {
+        this.scale = scale;
+        this.update();
+    }
     getSaveData() {
         return {};
     }

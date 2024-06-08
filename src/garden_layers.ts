@@ -89,6 +89,11 @@ abstract class Layer {
     this.update();
   }
 
+  setScale(scale: number){
+    this.scale = scale;
+    this.update();
+  }
+
   getSaveData(){
     return {};
   }
