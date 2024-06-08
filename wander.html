@@ -46,6 +46,7 @@
       var region = "Overgrown Root Tunnels";
       var scene = "entry cavern";
       var wanderables = [];
+      var last_wandered = "";  // Stop wandering to the same place twice in a row!
       var backdrop;
       var inventory = {"health": 100};
       var titles = {};
@@ -171,6 +172,7 @@
       async function createCharacter(){
         let form = await imageFromPopup(document.body, "*player", x => {});
         form.removeChild(form.lastChild);
+        form.style.minWidth = "750px";
         grammarDiv = document.createElement("div");
         createChoiceField(grammarDiv, "The sprite is facing: ", "facing", ["Left", " Right"], updateImage);
         for(let i=0; i<fields.length; i++){
@@ -332,7 +334,13 @@
 
       function processChoice(choice){
         scene = choice["goto"] instanceof Array ? randomFromArray(choice["goto"]) : choice["goto"];
-        if(scene === "$WANDERABLE"){scene = randomFromArray(wanderables);}
+        if(scene === "$WANDERABLE"){
+          scene = randomFromArray(wanderables);
+          // Just roll twice I guess. I'm considering a better overall solution than last_wandered anyways.
+          scene = scene === last_wandered? randomFromArray(wanderables) : scene;
+          scene = scene === last_wandered? randomFromArray(wanderables) : scene;
+          last_wandered = scene;
+        }
         if(Object.hasOwn(choice, "gives")){choice["gives"].forEach((x) => addToInventory(x))}
         if(Object.hasOwn(choice, "consumes")){choice["consumes"].forEach((x) => addToInventory(x, false, true))}
         if(Object.hasOwn(choice, "title")){addToInventory([choice["title"], 1], true)}
