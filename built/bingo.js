@@ -552,6 +552,10 @@ async function toggle_status(e, generate_rewards = true) {
     bingo_square.lastChild.style.opacity = 0.2; // Make label translucent
     if (square_info["earned"]) {
         num_squares_revealed++;
+        // We have a potential side-reward of RS
+        if (generate_rewards) {
+            getDissolvingRS(bingo_square, 1, 0.05)();
+        }
         // Null is treated as 0...Javascript!
         if (num_plants_revealed < plants_revealed_at[num_squares_revealed]) {
             // Time to reveal a plant!

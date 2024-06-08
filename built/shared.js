@@ -45,6 +45,32 @@ function collectSeed(seed) {
         localStorage.seed_collection = seeds + "," + localStorage.seed_collection;
     }
 }
+function getDissolvingRS(parent, amount, chance) {
+    return function () {
+        if (Math.random() > chance) {
+            return;
+        }
+        addSeedPoints(amount);
+        let p = document.createElement("p");
+        p.innerHTML = "+" + amount + " rs";
+        p.className = "rs_message";
+        parent.appendChild(p);
+        const anim = p.animate([
+            {
+                transform: `translate(0px, 0px)`,
+                opacity: 1
+            },
+            {
+                transform: `translate(0px, -50px)`,
+                opacity: 0
+            }
+        ], {
+            duration: 1000,
+            easing: 'linear',
+        });
+        anim.onfinish = () => { p.remove(); };
+    }.bind(parent, amount, chance);
+}
 function addSeedPoints(amount_to_add) {
     if (localStorage.seed_points == undefined) {
         localStorage.seed_points = amount_to_add;

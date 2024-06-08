@@ -144,13 +144,14 @@
         available_sounds[Math.floor(Math.random() * available_sounds.length)].play();
         return;
       }
-
       let checkbox_reward_plant_id = document.getElementById(e.target.id+"_reward").value - 1;
       let bubble_palette = samplePlantColor(checkbox_reward_plant_id);
       for (let i = 0; i < 75; i++) {
         // We root them to a random location slightly below the bottom of the window
         createPlantParticle(Math.random() * window.innerWidth, window.innerHeight + 10, bubble_palette);
       }
+      const reward_rs = getDissolvingRS(e.target.parentNode, 2, 0.2);
+      reward_rs();
     }
 
     // Update our list of earned seeds and add a new set of to-dos if necessary.
