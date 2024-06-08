@@ -1,9 +1,9 @@
 /** This module holds the UI logic for garden creation. **/
-const PROPERTIES = { "base": { "defaultPalette": "CunEjC0KIh", "mainColor": "#FF0000", "secondColor": "#AA0000", "accentColor": "#FFAA00", "icon": "▒" },
-    "garden": { "defaultPalette": "CunEjC0KIh", "mainColor": "#1C2121", "secondColor": "#151818", "accentColor": "#273831", "icon": "⚘" },
-    "decor": { "defaultPalette": "CunEjC0KIh", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains", "accentColor": "#3D362B", "icon": "ꕔ" },
-    "overlay": { "mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "⚙" },
-    "celestial": { "defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "defaultCustomPalette": ["#192446", "#335366", "#426f7a"], "icon": "☾" } }; // old overlay: 1F191A
+const PROPERTIES = { "base": { "defaultPalette": "CunEjC0KIh", "mainColor": "#FF0000", "secondColor": "#AA0000", "accentColor": "#FFAA00", "icon": "▒", "hovertext": "unused..." },
+    "garden": { "defaultPalette": "CunEjC0KIh", "mainColor": "#1C2121", "secondColor": "#151818", "accentColor": "#273831", "icon": "⚘", "hovertext": "Create a new garden layer. This is where all the plants and goodies go!" },
+    "decor": { "defaultPalette": "CunEjC0KIh", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains", "accentColor": "#3D362B", "icon": "ꕔ", "hovertext": "Create a new decor layer. This lets you add mountains and the like." },
+    "overlay": { "mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "⚙", "hovertext": "Currently unused, how mysterious!" },
+    "celestial": { "defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "defaultCustomPalette": ["#192446", "#335366", "#426f7a"], "icon": "☾", "hovertext": "Create a new celestial layer, for adding skies, stars, fog, etc. Don't forget to drag the new layer up a bit if you're doing fog!" } }; // old overlay: 1F191A
 class LayerDiv {
     type;
     selfDiv;
@@ -100,6 +100,7 @@ class LayerDiv {
         editButton.type = "button";
         editButton.className = "chunky_wrap";
         editButton.value = "✎";
+        editButton.title = "expand layer for editing";
         editButton.addEventListener('click', this.toggleEditMode.bind(this));
         editButton.style.backgroundColor = this.accentColor;
         return editButton;
@@ -109,6 +110,7 @@ class LayerDiv {
         deleteButton.type = "button";
         deleteButton.className = "chunky_wrap";
         deleteButton.value = "✕";
+        deleteButton.title = "delete layer";
         deleteButton.addEventListener('click', function () { this.doDelete(); }.bind(this));
         deleteButton.style.backgroundColor = this.accentColor;
         return deleteButton;
@@ -145,7 +147,7 @@ class LayerDiv {
         let id = this.id + "_" + childType + "_" + descriptor;
         return id;
     }
-    buildGenericFillIn(target, labelText, color, coerceNumber = false) {
+    buildGenericFillIn(target, labelText, color, hovertext, coerceNumber = false) {
         let fillIn = document.createElement("input");
         fillIn.className = "garden-dim-bar";
         fillIn.id = this.generateId("fillin", target);
@@ -164,17 +166,18 @@ class LayerDiv {
         fillIn.value = this.layer[target] == 1 ? this.layer[target].toPrecision(2) : this.layer[target];
         let label = document.createElement("label");
         label.setAttribute("for", fillIn.id);
+        label.setAttribute("title", hovertext);
         label.innerHTML = labelText;
         return [fillIn, label];
     }
     buildPositionDiv() {
-        const pairs = [["x_offset", "x:"], ["y_offset", "y:"], ["width", "<br>width:"], ["scale", "scale:"]];
+        const pairs = [["x_offset", "x:", "layer's horizontal offset"], ["y_offset", "y:", "layer's vertical offset"], ["width", "<br>width:", "width of layer"], ["scale", "scale:", "multiply layer size by this amount"]];
         let holdDiv = this.buildGenericDiv(this.mainColor);
         holdDiv.style.display = "inline-block";
         holdDiv.style.height = "auto";
         holdDiv.style.textAlign = "right";
         for (let i = 0; i < pairs.length; i++) {
-            let [fillIn, label] = this.buildGenericFillIn(pairs[i][0], pairs[i][1], this.secondColor, true);
+            let [fillIn, label] = this.buildGenericFillIn(pairs[i][0], pairs[i][1], this.secondColor, pairs[i][2], true);
             fillIn.style.width = "2em";
             if (pairs[i][0] != "width") {
                 if (pairs[i][0] == "y_offset") {
@@ -247,7 +250,7 @@ class GardenLayerDiv extends LayerDiv {
         }.bind(this);
         dropdownDiv.appendChild(groundCoverSelect);
         dropdownDiv.appendChild(groundSelect);
-        let [fillIn, label] = this.buildGenericFillIn("groundPaletteSeed", "colors:", this.mainColor);
+        let [fillIn, label] = this.buildGenericFillIn("groundPaletteSeed", "colors:", this.secondColor, "seed providing colors for ground");
         fillIn.onchange = async function () {
             this.layer.groundPaletteSeed = fillIn.value;
             await this.layer.updateGround();
@@ -268,6 +271,7 @@ class GardenLayerDiv extends LayerDiv {
         swapButton.type = "button";
         swapButton.className = "chunky_wrap";
         swapButton.value = "☆"; // ★
+        swapButton.title = "edit this garden layer's seed list";
         swapButton.addEventListener('click', this.setActiveGarden.bind(this));
         swapButton.style.backgroundColor = this.accentColor;
         return swapButton;
@@ -296,7 +300,7 @@ class DecorLayerDiv extends LayerDiv {
         let dropdownDiv = this.buildOptionsHolderDiv();
         let contentSelect = this.buildGenericDropdown("content", Object.keys(available_tileables));
         dropdownDiv.appendChild(contentSelect);
-        let [fillIn, label] = this.buildGenericFillIn("contentPaletteSeed", "colors:", this.secondColor);
+        let [fillIn, label] = this.buildGenericFillIn("contentPaletteSeed", "colors:", this.secondColor, "seed providing colors for decor");
         dropdownDiv.appendChild(label);
         dropdownDiv.appendChild(fillIn);
         editDiv.appendChild(dropdownDiv);
@@ -349,7 +353,7 @@ class CelestialLayerDiv extends LayerDiv {
                 this.get_custom_palette(this.layer, this.onEditCallback);
             }
         }.bind(this, "skyPalette");
-        let [opacityFillIn, opacityLabel] = this.buildGenericFillIn("opacity", "opacity:", this.mainColor, true);
+        let [opacityFillIn, opacityLabel] = this.buildGenericFillIn("opacity", "opacity:", this.mainColor, "opacity of layer", true);
         dropdownDiv.appendChild(contentSelect);
         dropdownDiv.appendChild(skyPaletteSelect);
         dropdownDiv.appendChild(opacityLabel);
@@ -503,6 +507,7 @@ class LayerManager {
         layerButton.type = "button";
         layerButton.className = "chunky_wrap";
         layerButton.value = PROPERTIES[type]["icon"];
+        layerButton.title = PROPERTIES[type]["hovertext"];
         layerButton.addEventListener('click', callback.bind(this));
         layerButton.style.backgroundColor = PROPERTIES[type]["accentColor"];
         layerButton.style.width = "5vw";
