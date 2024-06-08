@@ -23,6 +23,8 @@ all_challenges = { "e": {
         "u": { "description": "Battle enemy + palette swap", "points": 100, "category": "coli", "full": "Battle both (or at least 2) versions of an enemy in the same battle (like a dryad + autumn dryad)" },
         "v": { "description": "Get something red", "points": 100, "category": "coli", "full": "Get any item that's mostly red, such as a slash battlestone, a red flower..." },
         "w": { "description": "Item + its recolor", "points": 100, "category": "coli", "full": "Get an item and its color variant in the same battle (like a micro deer + dwarf fawn)" },
+        "x": { "description": "MIMIC!", "points": 100, "category": "coli", "full": "Pick an enemy pack and mimic its pose and expression. Like janky yoga. 3 different enemies? 3 poses!" },
+        "y": { "description": "Composite item", "points": 100, "category": "coli", "full": "Get two or more battle rewards whose images appear to interact. What about two eels kissing, or a chicken holding up a battle stone? Anything you can justify is game!" },
     }, "m": {
         "a": { "description": "Any apparel", "points": 350, "category": "coli", "full": "Get any apparel, such as Veteran's Eye Scar" },
         "b": { "description": "Boss fight", "points": 250, "category": "coli", "full": "Fight any boss. You don't have to win!" },
@@ -554,7 +556,7 @@ async function toggle_status(e, generate_rewards = true) {
         num_squares_revealed++;
         // We have a potential side-reward of RS
         if (generate_rewards) {
-            getDissolvingRS(bingo_square, 1, 0.05)();
+            getDissolvingRS(bingo_square, 1, 0.04)();
         }
         // Null is treated as 0...Javascript!
         if (num_plants_revealed < plants_revealed_at[num_squares_revealed]) {
