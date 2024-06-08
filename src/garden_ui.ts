@@ -592,7 +592,7 @@ class LayerManager {
                         width = this.fullCanvas.width/this.scale, height = this.fullCanvas.height/this.scale, x_offset = 0, y_offset = 0, scale=1){
     let newGardenLayer = new GardenLayer(width, height, x_offset, y_offset, seedList, palette, groundCover, ground, scale);
     let newGardenLayerDiv = new GardenLayerDiv(newGardenLayer, this.get_id(), this.updateCallback, this.gardenToggleCallback);
-    await newGardenLayer.updateMain().then(_ => newGardenLayer.updateGround());
+    //await newGardenLayer.updateMain().then(_ => newGardenLayer.updateGround());
     return this.addLayerAndAnimate(newGardenLayerDiv, openEditMode);
   }
 
