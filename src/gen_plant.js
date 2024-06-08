@@ -143,11 +143,11 @@ async function preload_plants() {
     for(var i=0; i<all_features.length; i++){
         refs["feature"+i] = preload_single_image(all_features[i]);
     }
-    await preload_spritesheet("foliage", FOLIAGE_SPRITESHEET, all_foliage.length);
+    return preload_spritesheet("foliage", FOLIAGE_SPRITESHEET, all_foliage.length);
 }
 
 async function preload_named() {
-    await preload_spritesheet("named", NAMED_SPRITESHEET, Object.keys(reformatted_named).length);
+    return preload_spritesheet("named", NAMED_SPRITESHEET, Object.keys(reformatted_named).length);
 }
 
 // Sound of me not being 100% confident in my async usage yet
@@ -177,7 +177,6 @@ async function load_sprite_from_spritesheet(img, offset){
     ctx.drawImage(img, source_offset_x, source_offset_y, 32, 32, 0, 0, 32, 32);
     let new_img = new Image;
     new_img.src = canvas.toDataURL();
-    await new_img.decode();
     return new_img;
 }
 
@@ -189,12 +188,12 @@ async function preload_spritesheet(name, URL, count){
         base64img.onerror = function() { base64img.src = BAD_IMG_URL;};
         base64img.src=URL;
     });
-    await img.decode();
+    return img.decode().then(x => {
     offset = 0
     while(offset < count){
         refs[name+offset.toString()] = load_sprite_from_spritesheet(img, offset)
         offset ++;
-    }
+    }});
 }
 
 
@@ -357,7 +356,7 @@ async function gen_plant(plant_data, with_color_key=false) {
     let cachable = true;
     if(encode_plant_data.hasOwnProperty(seed)){return encode_plant_data(seed);}
     var work_canvas = document.createElement("canvas");
-    var work_ctx=work_canvas.getContext("2d");
+    var work_ctx=work_canvas.getContext("2d", { willReadFrequently: true });
     plant_data = parse_plant_data(plant_data);
     work_canvas.width = work_canvas_size;
     work_canvas.height = work_canvas_size;
