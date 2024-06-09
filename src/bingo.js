@@ -766,7 +766,22 @@
             return false;
           }
           import_bingo(JSON.parse(localStorage.bingo_state));
-          return true;      
+          p = document.createElement("p");
+          p.innerHTML = "Board state restored!\nIf you want to discard it (and get the effects of any new configuration), click [New Board]. Bye!"
+          p.style.color = "#8CDF8F";
+          document.getElementById("board_div").appendChild(p);
+          const anim = p.animate([
+            {
+              opacity: 1
+            },
+            {
+              opacity: 0
+            }
+          ], {
+            duration: 5000,
+            easing: 'linear',
+          });
+          anim.onfinish = () => { p.remove() };     
       }
 
         function toggle_extra_icons() {
