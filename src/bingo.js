@@ -604,7 +604,11 @@
             } else if(!now_has_bingo){
               shimmer_bingo_borders(bingo_border_color, "#b1f2c0", row, col);
             }
-            stashBingoState();
+
+            // TODO: patch solution for the self-care board trying to save to the coli slot: disable it entirely. hopefully.
+            if(forced_random_seed == null){
+              stashBingoState();
+            }
         }
 
         function update_squares_til_if_present(){
