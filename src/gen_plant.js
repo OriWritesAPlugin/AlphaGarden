@@ -133,8 +133,8 @@ async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, c
 
 
 async function place_foliage(img_idx, ctx){
-    let img = await refs["foliage"+img_idx.toString()]
-    ctx.drawImage(img, 0, 0);
+    await (await refs["foliage"+img_idx.toString()]).decode();
+    ctx.drawImage(await refs["foliage"+img_idx.toString()], 0, 0);
 }
 
 
