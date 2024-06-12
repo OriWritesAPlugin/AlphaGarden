@@ -561,7 +561,7 @@ async function toggle_status(e, generate_rewards = true) {
         num_squares_revealed++;
         // We have a potential side-reward of RS
         if (generate_rewards) {
-            getDissolvingRS(bingo_square, 1, 0.04)();
+            getDissolvingRS(bingo_square, 1, 0.025)();
         }
         // Null is treated as 0...Javascript!
         if (num_plants_revealed < plants_revealed_at[num_squares_revealed]) {

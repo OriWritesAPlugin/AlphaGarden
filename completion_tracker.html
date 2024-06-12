@@ -22,7 +22,7 @@
                 <!--<input id="mark_bases" type="button" class="chunky_fullwidth" value="Mark" onclick="mark(true)"></input>-->
               </div>
               <div style="margin-left: 15px; text-align: left">
-                <p>View the bases you've discovered! Reroll to see a new color scheme drawn from palettes you've discovered.</p><br>
+                <p id="base_text">View the bases you've discovered! Reroll to see a new color scheme drawn from palettes you've discovered.</p><br>
               </div>
             </div>
             <div id="base_content_div"></div>
@@ -35,7 +35,7 @@
                 <input id="mark_palettes" type="button" class="chunky_fullwidth" value="Mark" onclick="mark(false)"></input>
               </div>
               <div style="margin-left: 15px; text-align: left">
-                <p>View the palettes you've discovered! Click them to build a palette for the base viewer. Click Mark then a palette to toggle a square mark on bingo/swap/etc seeds using that palette.</p><br>
+                <p id=palette_text>View the palettes you've discovered! Click them to build a palette for the base viewer. Click Mark then a palette to toggle a square mark on bingo/swap/etc seeds using that palette.</p><br>
               </div>
             </div>
             <div id="palette_content_div"></div>
@@ -74,6 +74,10 @@
         owned_bases = new Set();
         owned_palettes = new Set();
         seed_list = getSeedCollection();
+        const base_help_text = "View the bases you've discovered! Reroll to see a new color scheme drawn from palettes you've discovered.";
+        const palette_help_text = "View the palettes you've discovered! Click them to build a palette for the base viewer. Click Mark then a palette to toggle a square mark on bingo/swap/etc seeds using that palette.";
+        const marker_help_text = "You've entered Marking Mode! Any palette clicked will get a colored border; a little marker in this color will appear on an earnable plant that contains that palette. Use this to find plants with palettes you want to collect! Click a palette again to deselect it. Click the button again to exit marking mode and return to palette select mode.";
+
         for(seed of seed_list){
             let seed_data = decode_plant_data(seed);
             owned_bases.add(seed_data["foliage"]);
@@ -131,6 +135,12 @@
               replace_color_palette(overall_palette, new_overall_palette, ctx, 128, 96);
               ctx.scale(0.5,0.5);
           };
+          document.getElementById("base_text").innerHTML = getMarkerDescText(base_help_text);
+          document.getElementById("palette_text").innerHTML = getMarkerDescText(palette_help_text);
+        }
+
+        function getMarkerDescText(base_text){
+          return base_text + "<br><br>Palette: " + buildColorMessage({"foliage": 1, "foliage_palette": selected_palettes[0], "feature_palette": selected_palettes[1], "accent_palette": selected_palettes[2]}, false);
         }
 
         
@@ -138,6 +148,7 @@
           let target = is_bases? document.getElementById("mark_bases") : document.getElementById("mark_palettes");
           const sentinel = is_bases? marking_bases : marking_palettes;
           target.value = sentinel? "Mark" : "Stop Marking";
+          document.getElementById("palette_text").innerHTML = sentinel? palette_help_text : marker_help_text;
           if(is_bases){  marking_bases = !sentinel; } else {  marking_palettes = !sentinel; }
         }
 

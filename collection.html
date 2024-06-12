@@ -669,15 +669,7 @@
       if(seed_string[0] == "!"){
           text_output.innerText = "Name: " + item_name + "\nArtist: " + reformatted_named[item_name]["artist"]
       } else {
-          color_msg = ""
-          if(plant_data["foliage"] == 160){
-            color_msg += "This seed is malformed"
-          } else {
-            for(category of ["foliage_palette", "feature_palette", "accent_palette"]){
-              let link_color = "#"+plant_data[category][0];
-              color_msg += ("<a href='javascript:forceFilter(-1, " + raw_plant_data[category] + ");' style='text-decoration-color: " + link_color + "'><span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["name"]+"<\a><\span> ");
-            }
-          }
+          color_msg = buildColorMessage(raw_plant_data);
           text_output.innerHTML = "Name: "+"<a href='javascript:forceFilter(" + plant_data["foliage"] + ", -1);'>"+all_foliage[plant_data["foliage"]]["name"]+"<\a>";
           text_output.innerHTML += ("<br>Artist: "+all_foliage[plant_data["foliage"]]["artist"]+
           "<br>Type: "+all_foliage[plant_data["foliage"]]["categories"]+

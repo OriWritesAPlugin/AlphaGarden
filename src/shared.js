@@ -54,8 +54,27 @@ function collectSeed(seed){
   }
 }
 
+
+function buildColorMessage(raw_plant_data, do_links=true){
+  let color_msg = "";
+  if(raw_plant_data["foliage"] == 160){
+    color_msg += "This seed is malformed"
+  } else {
+    for(category of ["foliage_palette", "feature_palette", "accent_palette"]){
+      let link_color = "#"+ all_palettes[raw_plant_data[category]]["palette"][0];
+      if(do_links){
+        color_msg += ("<a href='javascript:forceFilter(-1, " + raw_plant_data[category] + ");' style='text-decoration-color: " + link_color + "'><span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["name"]+"<\a><\span> ");
+      } else {
+        color_msg += ("<span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["name"]+"<\span> ");
+
+      }
+    }
+  }
+  return color_msg;
+}
+
 function getDissolvingRS(parent, amount, chance){
-  return function () {
+  return function (e) {
     if(Math.random() > chance){
         return;
     }
@@ -63,6 +82,9 @@ function getDissolvingRS(parent, amount, chance){
     let p = document.createElement("p");
     p.innerHTML = "+" + amount + " rs";
     p.className = "rs_message";
+    //p.style.position = 'absolute';
+    //p.style.top = `${e.clientY}`;
+    //p.style.left = `${e.clientX}`;
     parent.appendChild(p);
     const anim = p.animate([
       {
