@@ -184,17 +184,20 @@
         let plant_data = gen_plant_data(0, salt);
         let seed = encode_plant_data_v2(plant_data);
         let data_url = await drawPlantForSquare(seed, size);
+        let prize_url = data_url;
         prize_select_square.setAttribute("data-seed", seed);
         prize_select_square.style.background = 'url(' + data_url + ')  no-repeat center center';
-        if(size == 64 ){ data_url = await drawPlantForSquare(seed); } // Return to realsize for the display.
+        if(size == 64 ){ 
+          prize_url = await drawPlantForSquare(seed); 
+        } // Return to realsize for the display.
         if(can_select){
           prize_select_square.onclick = function(){
               prize_display_square.setAttribute("data-seed", seed);
-              prize_display_square.style.background = 'url(' + data_url + ')  no-repeat center center';
+              prize_display_square.style.background = 'url(' + prize_url + ')  no-repeat center center';
               setTimeout(function(){plant_select_div.style.height = "0px"}, 5);
               // This feels like such a bad idea, but it works...eat the next call to this function, then return focus to the task.
               document.getElementById('desc_'+id).focus();
-          }.bind(prize_display_square, prize_select_square, seed, data_url);
+          }.bind(prize_display_square, prize_select_square, seed, prize_url);
         } else {
           if(i != id%num_tasks_per_set){ prize_select_square.style.opacity = 0.2; }
           prize_select_square.onclick = function(e){ setTimeout(function(){plant_select_div.style.height = "0px"}, 5); };
