@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="utf-8"/>
+    <head>
+        <title>Palette Tester [EG]</title>
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
+        <link rel="icon" href="https://i.imgur.com/pFuZrH6.png">
+    </head>
+    <body onload="">
+    <div id=create_garden_organizer style="display: flex">
+      <div style="width: 100%">
+        <a href="./" class="index_link"><--Home</a>
+        <h1 id="title">Palette Tester</h1>
+        <h2 id="subtitle">Test and compare palettes, including custom ones</h2>
+        </br>
+        <div style="display: none">
+          <label for="seed_list">Edit test seeds:</label><br>
+          <textarea id="seed_list" name="seed_list" style="max-height: 5%">CumHmCNz-D%-2, CgHXGCAb+v%8, CvwKqC6otQ%21, Ctc3mCPTYy%33, CqxieC2++9%46, CjhefCPs3i%58, Cd-0jB+QFh%71, CKYGfB-y02%85</textarea><br>
+          <label for="quantity">Garden width:</label> <input class="garden-dim-bar" type="number" id="garden_width" name="quantity" min="64" value=450>
+          <label for="garden_height">Garden height:</label> <input class="garden-dim-bar" type="number" id="garden_height" name="garden_height" min="70" value=70>
+          <label for="draw_outline" style="margin-left: 10px">Draw outline:</label><input type="checkbox" id="draw_outline" value="Draw outline">
+          <input type="button" class="chunky_wrap" value="Toggle Editor" onClick="gm.toggleVisibility()">
+          <br><br>
+        </div>
+          <div class="center-what-i-hold">
+            <input type="radio" id="all_opt" name="to_edit" value="all" checked>
+            <label for="all_opt">All</label>
+            <input type="radio" id="foliage_opt" name="to_edit" value="foliage">
+            <label for="foliage_opt">Foliage</label>
+            <input type="radio" id="feature_opt" name="to_edit" value="feature">
+            <label for="feature_opt">Feature</label>
+            <input type="radio" id="accent_opt" name="to_edit" value="accent">
+            <label for="accent_opt">Accent</label><br>
+          </div>
+          <div id=content_div>
+              </br></br>
+              <div id="output"><canvas id="output_canvas" width="450" height="70"></canvas></div>
+              </br>
+              <input type="text" id="palette_text" class="basic-text-entry" style="max-width: max(25vw, 200px)"></input>
+            </br>
+          </div>
+          <br>
+      </div>
+    </div>
+    </body>
+
+    <script src="built/data.js"></script>
+    <script src="built/gen_plant.js"></script>
+    <script src="built/gen_garden.js"></script>
+    <script src="built/shared.js"></script>
+    <script src="built/garden_layers.js"></script>
+    <script src="built/garden_ui.js"></script>
+    <script src="built/drag_and_drop.js"></script>
+    <script type="text/javascript">
+
+      var sl;
+      var gl;
+      var g2;
+      var o1;
+      var d1;
+      var da_canvas;
+      var da_ctx;
+      var gm;
+      var g1;
+
+      // 339324,adef94,46d01b,21372a
+      // ddd1ff,ccb5ff,d28efa,c75de8
+
+      for(let i=0; i<10; i++){
+              all_palettes.unshift({"palette": ['eeeeee', 'cccccc', 'aaaaaa', '888888'], "categories": ["custom slots (click one and edit above)"]});
+          }
+
+        async function do_stuff(){
+          await do_preload_initial();
+          da_canvas = document.getElementById("output_canvas");
+          gm = new LayerManager(da_canvas, document.getElementById("seed_list"));
+          gl = gm.activeGardenDiv.layer;
+          document.getElementById("create_garden_organizer").appendChild(gm.selfDiv);
+          callOnDrag = gm.updateCallback;  // Horrible little sin on my otherwise (IMO) nice refactor.
+          // We need to pre-prime the ground canvas, since it and the seed list update independently
+          await gl.updateGround();
+          await gm.redraw();
+          gm.toggleVisibility();
+          gm.toggleVisibility();
+
+          palettes_by_category = assemble_categories("all_palettes");
+          document.getElementById("palette_text").value = "";
+
+          da_box = document.getElementById("content_div");
+          horrid_list = [];
+          for(let i=0; i<all_palettes.length; i++){
+            horrid_list.push([toHue("#" + all_palettes[i]["palette"][1]), i]);
+          }
+          horrid_list = horrid_list.sort(function(a, b) { return b[0] - a[0]; });
+          for(category of Object.keys(palettes_by_category)){
+            header = document.createElement("h3");
+            header.textContent = category;
+            da_box.appendChild(header);
+            for(let i=0; i<palettes_by_category[category].length; i++){
+              //let palette = all_palettes[horrid_list[i][1]]["palette"];
+              let palette_redirect = palettes_by_category[category][i];
+              let palette = all_palettes[palette_redirect]["palette"];
+              divvy = document.createElement("div");
+              divvy.style.display = "inline-block";
+              divvy.id = "palette_" + palette_redirect;
+              divvy.addEventListener("click", function(){
+                regenWithPalette(palette_redirect);
+                document.getElementById("palette_text").value = all_palettes[palette_redirect]["palette"];
+                document.getElementById("palette_text").setAttribute("data-offset", palette_redirect);
+                //setPalette(divvy, all_palettes[palette_redirect]["palette"]);
+              });
+              setPalette(divvy, palette);
+              da_box.appendChild(divvy);
+            }
+          }
+          /* Used for taking screenshots of palettes next to good example bases
+          new_div = document.createElement("div");
+          document.body.appendChild(new_div);
+          for(let i=0; i<all_palettes.length; i++){
+              //let palette = all_palettes[horrid_list[i][1]]["palette"];
+              let palette_redirect = i;
+              let palette = all_palettes[i]["palette"];
+              plant_canvas = await gen_plant({"foliage": 118, "foliage_palette": i, "feature_palette": i, "accent_palette": i});
+              var scale_canvas = document.createElement("canvas");
+              scale_canvas.width = 96;
+              scale_canvas.height = 96;
+              var scale_ctx = scale_canvas.getContext("2d");
+              scale_ctx.imageSmoothingEnabled = false;
+              scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
+              plant_canvas_2 = await gen_plant({"foliage": 152, "foliage_palette": i, "feature_palette": i, "accent_palette": i});
+              var scale_canvas_2 = document.createElement("canvas");
+              scale_canvas_2.width = 96;
+              scale_canvas_2.height = 96;
+              var scale_ctx_2 = scale_canvas_2.getContext("2d");
+              scale_ctx_2.imageSmoothingEnabled = false;
+              scale_ctx_2.drawImage(plant_canvas_2, 0, 0, 96, 96);
+              divvy = document.createElement("div");
+              divvy.id = "palette_" + palette_redirect;
+              divvy.style.height = "96px";
+              divvy.style.display = "flex";
+              setPalette(divvy, palette);
+              divvy.appendChild(scale_canvas);
+              divvy.appendChild(scale_canvas_2);
+              new_div.appendChild(divvy);
+          }*/
+
+          doThisRegen();
+        }
+
+
+
+        do_stuff();
+
+      function setPalette(parent, palette){
+        parent.innerHTML = "";
+        canvas = document.createElement("canvas");
+              canvas.width = 100;
+              canvas.height = 25;
+              canvas.background = "#FFFFFF";
+              let ctx = canvas.getContext("2d");
+              for(let i=0; i<4; i++){
+                ctx.fillStyle = "#"+palette[i];
+                ctx.fillRect(25*i, 0, 25+25*i, 25);
+              }
+        parent.appendChild(canvas);
+      }
+
+      function regenWithPalette(palette){
+        seeds = gm.activeGardenDiv.layer.seedList;
+        edit_elem = document.getElementsByName('to_edit');
+        let edit = "all";
+        for(i = 0; i < edit_elem.length; i++) {
+            if(edit_elem[i].checked){ edit = edit_elem[i].value; }
+        }
+        for(let i=0; i<seeds.length; i++){
+          let seed = seeds[i];
+          let percent_pos = seed.indexOf('%');
+          percent_val = "";
+          if(percent_pos > 0){
+            percent_val = seed.slice(percent_pos );
+            seed = seed.slice(0, percent_pos);
+          }
+          let data = decode_plant_data(seed);
+          if(edit=="all" || edit=="foliage"){data["foliage_palette"] = palette;}
+          if(edit=="all" || edit=="feature"){data["feature_palette"] = palette;}
+          if(edit=="all" || edit=="accent"){data["accent_palette"] = palette;}
+          seeds[i] = encode_plant_data_v2(data) + percent_val;
+        }
+        tintedRegen(seeds);
+      }
+
+      //document.getElementById("palette_text").addEventListener('click', updatePalette);
+      //document.getElementById("palette_text").addEventListener('focusout', updatePalette);
+      document.getElementById("palette_text").addEventListener("keyup", updatePalette);
+
+      function updatePalette(){
+        palette = document.getElementById("palette_text");
+        redirect = palette.getAttribute("data-offset");
+        console.log(redirect);
+        new_palette = palette.value.split(",");
+        all_palettes[redirect]["palette"] = new_palette;
+        setPalette(document.getElementById("palette_"+redirect), new_palette);
+        regenWithPalette(redirect);
+      }
+
+      function tintedRegen(seed_list){
+        gm.setHeight(parseInt(document.getElementById("garden_height").value));
+        gm.setWidth(parseInt(document.getElementById("garden_width").value));
+        gm.regenActiveGarden(seed_list.toString());
+      }
+
+      function doThisRegen(){
+        gm.setHeight(parseInt(document.getElementById("garden_height").value));
+        gm.setWidth(parseInt(document.getElementById("garden_width").value));
+        gm.regenActiveGarden(document.getElementById("seed_list").value);
+      }
+
+    </script>
+</html>
