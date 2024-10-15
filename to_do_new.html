@@ -11,9 +11,10 @@
         <div class='center-parent'>
           <div style="height: 5rem" id="top_spacer"></div>
           <button type="button" id="todo_add_new" onclick="generateTask()" class="chunky">Add Task</button>
+          <p id="load_text">Loading plants...</p>
           <div class='center-parent' id="task_div">
           </div>
-          <button type="button" id="todo_clear_completed" class="chunky" onclick="clearCompleted()">Clear Completed Tasks</button>
+          <button type="button" id="todo_clear_completed" style="display: none" class="chunky" onclick="clearCompleted()">Clear Completed Tasks</button>
         </div>  
     </body>
     <script src="built/data.js"></script>
@@ -31,7 +32,6 @@
     const forced_random_seed = d.getDate().toString()+d.getMonth().toString()+d.getFullYear().toString()+"todo";
     const max_outstanding_tasks = 10;  // To incentivize avoiding overwhelming yourself, the max number of tasks you can have outstanding while still choosing plants
     var task_sets_generated = 0;
-    var focusTimeout = false;
     const task_hints = Array("Done anything nice for yourself lately?", "Anyone you've been meaning to respond to?",
                              "How are you doing on food?", "How go the hobbies as of late?", "Any meals you're excited for?",
                              "Got anything coming up you'd want to prep for?", "How are you doing on deadlines, anything coming up?",
@@ -45,8 +45,11 @@
     var setup_complete = false; // Sentinel so we don't spawn a bajillion bubbles on page load.
 
     async function doSetup(){
+        document.getElementById("load_text").animate([{opacity: 0},{opacity: 0},{opacity: 1}], {duration: 1000, easing: 'linear'});
         await preload_plants();
         await rememberTasks();
+        document.getElementById("load_text").remove();
+        document.getElementById("todo_clear_completed").style.display = "inline-block";
     }
 
 
@@ -67,7 +70,7 @@
       textbox.id = "desc_" + id;
       textbox.placeholder = task_hints[Math.floor(Math.random() * task_hints.length)];
       if(desc != ""){textbox.textContent = desc};
-      textbox.addEventListener("focus", makePlantSelector, true);
+      textbox.addEventListener("click", makePlantSelector, true);
       textbox.addEventListener("focusout", saveTasks, true);
       let target_width = window.matchMedia('(min-width: 600px)')? "60vw" : "90vw";
       setTimeout(function(){textbox.style.width = target_width}, 20);
@@ -81,7 +84,7 @@
       checkbox.addEventListener('change', function(){
         textbox.disabled = true;
         checkbox.classList.add("disabled_cust");
-        textbox.removeEventListener("focus", makePlantSelector, true);
+        textbox.removeEventListener("click", makePlantSelector, true);
         textbox.style.textDecoration = "line-through";
         textbox.contentEditable = false;
         if(setup_complete){
@@ -119,6 +122,7 @@
       prize_display_square.style.background = 'url(' + data_url + ')  no-repeat center center';
   
       document.getElementById("task_div").appendChild(list_item);
+      textbox.focus();
       task_sets_generated += 1;
     }
 
@@ -127,13 +131,14 @@
     async function makePlantSelector(e){
 
       // First off, handle existing reward boxes--we only want one open at a time for coherence
-      if(focusTimeout){
-        focusTimeout = false;
-        return;
-      }
       if(active_plant_selector != undefined){
         if(active_plant_selector.getAttribute("idx") == e.target.parentNode.parentNode.getAttribute("idx")){
-          setTimeout(function(){active_plant_selector.style.height = active_plant_selector.getAttribute("target-height")}, 5);
+          // Toggle display
+          if(active_plant_selector.getBoundingClientRect()["height"] > 5){
+            setTimeout(function(){active_plant_selector.style.height = "0px"}, 5);
+          } else {
+            setTimeout(function(){active_plant_selector.style.height = active_plant_selector.getAttribute("target-height")}, 5);
+          }
           return;
         } else {
           gracefullyRemoveOldSelector();
@@ -159,25 +164,35 @@
 
       let grid = document.createElement("div");
       grid.id = "todo_plant_selector";
+      let size = window.innerWidth > 450 ? 96 : 64;
+      if(size == 64){
+        grid.classList.add("todo_plant_selector_minified");
+      } else {
+        grid.classList.add("todo_plant_selector_standard");
+      }
 
       // Generate the selection of plants to choose from
       prize_display_square = document.getElementById("task_" + id + "_reward");
       for(let i=0; i<plants_to_choose_from; i++){
         let prize_select_square = document.createElement('button');
         prize_select_square.classList.add('prize_select_plant_box');
+        if(size == 64){
+          prize_select_square.style.minWidth = "64px";
+          prize_select_square.style.minHeight = "64px";
+        }
         let salt = forced_random_seed + (Math.floor(id/num_tasks_per_set)*plants_to_choose_from + i % plants_to_choose_from);
         let plant_data = gen_plant_data(0, salt);
         let seed = encode_plant_data_v2(plant_data);
-        let data_url = await drawPlantForSquare(seed);
+        let data_url = await drawPlantForSquare(seed, size);
         prize_select_square.setAttribute("data-seed", seed);
         prize_select_square.style.background = 'url(' + data_url + ')  no-repeat center center';
+        if(size == 64 ){ data_url = await drawPlantForSquare(seed); } // Return to realsize for the display.
         if(can_select){
           prize_select_square.onclick = function(){
               prize_display_square.setAttribute("data-seed", seed);
               prize_display_square.style.background = 'url(' + data_url + ')  no-repeat center center';
               setTimeout(function(){plant_select_div.style.height = "0px"}, 5);
               // This feels like such a bad idea, but it works...eat the next call to this function, then return focus to the task.
-              focusTimeout = true;
               document.getElementById('desc_'+id).focus();
           }.bind(prize_display_square, prize_select_square, seed, data_url);
         } else {

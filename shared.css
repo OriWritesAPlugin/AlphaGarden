@@ -203,7 +203,6 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     min-width: 36px;
     min-height: 36px;
     margin-top: 60px;
-    height: 4px;
     margin-right: 8px;
     transition: accent-color 0.5s ease;
   }
@@ -392,17 +391,28 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     margin: 0px 1% 0px 1%;
     overflow: hidden;
 }
-.collection_row, .collection_display, #self_care_plant_selector, #todo_plant_selector {
+.collection_row, .collection_display, #self_care_plant_selector {
    display: flex;
    justify-content: center;
    align-content: center;
 }
 
-.collection_display, #self_care_plant_selector, #todo_plant_selector {
+.collection_display, #self_care_plant_selector, .todo_plant_selector_standard, .todo_plant_selector_minified {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(90px, max-content));
     width: 100%;
     margin: 2vh auto;
+    justify-content: center;
+    align-content: center;
+}
+
+.todo_plant_selector_standard {
+    grid-template-columns: repeat(auto-fit, minmax(90px, 120px));
+}
+
+.todo_plant_selector_minified {
+    grid-template-columns: repeat(auto-fit, minmax(60px, max-content));
+    margin: inherit;
 }
 
 .collection_display{
@@ -416,6 +426,11 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     border-color: #ffaaff;
     border-top-width: 0px;
     box-sizing: border-box;
+}
+
+#load_text {
+    opacity: 0;
+    transition: opacity 1s;
 }
 
 #viewport_spacer {
@@ -445,10 +460,8 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     justify-content: center;
     flex-direction:column;
     text-align:center;
-    width: 7rem;
-    height: 7rem;
-    min-width: 75px;
-    min-height: 75px;
+    min-width: 96px;
+    min-height: 96px;
     border-color: #71b280;
     border-style: none;
     border-width: thin;
@@ -663,9 +676,12 @@ font-weight: bold;
         #title, #subtitle {
             font-size: 1em;
         }
-        .dotted-fill-in {
-            font-size: 1rem;
-        }
+}
+
+@media (max-width: 450px) {
+    .dotted-fill-in {
+        font-size: 1rem;
+    }
 }
 
 
