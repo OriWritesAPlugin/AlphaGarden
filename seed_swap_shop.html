@@ -13,6 +13,7 @@
         <h3 id="sp_count" style="text-align: center;">Current raw seedstuff: 0</h3>
           <div id="content_div" class='center-parent'>
           <p id="seeds_earned">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> claimed yet<br></p>
+          <p id="load_text">Loading plants...</p>
           </div>
     </body>
     <script src="built/data.js"></script>
@@ -168,6 +169,7 @@
             let d = (new Date()).getDate();
             updateSeedPointTotal();
             await preload_plants();
+            document.getElementById("load_text").remove();
             await gen_divs();
         }
     </script>

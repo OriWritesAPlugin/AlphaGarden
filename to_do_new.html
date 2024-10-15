@@ -45,7 +45,6 @@
     var setup_complete = false; // Sentinel so we don't spawn a bajillion bubbles on page load.
 
     async function doSetup(){
-        document.getElementById("load_text").animate([{opacity: 0},{opacity: 0},{opacity: 1}], {duration: 1000, easing: 'linear'});
         await preload_plants();
         await rememberTasks();
         document.getElementById("load_text").remove();

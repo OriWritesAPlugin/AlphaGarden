@@ -430,7 +430,13 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
 
 #load_text {
     opacity: 0;
-    transition: opacity 1s;
+    animation: load_in 3s;
+}
+
+@keyframes load_in {
+  0%   {opacity: 0;}
+  10%  {opacity: 0;}
+  100% {opacity: 1;}
 }
 
 #viewport_spacer {

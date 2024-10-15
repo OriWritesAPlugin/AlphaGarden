@@ -51,7 +51,10 @@
                   <span id="seedstuff_tally" title="Convert unwanted seeds to raw seedstuff using the Recycle option">Current raw seedstuff: 0</span>
                   <input type="text" id="seed_collection" name="seed_collection" size="4" placeholder="Click here and paste!", style="width: 95%; margin: 5px;">
                   <input type="button" class="chunky_wrap" value="Add seeds" onClick="display_collection()">
-                  <div id="collection_display_div" class="collection_display"></div>
+                  <div id="collection_display_div" class="collection_display">
+                    <p id="load_text">Loading plants...</p>
+
+                  </div>
               </div>
               <div id="seed_collection_utility_spacer" class=garden_util_box style="width:20%; min-width: 100px; border-width: 0px"></div>
               <div id=seed_collection_utility_container class=garden_util_box_fixed style="right: 0.5%">
@@ -681,6 +684,7 @@
     async function do_preload() {
         await preload_plants();
         //await preload_named();
+        document.getElementById("load_text").remove();
         display_collection();
         base_sort_div = document.getElementById("base_sort_categories_div");
         for(category of Object.keys(foliage_by_category)){
