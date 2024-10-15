@@ -297,6 +297,7 @@
                                              7: {8: 1, 15: 2, 22: 3, 28: 4, 34: 5, 39: 6, 44: 7, 49: 8}};
         const plants_revealed_at_self_care = {4: 1, 8: 2, 12: 3, 16: 4, 20: 5, 25: 6}
         var plants_revealed_at;
+        //var moved_the_touch = false;
 
         const icons = [
            "https://i.imgur.com/GSNkSxm.png",
@@ -685,12 +686,14 @@
             bingo_square.id = id;
             bingo_square.className = 'bingo_box';
             bingo_square.onmouseover = function() {document.getElementById("bingo_hint").textContent = challenge["full"];};
-            bingo_square.onmouseover = function() {document.getElementById("bingo_hint").textContent = challenge["full"];};
+            bingo_square.addEventListener("click", toggle_status);
             bingo_square.addEventListener("touchstart", function() {document.getElementById("bingo_hint").textContent = challenge["full"]});
+            bingo_square.addEventListener("touchmove", function() {moved_the_touch = true;})
             bingo_square.addEventListener('touchend', function(e){
-                    toggle_status(e);
-                    e.preventDefault();
-                })
+                  if(moved_the_touch){ moved_the_touch = false; alert("moved!"); return;}
+                  toggle_status(e);
+                  e.preventDefault();
+            })
 
             var label = document.createElement('label')
             var challenge;

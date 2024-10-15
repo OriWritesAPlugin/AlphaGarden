@@ -27,6 +27,7 @@
                <input id="display_hints" type="checkbox" name="display_hints" onchange="toggle_hints()" style="margin-left: 10px;" checked> Display hints
                <input id="dark_mode" type="checkbox" name="dark_mode" onchange="toggle_dark_mode()" style="margin-left: 10px;" checked> Dark mode
           </div>
+          <p id="load_text">Loading plants...</p>
           <p id="bingo_seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> earned yet!</p>
         </div>
         <div id="board_div" class='center-parent'></div>
@@ -50,7 +51,10 @@
     var plants_revealed_at = plants_revealed_at_self_care;
 
     async function do_setup(){
+        toggle_hints();
+        toggle_dark_mode();
         await preload_plants();
+        document.getElementById("load_text").remove();
         let restored_state = false;
         try {
             restored_state = restoreBingoStateIfPresent();
@@ -60,8 +64,6 @@
         if(!restored_state){
             launch_plant_dialogue();
         }
-        toggle_hints();
-        toggle_dark_mode();
     }
 
     async function launch_plant_dialogue(){
