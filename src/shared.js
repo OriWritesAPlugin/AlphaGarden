@@ -55,16 +55,16 @@ function collectSeed(seed){
 }
 
 
-// Draws a plant that's meant to go in a 96x96 square
-async function drawPlantForSquare(seed){
+// Draws a plant that's meant to go in a 96x96 (or otherwise) square
+async function drawPlantForSquare(seed, size=96){
   plant_canvas = await gen_plant(decode_plant_data(seed));
   // TODO: This next scaling bit seems incredibly silly
   var scale_canvas = document.createElement("canvas");
-  scale_canvas.width = 96;
-  scale_canvas.height = 96;
+  scale_canvas.width = size;
+  scale_canvas.height = size;
   var scale_ctx = scale_canvas.getContext("2d");
   scale_ctx.imageSmoothingEnabled = false;
-  scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
+  scale_ctx.drawImage(plant_canvas, 0, 0, size, size);
   return scale_canvas.toDataURL();
 }
 

@@ -122,7 +122,10 @@
       prize_display_square.style.background = 'url(' + data_url + ')  no-repeat center center';
   
       document.getElementById("task_div").appendChild(list_item);
-      textbox.focus();
+      if(setup_complete){
+        textbox.focus();
+        textbox.scrollIntoView();
+      }
       task_sets_generated += 1;
     }
 
