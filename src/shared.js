@@ -55,6 +55,20 @@ function collectSeed(seed){
 }
 
 
+// Draws a plant that's meant to go in a 96x96 square
+async function drawPlantForSquare(seed){
+  plant_canvas = await gen_plant(decode_plant_data(seed));
+  // TODO: This next scaling bit seems incredibly silly
+  var scale_canvas = document.createElement("canvas");
+  scale_canvas.width = 96;
+  scale_canvas.height = 96;
+  var scale_ctx = scale_canvas.getContext("2d");
+  scale_ctx.imageSmoothingEnabled = false;
+  scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
+  return scale_canvas.toDataURL();
+}
+
+
 function buildColorMessage(raw_plant_data, do_links=true){
   let color_msg = "";
   if(raw_plant_data["foliage"] == 160){

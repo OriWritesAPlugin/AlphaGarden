@@ -93,13 +93,7 @@
     async function add_self_care_square(parent, id){
         let swap_square = document.createElement('button');
         swap_square.id = "selfcare_plant_" + id;
-        swap_square.classList.add('bingo_box');
-        swap_square.style.borderStyle = "none";
-        swap_square.style.marginBottom = "5px;";
-        swap_square.style.width = "auto";
-        swap_square.style.height = "auto";
-        swap_square.style.minWidth = "96px";
-        swap_square.style.minHeight = "96px";
+        swap_square.classList.add('prize_select_plant_box');
         swap_square.onclick = function(e){
             let square = document.getElementById(e.target.id);
             was_active = square.classList.contains("active");

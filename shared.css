@@ -52,7 +52,7 @@ input[name="form_type"] {
     margin-left: 10px;
 }
 
-input.chunky, input.chunky_wrap, input.chunky_fullwidth {
+input.chunky, input.chunky_wrap, button.chunky, input.chunky_fullwidth {
     width: 400px;
     font-family: monospace, Verdana, sans-serif;
     border-radius: 5px;
@@ -63,6 +63,28 @@ input.chunky, input.chunky_wrap, input.chunky_fullwidth {
     color: #DFC48C;
     background-color: #2F252D;
     font-size: 1.4rem;
+}
+
+button.chunky {
+    width: auto;
+    border-radius: 20px;
+    padding: 4px;
+}
+
+#todo_add_new {
+    position: fixed;
+    top: 5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: min(50vw, 200px);
+}
+
+#todo_clear_completed {
+    min-width: min(50vw, 200px);
+}
+
+button.chunky:hover {
+    background-color: #3F353D;
 }
 
 input.chunky_wrap {
@@ -89,6 +111,7 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     display: flex;
     justify-content: center;
     align-content: center;
+    text-align: center;
 }
 
 .directory-img{
@@ -96,6 +119,39 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     height: auto;
     margin-left: 5px;
     margin-right: 5px;
+}
+
+.dotted-fill-in {
+    border: none;
+    outline: none;
+    border-bottom-color: #ffffff;
+    border-bottom-style: dashed;
+    border-bottom-width: thin;
+    display: inline-block;
+    padding-top: 72px;
+    width: 10vw;
+    color: #DFC48C;
+    vertical-align: middle;
+    background-color: transparent;
+    font-size: 1.2rem;
+    transition: width 1s;
+    padding-bottom: 4px;
+    resize: none;
+    text-align: left;
+    max-height: min(20vh, 200px);
+    overflow: scroll; 
+}
+
+.dotted-fill-in:focus {
+    border-bottom-color: #ffaaff;
+}
+
+.dotted-fill-in::placeholder {
+    color: transparent;
+}
+
+.dotted-fill-in:hover::placeholder {
+    color: #999999;
 }
 
 .inline-flex-parent {
@@ -140,6 +196,30 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
 .garden-dim-bar:focus {
   border-color: #DFC48CA0;
   outline: none;
+}
+
+.todo_checkbox {
+    accent-color: #81309c;
+    min-width: 36px;
+    min-height: 36px;
+    margin-top: 60px;
+    height: 4px;
+    margin-right: 8px;
+    transition: accent-color 0.5s ease;
+  }
+
+  .todo_glowing {
+    box-shadow: 0px 0px 8px 4px #DFC48C;
+  }
+
+  .disabled_cust{
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.todo_checkbox_old {
+    accent-color: #81309c;
+    transform: scale(3.2);
 }
 
 .form-container {
@@ -201,6 +281,11 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     background-color: #3F353D;
 }
 
+#task_div {
+    margin-bottom: 16px;
+    transition: height 1s linear;
+}
+
 .unselectable {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -208,6 +293,13 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.growing-fadeout {
+    visibility: hidden;
+    opacity: 0;
+    width: 300vw;
+    transition: visibility 0s 1s, opacity 1s linear, width 1s;
 }
 
 .disabled{
@@ -300,16 +392,30 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     margin: 0px 1% 0px 1%;
     overflow: hidden;
 }
-.collection_row, .collection_display, #self_care_plant_selector {
+.collection_row, .collection_display, #self_care_plant_selector, #todo_plant_selector {
    display: flex;
    justify-content: center;
    align-content: center;
 }
 
-.collection_display, #self_care_plant_selector {
+.collection_display, #self_care_plant_selector, #todo_plant_selector {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, max-content));
+    grid-template-columns: repeat(auto-fit, minmax(90px, max-content));
     width: 100%;
+    margin: 2vh auto;
+}
+
+.collection_display{
+    grid-template-columns: repeat(auto-fill, minmax(90px, max-content));
+}
+
+#todo_plant_selector_container {
+    transition: height 0.75s;
+    border-style: dashed;
+    border-width: thin;
+    border-color: #ffaaff;
+    border-top-width: 0px;
+    box-sizing: border-box;
 }
 
 #viewport_spacer {
@@ -332,6 +438,36 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
         width: 100%;
     }
   }
+
+  .bingo_box, .prize_select_plant_box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction:column;
+    text-align:center;
+    width: 7rem;
+    height: 7rem;
+    min-width: 75px;
+    min-height: 75px;
+    border-color: #71b280;
+    border-style: none;
+    border-width: thin;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.bingo_box {
+    border-style: dashed;
+}
+
+.prize_select_plant_box {
+    border-style: "none";
+    margin-bottom: "5px;";
+    width: "auto";
+    height: "auto";
+    min-width: "96px";
+    min-height: "96px";
+}
 
 .swap_row {
     display: flex;
@@ -361,9 +497,8 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
 }
 
 #self_care_plant_selector {
-    max-width: 500px;
-    margin: 2vh auto;
-    width: 100%;
+    max-width: calc(112*5)px;
+    grid-template-columns: repeat(auto-fit, minmax(112px, max-content));
 }
 
 .garden_util_box, .garden_util_box_fixed {
@@ -495,6 +630,17 @@ font-weight: bold;
     }
   }
 
+@media (min-width: 800px) { /* hide scrollbars on wide screens */
+      .dotted-fill-in{
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+      }
+      /* Chromium */
+      .dotted-fill-in::-webkit-scrollbar {
+          display: none;
+        }
+}
+
 .side-by-side {
     display: flex;
     width: 100%;
@@ -516,6 +662,9 @@ font-weight: bold;
         }
         #title, #subtitle {
             font-size: 1em;
+        }
+        .dotted-fill-in {
+            font-size: 1rem;
         }
 }
 
@@ -576,3 +725,12 @@ border-width: thin;
     cursor: not-allowed;
     opacity: 0.35;
 }
+
+plant_particle {
+    border-radius: 50%;
+    left: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    opacity: 0;
+  }

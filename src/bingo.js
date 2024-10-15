@@ -529,25 +529,6 @@
             return encode_plant_data_v2(plant_data);
         }
 
-        // Looking quite a bit like quite a bit other code, takes a seed and draws the plant, but here in a bingo square.
-        async function drawPlantForSquare(seed, draw_markings=true){
-            let plant_data = decode_plant_data(seed);
-            plant_canvas = await gen_plant(plant_data);
-            // TODO: This next scaling bit seems incredibly silly
-            var scale_canvas = document.createElement("canvas");
-            scale_canvas.width = 96;
-            scale_canvas.height = 96;
-            var scale_ctx = scale_canvas.getContext("2d");
-            scale_ctx.imageSmoothingEnabled = false;
-            if (draw_markings) {
-              finished_canvas = await addMarkings(plant_data, plant_canvas);
-              scale_ctx.drawImage(finished_canvas, 0, 0, 96, 96);
-            } else {
-              scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
-            }
-            return scale_canvas.toDataURL();
-        }
-
         async function toggle_status(e, generate_rewards=true){
             var id = e.target.id;
             coords = id.split("_");
@@ -573,7 +554,12 @@
                       square_info['reward'] = {"type": "seed", "value": await genSeedForSquare()};
                   }
                   revealed_seeds.push(square_info['reward']["value"]);
-                  document.getElementById("bingo_seed_list").innerHTML = revealed_seeds.join(", ");
+                  document.getElementById("bingo_seed_list").innerHTML = revealed_seeds.join(", "); 
+                  // TODO: I can't figure out what causes this one, ugggh. Possibly a mismatch between save data and board settings?
+                  if(square_info['reward']['value'] === null){
+                    console.log("encountered ungenerated seed--making an emergency one!");
+                    square_info['reward']['value'] = encode_plant_data_v2(gen_plant_data(0));
+                  }
                   collectSeed(square_info['reward']["value"]);
                 }
               }

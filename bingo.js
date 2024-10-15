@@ -507,19 +507,6 @@
             return encode_plant_data_v2(plant_data);
         }
 
-        // Looking quite a bit like quite a bit other code, takes a seed and draws the plant, but here in a bingo square.
-        async function drawPlantForSquare(seed){
-            plant_canvas = await gen_plant(decode_plant_data(seed));
-            // TODO: This next scaling bit seems incredibly silly
-            var scale_canvas = document.createElement("canvas");
-            scale_canvas.width = 96;
-            scale_canvas.height = 96;
-            var scale_ctx = scale_canvas.getContext("2d");
-            scale_ctx.imageSmoothingEnabled = false;
-            scale_ctx.drawImage(plant_canvas, 0, 0, 96, 96);
-            return scale_canvas.toDataURL();
-        }
-
         async function toggle_status(e, generate_rewards=true){
             var id = e.target.id;
             coords = id.split("_");
