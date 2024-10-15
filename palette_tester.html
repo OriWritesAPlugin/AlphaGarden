@@ -14,8 +14,6 @@
         <h2 id="subtitle">Test and compare palettes, including custom ones</h2>
         </br>
         <div style="display: none">
-          <label for="seed_list">Edit test seeds:</label><br>
-          <textarea id="seed_list" name="seed_list" style="max-height: 5%">CumHmCNz-D%-2, CgHXGCAb+v%8, CvwKqC6otQ%21, Ctc3mCPTYy%33, CqxieC2++9%46, CjhefCPs3i%58, Cd-0jB+QFh%71, CKYGfB-y02%85</textarea><br>
           <label for="quantity">Garden width:</label> <input class="garden-dim-bar" type="number" id="garden_width" name="quantity" min="64" value=450>
           <label for="garden_height">Garden height:</label> <input class="garden-dim-bar" type="number" id="garden_height" name="garden_height" min="70" value=70>
           <label for="draw_outline" style="margin-left: 10px">Draw outline:</label><input type="checkbox" id="draw_outline" value="Draw outline">
@@ -37,9 +35,12 @@
               <div id="output"><canvas id="output_canvas" width="450" height="70"></canvas></div>
               </br>
               <input type="text" id="palette_text" class="basic-text-entry" style="max-width: max(25vw, 200px)"></input>
-            </br>
+          </br>
           </div>
+          <label for="seed_list">Edit test seeds:</label><br>
           <br>
+          <textarea id="seed_list" name="seed_list" style="max-height: 5%">CumHmCNz-D%-2, CgHXGCAb+v%8, CvwKqC6otQ%21, Ctc3mCPTYy%33, CqxieC2++9%46, CjhefCPs3i%58, Cd-0jB+QFh%71, CKYGfB-y02%85</textarea><br>
+          <p>Did you know? You can enter the phrase ENGAGECHEATS into the palette editor to unlock unknown palettes</p>
       </div>
     </div>
     </body>
@@ -62,13 +63,36 @@
       var da_ctx;
       var gm;
       var g1;
+      const empty_slots = 10;
+
+      owned_palettes = new Set();
+      seed_list = getSeedCollection();
+      for(seed of seed_list){
+            let seed_data = decode_plant_data(seed);
+            owned_palettes.add(seed_data["foliage_palette"] + empty_slots);
+            owned_palettes.add(seed_data["feature_palette"] + empty_slots);
+            owned_palettes.add(seed_data["accent_palette"] + empty_slots);
+      }
+      secrets_mode = false;
+
+      const hidden_palette = new Image();
+      hidden_palette.src="https://i.imgur.com/Hh8Nmck.png";
+      hidden_palette.crossOrigin = "anonymous"
+      hidden_palette.onload = function() {
+          do_stuff();
+      };
 
       // 339324,adef94,46d01b,21372a
       // ddd1ff,ccb5ff,d28efa,c75de8
 
-      for(let i=0; i<10; i++){
+      for(let i=0; i<empty_slots; i++){
+              owned_palettes.add(i);
               all_palettes.unshift({"palette": ['eeeeee', 'cccccc', 'aaaaaa', '888888'], "categories": ["custom slots (click one and edit above)"]});
-          }
+      }
+
+      if(owned_palettes.length == all_palettes.length){
+        secrets_mode = true;
+      }
 
         async function do_stuff(){
           await do_preload_initial();
@@ -100,16 +124,27 @@
               //let palette = all_palettes[horrid_list[i][1]]["palette"];
               let palette_redirect = palettes_by_category[category][i];
               let palette = all_palettes[palette_redirect]["palette"];
-              divvy = document.createElement("div");
+              let divvy = document.createElement("div");
               divvy.style.display = "inline-block";
               divvy.id = "palette_" + palette_redirect;
-              divvy.addEventListener("click", function(){
-                regenWithPalette(palette_redirect);
-                document.getElementById("palette_text").value = all_palettes[palette_redirect]["palette"];
-                document.getElementById("palette_text").setAttribute("data-offset", palette_redirect);
-                //setPalette(divvy, all_palettes[palette_redirect]["palette"]);
-              });
-              setPalette(divvy, palette);
+              if(secrets_mode || owned_palettes.has(palette_redirect)){
+                divvy.addEventListener("click", function(){
+                  regenWithPalette(palette_redirect);
+                  document.getElementById("palette_text").value = all_palettes[palette_redirect]["palette"];
+                  document.getElementById("palette_text").setAttribute("data-offset", palette_redirect);
+                  //setPalette(divvy, all_palettes[palette_redirect]["palette"]);
+                });
+              } else {
+                divvy.addEventListener("click", function(){
+                  if(secrets_mode){
+                    setPalette(divvy, palette, palette_redirect);
+                    regenWithPalette(palette_redirect);
+                    document.getElementById("palette_text").value = all_palettes[palette_redirect]["palette"];
+                    document.getElementById("palette_text").setAttribute("data-offset", palette_redirect);
+                  }
+                });   
+              }
+              setPalette(divvy, palette, palette_redirect);
               da_box.appendChild(divvy);
             }
           }
@@ -148,20 +183,21 @@
         }
 
 
-
-        do_stuff();
-
-      function setPalette(parent, palette){
+      function setPalette(parent, palette, palette_redirect){
         parent.innerHTML = "";
         canvas = document.createElement("canvas");
-              canvas.width = 100;
-              canvas.height = 25;
-              canvas.background = "#FFFFFF";
-              let ctx = canvas.getContext("2d");
-              for(let i=0; i<4; i++){
-                ctx.fillStyle = "#"+palette[i];
-                ctx.fillRect(25*i, 0, 25+25*i, 25);
-              }
+                canvas.width = 100;
+                canvas.height = 25;
+                canvas.background = "#FFFFFF";
+        let ctx = canvas.getContext("2d");
+        if(secrets_mode || owned_palettes.has(palette_redirect)){
+          for(let i=0; i<4; i++){
+            ctx.fillStyle = "#"+palette[i];
+            ctx.fillRect(25*i, 0, 25+25*i, 25);
+          }
+        } else {
+          ctx.drawImage(hidden_palette, 0, 0);
+        }
         parent.appendChild(canvas);
       }
 
@@ -189,17 +225,23 @@
         tintedRegen(seeds);
       }
 
-      //document.getElementById("palette_text").addEventListener('click', updatePalette);
-      //document.getElementById("palette_text").addEventListener('focusout', updatePalette);
       document.getElementById("palette_text").addEventListener("keyup", updatePalette);
 
-      function updatePalette(){
+      function updatePalette(e){
         palette = document.getElementById("palette_text");
+        // Enable spooky mode
+        if(!secrets_mode){
+            if(palette.value == "ENGAGECHEATS"){
+              alert("Cheat mode activated! You can now click unknown palettes to reveal them.");
+              secrets_mode = true;
+              return;
+            }
+        }
         redirect = palette.getAttribute("data-offset");
         console.log(redirect);
         new_palette = palette.value.split(",");
         all_palettes[redirect]["palette"] = new_palette;
-        setPalette(document.getElementById("palette_"+redirect), new_palette);
+        setPalette(document.getElementById("palette_"+redirect), new_palette, redirect);
         regenWithPalette(redirect);
       }
 
