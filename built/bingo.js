@@ -697,23 +697,14 @@ function add_bingo_square(parent, column, row, challenge_name) {
     bingo_square.id = id;
     bingo_square.className = 'bingo_box';
     bingo_square.onmouseover = function () { document.getElementById("bingo_hint").textContent = challenge["full"]; };
-    bingo_square.addEventListener("click", toggle_status);
-    bingo_square.addEventListener("touchstart", function () { document.getElementById("bingo_hint").textContent = challenge["full"]; });
-    function moveTest(e) {
-        if (e.target != document.elementFromPoint(e.clientX, e.clientY)) {
-            moved_the_touch = true;
+    function pointerShowHint(e) {
+        document.getElementById("bingo_hint").textContent = challenge["full"];
+        if (e.target.hasPointerCapture(e.pointerId)) {
+            e.target.releasePointerCapture(e.pointerId);
         }
-        ;
     }
-    bingo_square.addEventListener("touchmove", moveTest);
-    bingo_square.addEventListener('touchend', function (e) {
-        if (moved_the_touch) {
-            moved_the_touch = false;
-            return;
-        }
-        toggle_status(e);
-        e.preventDefault();
-    });
+    bingo_square.addEventListener("pointerdown", pointerShowHint);
+    bingo_square.addEventListener("pointerup", toggle_status);
     var label = document.createElement('label');
     var challenge;
     try {
