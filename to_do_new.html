@@ -25,8 +25,8 @@
     const available_sounds = [new Audio("sounds/fsharp_3_bell.mp3"), new Audio("sounds/asharp_bell.mp3"),
                               new Audio("sounds/csharp_bell.mp3"), new Audio("sounds/fsharp_4_bell.mp3")];
 
-    const num_tasks_per_set = 5;  // Every X, increment the salt
-    const plants_to_choose_from = 9; // How many plants each tasks presents
+    const num_tasks_per_set = 3;  // Every X, increment the salt
+    const plants_to_choose_from = 7; // How many plants each tasks presents
     const fallback_colors = [[255, 102, 99], [254, 177, 68], [253, 253, 151], [158, 224, 158], [158, 193, 207], [204, 153, 201]];  // RGB colors to use if the plant sampler fails to find any
     const forced_random_seed = d.getDate().toString()+d.getMonth().toString()+d.getFullYear().toString()+"todo";
     const max_outstanding_tasks = 10;  // To incentivize avoiding overwhelming yourself, the max number of tasks you can have outstanding while still choosing plants
@@ -213,7 +213,7 @@
       let text;
       let force_fill_plants = false;
       if (localStorage.todo_tasks == undefined) {
-        text = "uD3TIPCX7mOWelcome to the to-do list! Click a task to edit it & pick a reward. The selection changes every five tasks, and you can pick duplicates.|SEP|uD1BB2COlGNClick the box on the left to mark a task complete, earning the reward you picked. These first three are all freebies!|SEP|uCMq71B-AIsClearing completed tasks (bottom button) may reward RS. The chance doubles once the button starts glowing. Happy tasking!"
+        text = "uD3TIPCX7mOWelcome to the to-do list! Click a task to edit it & pick a reward. The selection changes every three tasks, and you can pick duplicates.|SEP|uD1BB2COlGNClick the box on the left to mark a task complete, earning the reward you picked. These first three are all freebies!|SEP|uCMq71B-AIsClearing completed tasks (bottom button) may reward RS. The chance doubles once the button starts glowing. Happy tasking!"
         force_fill_plants = true;
       } else {
         text = localStorage.todo_tasks;
