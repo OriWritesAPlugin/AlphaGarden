@@ -329,6 +329,7 @@
         var bingo_bases = foliage_base_odds;
         var current_challenge_code = null
         var challenge_list = [];
+        const dateString = new Date().getDate().toString();
 
         function setAvailableChallengeListFromCode(categories_code) {
             challenge_list = [];
@@ -501,10 +502,10 @@
         }
 
         function generate_board(size, board_challenge_code, seed_override=null) {
-            if(board_challenge_code == "s"){
-              plants_revealed_at = plants_revealed_at_self_care;
-            } else {
+            if(forced_random_seed == null){
               plants_revealed_at = plants_revealed_at_per_size[size];
+            } else {
+              plants_revealed_at = plants_revealed_at_self_care;
             }
             if(board_challenge_code != current_challenge_code){
                 setAvailableChallengeListFromCode(board_challenge_code);
@@ -594,6 +595,8 @@
             // TODO: patch solution for the self-care board trying to save to the coli slot: disable it entirely. hopefully.
             if(forced_random_seed == null){
               stashBingoState();
+            } else {
+              stashSelfCareState();
             }
         }
 
@@ -682,7 +685,8 @@
             bingo_square.id = id;
             bingo_square.className = 'bingo_box';
             bingo_square.onmouseover = function() {document.getElementById("bingo_hint").textContent = challenge["full"];};
-            bingo_square.addEventListener("click", toggle_status);
+            bingo_square.onmouseover = function() {document.getElementById("bingo_hint").textContent = challenge["full"];};
+            bingo_square.addEventListener("touchstart", function() {document.getElementById("bingo_hint").textContent = challenge["full"]});
             bingo_square.addEventListener('touchend', function(e){
                     toggle_status(e);
                     e.preventDefault();
@@ -747,13 +751,30 @@
           localStorage.bingo_state = export_bingo();
       }
 
+      function stashSelfCareState(){
+        localStorage.selfcare_bingo_state = (export_bingo() + "|SEP|" + dateString);
+    }
+
       function restoreBingoStateIfPresent(){
-          if (localStorage.bingo_state == undefined) {
-            return false;
+          let msg = "Board state restored!\nIf you want to discard it (and get the effects of any new configuration), click [New Board]. Bye!"
+          if(forced_random_seed == null){
+            if (localStorage.bingo_state == undefined) {
+              return false;
+            }
+            import_bingo(JSON.parse(localStorage.bingo_state));
+          } else {
+            if (localStorage.selfcare_bingo_state == undefined) {
+              return false;
+            }
+            let storageInfo = localStorage.selfcare_bingo_state.split("|SEP|");
+            if(storageInfo[1] != dateString){
+              return false;
+            }
+            import_bingo(JSON.parse(storageInfo[0]));
+            msg = "Board state restored!\nCome back tomorrow for a brand new board!"
           }
-          import_bingo(JSON.parse(localStorage.bingo_state));
           p = document.createElement("p");
-          p.innerHTML = "Board state restored!\nIf you want to discard it (and get the effects of any new configuration), click [New Board]. Bye!"
+          p.innerHTML = ""
           p.style.color = "#8CDF8F";
           document.getElementById("board_div").appendChild(p);
           const anim = p.animate([
@@ -767,7 +788,8 @@
             duration: 5000,
             easing: 'linear',
           });
-          anim.onfinish = () => { p.remove() };     
+          anim.onfinish = () => { p.remove() };    
+          return true; 
       }
 
         function toggle_extra_icons() {

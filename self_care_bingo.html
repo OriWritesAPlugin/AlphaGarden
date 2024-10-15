@@ -47,10 +47,19 @@
     var selected_seeds = new Set();
     const choose_from = 25;
     const max_choose = 7;
+    var plants_revealed_at = plants_revealed_at_self_care;
 
     async function do_setup(){
         await preload_plants();
-        launch_plant_dialogue();
+        let restored_state = false;
+        try {
+            restored_state = restoreBingoStateIfPresent();
+        } catch (e) {
+            alert("Malformed old bingo state, generating a new board!");
+        }
+        if(!restored_state){
+            launch_plant_dialogue();
+        }
         toggle_hints();
         toggle_dark_mode();
     }
