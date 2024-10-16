@@ -46,8 +46,15 @@ function collectSeed(seed) {
     }
 }
 // Draws a plant that's meant to go in a 96x96 (or otherwise) square
-async function drawPlantForSquare(seed, size = 96) {
-    plant_canvas = await gen_plant(decode_plant_data(seed));
+async function drawPlantForSquare(seed, size = 96, mark_wanted_palettes = true) {
+    const plant_data = decode_plant_data(seed);
+    let plant_canvas;
+    if (mark_wanted_palettes) {
+        plant_canvas = await addMarkings(plant_data, await gen_plant(plant_data));
+    }
+    else {
+        plant_canvas = await gen_plant(plant_data);
+    }
     // TODO: This next scaling bit seems incredibly silly
     var scale_canvas = document.createElement("canvas");
     scale_canvas.width = size;

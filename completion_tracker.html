@@ -233,7 +233,7 @@
                 plant_data["feature_palette"] = selected_palettes[1];
                 plant_data["accent_palette"] = selected_palettes[2];
                 let seed = encode_plant_data_v2(plant_data);
-                data_url = await drawPlantForSquare(seed);
+                data_url = await drawPlantForSquare(seed, swap_square.width, false);
             }
             swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
             swap_square.onclick = function() {

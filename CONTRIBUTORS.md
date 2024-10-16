@@ -71,6 +71,8 @@ Vanshira: Palette names
 
 Xaotician: Sand and Sand \[palette\] ground types (art was also used to make the snow ground type)
 
+MrSpite: Pearly palette
+
 
 
 
