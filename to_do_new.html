@@ -238,6 +238,10 @@
       } else {
         text = localStorage.todo_tasks;
       }
+      if (localStorage.todo_count != undefined) {
+        let count = localStorage.todo_count.split("|SEP|");
+        if(count[0] == d.getDate()){task_sets_generated = Number(count[1])}
+      }
       let tasks = text.split("|SEP|");
       let task_count = 0;
       for (const task of tasks){
@@ -274,6 +278,7 @@
         msg += desc + "|SEP|";
       }
       localStorage.todo_tasks = msg;
+      localStorage.todo_count = d.getDate() + "|SEP|" + (task_sets_generated - getListStatus()["unchecked"]);
       let p = document.createElement("p");
       p.innerHTML = "Saved progress!";
       p.style.position = 'fixed';
