@@ -217,30 +217,40 @@
             chosen_seeds = chosen_seeds.map(apply_random_permutations_to_seed);
             document.getElementById("seed_list").value = chosen_seeds.join(", ");
             gm.clearAllButActive();
-            let skyPalette = getRandomKeyFromObj(available_backgrounds);
-            gl.groundPaletteSeed = groundPaletteSeed;
             if(Math.random() < 0.7){
-              await gm.makeCelestialLayer(false, "Fog", skyPalette, (Math.random()*0.5 + 0.1).toFixed(2)); 
+              let skyPalette = getRandomKeyFromObj(available_backgrounds);
+              gl.groundPaletteSeed = groundPaletteSeed;
+              if(Math.random() < 0.8){
+                await gm.makeCelestialLayer(false, "Fog", skyPalette, (Math.random()*0.5 + 0.2).toFixed(2)); 
+              }
+              if(Math.random() < 0.1){
+                 let secondGarden = new GardenLayer(da_canvas.width, da_canvas.height, 0, da_canvas.height/5, chosen_seeds.slice(0, chosen_seeds.length/2 << 0), groundPaletteSeed,
+                                                "grass [palette]", getRandomKeyFromObj(available_ground_base), 1);
+                let secondGardenDiv = new GardenLayerDiv(secondGarden, gm.get_id(), gm.updateCallback, gm.gardenToggleCallback);
+                await secondGarden.updateMain();
+                await secondGarden.updateGround();
+                await gm.addLayerAndAnimate(secondGardenDiv, false);                
+              }
+              if(Math.random() < 0.7){
+                await gm.makeDecorLayer(false, getRandomKeyFromObj(available_tileables), decorPaletteSeed);
+              }
+              if(Math.random() < 0.25){
+                // TO-DO: reimplements makeGardenLayer() just to get the y offset.
+                let wallLayer = new GardenLayer(da_canvas.width, da_canvas.height, 0, da_canvas.height, [], groundPaletteSeed,
+                                                "none", getRandomKeyFromObj(available_ground_base), 1);
+                let wallLayerDiv = new GardenLayerDiv(wallLayer, gm.get_id(), gm.updateCallback, gm.gardenToggleCallback);
+                await wallLayer.updateMain();
+                await wallLayer.updateGround();
+                await gm.addLayerAndAnimate(wallLayerDiv, false);   
+              }
+              if(Math.random() < 0.25){
+                await gm.makeDecorLayer(false, getRandomKeyFromObj(available_tileables), decorPaletteSeed);
+              }
+              if(Math.random() < 0.60){
+                await gm.makeCelestialLayer(false, "Stars", skyPalette);
+              }
+              await gm.makeCelestialLayer(false, "Sky_Gradient", skyPalette);
             }
-            if(Math.random() < 0.7){
-              await gm.makeDecorLayer(false, getRandomKeyFromObj(available_tileables), decorPaletteSeed);
-            }
-            if(Math.random() < 0.25){
-              // TO-DO: reimplements makeGardenLayer() just to get the y offset.
-              let wallLayer = new GardenLayer(da_canvas.width, da_canvas.height, 0, da_canvas.height, [], groundPaletteSeed,
-                                              "none", getRandomKeyFromObj(available_ground_base), 1);
-              let wallLayerDiv = new GardenLayerDiv(wallLayer, gm.get_id(), gm.updateCallback, gm.gardenToggleCallback);
-              await wallLayer.updateMain();
-              await wallLayer.updateGround();
-              await gm.addLayerAndAnimate(wallLayerDiv, false);   
-            }
-            if(Math.random() < 0.25){
-              await gm.makeDecorLayer(false, getRandomKeyFromObj(available_tileables), decorPaletteSeed);
-            }
-            if(Math.random() < 0.60){
-              await gm.makeCelestialLayer(false, "Stars", skyPalette);
-            }
-            await gm.makeCelestialLayer(false, "Sky_Gradient", skyPalette);
             doThisRegen();
         }
 
