@@ -57,7 +57,7 @@
       var randomizer_timeout_id;
       var collection = getSeedCollection();
       var goodies = getGoodieCollection();
-      const max_from_random_palette = 7;
+      const max_from_random_palette = 6;
       const collection_by_main_color = function(){
         let by_color = {};
         for(const seedct in collection){
@@ -188,7 +188,7 @@
               num_plants += Math.random() * 3;
               while(chosen_seeds.length < num_plants){
                 let choose_from = randomValueFromObject(collection_by_main_color);
-                let num_choose = (Math.random() * Math.min(choose_from.length, max_from_random_palette) << 0) + Math.min(2, choose_from.length/2 << 0);
+                let num_choose = Math.min(max_from_random_palette, (Math.random() * choose_from.length + Math.min(2, choose_from.length/2)) << 0);
                 for(let i=0; i<num_choose; i++){
                   chosen_seeds.push(randomFromArray(choose_from));
                 }
