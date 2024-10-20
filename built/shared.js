@@ -231,6 +231,10 @@ function shuffleArray(arr) {
     return arr;
 }
 const randomFromArray = (arr) => { return arr[Math.floor(Math.random() * arr.length)]; };
+const randomValueFromObject = (obj) => {
+    var keys = Object.keys(obj);
+    return obj[keys[keys.length * Math.random() << 0]];
+};
 function get_overlay_color_from_name(color, alpha) {
     color = color.slice(1);
     if (available_overlay_colors.hasOwnProperty(color)) {

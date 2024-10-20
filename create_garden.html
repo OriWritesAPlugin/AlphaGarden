@@ -16,7 +16,7 @@
         <label for="seed_list">Seed list (comma-separated):</label><br>
         <textarea id="seed_list" name="seed_list" size="4" placeholder="Click here and paste!"></textarea><br>
         <label for="quantity">Width:</label> <input class="garden-dim-bar" type="number" id="garden_width" name="quantity" min="64" value=450>
-        <label for="garden_height">Height:</label> <input class="garden-dim-bar" type="number" id="garden_height" name="garden_height" min="70" value=80>
+        <label for="garden_height">Height:</label> <input class="garden-dim-bar" type="number" id="garden_height" name="garden_height" min="70" value=90>
         <label for="garden_scale">Scale:</label> <input class="garden-dim-bar" type="number" id="garden_scale" name="garden_scale" value=1 step="0.25">
         <input type="button" class="chunky_wrap" value="Sync sizes" id="size_syncer" title="Apply the overall image's size (to the left) to all its layers" onClick="sync_sizes()">
         <input type="button" class="chunky_wrap" value="Randomize" id="randomizer" title="Create a randomized garden using seeds from your collection" onClick="random_from_collection()">
@@ -27,7 +27,7 @@
             </br></br>
             <input type="button" class="chunky" value="&gt;&gt; Generate a garden!&lt;&lt;" onClick="doThisRegen()">
             </br></br>
-            <div id="output"><canvas id="output_canvas" width="450" height="80"></canvas></div>
+            <div id="output"><canvas id="output_canvas" width="450" height="90"></canvas></div>
             </br></br>
             <input type="button" class="chunky_wrap" value="Claim Garden" onClick="claim()">
         </div>
@@ -55,6 +55,35 @@
       var gm;
       var ready_to_random = false;
       var randomizer_timeout_id;
+      var collection = getSeedCollection();
+      var goodies = getGoodieCollection();
+      const max_from_random_palette = 7;
+      const collection_by_main_color = function(){
+        let by_color = {};
+        for(const seedct in collection){
+          let data = decode_plant_data(collection[seedct]);
+          let main = FOLIAGE_SPRITE_DATA[data["foliage"]]["m"];
+          let palette;
+          if(main==0){
+            palette = data["foliage_palette"];
+          } else if(main==1){
+            palette = data["feature_palette"];
+          } else {
+            palette = data["accent_palette"];
+          }
+          if(Object.hasOwn(by_color, palette)){
+            by_color[palette].push(collection[seedct]);
+          } else {
+            by_color[palette] = [collection[seedct]];
+          }
+        }
+        return by_color;
+      }();
+
+
+      async function organizePlantsForRandomGarden(){
+
+      }
 
         async function do_stuff(){
           await do_preload_initial();
@@ -129,6 +158,16 @@
           await doThisRegen();
         }
 
+        function apply_random_permutations_to_seed(seed){
+          if(Math.random() > 0.75){
+            seed += "%"+(Math.random()*100-0.1).toFixed(1).toString();
+          }
+          if(Math.random() > 0.75){
+            seed += "<";
+          }
+          return seed
+        }
+
         async function random_from_collection(){
             if(!ready_to_random){
               toggle_random();
@@ -138,23 +177,44 @@
               clearTimeout(randomizer_timeout_id);
               randomizer_timeout_id = setTimeout(toggle_random, 1000);           
             }
-            let collection = getSeedCollection();
-            let decorPaletteSeed = collection[Math.floor(Math.random() * collection.length)];
-            let groundPaletteSeed = collection[Math.floor(Math.random() * collection.length)];
-            let goodies = getGoodieCollection();
-            collection.push(...goodies.map(function(x){ return "!"+x;}));
+            let choose_from = [];
+            let chosen_seeds = [];
             let num_plants = Math.random() * (9 - 3) + 1;
-            let chosen_seeds = [decorPaletteSeed, groundPaletteSeed];
-            for(let i=0; i<num_plants; i++){
+            let matchColors = Math.random() < 1;
+            let decorPaletteSeed;
+            let groundPaletteSeed;
+            // Logic for "matchy" colors
+            if(matchColors){
+              num_plants += Math.random() * 3;
+              while(chosen_seeds.length < num_plants){
+                let choose_from = randomValueFromObject(collection_by_main_color);
+                let num_choose = (Math.random() * Math.min(choose_from.length, max_from_random_palette) << 0) + Math.min(2, choose_from.length/2 << 0);
+                for(let i=0; i<num_choose; i++){
+                  chosen_seeds.push(randomFromArray(choose_from));
+                }
+              }
+              decorPaletteSeed = chosen_seeds[0];
+              groundPaletteSeed = chosen_seeds[1];
+              let num_goodies = (Math.random() * 7 - 4) << 0;
+              if(num_goodies > 0){
+                let goodies = getGoodieCollection();
+                for(let i=0; i<num_goodies; i++){
+                  chosen_seeds.push("!"+randomFromArray(goodies));
+                }
+              }
+            } else {
+              collection = getSeedCollection();
+              decorPaletteSeed = collection[Math.floor(Math.random() * collection.length)];
+              groundPaletteSeed = collection[Math.floor(Math.random() * collection.length)];
+              let goodies = getGoodieCollection();
+              collection.push(...goodies.map(function(x){ return "!"+x;}));
+              chosen_seeds = [decorPaletteSeed, groundPaletteSeed];
+              for(let i=0; i<num_plants; i++){
                 let chosen_seed = collection[Math.floor(Math.random() * collection.length)];
-                if(Math.random() > 0.75){
-                  chosen_seed += "%"+(Math.random()*100-0.1).toFixed(1).toString();
-                }
-                if(Math.random() > 0.75){
-                  chosen_seed += "<";
-                }
                 chosen_seeds.push(chosen_seed);
-            }
+              }
+            } 
+            chosen_seeds = chosen_seeds.map(apply_random_permutations_to_seed);
             document.getElementById("seed_list").value = chosen_seeds.join(", ");
             gm.clearAllButActive();
             let skyPalette = getRandomKeyFromObj(available_backgrounds);
@@ -177,7 +237,7 @@
             if(Math.random() < 0.25){
               await gm.makeDecorLayer(false, getRandomKeyFromObj(available_tileables), decorPaletteSeed);
             }
-            if(Math.random() < 0.40){
+            if(Math.random() < 0.60){
               await gm.makeCelestialLayer(false, "Stars", skyPalette);
             }
             await gm.makeCelestialLayer(false, "Sky_Gradient", skyPalette);
