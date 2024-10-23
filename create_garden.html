@@ -159,7 +159,7 @@
         }
 
         function apply_random_permutations_to_seed(seed){
-          if(Math.random() > 0.75){
+          if(Math.random() > 0.90){
             seed += "%"+(Math.random()*100-0.1).toFixed(1).toString();
           }
           if(Math.random() > 0.75){
@@ -180,7 +180,7 @@
             let choose_from = [];
             let chosen_seeds = [];
             let num_plants = Math.random() * (9 - 3) + 1;
-            let matchColors = Math.random() < 1;
+            let matchColors = Math.random() < 0.9;
             let decorPaletteSeed;
             let groundPaletteSeed;
             // Logic for "matchy" colors
@@ -217,15 +217,16 @@
             chosen_seeds = chosen_seeds.map(apply_random_permutations_to_seed);
             document.getElementById("seed_list").value = chosen_seeds.join(", ");
             gm.clearAllButActive();
-            if(Math.random() < 0.7){
+            if(Math.random() < 0.8){
               let skyPalette = getRandomKeyFromObj(available_backgrounds);
               gl.groundPaletteSeed = groundPaletteSeed;
-              if(Math.random() < 0.8){
+              if(Math.random() < 0.92){
                 await gm.makeCelestialLayer(false, "Fog", skyPalette, (Math.random()*0.5 + 0.2).toFixed(2)); 
               }
               if(Math.random() < 0.15){
-                 let secondGarden = new GardenLayer(da_canvas.width, da_canvas.height, 0, da_canvas.height/5, chosen_seeds.slice(0, chosen_seeds.length/2 << 0), groundPaletteSeed,
-                                                "grass [palette]", getRandomKeyFromObj(available_ground_base), 1);
+                let secondSeeds = chosen_seeds.slice(0, chosen_seeds.length/2 << 0);
+                let secondGarden = new GardenLayer(da_canvas.width, da_canvas.height, -32, da_canvas.height/10 << 0, secondSeeds.concat(secondSeeds).concat(secondSeeds), groundPaletteSeed,
+                                                   "grass [palette]", getRandomKeyFromObj(available_ground_base), 1.5);
                 let secondGardenDiv = new GardenLayerDiv(secondGarden, gm.get_id(), gm.updateCallback, gm.gardenToggleCallback);
                 await secondGarden.updateMain();
                 await secondGarden.updateGround();
