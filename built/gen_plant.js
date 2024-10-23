@@ -111,7 +111,6 @@ async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, c
     }
 }
 async function place_foliage(img_idx, ctx) {
-    await (await refs["foliage" + img_idx.toString()]).decode();
     ctx.drawImage(await refs["foliage" + img_idx.toString()], 0, 0);
 }
 async function preload_plants() {
@@ -138,19 +137,23 @@ function preload_single_image(url) {
            .then(response => response.blob())
            .then(blob => createImageBitmap(blob));*/
 }
-async function load_sprite_from_spritesheet(img, offset) {
-    let canvas = document.createElement("canvas");
-    canvas.width = 32;
-    canvas.height = 32;
-    let ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, 32, 32);
-    // All spritesheets are 10 wide, N tall
-    source_offset_y = Math.floor(offset / 10) * 32;
-    source_offset_x = (offset % 10) * 32;
-    ctx.drawImage(img, source_offset_x, source_offset_y, 32, 32, 0, 0, 32, 32);
-    let new_img = new Image;
-    new_img.src = canvas.toDataURL();
-    return new_img;
+function load_sprite_from_spritesheet(img, offset) {
+    return new Promise(resolve => {
+        const new_img = new Image();
+        new_img.onload = () => { resolve(new_img); };
+        new_img.onerror = function () { new_img.src = BAD_IMG_URL; };
+        let canvas = document.createElement("canvas");
+        canvas.width = 32;
+        canvas.height = 32;
+        let ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, 32, 32);
+        // All spritesheets are 10 wide, N tall
+        source_offset_y = Math.floor(offset / 10) * 32;
+        source_offset_x = (offset % 10) * 32;
+        ctx.drawImage(img, source_offset_x, source_offset_y, 32, 32, 0, 0, 32, 32);
+        new_img.src = canvas.toDataURL();
+    }).then(x => { x.decode(); return x; }, x => { console.log("Failed loading at offset " + offset); });
+    //new_img.decode();
 }
 async function preload_spritesheet(name, URL, count) {
     let img = await new Promise(resolve => {

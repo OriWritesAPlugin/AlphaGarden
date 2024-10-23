@@ -586,9 +586,14 @@
       });
     }
 
-    async function create_collection_entry(offset, seed, hide_seed, show_palette){
+    async function create_collection_entry(offset, seed, hide_seed, show_palette, premade_entry=null){
+      let entry;
+      if(premade_entry === null){
+        entry = document.createElement('div');
+      } else {
+        entry = premade_entry;
+      }
       var id = offset;
-      var entry = document.createElement('div');
       entry.id = id;
       entry.className = showcase_mode ? 'showcase_collection_box' : 'collection_box';
       entry.setAttribute('data-seed', seed);  // For access with onclick
@@ -636,8 +641,9 @@
 
     // Exists solely to smooth use of setTimeout.
     async function add_collection_entry(parent, offset, seed, hide_seed, show_palette){
-      child = await create_collection_entry(offset, seed, hide_seed, show_palette);
-      parent.appendChild(child);
+      placeholder_child = document.createElement("div");
+      parent.appendChild(placeholder_child);
+      await create_collection_entry(offset, seed, hide_seed, show_palette, placeholder_child);
     }
 
 
