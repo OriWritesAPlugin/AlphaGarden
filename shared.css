@@ -136,6 +136,15 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     outline: #806e4b;
 }
 
+#top_spacer{
+    opacity: 0;
+}
+
+#top_spacer:hover{
+    opacity: 1;
+    color: #DFC48C;
+}
+
 .dotted-fill-in {
     border: none;
     outline: none;

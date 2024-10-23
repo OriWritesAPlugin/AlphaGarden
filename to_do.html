@@ -344,6 +344,7 @@
       if(!setup_complete){return;}
       let reward_seed = document.getElementById(e.target.id+"_reward").getAttribute("data-seed");
       collectSeed(reward_seed);
+      document.getElementById("top_spacer").innerHTML += seed + ",";
       let bubble_palette = await samplePlantColor(reward_seed);
       for (let i = 0; i < 75; i++) {
         // We root them to a random location slightly below the bottom of the window
