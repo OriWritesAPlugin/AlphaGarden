@@ -190,7 +190,7 @@
                 canvas.height = 25;
                 canvas.background = "#FFFFFF";
         let ctx = canvas.getContext("2d");
-        if(secrets_mode || owned_palettes.has(palette_redirect)){
+        if(secrets_mode || owned_palettes.has(Number(palette_redirect))){
           for(let i=0; i<4; i++){
             ctx.fillStyle = "#"+palette[i];
             ctx.fillRect(25*i, 0, 25+25*i, 25);
