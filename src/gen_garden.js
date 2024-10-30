@@ -7,6 +7,7 @@ const available_backgrounds = {"custom": [],
                                "dusk": ["#424270", "#4c4a73", "#5b5577", "#6f617f", "#7f6d82", "#8f7887", "#a2828a", "#b7938e", "#c29b8d"],
                                "early evening":  ["#4f6f94", "#5a839e", "#6da3ad", "#7eb9b8", "#9ccdbd", "#afdac4", "#c1e4cc", "#d0edd5", "#e0f6e1"],
                                "forest murk": ["#fef4c9", "#8e9a7b", "#567654", "#1d2e22"],
+                               "lilac dawn": ["#b88fe5", "#e0a9eb", "#f0c0e7", "#f3d2e6", "#f8f6eb"],
                                "magically charged": ["#3c085c", "#571170", "#66167a", "#85238f", "#a2319e", "#c550a9", "#f487bc"],
                                "midday": ["#74a3c7", "#91c2e7", "#a8def6", "#b7e6fb", "#d5f2f8", "#ecfdfd"],
                                "night": ["#000304", "#000407", "#00070c", "#000910", "#010c14", "#02111d"],
@@ -18,7 +19,8 @@ const available_backgrounds = {"custom": [],
                                "shallow water": ["#29abbe", "#237d99", "#1b6380", "#145a70", "#0f5061", "#0c4b5a", "#09434e"],
                                "sickly": ["#3a392f", "#424134", "#4c4d3a", "#595b41", "#606345", "#6a704a", "#737d4d", "#78854f", "#809552"],
                                "soft sunset": ["#eb8d7c", "#ed9489", "#efa38f", "#f1b296", "#f5c8a3", "#f7d2a9", "#fae0b2", "#fff5c2",],
-                               "sunrise": ["#ffd0db", "#ffc7cd", "#fdc3bb", "#fcc8ae", "#fbcda8", "#fde795"]}
+                               "sunrise": ["#ffd0db", "#ffc7cd", "#fdc3bb", "#fcc8ae", "#fbcda8", "#fde795"],
+                               "sunset": ["#68267a", "#843681", "#9a4d7f", "#a86080", "#b47084", "#bd7f88", "#c58c8d", "#d1a49e", "#efe4d7"]}
 
 // TODO: merge available_ground into this once I do the UI refactor.
 const available_tileables = available_midgrounds;
