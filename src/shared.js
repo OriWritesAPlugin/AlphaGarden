@@ -616,7 +616,7 @@ async function draw_outline_v2(template_canvas){
           this_is_background = true;
       } else {
           this_is_background = false;
-          most_recent_color = [main_imgData[i] * 0.75, main_imgData[i+1] * 0.75, main_imgData[i+2] * 0.75, 255];
+          most_recent_color = [main_imgData[i] * 0.7, main_imgData[i+1] * 0.7, main_imgData[i+2] * 0.7, 255];
       }
       // Note: because our "pixels" are 2x2, this shouldn't cause troubles at the corners...I think
       if(last_was_background && !this_is_background){
