@@ -22,12 +22,14 @@
         <input type="button" class="chunky_wrap" value="Randomize" id="randomizer" title="Create a randomized garden using seeds from your collection" onClick="random_from_collection()">
         <!--<input type="button" class="chunky_wrap" value="Sync Sizes" onClick="sync_sizes()">   waiting until height -->
         <input type="button" class="chunky_wrap" value="Load" title="Load a garden from a text blob. You get that when you claim a garden." onClick="load()">
+        <label for="outline_check" value="Outline" title="Experimental: draw an outline to maybe increase contrast">Outline</label>
+        <input type="checkbox" id="outline_check" checked />
         <br><br>
         <div id=content_div>
             </br></br>
             <input type="button" class="chunky" value="&gt;&gt; Generate a garden!&lt;&lt;" onClick="doThisRegen()">
             </br></br>
-            <div id="output"><canvas id="output_canvas" width="450" height="90"></canvas></div>
+            <div id="output"><canvas id="output_canvas" width="450" height="80"></canvas></div>
             </br></br>
             <input type="button" class="chunky_wrap" value="Claim Garden" onClick="claim()">
         </div>
@@ -269,6 +271,7 @@
           alert("WARNING: No active garden layer! Click the star mark on one of the garden (green) layers. If you don't have any, click the green button in the top right.")
           return;
         }
+        gl.draw_outline = document.getElementById("outline_check").checked;
         await gm.setHeight(parseInt(document.getElementById("garden_height").value));
         gm.setWidth(parseInt(document.getElementById("garden_width").value));
         gm.setScale(parseFloat(document.getElementById("garden_scale").value));

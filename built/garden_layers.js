@@ -187,6 +187,7 @@ class GardenLayer extends Layer {
     groundPaletteSeed;
     groundCover;
     ground;
+    draw_outline;
     constructor(width, height, x_offset, y_offset, seedList, groundPaletteSeed, groundCover, ground, scale) {
         super(width, height, x_offset, y_offset, scale);
         this.seedList = seedList;
@@ -341,6 +342,12 @@ class GardenLayer extends Layer {
         for (let i = 0; i < this.content.length; i++) {
             await this.content[i].place(this.canvasGarden);
         }
+        if (this.draw_outline) {
+            await draw_outline_v2(this.canvasGarden);
+        }
+        //alert(this.canvasGarden.toDataURL());
+        //alert(this.canvasGarden.toDataURL());
+        //ctxGarden.drawImage(outline, 0, 0);
         this.update();
     }
     /** Update the contents of the ground canvas, grass/sand/stone/etc.**/

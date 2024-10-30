@@ -578,4 +578,108 @@ function getBase64(file) {
       }
       reader.readAsDataURL(file);
     })
+}
+
+// TODO: this was hastily-written. Really needs some cleanup
+// NOTE: only v2 because of a name collision in gen_garden.js. Can probably replace that with this...
+async function draw_outline_v2(template_canvas){
+  let ctx = template_canvas.getContext("2d");
+  let output_canvas = document.createElement("canvas");
+  output_canvas.width = template_canvas.width;
+  output_canvas.height = template_canvas.height;
+  let main_img = ctx.getImageData(0, 0, template_canvas.width, template_canvas.height);
+  let main_imgData = main_img.data;
+  // We go left to right, marking each position where we switch from background to non-background and vice versa
+  // we also get an additional pixel to the left or right to create a 2 pixel wide outline
+  let points_to_color = [];
+  // If no color is specified, we'll use the nearest (more or less) and darken it
+  let colors_to_use = [];
+  var outline_color;
+  // We try to be smart with transparent overlays; we search for a background color.
+  // We expect this loop to either die early or let us leave early
+  for (let i=0; i < main_imgData.length; i += 4) {
+      if ( main_imgData[i + 3] < 255 ) {
+          outline_color = [main_imgData[i], main_imgData[i+1], main_imgData[i+2], main_imgData[i+3]];
+          break;
+      }
   }
+  // If we didn't find any non-opaque pixels, we have nothing to outline.
+  if(outline_color == undefined){return;}
+  // Otherwise, we start the first proper loop, left to right.
+  let last_was_background = (main_imgData.slice(0,4).toString() == outline_color.toString());
+  let this_is_background;
+  let most_recent_color = [0, 0, 0];
+  for (let i=4; i < main_imgData.length; i += 4) {
+      // Preemptive optimization is the enemy of progress, and yet. And yet.
+      if ( main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] &&
+               main_imgData[i + 1] == outline_color[1] &&  main_imgData[i + 2] == outline_color[2])) {
+          this_is_background = true;
+      } else {
+          this_is_background = false;
+          most_recent_color = [main_imgData[i] * 0.75, main_imgData[i+1] * 0.75, main_imgData[i+2] * 0.75, 255];
+      }
+      // Note: because our "pixels" are 2x2, this shouldn't cause troubles at the corners...I think
+      if(last_was_background && !this_is_background){
+          points_to_color.push(i-4);
+          //points_to_color.push(i-8);
+          // NOTE: push twice due to double-thickness
+          // TODO: could we do this before the resize? Easy 4x efficiency
+          colors_to_use.push(most_recent_color);
+          //colors_to_use.push(most_recent_color);
+
+      } else if (this_is_background && !last_was_background){
+          points_to_color.push(i);
+          colors_to_use.push(most_recent_color);
+          //points_to_color.push(i+4);
+          //colors_to_use.push(most_recent_color);
+      }
+      last_was_background = this_is_background;
+  }
+  // Now we repeat, drawing our lines top to bottom.
+  last_was_background = (main_imgData.slice(0,4).toString() == outline_color.toString());
+  this_is_background = undefined;
+  for (let j=0; j < template_canvas.width; j ++) {
+      for (let k=0; k < template_canvas.height; k++){
+          // This is so, so silly...
+          if( j==0 && k==0 ){k=4};  // skip our first again.
+          // We use our loops to format us up so we look like the prior inner loop for easier troubleshooting.
+          // TODO: At this point, I think the remainder could be refactored into a function. Would be a lot cleaner.
+          let i = (j + k*template_canvas.width)*4;
+          if ( main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] &&
+               main_imgData[i + 1] == outline_color[1] &&  main_imgData[i + 2] == outline_color[2])) {
+              this_is_background = true;
+          } else {
+              this_is_background = false;
+              most_recent_color = [main_imgData[i] * 0.75, main_imgData[i+1] * 0.75, main_imgData[i+2] * 0.75, 255];
+          }
+          if(last_was_background && !this_is_background){
+              points_to_color.push(i-template_canvas.width*4);
+              //points_to_color.push(i-output_canvas.width*2*4);
+              colors_to_use.push(most_recent_color);
+              //colors_to_use.push(most_recent_color);
+          } else if (this_is_background && !last_was_background){
+              points_to_color.push(i);
+              //points_to_color.push(i+output_canvas.width*4);
+              colors_to_use.push(most_recent_color);
+              //colors_to_use.push(most_recent_color);
+          }
+          last_was_background = this_is_background;
+      }
+  }
+   // And now we apply the color!
+   // Note the reason we store points instead of coloring them in place is to avoid the top-down picking up the left-right
+   // we want that little "curve" on the pixel outlines.
+   for (let i=0; i<points_to_color.length; i++){
+       color_to_use = colors_to_use[i];
+       main_imgData[points_to_color[i]] = color_to_use[0];
+       main_imgData[points_to_color[i]+1] = color_to_use[1];
+       main_imgData[points_to_color[i]+2] = color_to_use[2];
+       main_imgData[points_to_color[i]+3] = color_to_use[3];
+  }
+  ctx.putImageData(main_img, 0, 0);
+  //alert(output_canvas.toDataURL());
+  //return output_canvas;
+}
+
+
+
