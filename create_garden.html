@@ -195,9 +195,10 @@
                   chosen_seeds.push(randomFromArray(choose_from));
                 }
               }
-              if((num_plants < 4 && Math.random() < 0.7) || (Math.random() < 0.1)){
-                chosen_seeds = chosen_seeds.concat(chosen_seeds);
-                if(Math.random() < 0.4){
+              if((num_plants < 5 && Math.random() < 0.5) || (Math.random() < 0.1)){
+                if(Math.random() < 0.3){
+                  chosen_seeds = chosen_seeds.concat(chosen_seeds).concat(chosen_seeds);
+                } else {
                   chosen_seeds = chosen_seeds.concat(chosen_seeds);
                 }
               }
