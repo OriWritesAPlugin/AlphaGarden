@@ -279,6 +279,7 @@
             "b": {"description": "2 'currencies' at once", "points": 100, "category": "lesser_fest", "full": "Get two different currencies (ex: broken arrow and shield) or themed food"},
             "c": {"description": "Currency >= enemies", "points": 100, "category": "lesser_fest", "full": "Get as much currency (or more) than there are enemies"},
         }};
+        // z is reserved for challenges specified in a loadable board
 
         const difficulties = {"normal": ["e","m"],
                               "harder": ["e","m", "m", "h"],
@@ -392,7 +393,7 @@
             let rewards=[];
             for(let i= size * size; i>0; i--){
                 if(i in plants_revealed_at){
-                    rewards[i] = reward_seeds.pop();
+                    rewards[i - 1] = reward_seeds.pop();
                 }
             }
             return [rewards, reward_seeds.pop()];
@@ -462,7 +463,8 @@
               rewards = [];
               for(let i= size * size; i>0; i--){
                 if(i in plants_revealed_at){
-                    rewards[i] = seed_override.pop();
+                    // Gotta be 0-indexed for legible save/load data...
+                    rewards[i - 1] = seed_override.pop();
                 }
               }
               bingo_reward = seed_override.pop();
@@ -550,8 +552,9 @@
                 num_plants_revealed ++;
                 // If we're loading a pre-generated bingo board, rewards are already in place
                 if(generate_rewards){
-                  if (rewards.hasOwnProperty(num_squares_revealed)){
-                      square_info['reward'] = {"type": "seed", "value": rewards[num_squares_revealed]};
+                  // Rewards are zero-indexed, so we have to adjust.
+                  if (rewards.hasOwnProperty(num_squares_revealed-1)){
+                      square_info['reward'] = {"type": "seed", "value": rewards[num_squares_revealed-1]};
                   } else {
                       square_info['reward'] = {"type": "seed", "value": await genSeedForSquare()};
                   }
@@ -606,7 +609,7 @@
           let seed_at = "-";
           let size = current_board.length;
           for(let i=num_squares_revealed+1; i<=size*size; i++){
-            if(i in plants_revealed_at_per_size[size]){
+            if(i in plants_revealed_at){
               seed_at = i-num_squares_revealed;
               break;
             }
@@ -638,7 +641,8 @@
                     bingo_plant_data_url = await drawPlantForSquare(bingo_reward);
                     revealed_seeds.push(bingo_reward);
                     document.getElementById("bingo_seed_list").innerHTML = revealed_seeds.join(", ");
-                    collectSeed(bingo_reward);
+                    // TODO: WHOA that's some jank--patch to avoid re-awarding bingo on page reload.
+                    if(!getSeedCollection().includes(bingo_reward)) {collectSeed(bingo_reward)};
                 }
                 target_div.style.background = 'url(' + bingo_plant_data_url + ')  no-repeat center center';
                 parent_div.style.display = "block";
@@ -718,6 +722,21 @@
             bingo_board["squares"] = minify_squares(current_board);
             bingo_board["rewards"] = rewards;
             bingo_board["bingo_reward"] = bingo_reward;
+            if(all_challenges.hasOwnProperty("z")){
+              // Make sure we're on a board that uses the on-load custom challenges, so
+              // they don't stick around forever
+              let uses_custom_onload = false;
+              for(let i=0; i<bingo_board["squares"].length; i++){
+                for(let j=0; j<bingo_board["squares"][i].length; j++){
+                  if(bingo_board["squares"][i][j][1].slice(0,1) == "z"){
+                    uses_custom_onload = true;
+                  }     
+                }      
+              }
+              if(uses_custom_onload){
+                bingo_board["custom_challenges"] = all_challenges["z"];
+              }
+            }
             return JSON.stringify(bingo_board);
         }
 
@@ -740,10 +759,21 @@
 
         function import_bingo(bingo_board) {
           clear_board();
+          if(bingo_board.hasOwnProperty("custom_challenges")){
+            all_challenges["z"] = bingo_board["custom_challenges"];
+          }
           current_board = deminify_squares(bingo_board["squares"]);
           rewards = bingo_board["rewards"];
           bingo_reward = bingo_board["bingo_reward"];
           size = bingo_board["squares"].length;
+          plants_revealed_at = {};
+          let num_revealed = 1;
+          for(let i = 0; i < size**2; i++){ 
+            if(rewards[i] != null){
+              plants_revealed_at[i+1] = num_revealed;
+              num_revealed ++;
+            }
+          }
           draw_board();
        }
 
@@ -832,15 +862,15 @@
            for(let i=0; i<to_deminify.length; i++){
                let deminified_row = [];
                for(let j=0; j<to_deminify[i].length; j++){
-               let deminned = {"earned": to_deminify[i][j][0],
-                               "challenge": to_deminify[i][j][1]};
-                   if(to_deminify[i][j].length > 2){
-                       deminned["reward"] = {"type":to_deminify[i][j][2],
-                                             "value": to_deminify[i][j][3]};
-                   } else {
-                       deminned["reward"] = {"type": "none"};
-                   }
-                   deminified_row.push(deminned);
+                let deminned = {"earned": to_deminify[i][j][0],
+                                "challenge": to_deminify[i][j][1]};
+                if(to_deminify[i][j].length > 2){
+                    deminned["reward"] = {"type":to_deminify[i][j][2],
+                                          "value": to_deminify[i][j][3]};
+                } else {
+                    deminned["reward"] = {"type": "none"};
+                }
+                deminified_row.push(deminned);
                }
                deminified_board.push(deminified_row);
            }
