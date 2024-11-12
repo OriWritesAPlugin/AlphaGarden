@@ -12,6 +12,7 @@ class LayerDiv {
     secondColor;
     accentColor;
     editButton;
+    hideButton;
     name;
     editMode = true;
     layer;
@@ -47,6 +48,7 @@ class LayerDiv {
         this.selfDiv.id = this.id;
         let decorDiv = this.buildGenericDiv(this.mainColor);
         this.editButton = this.buildEditButton();
+        this.hideButton = this.buildHideButton();
         let deleteButton = this.buildDeleteButton();
         this.editDiv = this.buildEditDiv();
         decorDiv.style.padding = "0vh";
@@ -55,6 +57,7 @@ class LayerDiv {
         this.selfDiv.appendChild(this.editButton);
         let namePlate = document.createElement("input");
         namePlate.value = this.id;
+        this.selfDiv.appendChild(this.hideButton);
         this.selfDiv.appendChild(namePlate);
         this.selfDiv.appendChild(deleteButton);
         decorDiv.appendChild(this.editDiv);
@@ -96,6 +99,12 @@ class LayerDiv {
         }
         this.editButton.classList.toggle('active');
     }
+    toggleVisibility() {
+        this.hideButton.classList.toggle('active');
+        this.layer.isVisible = !this.layer.isVisible;
+        this.hideButton.value = this.layer.isVisible ? "•" : "–";
+        this.onEditCallback();
+    }
     buildEditButton() {
         let editButton = document.createElement("input");
         editButton.type = "button";
@@ -105,6 +114,16 @@ class LayerDiv {
         editButton.addEventListener('click', this.toggleEditMode.bind(this));
         editButton.style.backgroundColor = this.accentColor;
         return editButton;
+    }
+    buildHideButton() {
+        let hideButton = document.createElement("input");
+        hideButton.type = "button";
+        hideButton.className = "chunky_wrap";
+        hideButton.value = "•";
+        hideButton.title = "show or hide layer";
+        hideButton.addEventListener('click', this.toggleVisibility.bind(this));
+        hideButton.style.backgroundColor = this.accentColor;
+        return hideButton;
     }
     buildDeleteButton() {
         let deleteButton = document.createElement("input");
@@ -645,7 +664,7 @@ class LayerManager {
         for (let i = this.layerHolderDiv.children.length; i > 0; i--) {
             // TODO: right now we just free the layer. Should propagate the deletion fully to the manager.
             let layerDivObj = this.divToLayerMapper[this.layerHolderDiv.children[i - 1].id];
-            if (layerDivObj.layer === undefined) {
+            if (layerDivObj.layer === undefined || !layerDivObj.layer.isVisible) {
                 continue;
             }
             layerDivObj.layer.place(this.foreCanvas, this.backCanvas);

@@ -41,6 +41,7 @@ abstract class Layer {
   height: number;
   isActive: boolean;  // We hold this, but the layer manager's the one that needs it. Only gardens can be active (for now?)
   scale: number;
+  isVisible: boolean;
 
   constructor(width: number, height:number, x_offset: number, y_offset: number, scale: number) {
     this.canvas = document.createElement("canvas");
@@ -52,6 +53,7 @@ abstract class Layer {
     this.height = height;
     this.isActive = false;
     this.scale = scale;
+    this.isVisible = true;
   }
 
   place_fore(place_onto_canvas: HTMLCanvasElement) {

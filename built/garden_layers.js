@@ -36,6 +36,7 @@ class Layer {
     height;
     isActive; // We hold this, but the layer manager's the one that needs it. Only gardens can be active (for now?)
     scale;
+    isVisible;
     constructor(width, height, x_offset, y_offset, scale) {
         this.canvas = document.createElement("canvas");
         this.canvas.width = width;
@@ -46,6 +47,7 @@ class Layer {
         this.height = height;
         this.isActive = false;
         this.scale = scale;
+        this.isVisible = true;
     }
     place_fore(place_onto_canvas) {
         let place_onto_ctx = place_onto_canvas.getContext("2d");
