@@ -235,6 +235,19 @@ const randomValueFromObject = (obj) => {
     var keys = Object.keys(obj);
     return obj[keys[keys.length * Math.random() << 0]];
 };
+const getMainPaletteFromSeed = (seed) => {
+    let data = decode_plant_data(seed);
+    main = FOLIAGE_SPRITE_DATA[data["foliage"]]["m"];
+    if (main == 0) {
+        return data["foliage_palette"];
+    }
+    else if (main == 1) {
+        return data["feature_palette"];
+    }
+    else {
+        return data["accent_palette"];
+    }
+};
 function get_overlay_color_from_name(color, alpha) {
     color = color.slice(1);
     if (available_overlay_colors.hasOwnProperty(color)) {

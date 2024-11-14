@@ -421,13 +421,17 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
    align-content: center;
 }
 
-.collection_display, #self_care_plant_selector, .todo_plant_selector_standard, .todo_plant_selector_minified {
+.collection_display, #self_care_plant_selector, .todo_plant_selector_standard, .todo_plant_selector_minified, #seed_positioning_grid_div {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(90px, max-content));
     width: 100%;
     margin: 2vh auto;
     justify-content: center;
     align-content: center;
+}
+
+#seed_positioning_grid_div {
+    justify-content: left;
 }
 
 .todo_plant_selector_standard {

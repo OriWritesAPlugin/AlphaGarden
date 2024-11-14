@@ -147,8 +147,20 @@ class GardenPlacedItem extends GardenItem {
         place_onto_ctx.imageSmoothingEnabled = false;
         place_onto_ctx.drawImage(await this.canvas, place_onto_canvas.width * this.offset, place_onto_canvas.height - 70, GARDEN_ITEM_SIZE * 2, GARDEN_ITEM_SIZE * 2);
     }
-    getSeed() {
-        return this.identity + "%" + (this.offset * 100).toFixed(2).toString() + (this.isFlipped ? "<" : "");
+    async flipCanvas() {
+        this.canvas = this.canvas.then((resolved_canvas) => {
+            let flip_canvas = document.createElement("canvas");
+            flip_canvas.width = resolved_canvas.width;
+            flip_canvas.height = resolved_canvas.height;
+            let ctx = flip_canvas.getContext("2d");
+            ctx.setTransform(-1, 0, 0, 1, resolved_canvas.width, 0);
+            ctx.drawImage(resolved_canvas, 0, 0);
+            return flip_canvas;
+        });
+    }
+    getSeed(force_position = true) {
+        let pos = force_position || this.offsetSpecified ? "%" + (this.offset * 100).toFixed(2).toString() : "";
+        return this.identity + pos + (this.isFlipped ? "<" : "");
     }
 }
 /**

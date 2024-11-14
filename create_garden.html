@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1"/>
     <head>
         <title>Garden [EG]</title>
         <link rel="stylesheet" type="text/css"  href="shared.css" />
@@ -24,6 +24,8 @@
         <input type="button" class="chunky_wrap" value="Load" title="Load a garden from a text blob. You get that when you claim a garden." onClick="load()">
         <label for="outline_check" value="Outline" title="Experimental: draw an outline to maybe increase contrast">Outline</label>
         <input type="checkbox" id="outline_check" checked />
+        <label for="freeze_check" value="freeze palette" title="Experimental: try to maintain main palette colors when hitting random">Freeze palette</label>
+        <input type="checkbox" id="freeze_check" />
         <br><br>
         <div id=content_div>
             </br></br>
@@ -33,8 +35,23 @@
             </br></br>
             <input type="button" class="chunky_wrap" value="Claim Garden" onClick="claim()">
         </div>
-        <div id=seed_display_div style="display: flex"></div>
-        <div id=seed_positioning_div></div>
+        <div id=seed_positioning_grid_div></div>
+        <div id=seed_positioning_menu_div style="display: none">
+          <span id="seed_positioning_desc"></span>
+          <div id="seed_positioning_display">
+            <canvas id="seed_positioning_canvas"></canvas>
+            <div id="seed_positioning_controls" style="display: inline-block">
+              <label for="seed_positioning_flip_check" value="flipped" title="Horizontally mirror this sprite">flip: </label>
+              <input type="checkbox" id="seed_positioning_flip_check" onclick="togglePositionFlipped()"/><br>
+              <label for="seed_positioning_position_mode" title="Choose how to pick seed's position">position: </label>
+              <input type="radio" id="seed_positioning_random" name="seed_positioning_position_mode" value="random position" onclick="togglePositionFixed()">
+              <label for="seed_positioning_random">random</label>
+              <input type="radio" id="seed_positioning_fixed" name="seed_positioning_position_mode" value="fixed position" onclick="togglePositionFixed()">
+              <label for="seed_positioning_fixed">fixed</label><br>
+              <input type="range" id="seed_positioning_offset" min="-10" max="100"/><br>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     </body>
@@ -59,6 +76,7 @@
       var randomizer_timeout_id;
       var collection = getSeedCollection();
       var goodies = getGoodieCollection();
+      var activeGardenItem;
       const max_from_random_palette = 6;
       const collection_by_main_color = function(){
         let by_color = {};
@@ -81,6 +99,8 @@
         }
         return by_color;
       }();
+      document.getElementById("seed_positioning_offset").onpointerup = setPositionFixed;
+      document.getElementById("freeze_check").checked = false;
 
 
       async function organizePlantsForRandomGarden(){
@@ -91,6 +111,7 @@
           await do_preload_initial();
           da_canvas = document.getElementById("output_canvas");
           gm = new LayerManager(da_canvas, document.getElementById("seed_list"));
+          gm.activeGardenChangedCallback = function(){gl = gm.activeGardenDiv.layer;}
           gm.toggleVisibility();
           gl = gm.activeGardenDiv.layer;
           document.getElementById("create_garden_organizer").appendChild(gm.selfDiv);
@@ -185,8 +206,17 @@
             let matchColors = Math.random() < 0.9;
             let decorPaletteSeed;
             let groundPaletteSeed;
+            let keep_last_palette = document.getElementById("freeze_check").checked && gl.content.length > 0;
             // Logic for "matchy" colors
-            if(matchColors){
+            if(keep_last_palette) {
+              let main; let data;
+              for(let i=0; i<gl.content.length; i++){
+                if(gl.content[i].identity.startsWith("!")){continue;}
+                chosen_seeds.push(randomFromArray(collection_by_main_color[getMainPaletteFromSeed(gl.content[i].identity)]));
+              }
+              decorPaletteSeed = gl.content.length > 1? gl.content[1].identity.replace(/(?:%[\d .]*)?<?/g,'') : gl.groundPaletteSeed;
+              groundPaletteSeed = gl.groundPaletteSeed;
+            } else if(matchColors){
               num_plants += Math.random() * 3;
               while(chosen_seeds.length < num_plants){
                 let choose_from = randomValueFromObject(collection_by_main_color);
@@ -204,25 +234,23 @@
               }
               decorPaletteSeed = chosen_seeds[0];
               groundPaletteSeed = chosen_seeds[1];
-              let num_goodies = (Math.random() * 7 - 4) << 0;
-              if(num_goodies > 0){
-                let goodies = getGoodieCollection();
-                for(let i=0; i<num_goodies; i++){
-                  chosen_seeds.push("!"+randomFromArray(goodies));
-                }
-              }
             } else {
               collection = getSeedCollection();
               decorPaletteSeed = collection[Math.floor(Math.random() * collection.length)];
               groundPaletteSeed = collection[Math.floor(Math.random() * collection.length)];
-              let goodies = getGoodieCollection();
-              collection.push(...goodies.map(function(x){ return "!"+x;}));
               chosen_seeds = [decorPaletteSeed, groundPaletteSeed];
               for(let i=0; i<num_plants; i++){
                 let chosen_seed = collection[Math.floor(Math.random() * collection.length)];
                 chosen_seeds.push(chosen_seed);
               }
-            } 
+            }
+            let num_goodies = (Math.random() * 7 - 4) << 0;
+            if(num_goodies > 0){
+              let goodies = getGoodieCollection();
+              for(let i=0; i<num_goodies; i++){
+                chosen_seeds.push("!"+randomFromArray(goodies));
+              }
+            }
             chosen_seeds = chosen_seeds.map(apply_random_permutations_to_seed);
             document.getElementById("seed_list").value = chosen_seeds.join(", ");
             gm.clearAllButActive();
@@ -283,7 +311,9 @@
         gm.setWidth(parseInt(document.getElementById("garden_width").value));
         gm.setScale(parseFloat(document.getElementById("garden_scale").value));
         gm.regenActiveGarden(document.getElementById("seed_list").value);
-        //rebuildPositionButtons(document.getElementById("seed_list").value);
+        activeGardenItem = gl.content[0];
+        rebuildPositionButtons();
+        showManipMenu();
       }
 
       function claim(){
@@ -296,41 +326,74 @@
         new_window.document.body.appendChild(garden_code);
       }
 
-      async function rebuildPositionButtons(seed_list){
-        let seeds = gm.parseSeedList(seed_list, ()=>{alert("Somehow reached the position buttons with an unset wildcard. Let the maintainer know!")});
+      async function rebuildPositionButtons(){
         var doSeedOnclick = ()=>{};
-        position_buttons = await Promise.all(seeds.map(async (seed, idx)=>{return create_manip_entry(offset, seed, false, false)}));
-        document.getElementById("seed_display_div").replaceChildren(...position_buttons);
+        position_buttons = await Promise.all(gl.content.map(async (gardenitem, idx)=>{return create_manip_entry(offset, gardenitem, false, false)}));
+        document.getElementById("seed_positioning_grid_div").replaceChildren(...position_buttons);
       }
 
-      async function showManipMenu(e){
-        let seed = e.target.getAttribute('data-seed');
+      function togglePositionFixed(){
+        let pos_fixed = document.getElementById('seed_positioning_fixed').checked;
+        activeGardenItem.offsetSpecified = pos_fixed;
+        document.getElementById("seed_positioning_offset").disabled = !pos_fixed;
+        document.getElementById("seed_list").value = gl.content.map((entry) => {return entry.getSeed(false)});
+      }
+
+      async function togglePositionFlipped(){
+        activeGardenItem.isFlipped = document.getElementById('seed_positioning_flip_check').checked;
+        activeGardenItem.flipCanvas();
+        await gl.updateMain();
+        gm.redraw();
+        document.getElementById("seed_list").value = gl.content.map((entry) => {return entry.getSeed(false)});
+      }
+
+      async function setPositionFixed(){
+        activeGardenItem.offset = document.getElementById("seed_positioning_offset").value / 100;
+        await gl.updateMain();
+        gm.redraw();
+        document.getElementById("seed_list").value = gl.content.map((entry) => {return entry.getSeed(false)});
+      }
+
+      async function showManipMenu(){
+        let seed = activeGardenItem.identity;
+        let cleaned_seed = seed.replace(/(?:%[\d .]*)?<?/g,'');
         let item = gl.makeGardenItem(seed);
-        let div = document.createElement("div");
+        let raw_plant_data = decode_plant_data(cleaned_seed);
+        let plant_data = parse_plant_data(raw_plant_data);
+
+        // Draw infobox
+        let info_canvas;
+        if(seed.startsWith("!")){
+          document.getElementById("seed_positioning_desc").innerHTML = cleaned_seed;
+          info_canvas = gen_named(seed.slice(1));
+        } else {
+          document.getElementById("seed_positioning_desc").innerHTML = seed + ", " + all_foliage[plant_data["foliage"]]["name"] + ", " + buildColorMessage(raw_plant_data, false);
+          info_canvas = gen_plant(raw_plant_data, true);
+        }
         let canvas = document.createElement("canvas");
-        let scaleCanvas = document.createElement("canvas");
+        let scaleCanvas = document.getElementById("seed_positioning_canvas");
         ctx = canvas.getContext("2d");
-        canvas.width = 64; canvas.height = 64;
         scaleCtx = scaleCanvas.getContext("2d");
         scaleCanvas.width = 128; scaleCanvas.height = 128;
-        let draw_callback = async ()=>{ctx.clearRect(0, 0, 64, 64); scaleCtx.clearRect(0, 0, 128, 128); await item.place(canvas); scaleCtx.imageSmoothingEnabled = false; scaleCtx.drawImage(canvas, 0, 0, 128, 128)}
+        let draw_callback = async ()=>{ctx.clearRect(0, 0, 64, 64); scaleCtx.clearRect(0, 0, 128, 128); canvas = await info_canvas; scaleCtx.imageSmoothingEnabled = false; scaleCtx.drawImage(canvas, 0, 0, 128, 128)}
         await draw_callback();
-        div.appendChild(scaleCanvas);
-        let position = document.createElement("input");
-        position.type = "range"; position.min = -10; position.max = 100; value = item.position;
-        div.appendChild(position);
-        let makeBasicButton = (symbol) => {};
-        let upwards = 
-        document.getElementById("seed_positioning_div").replaceChildren(div);
+
+        // Draw controls
+        document.getElementById("seed_positioning_offset").value = activeGardenItem.offset*100;
+        document.getElementById("seed_positioning_flip_check").checked = activeGardenItem.isFlipped;
+        document.getElementById("seed_positioning_fixed").checked = activeGardenItem.offsetSpecified;
+        // html radiobutton jank
+        document.getElementById("seed_positioning_random").checked = !activeGardenItem.offsetSpecified;
+        document.getElementById("seed_positioning_offset").disabled = !activeGardenItem.offsetSpecified;
+        document.getElementById("seed_positioning_menu_div").style.display = "inline-block";
       }
 
-      async function create_manip_entry(offset, seed, hide_seed, show_palette){
+      async function create_manip_entry(offset, gardenitem, hide_seed, show_palette){
         let id = "manip_select_" + offset;
         let entry = document.createElement('div');
         entry.id = id;
         entry.className = 'collection_box';
-        entry.setAttribute('data-seed', seed);  // For access with onclick
-        entry.onclick = showManipMenu;
+        entry.onclick = function(e){ activeGardenItem = gardenitem; showManipMenu(e)};
         var scale_canvas = document.createElement("canvas");
         let final_size = 64;
         scale_canvas.width = final_size + 2;
@@ -338,7 +401,7 @@
         var scale_ctx = scale_canvas.getContext("2d");
         scale_ctx.imageSmoothingEnabled = false;
         // Strip any positional info
-        seed = seed.replace(/(?:%[\d .]*)?<?/g,'');
+        seed = gardenitem.identity.replace(/(?:%[\d .]*)?<?/g,'');
         if(seed.startsWith("!")){
           normalization_canvas = await gen_named(seed.slice(1));
           scale_ctx.drawImage(normalization_canvas, 0, 0, final_size, final_size);

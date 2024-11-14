@@ -465,6 +465,7 @@ class LayerManager {
   scale = 1;
   updateCallback: Function;
   gardenToggleCallback: Function;
+  activeGardenChangedCallback: Function;  // Optional callback for alerting other UI elements to active garden changes
   activeGardenSeeds: HTMLTextAreaElement;
   isVisible = false;
   divToLayerMapper = {};  // Associates div IDs to the layer they represent
@@ -492,6 +493,7 @@ class LayerManager {
     this.activeGardenSeeds = activeGardenSeeds;
     this.updateCallback = this.redraw.bind(this);
     this.gardenToggleCallback = this.swapActiveGarden.bind(this);
+    this.activeGardenChangedCallback = function(){};
     this.selfDiv.appendChild(this.buildLayerButton("garden", this.makeGardenLayer));
     this.selfDiv.appendChild(this.buildLayerButton("decor", this.makeDecorLayer));
     this.selfDiv.appendChild(this.buildLayerButton("celestial", this.makeCelestialLayer));
@@ -693,6 +695,7 @@ class LayerManager {
       if(oldActiveGarden){
         oldActiveGarden.unsetActiveGarden();
       }
+      this.activeGardenChangedCallback();
     }
   }
 
