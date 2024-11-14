@@ -26,6 +26,8 @@
         <input type="checkbox" id="outline_check" checked />
         <label for="freeze_check" value="freeze palette" title="Experimental: try to maintain main palette colors when hitting random">Freeze palette</label>
         <input type="checkbox" id="freeze_check" />
+        <label for="freeze_bg_check" value="freeze background" title="Experimental: don't randomize the background">Freeze background</label>
+        <input type="checkbox" id="freeze_bg_check" />
         <br><br>
         <div id=content_div>
             </br></br>
@@ -253,6 +255,10 @@
             }
             chosen_seeds = chosen_seeds.map(apply_random_permutations_to_seed);
             document.getElementById("seed_list").value = chosen_seeds.join(", ");
+            if(document.getElementById("freeze_bg_check").checked){
+              doThisRegen();
+              return;
+            }
             gm.clearAllButActive();
             if(Math.random() < 0.8){
               let skyPalette = getRandomKeyFromObj(available_backgrounds);
