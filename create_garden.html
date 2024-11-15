@@ -11,7 +11,7 @@
       <div style="width: 100%">
         <a href="./" class="index_link"><--Home</a>
         <h1 id="title">Endless Garden Creator</h1>
-        <h2 id="subtitle">This is the updated garden creator tool. Tell me how it goes!</h2>
+        <h2 id="subtitle">This is the updated garden creator tool. Check out the <a href=https://www1.flightrising.com/forums/cc/3159765/1#post_57883467>tutorial</a>!</h2>
         </br>
         <label for="seed_list">Seed list (comma-separated):</label><br>
         <textarea id="seed_list" name="seed_list" size="4" placeholder="Click here and paste!"></textarea><br>
@@ -123,8 +123,12 @@
           // We need to pre-prime the ground canvas, since it and the seed list update independently
           await gl.updateGround();
           await gm.redraw();
-          ready_to_random = true;
-          random_from_collection();
+          // I'd like to do SOMETHING to indicate how to initially use the tool, but without it being obnoxious
+          // for returning users.
+          /*if(!document.getElementById("seed_list").value){
+            document.getElementById("randomizer").classList.add("hint_glow");
+            setTimeout(function(){document.getElementById("randomizer").classList.remove("hint_glow")}, 1000);
+          }*/
         }
         do_stuff();
 
