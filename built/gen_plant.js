@@ -498,3 +498,10 @@ function shuffleArray(arr) {
         [arr[i], arr[j]] = [arr[j], arr[i]];
     }
 }
+// Adds a color palette to an existing canvas; mostly useful for the gardenitems.
+async function add_color_key(canvas, plant_data) {
+    let work_ctx = canvas.getContext("2d", { willReadFrequently: true });
+    await place_foliage(160, work_ctx);
+    let new_overall_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);
+    replace_color_palette(overall_palette, new_overall_palette, work_ctx);
+}

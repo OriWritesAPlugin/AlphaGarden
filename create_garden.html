@@ -39,10 +39,10 @@
         </div>
         <div id=seed_positioning_grid_div></div>
         <div id=seed_positioning_menu_div style="display: none">
-          <span id="seed_positioning_desc"></span>
           <div id="seed_positioning_display">
             <canvas id="seed_positioning_canvas"></canvas>
             <div id="seed_positioning_controls" style="display: inline-block">
+              <span id="seed_positioning_desc"></span><br>
               <label for="seed_positioning_flip_check" value="flipped" title="Horizontally mirror this sprite">flip: </label>
               <input type="checkbox" id="seed_positioning_flip_check" onclick="togglePositionFlipped()"/><br>
               <label for="seed_positioning_position_mode" title="Choose how to pick seed's position">position: </label>
@@ -50,7 +50,7 @@
               <label for="seed_positioning_random">random</label>
               <input type="radio" id="seed_positioning_fixed" name="seed_positioning_position_mode" value="fixed position" onclick="togglePositionFixed()">
               <label for="seed_positioning_fixed">fixed</label><br>
-              <input type="range" id="seed_positioning_offset" min="-10" max="100"/><br>
+              <input type="range" id="seed_positioning_offset" min="-10" max="100" style="width: 100%"/><br>
             </div>
           </div>
         </div>
@@ -343,6 +343,7 @@
         activeGardenItem.offsetSpecified = pos_fixed;
         document.getElementById("seed_positioning_offset").disabled = !pos_fixed;
         document.getElementById("seed_list").value = gl.content.map((entry) => {return entry.getSeed(false)});
+        showManipMenu();
       }
 
       async function togglePositionFlipped(){
@@ -351,6 +352,7 @@
         await gl.updateMain();
         gm.redraw();
         document.getElementById("seed_list").value = gl.content.map((entry) => {return entry.getSeed(false)});
+        showManipMenu();
       }
 
       async function setPositionFixed(){
@@ -358,6 +360,7 @@
         await gl.updateMain();
         gm.redraw();
         document.getElementById("seed_list").value = gl.content.map((entry) => {return entry.getSeed(false)});
+        showManipMenu();
       }
 
       async function showManipMenu(){
@@ -368,20 +371,20 @@
         let plant_data = parse_plant_data(raw_plant_data);
 
         // Draw infobox
+        let scaleCanvas = document.getElementById("seed_positioning_canvas");
         let info_canvas;
         if(seed.startsWith("!")){
-          document.getElementById("seed_positioning_desc").innerHTML = cleaned_seed;
+          document.getElementById("seed_positioning_desc").innerHTML = activeGardenItem.getSeed() + "<br>";
           info_canvas = gen_named(seed.slice(1));
         } else {
-          document.getElementById("seed_positioning_desc").innerHTML = seed + ", " + all_foliage[plant_data["foliage"]]["name"] + ", " + buildColorMessage(raw_plant_data, false);
-          info_canvas = gen_plant(raw_plant_data, true);
+          document.getElementById("seed_positioning_desc").innerHTML = activeGardenItem.getSeed() + ", " + all_foliage[plant_data["foliage"]]["name"] + "<br>" + buildColorMessage(raw_plant_data, false);
+          // Feels early for an await given draw_callback below.
+          info_canvas = cloneCanvas(await activeGardenItem.canvas);
+          await add_color_key(info_canvas, plant_data);
         }
-        let canvas = document.createElement("canvas");
-        let scaleCanvas = document.getElementById("seed_positioning_canvas");
-        ctx = canvas.getContext("2d");
         scaleCtx = scaleCanvas.getContext("2d");
         scaleCanvas.width = 128; scaleCanvas.height = 128;
-        let draw_callback = async ()=>{ctx.clearRect(0, 0, 64, 64); scaleCtx.clearRect(0, 0, 128, 128); canvas = await info_canvas; scaleCtx.imageSmoothingEnabled = false; scaleCtx.drawImage(canvas, 0, 0, 128, 128)}
+        let draw_callback = async ()=>{scaleCtx.clearRect(0, 0, 128, 128); scaleCtx.imageSmoothingEnabled = false; scaleCtx.drawImage(await info_canvas, 0, 0, 128, 128)}
         await draw_callback();
 
         // Draw controls
@@ -416,8 +419,8 @@
           alert("You seem to have a malformed seed! Seeds are 10 characters long, but got \""+seed+"\". Skipping!");
         }
         else {
-          var plant_canvas = await gen_plant(decode_plant_data(seed), show_palette); // Maybe I should just scale the plants up in gen_plant...
-          scale_ctx.drawImage(plant_canvas, 0, 0, final_size, final_size);
+          //var plant_canvas = await gardenitem.canvas;
+          scale_ctx.drawImage(await gardenitem.canvas, 0, 0, final_size, final_size);
         }}
         entry.style.background = 'url(' + scale_canvas.toDataURL() + ')  no-repeat bottom center';
         return entry;

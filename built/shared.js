@@ -643,3 +643,11 @@ async function draw_outline_v2(template_canvas) {
     //alert(output_canvas.toDataURL());
     //return output_canvas;
 }
+function cloneCanvas(orig) {
+    let clone = document.createElement('canvas');
+    let clone_ctx = clone.getContext('2d');
+    clone.width = orig.width;
+    clone.height = orig.height;
+    clone_ctx.drawImage(orig, 0, 0);
+    return clone;
+}

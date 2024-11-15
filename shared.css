@@ -432,6 +432,7 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
 
 #seed_positioning_grid_div {
     justify-content: left;
+    margin: 0vh auto;
 }
 
 .todo_plant_selector_standard {
@@ -548,7 +549,7 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     grid-template-columns: repeat(auto-fit, minmax(112px, max-content));
 }
 
-.garden_util_box, .garden_util_box_fixed {
+.garden_util_box, .garden_util_box_fixed, #seed_positioning_display {
     align-items: center;
     justify-content: center;
     flex-direction:column;
@@ -556,6 +557,14 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     border-color: #DFC48C;
     border-style: dashed;
     border-width: thin;
+}
+
+#seed_positioning_display {
+    text-align: left;
+    padding-right: 20px;
+}
+
+.garden_util_box, .garden_util_box_fixed {
     padding: 20px;
 }
 

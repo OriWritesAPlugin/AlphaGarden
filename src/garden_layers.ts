@@ -169,10 +169,11 @@ class GardenPlacedItem extends GardenItem{
     this.isFlipped = isFlipped;
   }
 
-  async place(place_onto_canvas: HTMLCanvasElement){
+  async place(place_onto_canvas: HTMLCanvasElement, use_offset=true){
     let place_onto_ctx = place_onto_canvas.getContext("2d");
+    let acting_offset = use_offset? this.offset : 1
     place_onto_ctx.imageSmoothingEnabled = false;
-    place_onto_ctx.drawImage(await this.canvas, place_onto_canvas.width*this.offset, place_onto_canvas.height-70, GARDEN_ITEM_SIZE*2, GARDEN_ITEM_SIZE*2);
+    place_onto_ctx.drawImage(await this.canvas, place_onto_canvas.width*acting_offset, place_onto_canvas.height-70, GARDEN_ITEM_SIZE*2, GARDEN_ITEM_SIZE*2);
   }
 
   async flipCanvas(){

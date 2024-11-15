@@ -352,6 +352,7 @@ Base64 = (function () {
     };
 })();
 
+
 async function gen_plant(plant_data, with_color_key=false) {
     // Returns the image data for a generated plant
     // First we check cache
@@ -532,4 +533,12 @@ function shuffleArray(arr) {
     const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
+}
+
+// Adds a color palette to an existing canvas; mostly useful for the gardenitems.
+async function add_color_key(canvas, plant_data){
+    let work_ctx = canvas.getContext("2d", { willReadFrequently: true });
+    await place_foliage(160, work_ctx);
+    let new_overall_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);
+    replace_color_palette(overall_palette, new_overall_palette, work_ctx);
 }
