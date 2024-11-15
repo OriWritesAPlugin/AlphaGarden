@@ -113,7 +113,7 @@
           await do_preload_initial();
           da_canvas = document.getElementById("output_canvas");
           gm = new LayerManager(da_canvas, document.getElementById("seed_list"));
-          gm.activeGardenChangedCallback = function(){gl = gm.activeGardenDiv.layer;}
+          gm.activeGardenChangedCallback = function(){gl = gm.activeGardenDiv.layer; rebuildPositionButtons();}
           gm.toggleVisibility();
           gl = gm.activeGardenDiv.layer;
           document.getElementById("create_garden_organizer").appendChild(gm.selfDiv);
@@ -317,9 +317,7 @@
         gm.setWidth(parseInt(document.getElementById("garden_width").value));
         gm.setScale(parseFloat(document.getElementById("garden_scale").value));
         gm.regenActiveGarden(document.getElementById("seed_list").value);
-        activeGardenItem = gl.content[0];
         rebuildPositionButtons();
-        showManipMenu();
       }
 
       function claim(){
@@ -336,6 +334,8 @@
         var doSeedOnclick = ()=>{};
         position_buttons = await Promise.all(gl.content.map(async (gardenitem, idx)=>{return create_manip_entry(offset, gardenitem, false, false)}));
         document.getElementById("seed_positioning_grid_div").replaceChildren(...position_buttons);
+        activeGardenItem = gl.content[0];
+        showManipMenu();
       }
 
       function togglePositionFixed(){
