@@ -565,7 +565,7 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
 }
 
 .garden_util_box, .garden_util_box_fixed {
-    padding: 20px;
+    padding: 0.5em;
 }
 
 .garden_util_box_fixed {

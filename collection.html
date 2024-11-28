@@ -12,24 +12,17 @@
         <h1 id="title">Your Collection</h1>
         <div id=content_div style="padding: 0px;">
             <div id="collection_horiz_div", class="collection_row">
-              <div id=seed_collection_display_container_spacer class=garden_util_box style="width:20%; min-width: 100px; border-width: 0px"></div>
-                <div id=seed_info_div class=garden_util_box_fixed style="text-align: left; left: 0.5%">
+              <div id=seed_collection_display_spacer class=garden_util_box style="width:20%; min-width: 100px; border-width: 0px"></div>
+                <div id=seed_collection_display_container class=garden_util_box_fixed style="text-align: left; left: 0.5%">
                   <input type="button" class="chunky_fullwidth" value="Sort/Refresh" onClick="doFilter()">
                   <h3>Sort By</h2>
-                  <input type="radio" id="none_opt" name="sort_order" value="None" checked>
-                  <label for="none_opt">Chronological</label><br>
-                  <input type="radio" id="main" name="sort_order" value="alphabetical">
-                  <label for="main">Alphabetical</label><br>
-                  <input type="radio" id="base" name="sort_order" value="foliage">
-                  <label for="base">Base</label><br>
-                  <input type="radio" id="foliage" name="sort_order" value="foliage_palette">
-                  <label for="foliage">Foliage Palette</label><br>
-                  <input type="radio" id="feature" name="sort_order" value="feature_palette">
-                  <label for="feature">Feature Palette</label><br>
-                  <input type="radio" id="accent" name="sort_order" value="accent_palette">
-                  <label for="accent">Accent Palette</label><br>
-                  <input type="radio" id="main" name="sort_order" value="main_palette">
-                  <label for="main">Main Palette</label>
+                  <input type="radio" id="none_opt" name="sort_order" value="None" checked><label for="none_opt">Age</label><br>
+                  <input type="radio" id="main" name="sort_order" value="alphabetical"><label for="main">Seed</label><br>
+                  <input type="radio" id="base" name="sort_order" value="foliage"><label for="base">Base</label><br>
+                  <input type="radio" id="foliage" name="sort_order" value="foliage_palette"><label for="foliage">Foliage Palette</label><br>
+                  <input type="radio" id="feature" name="sort_order" value="feature_palette"><label for="feature">Feature Palette</label><br>
+                  <input type="radio" id="accent" name="sort_order" value="accent_palette"><label for="accent">Accent Palette</label><br>
+                  <input type="radio" id="main" name="sort_order" value="main_palette"><label for="main">Main Palette</label>
                   <h3>Show Seeds of Type</h2>
                   <div id="base_sort_categories_div"></div>
                   <h3>With Colors</h2>
@@ -50,7 +43,12 @@
                   <input id="showcase_display" type="checkbox">
                   <label for="showcase_display" class="unselectable">Showcase Mode</label>
                 </div>
-              <div id=seed_collection_display_container class=garden_util_box style="width:60%; border: none">
+              <div id=seed_collection_display_container class=garden_util_box style="border: none; display: flex; flex-grow: 100">
+                <div style="display: block">
+                  <a href='javascript:toggleSideMenu("left");' id="toggle_left_menu" title="Toggle the visibility of the sort/display menu"><< hide filters</a>
+                  <span> || </span>
+                  <a href='javascript:toggleSideMenu("right");' id="toggle_right_menu" title="Toggle the visibility of the seed interactions menu">hide utilities >></a><br><br>
+                </div>
                   <span id="seedstuff_tally" title="Convert unwanted seeds to raw seedstuff using the Recycle option">Current raw seedstuff: 0</span>
                   <input type="text" id="seed_collection" name="seed_collection" size="4" placeholder="Click here and paste!", style="width: 95%; margin: 5px;">
                   <input type="button" class="chunky_wrap" value="Add seeds" onClick="display_collection()">
@@ -147,6 +145,24 @@
       function checkIfRefreshNeeded(){
         if(getSeedCollectionAsString().slice(0, 50) != first_chunk_on_last_sort){
           display_collection();
+        }
+      }
+
+      function toggleSideMenu(side="left"){
+        let targets = ["toggle_left_menu", "seed_collection_display_spacer", "seed_collection_display_container"];
+        if(side=="right"){
+          targets = ["toggle_right_menu", "seed_collection_utility_spacer", "seed_collection_utility_container"]
+        }
+        let clicked = document.getElementById(targets[0]);
+        let state = side == "left"? clicked.innerText.slice(3,7) : clicked.innerText.slice(0,4);
+        let new_state = state == "hide" ? "show" : "hide";
+        clicked.innerText = side == "left" ? clicked.innerText.slice(0,3) + new_state + clicked.innerText.slice(7) : new_state + clicked.innerText.slice(4);
+        if(state == "hide"){
+          document.getElementById(targets[1]).style.display = "none";
+          document.getElementById(targets[2]).style.display = "none";
+        } else {
+          document.getElementById(targets[1]).style.display = "block";
+          document.getElementById(targets[2]).style.display = "block";     
         }
       }
 
