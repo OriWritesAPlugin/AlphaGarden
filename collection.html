@@ -18,6 +18,8 @@
                   <h3>Sort By</h2>
                   <input type="radio" id="none_opt" name="sort_order" value="None" checked>
                   <label for="none_opt">Chronological</label><br>
+                  <input type="radio" id="main" name="sort_order" value="alphabetical">
+                  <label for="main">Alphabetical</label><br>
                   <input type="radio" id="base" name="sort_order" value="foliage">
                   <label for="base">Base</label><br>
                   <input type="radio" id="foliage" name="sort_order" value="foliage_palette">
@@ -575,6 +577,7 @@
 
       let lookup_redirect = document.getElementById("rainbow_palettes").checked && sort_key != "foliage" ? x => rainbow_offset[x] : x => x;
       if(sort_key == "None") { return collection; };
+      if(sort_key == "alphabetical") { return collection.sort(); };
       if(sort_key == "main_palette") {
         return collection.sort(function(a, b) {
           // Look up the base in FOLIAGE_SPRITE_DATA and grab which palette is the main (majority pixels) palette
