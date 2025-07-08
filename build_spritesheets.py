@@ -5,8 +5,9 @@ import math
 import os
 import requests
 import subprocess  # used to run pngcrush
+from collections import defaultdict
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 SPRITES_PER_ROW = 10
 SPRITE_DIMENSION = 32  # ex: 32 x 32 px. Also sounds refreshing, too sweet for me though.
@@ -25,6 +26,20 @@ def to_rgb(hex):
 base_foliage_palette = set(to_rgb(x) for x in ["#aed740", "#76c935", "#50aa37", "#2f902b"])
 base_accent_palette = set(to_rgb(x) for x in ["fef4cc", "fde47b", "ffd430", "ecb600"])
 base_feature_palette = set(to_rgb(x) for x in ["f3addd", "d87fbc", "c059a0", "aa3384"])
+
+accursed_color_lookup = defaultdict(lambda: defaultdict(dict))
+hex_codes = ["#aed740", "#76c935", "#50aa37", "#2f902b",
+            # accent
+            "fef4cc", "fde47b", "ffd430", "ecb600",
+            # feature
+            "f3addd", "d87fbc", "c059a0", "aa3384",
+            # complex, simple, 25%alphaglow, 10%alphaglow
+            "ff943a", "e900ff", "c8ffb7", "9fe389"
+            ]
+custom_colors = {}
+for idx, code in enumerate(hex_codes):
+    rgb_tuple = to_rgb(code)
+    accursed_color_lookup[rgb_tuple[0]][rgb_tuple[1]][rgb_tuple[2]] = chr(idx + 65)
 
 def extract_json_from_js_var(var_name):
     with open(DATA_FILE, "r") as f:
@@ -55,25 +70,48 @@ def assemble_spritesheet_from_list(var_name):
         y_offset = (math.floor(idx / SPRITES_PER_ROW)) * SPRITE_DIMENSION
         response = requests.get(sprite_info["source"], headers= {"user-agent": "curl/8.1.1", "accept": "*/*"})
         sprite = Image.open(io.BytesIO(response.content)).convert('RGBA')
+        if(sprite.size[0] > 90):
+            print(f"Missing image? {sprite_info["name"]}")
+            sprite = Image.new("RGBA", (10, 10))
+            rect = ImageDraw.Draw(sprite)  
+            rect.rectangle([(1, 1), (9, 9)], fill ="#aed740", outline ="#fde47b")
         # For some godforsaken reason I didn't always standardize my filesizes, so we gotta do some dancing
         width, height = sprite.size
         bounding_box = sprite.getbbox()
+        uses_custom_colors=False
         if(bounding_box is None):
             sprite_calc_info.append({"w": width, "h": height, "wc": width/2, "m": 0})
         else:
-            left, upper, right, _ = sprite.getbbox()
+            left, upper, right, bottom = sprite.getbbox()
             counts = {0: 0, 1: 0, 2:0}
-            for pixel in sprite.getdata():
+            data = ""
+            bbox_sprite = sprite.crop(bounding_box)
+            for idx, pixel in enumerate(bbox_sprite.getdata()):
+                if pixel[3] < 40:
+                    data += '0'
+                elif pixel[0] in accursed_color_lookup and pixel[1] in accursed_color_lookup[pixel[0]] and pixel[2] in accursed_color_lookup[pixel[0]][pixel[1]]:
+                    data += accursed_color_lookup[pixel[0]][pixel[1]][pixel[2]]
+                elif pixel[0] == 255 and pixel[1] == 255 and pixel[2] == 255:
+                    data += '1'  # is reserved for hard white, a common "custom" color
+                else:
+                    #char_code = chr(97 + len(custom_colors.keys()))
+                    #accursed_color_lookup[pixel[0]][pixel[1]][pixel[2]] = char_code
+                    #hex_codes.append("cust")
+                    #custom_colors[char_code] = (pixel[0], pixel[1], pixel[2])
+                    #data += char_code
+                    data += 'X'
+                    uses_custom_colors = True
                 if pixel[:3] in base_foliage_palette:
                     counts[0] += 1
                 elif pixel[:3] in base_feature_palette:
                     counts[1] += 1
                 elif pixel[:3] in base_accent_palette:
                     counts[2] += 1
-            sprite_calc_info.append({"w": right - left, "h": height-upper, "wc": (right + left)/2 + left, "m": max(counts, key=counts.get)})
+            sprite_calc_info.append({"w":right - left, "h": height-upper, "wc": (right + left)/2 + left, "l": height-bottom, "m": max(counts, key=counts.get), "e": data, "x": int(uses_custom_colors)})
         spritesheet.paste(sprite, (x_offset + (SPRITE_DIMENSION - width)//2, y_offset + (SPRITE_DIMENSION - height)))
     spritesheet.save(f"{OUTPATH}/{var_name}-uncrushed.png")
-    subprocess.run([os.path.expanduser("~/misc_tools/pngcrush/pngcrush"), f"{OUTPATH}/{var_name}-uncrushed.png", f"{OUTPATH}/{var_name}.png"])
+    print(custom_colors)
+    subprocess.run([os.path.expanduser("~/misc_tools/pngcrush/pngcrush/pngcrush"), f"{OUTPATH}/{var_name}-uncrushed.png", f"{OUTPATH}/{var_name}.png"])
     # Base64 encode and embed into files
     encoded = base64.b64encode(io.BytesIO(open(f"{OUTPATH}/{var_name}-uncrushed.png", "rb").read()).getvalue()).decode("utf-8")
     indexed_base64_val = base64.b64encode(io.BytesIO(open(f"{OUTPATH}/{var_name}.png", "rb").read()).getvalue()).decode("utf-8")

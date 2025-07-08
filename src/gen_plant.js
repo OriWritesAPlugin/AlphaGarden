@@ -6,7 +6,7 @@ const base_accent_palette = ["fef4cc", "fde47b", "ffd430", "ecb600"];
 const base_feature_palette = ["f3addd", "d87fbc", "c059a0", "aa3384"];
 const overall_palette = base_foliage_palette.concat(base_accent_palette).concat(base_feature_palette);
 
-var work_canvas_size = 32;  // in pixels
+const work_canvas_size = 32 // in pixels
 
 // A pixel of these colors indicates we should place the corresponding feature type
 const place_complex_feature = "ff943a";
@@ -194,7 +194,10 @@ async function preload_spritesheet(name, URL, count){
     return img.decode().then(x => {
     offset = 0
     while(offset < count){
-        refs[name+offset.toString()] = load_sprite_from_spritesheet(img, offset);
+        // We now only need to load sprites that use custom colors
+        if(FOLIAGE_SPRITE_DATA[offset]['x']){
+            refs[name+offset.toString()] = load_sprite_from_spritesheet(img, offset);
+        }
         offset ++;
     }});
 }
@@ -244,8 +247,8 @@ function parse_plant_data(plant_data){
         return parse_plant_data(ERROR_PLANT);
     }
     return {"foliage": plant_data["foliage"],
-            "simple_feature": "feature"+plant_data["simple_feature"],
-            "complex_feature": "feature"+plant_data["complex_feature"],
+            "simple_feature": plant_data["simple_feature"],
+            "complex_feature": plant_data["complex_feature"],
             "foliage_palette": all_palettes[plant_data["foliage_palette"]]["palette"],
             "feature_palette": all_palettes[plant_data["feature_palette"]]["palette"],
             "accent_palette": all_palettes[plant_data["accent_palette"]]["palette"]}
@@ -367,51 +370,55 @@ async function gen_plant(plant_data, with_color_key=false) {
     if(with_color_key){
         await place_foliage(160, work_ctx);  // Place I AM ERROR, actually the palette display sprite
     }
-    await place_foliage(plant_data["foliage"], work_ctx);
+    // We use the old method for any sprite that uses custom colors (the vast majority do not)
+    if(!FOLIAGE_SPRITE_DATA[plant_data["foliage"]]["x"]){
+        return draw_plant_with_color_palette(plant_data);
+    } else {
+        await place_foliage(plant_data["foliage"], work_ctx);
+        // Figure out where to put each kind of feature, replacing marker pixels as we go
+        let marker_coords = getSpecialMarkers(work_ctx);
 
-    // Figure out where to put each kind of feature, replacing marker pixels as we go
-    let marker_coords = getSpecialMarkers(work_ctx);
+        if(marker_coords[place_simple_feature].length > 0 || marker_coords[place_complex_feature].length > 0){
+            cachable = false;
+            replace_color_palette([place_simple_feature, place_complex_feature], [base_foliage_palette[1], base_foliage_palette[1]], work_ctx);
+            // Place the features
+            if(marker_coords[place_simple_feature].length > 0){
+                var place_simple = await place_image_at_coords_with_chance("feature"+plant_data["simple_feature"], marker_coords[place_simple_feature], work_ctx, 0.5);
+            }
+            if(marker_coords[place_complex_feature].length > 0){
+                /* Chance that if there's already simple flowers, we keep using that flower
+                if(simple_flower_coords.length == 0 || Math.random()>0.5){
+                    flower_url = complex_flowers[Math.floor(Math.random()*complex_flowers.length)];
+                } else {*/
+                var place_complex = await place_image_at_coords_with_chance("feature"+plant_data["complex_feature"], marker_coords[place_complex_feature], work_ctx, 0.8, true);
+            }
+            replace_color_palette([place_25a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.25*255);
+            replace_color_palette([place_10a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.10*255);
+        } else {  // If we place a feature above, we do the below no matter what, hence the else.
+            if(marker_coords[place_25a_accent].length > 0){
+                replace_color_palette([place_25a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.35*255);
+            }
+            if(marker_coords[place_10a_accent].length > 0){
+                replace_color_palette([place_10a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.15*255);
+            }
 
-    if(marker_coords[place_simple_feature].length > 0 || marker_coords[place_complex_feature].length > 0){
-        cachable = false;
-        replace_color_palette([place_simple_feature, place_complex_feature], [base_foliage_palette[1], base_foliage_palette[1]], work_ctx);
-        // Place the features
-        if(marker_coords[place_simple_feature].length > 0){
-            var place_simple = await place_image_at_coords_with_chance(plant_data["simple_feature"], marker_coords[place_simple_feature], work_ctx, 0.5);
-        }
-        if(marker_coords[place_complex_feature].length > 0){
-            /* Chance that if there's already simple flowers, we keep using that flower
-            if(simple_flower_coords.length == 0 || Math.random()>0.5){
-                flower_url = complex_flowers[Math.floor(Math.random()*complex_flowers.length)];
-            } else {*/
-            var place_complex = await place_image_at_coords_with_chance(plant_data["complex_feature"], marker_coords[place_complex_feature], work_ctx, 0.8, true);
-        }
-        replace_color_palette([place_25a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.25*255);
-        replace_color_palette([place_10a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.10*255);
-    } else {  // If we place a feature above, we do the below no matter what, hence the else.
-        if(marker_coords[place_25a_accent].length > 0){
-            replace_color_palette([place_25a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.35*255);
-        }
-        if(marker_coords[place_10a_accent].length > 0){
-            replace_color_palette([place_10a_accent], [plant_data["accent_palette"][0]], work_ctx, work_canvas_size, work_canvas_size, 0.15*255);
         }
 
+        // We do all the recolors at once because Speed?(TM)?
+        var new_overall_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);
+        replace_color_palette(overall_palette, new_overall_palette, work_ctx);
+        if(cachable){
+            let keys = Object.keys(plant_cache);
+            if(keys.length < plant_cache_max_size){
+                plant_cache[seed] = work_canvas;
+            } else {
+                delete plant_cache[keys[ keys.length * Math.random() << 0]];
+                plant_cache[seed] = work_canvas;
+            }
+        }
+        // We can draw a canvas directly on another canvas
+        return work_canvas;
     }
-
-    // We do all the recolors at once because Speed?(TM)?
-    var new_overall_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);
-    replace_color_palette(overall_palette, new_overall_palette, work_ctx);
-    if(cachable){
-        let keys = Object.keys(plant_cache);
-        if(keys.length < plant_cache_max_size){
-            plant_cache[seed] = work_canvas;
-        } else {
-            delete plant_cache[keys[ keys.length * Math.random() << 0]];
-            plant_cache[seed] = work_canvas;
-        }
-    }
-    // We can draw a canvas directly on another canvas
-    return work_canvas;
 }
 
 async function gen_named(name){
@@ -491,6 +498,65 @@ function replace_color_palette(old_palette, new_palette, ctx, work_canvas_width=
       }
     // put the data back on the canvas
     ctx.putImageData(imageData,0,0);
+}
+
+// Get hype for COORDINATE MATH
+function get_absolute_offset(inner_offset, offset_data){
+    // First line is x pos: offset within the row plus however far we need to shift in to center. Second is y: number of rows finished plus rows from top
+    let x_coord = inner_offset % offset_data["w"] + Math.floor((work_canvas_size - offset_data["w"])/2);
+    let y_coord = Math.floor(inner_offset / offset_data["w"]) + (work_canvas_size - offset_data["h"]);
+    return 4*(x_coord + y_coord*work_canvas_size);
+}
+
+// A 12-color palette. We're about to get a little wacky with it.
+function draw_plant_with_color_palette(plant_data){
+    const plant_num = plant_data["foliage"];
+    const raw_data = FOLIAGE_SPRITE_DATA[plant_num]['e'];
+    const hex_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);
+    let canvas = document.createElement("canvas");
+    canvas.width = work_canvas_size;
+    canvas.height = work_canvas_size;
+    let ctx = canvas.getContext("2d");
+    let imageData = ctx.getImageData(0, 0, work_canvas_size, work_canvas_size);
+    const palette = hex_palette.map(hexToRgb);
+    imageData = draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, FOLIAGE_SPRITE_DATA[plant_num], palette);
+    ctx.putImageData(imageData,0,0);
+    return canvas;
+}
+
+function draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, offset_data, palette, initial_offset=0){
+    let i = 0;
+    let raw_data = offset_data['e'];
+    while (i < raw_data.length) {
+        let pos = initial_offset + get_absolute_offset(i, offset_data);
+        let char = raw_data.charCodeAt(i);
+        i ++;
+        if(char == 48 || imageData.data[pos]){continue;} // 0, an empty pixel, or we already drew something with the subpart system
+        // 1, a hard white pixel
+        if(char == 49){imageData.data[pos]  = 255; imageData.data[pos+1]  = 255; imageData.data[pos+2]  = 255; imageData.data[pos+3]  = 255;}
+        // Our 12 colors, also a common case
+        else if(char > 64 && char < 77){
+            imageData.data[pos]  = palette[char - 65][0];
+            imageData.data[pos+1] = palette[char - 65][1];
+            imageData.data[pos+2] = palette[char - 65][2];
+            imageData.data[pos+3] = 255;
+        } else if(char == 77 || char == 78){
+            char == 77? (addon_num = plant_data["complex_feature"], chance = 0.8) : (addon_num = plant_data["simple_feature"], chance = 0.4);
+            if(chance < Math.random()){continue;}
+            let mini_data = ADDON_SPRITE_DATA[addon_num];
+            let centerpoint = work_canvas_size*work_canvas_size + Math.floor((work_canvas_size-mini_data["w"])/2) - work_canvas_size + Math.floor(mini_data["w"]/2);
+            draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, ADDON_SPRITE_DATA[addon_num], palette,  pos-4*centerpoint);
+        } else if(char == 79 || char == 80){
+            imageData.data[pos]  = palette[4][0];
+            imageData.data[pos+1] = palette[4][1];
+            imageData.data[pos+2] = palette[4][2];
+            imageData.data[pos+3] = char == 80? 25 : 60;         
+        }
+    }
+    /*for(let j=0; j<imageData.data.length; j++){
+        if(j%4 != 3){imageData.data[j] = 90} else {imageData.data[j] = 100};
+    }*/
+    return imageData;
 }
 
 // Build a "lookup tree" (implemented as a nested obj) used for checking if some pixel exists in a set of palettes.
