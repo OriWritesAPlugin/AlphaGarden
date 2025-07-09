@@ -27,7 +27,6 @@ base_foliage_palette = set(to_rgb(x) for x in ["#aed740", "#76c935", "#50aa37", 
 base_accent_palette = set(to_rgb(x) for x in ["fef4cc", "fde47b", "ffd430", "ecb600"])
 base_feature_palette = set(to_rgb(x) for x in ["f3addd", "d87fbc", "c059a0", "aa3384"])
 
-accursed_color_lookup = defaultdict(lambda: defaultdict(dict))
 hex_codes = ["#aed740", "#76c935", "#50aa37", "#2f902b",
             # accent
             "fef4cc", "fde47b", "ffd430", "ecb600",
@@ -37,9 +36,15 @@ hex_codes = ["#aed740", "#76c935", "#50aa37", "#2f902b",
             "ff943a", "e900ff", "c8ffb7", "9fe389"
             ]
 custom_colors = {}
-for idx, code in enumerate(hex_codes):
-    rgb_tuple = to_rgb(code)
-    accursed_color_lookup[rgb_tuple[0]][rgb_tuple[1]][rgb_tuple[2]] = chr(idx + 65)
+
+def create_accursed_lookup(make_empty=False):
+    accursed_color_lookup = defaultdict(lambda: defaultdict(dict))
+    if make_empty:
+        return accursed_color_lookup
+    for idx, code in enumerate(hex_codes):
+        rgb_tuple = to_rgb(code)
+        accursed_color_lookup[rgb_tuple[0]][rgb_tuple[1]][rgb_tuple[2]] = chr(idx + 65)
+    return accursed_color_lookup
 
 def extract_json_from_js_var(var_name):
     with open(DATA_FILE, "r") as f:
@@ -54,7 +59,9 @@ def extract_json_from_js_var(var_name):
             json_string += line
     formatted = json.loads(json_string)
     # One of them is weird because it's much easier to have it as a dict in js
-    if var_name in ("reformatted_named", "available_ground_base"):
+    if var_name == "reformatted_named":
+        return[dict(name=x, **y) for x,y in formatted.items()]
+    if var_name == "available_ground_base":
         return [y for y in formatted.values()]
     return formatted        
 
@@ -63,6 +70,8 @@ def assemble_spritesheet_from_list(var_name):
     num_rows = math.ceil(len(json_list)/SPRITES_PER_ROW)
     spritesheet = Image.new("RGBA",(SPRITES_PER_ROW * SPRITE_DIMENSION, num_rows * SPRITE_DIMENSION))
     sprite_calc_info = []
+    last_used_custom_colors=False
+    accursed_color_lookup = create_accursed_lookup()
     for idx, sprite_info in enumerate(json_list):
         if idx % 10 == 0:
             print(f"Finished {idx} of {var_name}")
@@ -75,10 +84,13 @@ def assemble_spritesheet_from_list(var_name):
             sprite = Image.new("RGBA", (10, 10))
             rect = ImageDraw.Draw(sprite)  
             rect.rectangle([(1, 1), (9, 9)], fill ="#aed740", outline ="#fde47b")
-        # For some godforsaken reason I didn't always standardize my filesizes, so we gotta do some dancing
         width, height = sprite.size
         bounding_box = sprite.getbbox()
-        uses_custom_colors=False
+        if last_used_custom_colors:
+            accursed_color_lookup = create_accursed_lookup(var_name == "reformatted_named")
+        custom_colors = {}
+        last_used_custom_colors = False
+        last_used_sub_elements = False
         if(bounding_box is None):
             sprite_calc_info.append({"w": width, "h": height, "wc": width/2, "m": 0})
         else:
@@ -94,23 +106,30 @@ def assemble_spritesheet_from_list(var_name):
                 elif pixel[0] == 255 and pixel[1] == 255 and pixel[2] == 255:
                     data += '1'  # is reserved for hard white, a common "custom" color
                 else:
-                    #char_code = chr(97 + len(custom_colors.keys()))
-                    #accursed_color_lookup[pixel[0]][pixel[1]][pixel[2]] = char_code
-                    #hex_codes.append("cust")
-                    #custom_colors[char_code] = (pixel[0], pixel[1], pixel[2])
-                    #data += char_code
-                    data += 'X'
-                    uses_custom_colors = True
+                    if var_name == "reformatted_named":
+                        if len(custom_colors.keys()) < 26:
+                            char_code = chr(65 + len(custom_colors.keys()))
+                        else:
+                            char_code = chr((97-26) + len(custom_colors.keys()))
+                    else:
+                        char_code = chr(97 + len(custom_colors.keys()))
+                    accursed_color_lookup[pixel[0]][pixel[1]][pixel[2]] = char_code
+                    custom_colors[char_code] = [pixel[0], pixel[1], pixel[2], pixel[3]]
+                    data += char_code
+                    last_used_custom_colors = True
+                if(data[-1] == 'M' or data[-1] == 'N'):
+                    last_used_sub_elements = True
                 if pixel[:3] in base_foliage_palette:
                     counts[0] += 1
                 elif pixel[:3] in base_feature_palette:
                     counts[1] += 1
                 elif pixel[:3] in base_accent_palette:
                     counts[2] += 1
-            sprite_calc_info.append({"w":right - left, "h": height-upper, "wc": (right + left)/2 + left, "l": height-bottom, "m": max(counts, key=counts.get), "e": data, "x": int(uses_custom_colors)})
+            if(len(custom_colors.keys()) > 50):
+                print(f"{sprite_info["name"]} used {len(custom_colors.keys())} colors")
+            sprite_calc_info.append({"w":right - left, "h": height-upper, "wc": (right + left)/2 + left, "l": height-bottom, "m": max(counts, key=counts.get), "e": data, "x": custom_colors, "s": int(last_used_custom_colors)})
         spritesheet.paste(sprite, (x_offset + (SPRITE_DIMENSION - width)//2, y_offset + (SPRITE_DIMENSION - height)))
     spritesheet.save(f"{OUTPATH}/{var_name}-uncrushed.png")
-    print(custom_colors)
     subprocess.run([os.path.expanduser("~/misc_tools/pngcrush/pngcrush/pngcrush"), f"{OUTPATH}/{var_name}-uncrushed.png", f"{OUTPATH}/{var_name}.png"])
     # Base64 encode and embed into files
     encoded = base64.b64encode(io.BytesIO(open(f"{OUTPATH}/{var_name}-uncrushed.png", "rb").read()).getvalue()).decode("utf-8")
