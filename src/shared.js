@@ -1,6 +1,7 @@
 // Contains general utility functions used by multiple pages.
 // Modified version of the Okabe-Ito colorblind palette, replacing black with white due to dark website background
 const OFFSET_COLORS = ["#FFFFFF", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999"]
+var wildcard_canvases = {};
 
 // Stolen from https://stackoverflow.com/questions/17386707/how-to-check-if-a-canvas-is-blank
 // returns true if every pixel's uint32 representation is 0 (or "blank")
@@ -445,8 +446,9 @@ async function resize_for_garden(name_of_image, sourceURL){
     wildcard_ctx.drawImage(temp_img, 0, 32-temp_img.naturalHeight*(32/max_side),
                            temp_img.naturalWidth*(32/max_side),
                            temp_img.naturalHeight*(32/max_side));
-    let resized_dataURL = wildcard_canvas.toDataURL(temp_img.type);
-    refs[refURL] = await preload_single_image(resized_dataURL);
+    //let resized_dataURL = wildcard_canvas.toDataURL(temp_img.type);
+    //refs[refURL] = await preload_single_image(resized_dataURL);
+    wildcard_canvases[name_of_image] = wildcard_canvas;
     let preview_canvas = document.createElement("canvas");
     let preview_context = preview_canvas.getContext("2d");
     preview_canvas.width = 64;

@@ -413,12 +413,13 @@ function gen_plant(plant_data, with_color_key=false, with_scale=1) {
     }
 }
 
-async function gen_named(name){
+function gen_named(name){
     let work_canvas = document.createElement("canvas");
     let work_ctx = work_canvas.getContext("2d");
     work_canvas.width = work_canvas_size;
     work_canvas.height = work_canvas_size;
-    place_image_at_coords_with_chance("named"+reformatted_named[name]["offset"], [[Math.floor(work_canvas_size/2), work_canvas_size-1]], work_ctx, 1, true);
+    let imageData = draw_arbitrary_onto_imageData_without_color_palette(work_ctx.getImageData(0, 0, work_canvas_size, work_canvas_size), NAMED_SPRITE_DATA[reformatted_named[name]["offset"]], true, 0)
+    work_ctx.putImageData(imageData,0,0);
     return work_canvas;
 }
 
@@ -510,6 +511,7 @@ function get_absolute_offset(inner_offset, offset_data, center_factor){
     return 4*(x_coord + y_coord*work_canvas_size);
 }
 
+// Basically, draw plants
 function draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, offset_data, palette, center, initial_offset=0){
     let i = 0;
     let raw_data = offset_data['e'];
@@ -538,6 +540,29 @@ function draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data,
             imageData.data[pos+2] = palette[4][2];
             imageData.data[pos+3] = char == 80? 25 : 60;         
         } else {
+            let char = raw_data.charAt(i);
+            imageData.data[pos] = offset_data['x'][char][0];
+            imageData.data[pos+1] = offset_data['x'][char][1];
+            imageData.data[pos+2] = offset_data['x'][char][2];
+            imageData.data[pos+3] = offset_data['x'][char][3];
+        }
+        i ++;
+    }
+    return imageData;
+}
+
+// Basically, draw named components (perhaps this should go in shared but it's near identical to the above)
+function draw_arbitrary_onto_imageData_without_color_palette(imageData, offset_data, center, initial_offset=0){
+    let i = 0;
+    let raw_data = offset_data['e'];
+    let x_center = center? Math.floor((work_canvas_size - offset_data["w"])/2) : 0;
+    while (i < raw_data.length) {
+        let pos = initial_offset + get_absolute_offset(i, offset_data, x_center);
+        let char = raw_data.charCodeAt(i);
+        if(char == 48 || imageData.data[pos]){} // 0, an empty pixel, or we already drew something with the subpart system
+        // 1, a hard white pixel
+        else if(char == 49){imageData.data[pos]  = 255; imageData.data[pos+1]  = 255; imageData.data[pos+2]  = 255; imageData.data[pos+3]  = 255;}
+        else {
             let char = raw_data.charAt(i);
             imageData.data[pos] = offset_data['x'][char][0];
             imageData.data[pos+1] = offset_data['x'][char][1];

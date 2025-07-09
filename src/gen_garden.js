@@ -553,15 +553,13 @@ function set_ground_selection(opt){
     current_ground = opt;
 }
 
-async function get_canvas_for_named_component(name){
-    // TODO: This is hideous and terrible but I am very tired and wanted to write something before bed
-    var work_canvas = document.createElement("canvas");
-    var work_ctx=work_canvas.getContext("2d");
-    work_canvas.width = work_canvas_size;
-    work_canvas.height = work_canvas_size;
-    name = name.startsWith("*")? name+"_wildcard_data_url" : "named" + reformatted_named[name]["offset"];
-    place_image_at_coords_with_chance(name, [[Math.floor(work_canvas_size/2), work_canvas_size-1]], work_ctx, 1, true);
-    return work_canvas;
+function get_canvas_for_named_component(name){
+    // The great de-async-ening definitely breaks wildcards.
+    if(name.startsWith("*")){
+        console.log(wildcard_canvases[name]);
+        return wildcard_canvases[name];
+    }
+    return gen_named(name);
 }
 
 function get_rgb_from_overlay_name(color){

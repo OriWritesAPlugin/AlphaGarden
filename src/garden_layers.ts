@@ -156,11 +156,11 @@ mind when you think "thing to put in a garden".
 class GardenPlacedItem extends GardenItem{
   offset: number;  // fraction of the way across the canvas to put it. .7 = 70%, near the right
   offsetSpecified: Boolean;  // Whether the offset was provided by the user (so don't scramble it!)
-  canvas: Promise<HTMLCanvasElement>;
+  canvas: HTMLCanvasElement;
   heightCategory: GardenItemHeightCategory;
   isFlipped: Boolean;
   constructor(identity: string, type:GardenItemType, offset: number,
-              canvas: Promise<HTMLCanvasElement>, height: GardenItemHeightCategory, offsetSpecified: Boolean, isFlipped: Boolean) {
+              canvas: HTMLCanvasElement, height: GardenItemHeightCategory, offsetSpecified: Boolean, isFlipped: Boolean) {
     super(identity, type);
     this.offset = offset;
     this.canvas = canvas;
@@ -169,22 +169,21 @@ class GardenPlacedItem extends GardenItem{
     this.isFlipped = isFlipped;
   }
 
-  async place(place_onto_canvas: HTMLCanvasElement, use_offset=true){
+  place(place_onto_canvas: HTMLCanvasElement, use_offset=true){
     let place_onto_ctx = place_onto_canvas.getContext("2d");
     let acting_offset = use_offset? this.offset : 1
     place_onto_ctx.imageSmoothingEnabled = false;
-    place_onto_ctx.drawImage(await this.canvas, place_onto_canvas.width*acting_offset, place_onto_canvas.height-70, GARDEN_ITEM_SIZE*2, GARDEN_ITEM_SIZE*2);
+    place_onto_ctx.drawImage(this.canvas, place_onto_canvas.width*acting_offset, place_onto_canvas.height-70, GARDEN_ITEM_SIZE*2, GARDEN_ITEM_SIZE*2);
   }
 
   async flipCanvas(){
-    this.canvas = this.canvas.then((resolved_canvas) => {
     let flip_canvas = document.createElement("canvas")
-    flip_canvas.width = resolved_canvas.width;
-    flip_canvas.height = resolved_canvas.height;
+    flip_canvas.width = flip_canvas.width;
+    flip_canvas.height = flip_canvas.height;
     let ctx = flip_canvas.getContext("2d");
-    ctx.setTransform(-1,0,0,1,resolved_canvas.width, 0);
-    ctx.drawImage(resolved_canvas, 0,0);
-    return flip_canvas;});
+    ctx.setTransform(-1,0,0,1,flip_canvas.width, 0);
+    ctx.drawImage(flip_canvas, 0,0);
+    return flip_canvas;
   }
 
   getSeed(force_position = true){
@@ -307,7 +306,7 @@ class GardenLayer extends Layer{
   /** Create a GardenItem from an entry in the seed list (like #blue or GawR7as64e%50) **/
   makeGardenItem(identity: string){
     let type: GardenItemType;
-    let canvas: Promise<HTMLCanvasElement>;
+    let canvas: HTMLCanvasElement;
     let height;
     let canvas_func: Function;
     let percent_pos = identity.indexOf('%');
@@ -341,18 +340,16 @@ class GardenLayer extends Layer{
       canvas_func = get_canvas_for_plant;
     }
 
-    canvas = canvas_func(identity).then((resolved_canvas) => {
-      if(is_flipped){
-        let flip_canvas = document.createElement("canvas")
-        flip_canvas.width = resolved_canvas.width;
-        flip_canvas.height = resolved_canvas.height;
-        let ctx = flip_canvas.getContext("2d");
-        ctx.setTransform(-1,0,0,1,resolved_canvas.width, 0);
-        ctx.drawImage(resolved_canvas, 0,0);
-        return flip_canvas;
-      }
-      return resolved_canvas;
-    });
+    canvas = canvas_func(identity);
+    if(is_flipped){
+      let flip_canvas = document.createElement("canvas")
+      flip_canvas.width = canvas.width;
+      flip_canvas.height = canvas.height;
+      let ctx = flip_canvas.getContext("2d");
+      ctx.setTransform(-1,0,0,1, canvas.width, 0);
+      ctx.drawImage( canvas, 0,0);
+      canvas = flip_canvas;
+    }
 
     if(percent_pos == null){ percent_val = Math.random(); }
     return new GardenPlacedItem(type == GardenItemType.Catalog? "!"+identity : identity, type, percent_val, canvas, height, custom_pos, is_flipped);
@@ -385,13 +382,13 @@ class GardenLayer extends Layer{
   }
 
   /** Update the contents of the main canvas, which holds all the plants. **/
-  async updateMain(){
+  updateMain(){
     var ctxGarden = this.canvasGarden.getContext("2d");
     ctxGarden.clearRect(0, 0, this.canvasGarden.width, this.canvasGarden.height);
     for(let i=0; i<this.content.length; i++){
-      await this.content[i].place(this.canvasGarden);
+      this.content[i].place(this.canvasGarden);
     }
-    if(this.draw_outline){await draw_outline_v2(this.canvasGarden);}
+    if(this.draw_outline){draw_outline_v2(this.canvasGarden);}
     //alert(this.canvasGarden.toDataURL());
     //alert(this.canvasGarden.toDataURL());
     //ctxGarden.drawImage(outline, 0, 0);

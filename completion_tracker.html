@@ -155,7 +155,7 @@
         }
 
 
-        async function gen_palette_divs() {
+        function gen_palette_divs() {
           let parent = document.getElementById("palette_content_div");
           parent.innerHTML = '';
           for(category of Object.keys(palettes_by_category)){
@@ -176,7 +176,7 @@
         }
 
 
-        async function gen_goodie_divs() {
+        function gen_goodie_divs() {
           goodieCollection = new Set(getGoodieCollection());
           let parent = document.getElementById("goodie_content_div");
           parent.innerHTML = '';
@@ -250,14 +250,14 @@
         }
 
         // Largely similar to bingo squares
-        async function add_goodie_square(parent, name){
+        function add_goodie_square(parent, name){
             let goodie_square = document.createElement('div');
             goodie_square.id = name+"_goodie_square";
             goodie_square.className = 'swap_box';
             goodie_square.style.display = "inline";  // to align the label
             goodie_square.style.borderStyle = "none";
             goodie_square.style.marginBottom = "5px;"
-            let work_canvas = await gen_named(name);
+            let work_canvas = gen_named(name);
             let canvas = document.createElement("canvas");
             canvas.width = 96;
             canvas.height = 96;
@@ -272,7 +272,7 @@
             parent.appendChild(goodie_square);
         }
 
-        async function setGoodieDisplay(goodie_name){
+        function setGoodieDisplay(goodie_name){
           info = reformatted_named[goodie_name];
           document.getElementById("goodie_name").innerHTML = "Name: " + goodie_name;
           document.getElementById("goodie_artist").innerHTML = "Artist: " + info["artist"];
@@ -299,7 +299,7 @@
             document.getElementById("goodie_claim_button").style.opacity = 1;
             document.getElementById("goodie_claim_button").onclick = claim_selected_goodie;
           }
-          let work_canvas = await gen_named(goodie_name);
+          let work_canvas = gen_named(goodie_name);
           let canvas = document.getElementById("goodie_canvas");
           canvas.width = 128;
           canvas.height = 128;
@@ -339,8 +339,8 @@
           }
         }
 
-        async function do_preload() {         
-          await preload_named().then( x=> (gen_base_divs()));
+        function do_preload() {         
+          gen_base_divs();
           document.getElementById("load_text").remove();
         }
 
