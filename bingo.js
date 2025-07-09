@@ -496,7 +496,7 @@
         // Reveal a plant in a square (either within the board or the "bonus bingo plant"
         // Handles the work of generating the plant itself and adding the seed to the pile.
         // Returns a dataURL to set as an image someplace.
-        async function genSeedForSquare(forced_random_offset=0){
+        function genSeedForSquare(forced_random_offset=0){
             rarity = plant_rarity_lookup[current_difficulty][num_plants_revealed];
             if(forced_random_seed == null){
                 plant_data = gen_plant_data(rarity);
@@ -507,7 +507,7 @@
             return encode_plant_data_v2(plant_data);
         }
 
-        async function toggle_status(e, generate_rewards=true){
+        function toggle_status(e, generate_rewards=true){
             var id = e.target.id;
             coords = id.split("_");
             var row = parseInt(coords[0]);
@@ -527,7 +527,7 @@
                   if (rewards.hasOwnProperty(num_squares_revealed)){
                       square_info['reward'] = {"type": "seed", "value": rewards[num_squares_revealed]};
                   } else {
-                      square_info['reward'] = {"type": "seed", "value": await genSeedForSquare()};
+                      square_info['reward'] = {"type": "seed", "value": genSeedForSquare()};
                   }
                   revealed_seeds.push(square_info['reward']["value"]);
                   document.getElementById("seed_list").innerHTML = revealed_seeds.join(", ");
@@ -539,7 +539,7 @@
               if(current_icons && square_info["reward"]["type"] == "icon"){
                 bingo_square.style.background = 'url(' + square_info["reward"]["value"] + ')  no-repeat center center';
               } else if(square_info["reward"]["type"] == "seed"){
-                let data_url = await drawPlantForSquare(square_info["reward"]["value"]);
+                let data_url = drawPlantForSquare(square_info["reward"]["value"]);
                 bingo_square.style.background = 'url(' + data_url + ')  no-repeat center center';
               } else {bingo_square.style.background = "none";}
             } else {
@@ -551,7 +551,7 @@
             now_has_bingo = has_bingo();
             if(now_has_bingo != had_bingo_last_turn){  // our bingo state has changed
                 had_bingo_last_turn = now_has_bingo;
-                await setBingoPlantVisibility(now_has_bingo);
+                setBingoPlantVisibility(now_has_bingo);
                 if(now_has_bingo){
                   transition_all_bingo_borders("#ffffff", row, col);
                 } else {
@@ -576,14 +576,14 @@
               }
         }
 
-        async function setBingoPlantVisibility(show_plant){
+        function setBingoPlantVisibility(show_plant){
             parent_div = document.getElementById("bingo_plant_container_div");
             if(!show_plant){
                 parent_div.style.display = "none";
             } else {
                 target_div = document.getElementById("bingo_plant_div");
                 if(bingo_plant_data_url == null){
-                    bingo_plant_data_url = await drawPlantForSquare(bingo_reward);
+                    bingo_plant_data_url = drawPlantForSquare(bingo_reward);
                     revealed_seeds.push(bingo_reward);
                     document.getElementById("seed_list").innerHTML = revealed_seeds.join(", ");
                 }

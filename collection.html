@@ -226,22 +226,22 @@
         return false;
       }
 
-      async function select_seed(seed) {
+      function select_seed(seed) {
         let parent = document.getElementById("selection_display_div");
-        let entry = await create_collection_entry(parent.children.length, seed, document.getElementById("hide_seeds").checked, document.getElementById("show_palettes").checked);
+        let entry = create_collection_entry(parent.children.length, seed, document.getElementById("hide_seeds").checked, document.getElementById("show_palettes").checked);
         entry.onclick = function(){parent.removeChild(entry)};
         parent.appendChild(entry);
       }
 
-      async function prep_recycle_seed(seed) {
+      function prep_recycle_seed(seed) {
         let parent = document.getElementById("recycle_display_div");
-        let entry = await create_collection_entry(parent.children.length, seed, document.getElementById("hide_seeds").checked, document.getElementById("show_palettes").checked);
+        let entry = create_collection_entry(parent.children.length, seed, document.getElementById("hide_seeds").checked, document.getElementById("show_palettes").checked);
         entry.onclick = function(){parent.removeChild(entry)};
         parent.appendChild(entry);   
       }
 
       // The force option is used to clear all other seeds, it's how we select the child after a mutation operation.
-      async function prep_mutate_seed(seed, force=false){
+      function prep_mutate_seed(seed, force=false){
         let first_splice = document.getElementById("first_splice");
         let second_splice = document.getElementById("second_splice");
 
@@ -250,9 +250,9 @@
           if(second_splice.children.length > 0){second_splice.removeChild(second_splice.children[0]); second_splice.setAttribute("data-seed", "")}
         }
 
-        async function setup_splice(parent){
+        function setup_splice(parent){
           parent.setAttribute("data-seed", seed);
-          let entry = await create_collection_entry(parent.id=="second_splice", seed, document.getElementById("hide_seeds").checked, document.getElementById("show_palettes").checked);
+          let entry = create_collection_entry(parent.id=="second_splice", seed, document.getElementById("hide_seeds").checked, document.getElementById("show_palettes").checked);
           entry.style.borderWidth = 0;
           if(parent.children.length > 0){
             parent.removeChild(parent.children[0]);
@@ -262,18 +262,18 @@
         }
 
         if(first_splice.children.length == 0){
-          await setup_splice(first_splice);
+          setup_splice(first_splice);
         }
         // If first or both set
          else {
           if(first_splice.getAttribute("data-seed")==seed){ return; }  // prevent double-select
-          await setup_splice(second_splice);}
+          setup_splice(second_splice);}
 
         update_mutate();
       }
 
-      async function draw_preview(canvas_element, seed_data){
-        let plant_canvas = await gen_plant(seed_data, document.getElementById("show_palettes").checked);
+      function draw_preview(canvas_element, seed_data){
+        let plant_canvas = gen_plant(seed_data, document.getElementById("show_palettes").checked);
         var preview_canvas = document.getElementById(canvas_element);
         var preview_ctx = preview_canvas.getContext("2d");
         preview_ctx.imageSmoothingEnabled = false;
@@ -293,7 +293,7 @@
         }
       }
 
-      async function update_cycle(){
+      function update_cycle(){
         let orig_seed;
         let was_first;
         if(document.getElementById("first_splice").getAttribute("data-seed") != ""){
@@ -316,11 +316,11 @@
         let orig_feature = plant_data["feature_palette"]; 
         let orig_accent = plant_data["accent_palette"];
 
-        async function create_shuffled_seed(foliage_palette, feature_palette, accent_palette){
+        function create_shuffled_seed(foliage_palette, feature_palette, accent_palette){
           plant_data["foliage_palette"] = foliage_palette;
           plant_data["feature_palette"] = feature_palette;
           plant_data["accent_palette"] = accent_palette;
-          entry = await create_collection_entry(0, encode_plant_data_v2(plant_data), false, true);
+          entry = create_collection_entry(0, encode_plant_data_v2(plant_data), false, true);
           entry.children[0].textContent = "2 rs";
           entry.onclick = function(e){
             if(getSeedPoints() >= 2){
@@ -340,9 +340,9 @@
         }
 
         cycle_panel.innerHTML = "";  // Clear prior children
-        await create_shuffled_seed(orig_accent, orig_foliage, orig_feature);
-        await create_shuffled_seed(orig_feature, orig_accent, orig_foliage);
-        await create_shuffled_seed(orig_accent, orig_feature, orig_foliage);
+        create_shuffled_seed(orig_accent, orig_foliage, orig_feature);
+        create_shuffled_seed(orig_feature, orig_accent, orig_foliage);
+        create_shuffled_seed(orig_accent, orig_feature, orig_foliage);
       }
 
       function update_splice(){
@@ -606,7 +606,7 @@
       });
     }
 
-    async function create_collection_entry(offset, seed, hide_seed, show_palette, premade_entry=null){
+    function create_collection_entry(offset, seed, hide_seed, show_palette, premade_entry=null){
       let entry;
       if(premade_entry === null){
         entry = document.createElement('div');
@@ -622,29 +622,14 @@
       label.style.pointerEvents = "none";
       var scale_canvas = document.createElement("canvas");
       let final_size = showcase_mode? 32*3 : 64;
-      scale_canvas.width = final_size + 2;
-      scale_canvas.height = final_size + 2;
-      var scale_ctx = scale_canvas.getContext("2d");
-      scale_ctx.imageSmoothingEnabled = false;
       // Strip any positional info
       seed = seed.replace(/%[\d .]*/g,'');
-      if(seed.startsWith("!")){
-        normalization_canvas = document.createElement("canvas");
-        normalization_canvas.width = 32;
-        normalization_canvas.height = 32;
-        var normalization_ctx = normalization_canvas.getContext("2d");
-        normalization_ctx.imageSmoothingEnabled = false;
-        let ref_img = await refs[all_named[seed.slice(1)]];
-        normalization_ctx.drawImage(ref_img, 16-ref_img.width/2, 32-ref_img.height);
-        scale_ctx.drawImage(normalization_canvas, 0, 0, final_size, final_size);
-      } else {
       if(seed.length != 10){
         alert("You seem to have a malformed seed! Seeds are 10 characters long, but got \""+seed+"\". Skipping!");
       }
       else {
-        var plant_canvas = await gen_plant(decode_plant_data(seed), show_palette); // Maybe I should just scale the plants up in gen_plant...
-        scale_ctx.drawImage(plant_canvas, 0, 0, final_size, final_size);
-      }}
+        var plant_canvas = gen_plant(decode_plant_data(seed), show_palette, final_size/32);
+      }
       label.htmlFor = id;
       label.className = showcase_mode ? 'showcase_collection_label' : 'collection_label';
       if(hide_seed){text_content = offset+1;} else {text_content = seed;}
@@ -655,39 +640,33 @@
       label.appendChild(separator);
       label.style.maxWidth = "86px";
       entry.appendChild(label);
-      entry.style.background = 'url(' + scale_canvas.toDataURL() + ')  no-repeat bottom center';
+      entry.style.background = 'url(' + plant_canvas.toDataURL() + ')  no-repeat bottom center';
       return entry;
     }
 
     // Exists solely to smooth use of setTimeout.
-    async function add_collection_entry(parent, offset, seed, hide_seed, show_palette){
+    function add_collection_entry(parent, offset, seed, hide_seed, show_palette){
       placeholder_child = document.createElement("div");
       parent.appendChild(placeholder_child);
-      await create_collection_entry(offset, seed, hide_seed, show_palette, placeholder_child);
+      create_collection_entry(offset, seed, hide_seed, show_palette, placeholder_child);
     }
 
 
-    async function analyze_seed(seed_string) {
+    function analyze_seed(seed_string) {
       var canvas = document.getElementById("analysis_output_canvas");
       var ctx = canvas.getContext("2d");
-      if(seed_string[0] == "!"){
-          item_name = seed_string.slice(1);
-          var plant_canvas = await gen_named(item_name);
-          canvas.setAttribute("hidden", "hidden");
-      } else {
-          canvas.removeAttribute("hidden");
-          var raw_plant_data = decode_plant_data(seed_string);
-          var plant_data = parse_plant_data(raw_plant_data);
-          var img=new Image();
-          img.src=PALETTE_PREVIEW_IMG;
-          img.crossOrigin = "anonymous"
-          img.onload = function() {
-              ctx.drawImage(img, 0, 0);
-              var new_overall_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);
-              replace_color_palette(overall_palette, new_overall_palette, ctx, 64, 64);
-          };
-          var plant_canvas = await gen_plant(raw_plant_data); // Maybe I should just scale the plants up in gen_plant...
-      }
+      canvas.removeAttribute("hidden");
+      var raw_plant_data = decode_plant_data(seed_string);
+      var plant_data = parse_plant_data(raw_plant_data);
+      var img=new Image();
+      img.src=PALETTE_PREVIEW_IMG;
+      img.crossOrigin = "anonymous"
+      img.onload = function() {
+          ctx.drawImage(img, 0, 0);
+          var new_overall_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);
+          replace_color_palette(overall_palette, new_overall_palette, ctx, 64, 64);
+      };
+      var plant_canvas = gen_plant(raw_plant_data); // Maybe I should just scale the plants up in gen_plant...
       var preview_canvas = document.getElementById("analysis_preview_canvas");
       document.getElementById("analysis_preview_canvas_label").textContent = seed_string;
       var preview_ctx = preview_canvas.getContext("2d");
@@ -707,9 +686,7 @@
       }//text_output.innerText = `Base: ${raw_plant_data["foliage"]}`+"\n"+`Simple Feature: ${raw_plant_data["simple_feature"]}`+"\n"+`Complex Feature: ${raw_plant_data["complex_feature"]}`;
   }
 
-    async function do_preload() {
-        await preload_plants();
-        //await preload_named();
+    function do_preload() {
         document.getElementById("load_text").remove();
         display_collection();
         base_sort_div = document.getElementById("base_sort_categories_div");

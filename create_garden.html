@@ -386,9 +386,7 @@
           info_canvas = gen_named(seed.slice(1));
         } else {
           document.getElementById("seed_positioning_desc").innerHTML = activeGardenItem.getSeed() + ", " + all_foliage[plant_data["foliage"]]["name"] + "<br>" + buildColorMessage(raw_plant_data, false);
-          // Feels early for an await given draw_callback below.
-          info_canvas = cloneCanvas(await activeGardenItem.canvas);
-          await add_color_key(info_canvas, plant_data);
+          info_canvas = gen_plant(decode_plant_data(seed), true);
         }
         scaleCtx = scaleCanvas.getContext("2d");
         scaleCanvas.width = 128; scaleCanvas.height = 128;

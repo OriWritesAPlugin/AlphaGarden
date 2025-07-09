@@ -305,7 +305,7 @@ function getRandomKeyFromObj(obj){
 }
 
 
-async function applyOverlay(stencil_canvas, palette, opacity){
+function applyOverlay(stencil_canvas, palette, opacity){
     let stencil_ctx = stencil_canvas.getContext("2d");
     let return_canvas = document.createElement("canvas");
     let return_ctx = return_canvas.getContext("2d");
@@ -342,7 +342,7 @@ async function applyOverlay(stencil_canvas, palette, opacity){
 // tile an image left to right across a canvas at some y
 // optionally, offset them all to the left (or right, if you prefer) to
 // make the tileables look somewhat different from garden to garden
-async function tileAlongY(tileCtx, img, yPos, width, xOffset=0){
+function tileAlongY(tileCtx, img, yPos, width, xOffset=0){
   let groundXPos = xOffset;
   while(groundXPos < width){
       tileCtx.drawImage(img, groundXPos, yPos, img.width*2, img.height*2);
@@ -587,7 +587,7 @@ function getBase64(file) {
 
 // TODO: this was hastily-written. Really needs some cleanup
 // NOTE: only v2 because of a name collision in gen_garden.js. Can probably replace that with this...
-async function draw_outline_v2(template_canvas){
+function draw_outline_v2(template_canvas){
   let ctx = template_canvas.getContext("2d");
   let output_canvas = document.createElement("canvas");
   output_canvas.width = template_canvas.width;

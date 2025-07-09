@@ -53,7 +53,6 @@
     async function do_setup(){
         toggle_hints();
         toggle_dark_mode();
-        await preload_plants();
         document.getElementById("load_text").remove();
         let restored_state = false;
         try {
@@ -66,7 +65,7 @@
         }
     }
 
-    async function launch_plant_dialogue(){
+    function launch_plant_dialogue(){
         modal = document.createElement("div");
         modal.classList.add("bingo-popup");
         modal.style.padding = "2vh";
@@ -76,7 +75,7 @@
         grid = document.createElement("div");
         grid.id = "self_care_plant_selector";
         for(let i=0; i<choose_from; i++){
-            await add_self_care_square(grid, i);
+            add_self_care_square(grid, i);
         }
         button_container = document.createElement("div");
         button_container.classList.add("center-what-i-hold");
@@ -122,7 +121,7 @@
         }
         let plant_data = gen_plant_data(0, forced_random_seed+id);
         let seed = encode_plant_data_v2(plant_data);
-        data_url = await drawPlantForSquare(seed);
+        data_url = drawPlantForSquare(seed);
         swap_square.setAttribute("data-seed", seed);
         swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
         parent.appendChild(swap_square);

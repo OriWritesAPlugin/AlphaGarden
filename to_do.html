@@ -45,16 +45,15 @@
     var active_plant_selector;
     var setup_complete = false; // Sentinel so we don't spawn a bajillion bubbles on page load.
 
-    async function doSetup(){
-        await preload_plants();
-        await rememberTasks();
+    function doSetup(){
+        rememberTasks();
         document.getElementById("load_text").remove();
         document.getElementById("todo_clear_completed").style.display = "inline-block";
     }
 
 
     // Generate a brand new task; most logic is connected to task elements, so a bit beefy
-    async function generateTask(is_checked=false, reward_seed="", desc=""){
+    function generateTask(is_checked=false, reward_seed="", desc=""){
       let id = task_sets_generated;
       let list_item = document.createElement("li");
       list_item.setAttribute("idx", id);
@@ -117,7 +116,7 @@
         let plant_data = gen_plant_data(0, salt);
         reward_seed = encode_plant_data_v2(plant_data);
       }
-      data_url = await drawPlantForSquare(reward_seed);
+      data_url = drawPlantForSquare(reward_seed);
       prize_display_square.setAttribute("data-seed", reward_seed);
       prize_display_square.style.background = 'url(' + data_url + ')  no-repeat center center';
   
@@ -131,7 +130,7 @@
 
 
     // Generate the "reward box" that displays while editing a task. Contains plants to pick from.
-    async function makePlantSelector(e){
+    function makePlantSelector(e){
 
       // First off, handle existing reward boxes--we only want one open at a time for coherence
       if(active_plant_selector != undefined){
@@ -186,12 +185,12 @@
         let salt = forced_random_seed + (Math.floor(id/num_tasks_per_set)*plants_to_choose_from + i % plants_to_choose_from);
         let plant_data = gen_plant_data(0, salt);
         let seed = encode_plant_data_v2(plant_data);
-        let data_url = await drawPlantForSquare(seed, size);
+        let data_url = drawPlantForSquare(seed, size);
         let prize_url = data_url;
         prize_select_square.setAttribute("data-seed", seed);
         prize_select_square.style.background = 'url(' + data_url + ')  no-repeat center center';
         if(size == 64 ){ 
-          prize_url = await drawPlantForSquare(seed); 
+          prize_url = drawPlantForSquare(seed); 
         } // Return to realsize for the display.
         if(can_select){
           prize_select_square.onclick = function(){
@@ -341,12 +340,12 @@
     // This next bit was shamelessly stolen from https://css-tricks.com/playing-with-particles-using-the-web-animations-api/
     // Genuinely learning a lot here...maybe I'll even learn Javascript some day? :)
     // But really, it's a fantastic tutorial. I should (TODO) revisit
-    async function bubble_up(e) {
+    function bubble_up(e) {
       if(!setup_complete){return;}
       let reward_seed = document.getElementById(e.target.id+"_reward").getAttribute("data-seed");
       collectSeed(reward_seed);
       document.getElementById("top_spacer").innerHTML += seed + ",";
-      let bubble_palette = await samplePlantColor(reward_seed);
+      let bubble_palette = samplePlantColor(reward_seed);
       for (let i = 0; i < 75; i++) {
         // We root them to a random location slightly below the bottom of the window
         createPlantParticle(Math.random() * window.innerWidth, window.innerHeight + 10, bubble_palette);
@@ -399,8 +398,8 @@
     // Take a bunch of random samples of the plant's color
     // Return as RGB for mathing. Ignore transparent pixels.
     // Gets us around the thing where not all bases use all palettes
-    async function samplePlantColor(seed){
-        let sample_canvas = await gen_plant(decode_plant_data(seed));
+    function samplePlantColor(seed){
+        let sample_canvas = gen_plant(decode_plant_data(seed));
         let sample_ctx = sample_canvas.getContext("2d");
         // We take X samples from the plant image. If we don't get any colors in this many, we use a fallback.
         let sample_attempts = 128;

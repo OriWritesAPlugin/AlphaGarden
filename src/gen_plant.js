@@ -144,19 +144,6 @@ async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, c
 }
 
 
-async function place_foliage(img_idx, ctx){
-    ctx.drawImage(await refs["foliage"+img_idx.toString()], 0, 0);
-}
-
-
-async function preload_plants() {
-    /*// TODO: Replace with spritesheet
-    for(var i=0; i<all_features.length; i++){
-        refs["feature"+i] = preload_single_image(all_features[i]);
-    }
-    return preload_spritesheet("foliage", FOLIAGE_SPRITESHEET, all_foliage.length);*/
-}
-
 async function preload_named() {
     return preload_spritesheet("named", NAMED_SPRITESHEET, Object.keys(reformatted_named).length);
 }
@@ -602,12 +589,4 @@ function shuffleArray(arr) {
     const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-}
-
-// Adds a color palette to an existing canvas; mostly useful for the gardenitems.
-async function add_color_key(canvas, plant_data){
-    let work_ctx = canvas.getContext("2d", { willReadFrequently: true });
-    await place_foliage(160, work_ctx);
-    let new_overall_palette = plant_data["foliage_palette"].concat(plant_data["accent_palette"]).concat(plant_data["feature_palette"]);
-    replace_color_palette(overall_palette, new_overall_palette, work_ctx);
 }

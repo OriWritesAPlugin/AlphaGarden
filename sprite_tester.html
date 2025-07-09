@@ -72,8 +72,6 @@
         let seeds_to_add = [];
         if(document.getElementById("plant_seed").checked){
           all_named[add_catalog_name] = "";
-          all_foliage[add_plant_idx] = {"source": document.getElementById("image_injector").value};
-          refs["foliage"+[add_plant_idx]] = await preload_single_image(all_foliage[add_plant_idx]["source"]);
           img = await preload_single_image(document.getElementById("image_injector").value);
           var canvas = document.createElement('canvas');
           var context = canvas.getContext('2d');
@@ -96,7 +94,7 @@
                 data += char_code;
             }
           }
-          FOLIAGE_SPRITE_DATA[add_plant_idx] = {"w": 32, "h": 32, "l": 0, "m": 0, "e": data, "x": custom_colors};
+          FOLIAGE_SPRITE_DATA[add_plant_idx] = {"w": 32, "h": 32, "l": 0, "m": 0, "e": data, "x": custom_colors, "s": 1};
           for(let i=0; i<num_to_gen; i++){
             let new_data = gen_plant_data(7);
             new_data["foliage"] = add_plant_idx;
@@ -126,7 +124,7 @@
           swap_square.style.borderWidth = 0;
           let plant_data = gen_plant_data(0);
           plant_data["foliage"] = add_plant_idx;
-          data_url = await drawPlantForSquare(encode_plant_data_v2(plant_data));
+          data_url = drawPlantForSquare(encode_plant_data_v2(plant_data));
           swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
           color_div.appendChild(swap_square);
         }

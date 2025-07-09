@@ -709,16 +709,16 @@ async function assign_overlay_canvas(color, ctx){
     return({"canvas": color_canvas, "x_pos": 0, "y_pos": 0, "width": color_canvas.width, "height": color_canvas.height});
 }
 
-async function get_canvas_for_plant(seed){
-    return await gen_plant_from_seed(seed);
+function get_canvas_for_plant(seed){
+    return gen_plant_from_seed(seed);
 }
 
-async function gen_plant_from_seed(seed) {
+function gen_plant_from_seed(seed) {
     var plant_data = decode_plant_data(seed);
     for (const palette_type of Object.keys(possible_ground_palettes)){
         possible_ground_palettes[palette_type].push(plant_data[palette_type+"_palette"]);
     }
-    var ret_canvas = await gen_plant(plant_data);
+    var ret_canvas = gen_plant(plant_data);
     return ret_canvas;
 }
 
@@ -868,7 +868,6 @@ async function preload_ground_bases() {
 // This is the only portion that needs run for the new layer-based interface, so for now they live in parallel.
 async function do_preload_initial() {
     await preload_ground_bases();  // Chrome demands this come first
-    await preload_plants();
     await preload_named();
     tileables = new Set();
     // Grounds and midgrounds have variable sizes, so can't be stored in spritesheets

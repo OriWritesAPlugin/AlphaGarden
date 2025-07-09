@@ -33,7 +33,7 @@
         const price_colors = {1: "#8CDF8F", 2: "#DFC48C", 4: "#DF8C9C", 5: "#CF8CDF"}
 
 
-        async function gen_divs() {
+        function gen_divs() {
             let parent = document.getElementById("content_div");
             for(let i=0; i<days_to_gen; i++){
                 let d = new Date();
@@ -48,7 +48,7 @@
                 parent.appendChild(new_row);
                 for(let j=0; j<prices.length; j++){
                     let id = i + "_" + j;
-                    await add_swap_square(new_row, j, id, prices[j], i);
+                    add_swap_square(new_row, j, id, prices[j], i);
                 }
             }
         }
@@ -99,7 +99,7 @@
         }
 
         // Largely similar to bingo squares
-        async function add_swap_square(parent, column_offset, id, price, day){
+        function add_swap_square(parent, column_offset, id, price, day){
             let swap_square = document.createElement('div');
             swap_square.id = id;
             swap_square.className = 'swap_box';
@@ -114,7 +114,7 @@
                 plant_data["accent_palette"] = random_from_list(daily_specials[day][1][1], specials_prng);
             }
             let seed = encode_plant_data_v2(plant_data);
-            let data_url = await drawPlantForSquare(seed);
+            let data_url = drawPlantForSquare(seed);
             swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
             swappable_seeds[id] = seed;
             let label = document.createElement('label')
@@ -168,9 +168,8 @@
         async function do_preload() {
             let d = (new Date()).getDate();
             updateSeedPointTotal();
-            await preload_plants();
             document.getElementById("load_text").remove();
-            await gen_divs();
+            gen_divs();
         }
     </script>
     </body>
