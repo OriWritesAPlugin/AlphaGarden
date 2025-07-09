@@ -56,22 +56,15 @@ function collectSeed(seed){
 
 
 // Draws a plant that's meant to go in a 96x96 (or otherwise) square
-async function drawPlantForSquare(seed, size=96, mark_wanted_palettes=true){
+function drawPlantForSquare(seed, size=96, mark_wanted_palettes=true){
   const plant_data = decode_plant_data(seed);
   let plant_canvas;
   if(mark_wanted_palettes){
-    plant_canvas = await addMarkings(plant_data, await gen_plant(plant_data));
+    plant_canvas = addMarkings(plant_data, gen_plant(plant_data, false, size/work_canvas_size));
   } else {
-    plant_canvas = await gen_plant(plant_data);
+    plant_canvas = gen_plant(plant_data, false, size/work_canvas_size);
   }
-  // TODO: This next scaling bit seems incredibly silly
-  var scale_canvas = document.createElement("canvas");
-  scale_canvas.width = size;
-  scale_canvas.height = size;
-  var scale_ctx = scale_canvas.getContext("2d");
-  scale_ctx.imageSmoothingEnabled = false;
-  scale_ctx.drawImage(plant_canvas, 0, 0, size, size);
-  return scale_canvas.toDataURL();
+  return plant_canvas.toDataURL();
 }
 
 
@@ -175,7 +168,7 @@ function getMarkedBases(){
 // Check if plant_data fulfills any "mark" criteria
 // (which users set up in the completion tracker, lets them tag plants using
 // a certain palette, etc) and adds the corresponding marks.
-async function addMarkings(plant_data, plant_canvas){
+function addMarkings(plant_data, plant_canvas){
   const ctx = plant_canvas.getContext("2d");
   let colors = getMarkedPalettes();
   let draw_offset = 0;
