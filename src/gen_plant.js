@@ -38,7 +38,19 @@ var foliage_by_category = {};
 
 // Cache non-component-using plants
 var plant_cache = {};
+var plant_cache_order = [];
 var plant_cache_max_size = 30;
+// TODO: this made things way faster, but things kept snatching one another's canvases. Async troubles?
+/*var plant_gen_canvas = document.createElement("canvas");
+var plant_gen_ctx = plant_gen_canvas.getContext("2d");
+plant_gen_canvas.width = work_canvas_size;
+plant_gen_canvas.height = work_canvas_size;*/
+var plant_gen_scale_canvas = document.createElement("canvas");
+var plant_gen_scale_ctx=plant_gen_scale_canvas.getContext("2d");
+plant_gen_scale_canvas.width = work_canvas_size;
+plant_gen_scale_canvas.height = work_canvas_size;
+plant_gen_scale_ctx.imageSmoothingEnabled = false;
+var latest_scale = 1;
 
 function assemble_categories(target_list){
     by_category = {};
@@ -138,11 +150,11 @@ async function place_foliage(img_idx, ctx){
 
 
 async function preload_plants() {
-    // TODO: Replace with spritesheet
+    /*// TODO: Replace with spritesheet
     for(var i=0; i<all_features.length; i++){
         refs["feature"+i] = preload_single_image(all_features[i]);
     }
-    return preload_spritesheet("foliage", FOLIAGE_SPRITESHEET, all_foliage.length);
+    return preload_spritesheet("foliage", FOLIAGE_SPRITESHEET, all_foliage.length);*/
 }
 
 async function preload_named() {
@@ -353,37 +365,65 @@ Base64 = (function () {
 })();
 
 
-async function gen_plant(plant_data, with_color_key=false) {
+function gen_plant(plant_data, with_color_key=false, with_scale=1) {
     // Returns the image data for a generated plant
     // First we check cache
     let seed = encode_plant_data_v2(plant_data);
-    let cachable = true;
     if(encode_plant_data.hasOwnProperty(seed)){return encode_plant_data(seed);}
-    var work_canvas = document.createElement("canvas");
-    var work_ctx=work_canvas.getContext("2d");
+    var plant_gen_canvas = document.createElement("canvas");
+    var plant_gen_ctx = plant_gen_canvas.getContext("2d");
+    plant_gen_canvas.width = work_canvas_size;
+    plant_gen_canvas.height = work_canvas_size;
+    plant_gen_ctx.clearRect(0, 0, 32, 32);
     plant_data = parse_plant_data(plant_data);
-    work_canvas.width = work_canvas_size;
-    work_canvas.height = work_canvas_size;
     if(with_color_key){
+        // We need a new canvas to handle layering
+        var plant_gen_overlay_canvas = document.createElement("canvas");
+        var plant_gen_overlay_ctx=plant_gen_overlay_canvas.getContext("2d");
+        plant_gen_overlay_canvas.width = work_canvas_size;
+        plant_gen_overlay_canvas.height = work_canvas_size;
+
         // Place I AM ERROR, actually the palette display sprite
         color_key_data = structuredClone(plant_data);
         color_key_data["foliage"] = 160;
-        draw_plant_with_color_palette(work_ctx, color_key_data, false);
+        draw_plant_with_color_palette(plant_gen_ctx, color_key_data, false);
 
         // Now draw up the plant on the other canvas
-        let overlay = document.createElement("canvas");
-        let overlay_ctx=overlay.getContext("2d");
-        overlay.width = work_canvas_size;
-        overlay.height = work_canvas_size;
-        draw_plant_with_color_palette(overlay_ctx, plant_data, true);
+        plant_gen_overlay_ctx.clearRect(0, 0, 32, 32);
+        plant_gen_overlay_ctx.scale(with_scale, with_scale);
+        draw_plant_with_color_palette(plant_gen_overlay_ctx, plant_data, true);
 
         // And place the plant onto the canvas
-        work_ctx.drawImage(overlay,0,0);
+        plant_gen_ctx.drawImage(plant_gen_overlay_canvas,0,0);
 
+    } else if(seed in plant_cache){
+        plant_gen_canvas = plant_cache[seed];
     } else {
-        draw_plant_with_color_palette(work_ctx, plant_data, true);
+        draw_plant_with_color_palette(plant_gen_ctx, plant_data, true);
+        // s is for subparts
+        if(!FOLIAGE_SPRITE_DATA[plant_data["foliage"]["s"]]){
+            plant_cache[seed] = plant_gen_canvas;
+            plant_cache_order.push(seed);
+            if(plant_cache.length > plant_cache_max_size){
+                let to_remove = plant_cache_order.shift();
+                delete plant_cache[to_remove];
+            }
+        }
     }
-    return work_canvas;
+    if(with_scale != 1){
+        if(with_scale != latest_scale){
+            latest_scale = with_scale;
+            plant_gen_scale_canvas.width = work_canvas_size*with_scale;
+            plant_gen_scale_canvas.height = work_canvas_size*with_scale;
+            plant_gen_scale_ctx.scale(with_scale, with_scale);
+        }
+        plant_gen_scale_ctx.clearRect(0, 0, plant_gen_scale_canvas.width, plant_gen_scale_canvas.width);
+        plant_gen_scale_ctx.imageSmoothingEnabled = false;
+        plant_gen_scale_ctx.drawImage(plant_gen_canvas, 0, 0);
+        return plant_gen_scale_canvas;
+    } else {
+        return plant_gen_canvas;
+    }
 }
 
 async function gen_named(name){
@@ -465,15 +505,6 @@ function replace_color_palette(old_palette, new_palette, ctx, work_canvas_width=
     ctx.putImageData(imageData,0,0);
 }
 
-// Get hype for COORDINATE MATH
-function get_absolute_offset(inner_offset, offset_data, center){
-    // First line is x pos: offset within the row plus however far we need to shift in to center. Second is y: number of rows finished plus rows from top
-    let x_coord = inner_offset % offset_data["w"]
-    if(center){ x_coord += Math.floor((work_canvas_size - offset_data["w"])/2);}
-    let y_coord = Math.floor(inner_offset / offset_data["w"]) + (work_canvas_size - offset_data["h"]);
-    return 4*(x_coord + y_coord*work_canvas_size);
-}
-
 function draw_plant_with_color_palette(ctx, plant_data, center){
     const plant_num = plant_data["foliage"];
     const raw_data = FOLIAGE_SPRITE_DATA[plant_num]['e'];
@@ -484,11 +515,20 @@ function draw_plant_with_color_palette(ctx, plant_data, center){
     ctx.putImageData(imageData,0,0);
 }
 
+// Get hype for COORDINATE MATH
+function get_absolute_offset(inner_offset, offset_data, center_factor){
+    // First line is x pos: offset within the row plus however far we need to shift in to center. Second is y: number of rows finished plus rows from top
+    let x_coord = inner_offset % offset_data["w"] + center_factor;
+    let y_coord = Math.floor(inner_offset / offset_data["w"]) + (work_canvas_size - offset_data["h"]);
+    return 4*(x_coord + y_coord*work_canvas_size);
+}
+
 function draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, offset_data, palette, center, initial_offset=0){
     let i = 0;
     let raw_data = offset_data['e'];
+    let x_center = center? Math.floor((work_canvas_size - offset_data["w"])/2) : 0;
     while (i < raw_data.length) {
-        let pos = initial_offset + get_absolute_offset(i, offset_data, center);
+        let pos = initial_offset + get_absolute_offset(i, offset_data, x_center);
         let char = raw_data.charCodeAt(i);
         if(char == 48 || imageData.data[pos]){} // 0, an empty pixel, or we already drew something with the subpart system
         // 1, a hard white pixel
