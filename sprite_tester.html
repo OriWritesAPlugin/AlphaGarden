@@ -7,128 +7,28 @@
         <link rel="stylesheet" type="text/css"  href="shared.css" />
         <link rel="icon" href="https://i.imgur.com/fRqhbd7.png">
     </head>
-    <body onload="preloadSeedTester()">
+    <body>
         <a href="./" class="index_link"><--Home</a>
         <h1 id="title">Sprite Tester</h1>
         <h2 id="subtitle">Test plant bases and catalog items to see how they'll look.</h2>
         </br>
         <label for="image_injector">URL of image (Imgur works well) (Only one at a time for now!):</label>
         <input type="text" id="image_injector" name="image_injector" size="4" placeholder="make sure it ends in .png!">
-        <input type="radio" id="plant_seed" name="img_type" value="plant_seed" checked>
-        <label for="plant_seed">Plant</label><br>
-        <input type="radio" id="catalog_item" name="img_type" value="catalog_item">
-        <label for="catalog_item">Catalog Item</label><br>
         <label for="seed_quantity">Number to generate:</label><br>
         <input type="number" id="seed_quantity" name="seed_quantity" min="1" value=5>
         <label for="partial_seed_list">Existing seeds to include in test garden:</label>
         <input type="text" id="partial_seed_list" name="seed_list" size="4" value="yhNA2ysxuY, y5Dm2y5HQq"></input>
-        <label for="use_smart_spacing">Use smart spacing:</label><input type="checkbox" id="use_smart_spacing" value="Use smart spacing" checked>
-        <!--<label for="pick_ground">Pick ground:</label><select type="select" id="pick_ground" class="garden_dropdown" value="Pick Ground" onChange="current_ground=pick_ground.value"></select>-->
-        <label for="quantity">Garden width:</label> <input class="garden-dim-bar" type="number" id="garden_width" name="quantity" min="64" value=450>
-        <label for="garden_height">Garden height:</label> <input class="garden-dim-bar" type="number" id="garden_height" name="garden_height" min="70" value=70>
         <label for="draw_outline" style="margin-left: 10px">Draw outline:</label><input type="checkbox" id="draw_outline" value="Draw outline">
-        <!--<label for="pick_background_color">Sky:</label><select type="select" id="pick_background_color" class="garden_dropdown" value="none" onChange="background_color=pick_background_color.value"></select>
-        <label for="pick_background_style">Sky style:</label><select type="select" id="pick_background_style" class="garden_dropdown" value="gradient" onChange="background_style=pick_background_style.value"></select>
-        <label for="draw_starfield" style="margin-left: 10px">Stars:</label><input type="checkbox" id="draw_starfield">-->
         <div id=content_div>
             </br></br>
-            <input type="button" class="chunky" value="&gt;&gt; Generate a (test) garden!&lt;&lt;" onClick="genTestGarden()">
+            <input type="button" class="chunky" id="gen_sprite_test_garden" value="&gt;&gt; Generate a (test) garden!&lt;&lt;">
             </br></br>
             <div id="output"><canvas id="output_canvas" width="450" height="70"></canvas></div>
-            </br></br>
-            <input type="button" class="chunky_wrap" value="Scramble" onClick="scramble_randogarden()">
-            <input type="button" class="chunky_wrap" value="Reroll ground" onClick="place_ground(scramble_ground=true)">
-            <input type="button" class="chunky_wrap" value="Claim" onClick="claim_garden()">
         </div>
         <span id="seed_list" style="display: none"></span>
         <div id="sprite_color_tester" class="collection_display"></div>
     </body>
-    <script src="built/data.js"></script>
-    <script src="built/gen_plant.js"></script>
-    <script src="built/gen_garden.js"></script>
-    <script src="built/shared.js"></script>
-    <script src="built/bingo.js"></script>
-    <script src="built/garden_layers.js"></script>
-    <script src="built/garden_ui.js"></script>
-    <script src="built/drag_and_drop.js"></script>
-    <script type="text/javascript">
-       const add_plant_idx = all_foliage.length;  // We can only ever test one plant at a time using this patched-together system.
-       const add_catalog_name = "temporaryTestItem";
-       var gm;
-       const color_lookup = {174: {215: {64: 'A'}}, 118: {201: {53: 'B'}}, 80: {170: {55: 'C'}}, 47: {144: {43: 'D'}},
-                             254: {244: {204: 'E'}}, 253: {228: {123: 'F'}}, 255: {212: {48: 'G'}, 148: {58: 'M'}},
-                             236: {182: {0: 'H'}}, 243: {173: {221: 'I'}}, 216: {127: {188: 'J'}}, 192: {89: {160: 'K'}},
-                             170: {51: {132: 'L'}}, 233: {0: {255: 'N'}}, 200: {255: {183: 'O'}}, 159: {227: {137: 'P'}}};
-
-       async function preloadSeedTester(){
-          await do_preload_initial();
-          gm = new LayerManager(document.getElementById("output_canvas"), "");
-          gm.toggleVisibility();
-       }
-
-      async function genTestGarden(){
-        let modified_seed_list = sortAndVerifySeedList(document.getElementById("partial_seed_list").value);
-        let num_to_gen = document.getElementById("seed_quantity").value;
-        let seeds_to_add = [];
-        if(document.getElementById("plant_seed").checked){
-          all_named[add_catalog_name] = "";
-          img = await preload_single_image(document.getElementById("image_injector").value);
-          var canvas = document.createElement('canvas');
-          var context = canvas.getContext('2d');
-          context.drawImage(img, 0, 0);
-          let img_data = context.getImageData(0, 0, 32, 32).data;
-          data = "";
-          custom_colors = {};
-          accursed_color_lookup = structuredClone(color_lookup);
-          for(let i=0; i<img_data.length; i += 4){
-            if(img_data[i+3] < 40) { data += '0'}
-            else if(img_data[i] in accursed_color_lookup && img_data[i+1] in accursed_color_lookup[img_data[i]] && img_data[i+2] in accursed_color_lookup[img_data[i]][img_data[i+1]]){
-                data += accursed_color_lookup[img_data[i]][img_data[i+1]][img_data[i+2]];
-            }
-            else if(img_data[i]==255 && img_data[i]==255 && img_data[i]==255){
-                data += '1';
-            } else {
-                char_code = String.fromCharCode(97 + len(custom_colors.keys()));
-                accursed_color_lookup[img_data[i]][img_data[i+1]][img_data[i+2]] = char_code;
-                custom_colors[char_code] = [img_data[i], img_data[i+1], img_data[i+2], img_data[i+3]];
-                data += char_code;
-            }
-          }
-          FOLIAGE_SPRITE_DATA[add_plant_idx] = {"w": 32, "h": 32, "l": 0, "m": 0, "e": data, "x": custom_colors, "s": 1};
-          for(let i=0; i<num_to_gen; i++){
-            let new_data = gen_plant_data(7);
-            new_data["foliage"] = add_plant_idx;
-            seeds_to_add.push(encode_plant_data_v2(new_data));
-          }
-          override_foliage = [];
-        }
-        else {
-          all_foliage[add_plant_idx] = "";
-          all_named[add_catalog_name] = document.getElementById("image_injector").value;
-          for(let i=0; i<num_to_gen; i++){
-            seeds_to_add.push("!temporaryTestItem");
-          }
-        }
-        // We "mix" the test seeds into the existing garden stuff, so long as there's seeds to mix into.
-        if(seeds_to_add.length>2){
-          for(let i=0; i<seeds_to_add.length; i++){
-            modified_seed_list.splice(Math.floor(Math.random()*(modified_seed_list.length-1))+1, 0, seeds_to_add[i]);
-          }
-        }
-        gm.regenActiveGarden(modified_seed_list.join());
-        color_div = document.getElementById("sprite_color_tester");
-        color_div.innerHTML = "";
-        for(let i=0; i<20; i++){
-          let swap_square = document.createElement('div');
-          swap_square.className = 'bingo_box';
-          swap_square.style.borderWidth = 0;
-          let plant_data = gen_plant_data(0);
-          plant_data["foliage"] = add_plant_idx;
-          data_url = drawPlantForSquare(encode_plant_data_v2(plant_data));
-          swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
-          color_div.appendChild(swap_square);
-        }
-      }
+    <script type="module" src="built/page_specific/sprite_tester.js"></script>
     </script>
     </body>
 </html>

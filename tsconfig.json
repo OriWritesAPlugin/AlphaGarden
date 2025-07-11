@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./built",
     "allowJs": true,
-    "module": "commonjs",
+    "module": "es2015",
     "target": "ESNext"
   },
   "include": ["./src/**/*"]

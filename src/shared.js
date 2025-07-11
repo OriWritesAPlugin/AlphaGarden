@@ -1,26 +1,19 @@
+import { decode_plant_data, work_canvas_size, gen_plant } from "./gen_plant.js";
+import { available_overlay_colors, resize_for_garden } from "./gen_garden.js";
+import { all_palettes, FOLIAGE_SPRITE_DATA } from "./data.js";
+
 // Contains general utility functions used by multiple pages.
 // Modified version of the Okabe-Ito colorblind palette, replacing black with white due to dark website background
 const OFFSET_COLORS = ["#FFFFFF", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999"]
-var wildcard_canvases = {};
-
-// Stolen from https://stackoverflow.com/questions/17386707/how-to-check-if-a-canvas-is-blank
-// returns true if every pixel's uint32 representation is 0 (or "blank")
-function isCanvasBlank(canvas) {
-  const context = canvas.getContext('2d');
-  const pixelBuffer = new Uint32Array(
-    context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
-        );
-  return !pixelBuffer.some(color => color !== 0);
-}
 
 
 // Generate some spaced x-coordinates to ex: assign plants to
 // Used with smart placement
 function createSpacedPlacementQueue(total_width, with_spacing=64){
-  x_coords = [];
+  let x_coords = [];
   // Random number between, by default, 0 and 16 (remember we already place ground-centered in a 64x area)
   var range = Math.floor(with_spacing/4);
-  current_x = Math.floor(Math.random()*range);
+  let current_x = Math.floor(Math.random()*range);
   // 64 below to avoid plants getting cut off on the edges.
   while(current_x < (total_width-64)){
     x_coords.push(current_x);
@@ -48,7 +41,7 @@ function collectSeed(seed){
   if (seeds.length == 0){
     return;
   }
-    else if (localStorage.seed_collection == undefined) {
+  else if (localStorage.seed_collection == undefined) {
     localStorage.seed_collection = seeds;
   } else {
     localStorage.seed_collection = seeds + "," + localStorage.seed_collection;
@@ -74,13 +67,13 @@ function buildColorMessage(raw_plant_data, do_links=true){
   if(raw_plant_data["foliage"] == 160){
     color_msg += "This seed is malformed"
   } else {
-    for(category of ["foliage_palette", "feature_palette", "accent_palette"]){
+    for(let category of ["foliage_palette", "feature_palette", "accent_palette"]){
       let link_color = "#"+ all_palettes[raw_plant_data[category]]["palette"][0];
       if(do_links){
-        color_msg += ("<a href='javascript:forceFilter(-1, " + raw_plant_data[category] + ");' style='text-decoration-color: " + link_color + "'><span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["name"]+"<\a><\span> ");
+        color_msg += ("<a href='javascript:forceFilter(-1, " + raw_plant_data[category] + ");' style='text-decoration-color: " + link_color + "'><span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["name"]+"</a></span> ");
       } else {
-        color_msg += ("<span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["name"]+"<\span> ");
-
+        color_msg += ("<span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["name"]+"</span> ");
+        
       }
     }
   }
@@ -88,9 +81,9 @@ function buildColorMessage(raw_plant_data, do_links=true){
 }
 
 function getDissolvingRS(parent, amount, chance){
-  return function (e) {
+  return function () {
     if(Math.random() > chance){
-        return;
+      return;
     }
     addSeedPoints(amount);
     let p = document.createElement("p");
@@ -145,7 +138,7 @@ function getSeedCollectionAsString(){
 
 
 function getSeedCollection(){
-  collection = getSeedCollectionAsString();
+  let collection = getSeedCollectionAsString();
   if (collection == "") {
     return [];
   }
@@ -174,7 +167,7 @@ function addMarkings(plant_data, plant_canvas){
   let colors = getMarkedPalettes();
   let draw_offset = 0;
   for (const palette of ["foliage_palette", "feature_palette", "accent_palette"]){
-    color_offset = colors.indexOf(plant_data[palette]);
+    let color_offset = colors.indexOf(plant_data[palette]);
     if(color_offset != -1){
       ctx.fillStyle = getOffsetColor(color_offset);
       ctx.fillRect(plant_canvas.width - 4, draw_offset, 4, 4);
@@ -206,12 +199,12 @@ function collectGoodie(goodie_name){
 
 // Used mostly in the collection, parses a list of seeds, splitting it into named and unnamed
 function sortAndVerifySeedList(raw_list){
-  true_seeds = [];
+  let true_seeds = [];
   if(raw_list.length == 0){
     return true_seeds;
   }
-  split_seeds = raw_list.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");;
-  for(seed of split_seeds){
+  let split_seeds = raw_list.split(" ").join("").replace(/(^,)|(,$)/g, '').split(",");;
+  for(let seed of split_seeds){
     if(seed.startsWith("!")){
       continue;  // we skip these here
     }
@@ -226,21 +219,21 @@ function sortAndVerifySeedList(raw_list){
 
 // Given an index, retrieve the associated color. Color palette loops.
 function getOffsetColor(idx){
-    return OFFSET_COLORS[idx % OFFSET_COLORS.length];
+  return OFFSET_COLORS[idx % OFFSET_COLORS.length];
 }
 
 
 // Returns true if there's a non-transparent pixel in `row` in ImageData `image_data`. Row is 0-indexed.
 // Modified from https://stackoverflow.com/questions/11796554/automatically-crop-html5-canvas-to-contents
 function hasPixelInRow(image_data, row, width=32){
-    var index, x;
-    for (x = 0; x < width; x++) {
-        index = (row * width + x) * 4;
-        if (image_data.data[index+3] > 0) {
-            return true;
-        }
+  var index, x;
+  for (x = 0; x < width; x++) {
+    index = (row * width + x) * 4;
+    if (image_data.data[index+3] > 0) {
+      return true;
     }
-    return false;
+  }
+  return false;
 }
 
 // Shuffles an array in place
@@ -261,7 +254,7 @@ const randomValueFromObject = (obj) => {
 
 const getMainPaletteFromSeed = (seed) => {
   let data = decode_plant_data(seed);
-  main =FOLIAGE_SPRITE_DATA[data["foliage"]]["m"];
+  let main = FOLIAGE_SPRITE_DATA[data["foliage"]]["m"];
   if(main==0){
     return data["foliage_palette"];
   } else if(main==1){
@@ -271,17 +264,27 @@ const getMainPaletteFromSeed = (seed) => {
   }
 }
 
-function get_overlay_color_from_name(color, alpha){
-    color = color.slice(1);
-    if(available_overlay_colors.hasOwnProperty(color)){ color = available_overlay_colors[color]; }
-    let rgb_code = hexToRgb(color)
-    rgb_code.push(255*alpha)
-    return rgb_code;
+function hexToRgb(hex) {
+  // taken from https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? [
+    parseInt(result[1], 16),
+    parseInt(result[2], 16),
+    parseInt(result[3], 16)
+  ] : null;
 }
 
-function get_hex_from_name(color, alpha){
+function get_overlay_color_from_name(color, alpha){
   color = color.slice(1);
-  if(available_overlay_colors.hasOwnProperty(color)){ color = available_overlay_colors[color]; }
+  if(Object.prototype.hasOwnProperty.call(available_overlay_colors, color)){ color = available_overlay_colors[color]; }
+  let rgb_code = hexToRgb(color)
+  rgb_code.push(255*alpha)
+  return rgb_code;
+}
+
+function get_hex_from_name(){
+  let color = color.slice(1);
+  if(Object.prototype.hasOwnProperty.call(available_overlay_colors, color)){ color = available_overlay_colors[color]; }
   return color;
 }
 
@@ -307,37 +310,40 @@ function getRandomKeyFromObj(obj){
 
 
 function applyOverlay(stencil_canvas, palette, opacity){
-    let stencil_ctx = stencil_canvas.getContext("2d");
-    let return_canvas = document.createElement("canvas");
-    let return_ctx = return_canvas.getContext("2d");
-    let pick_canvas = document.createElement("canvas");
-    let pick_ctx = pick_canvas.getContext("2d");
-    return_canvas.width, pick_canvas.width = stencil_canvas.width;
-    return_canvas.height, pick_canvas.height = stencil_canvas.height;
-    if(!Array.isArray(palette)){
-      palette = ["#"+get_hex_from_name(palette, opacity)];
+  let stencil_ctx = stencil_canvas.getContext("2d");
+  let return_canvas = document.createElement("canvas");
+  let return_ctx = return_canvas.getContext("2d");
+  let pick_canvas = document.createElement("canvas");
+  let pick_ctx = pick_canvas.getContext("2d");
+  return_canvas.width = stencil_canvas.width;
+  pick_canvas.width = stencil_canvas.width;
+  return_canvas.height = stencil_canvas.height;
+  pick_canvas.height = stencil_canvas.height;
+  if(!Array.isArray(palette)){
+    palette = ["#"+get_hex_from_name(palette, opacity)];
+  }
+  pick_canvas = drawSkyGradient(pick_canvas, palette, opacity);
+  
+  return_canvas.width = stencil_canvas.width;
+  return_canvas.height = stencil_canvas.height;
+  
+  // With our color info loaded, we apply the color itself to its own canvas
+  let main_imgData = stencil_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height).data;
+  let pick_imgData = pick_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height).data;
+  let return_img = return_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height);
+  let return_imgData = return_img.data;
+  // Loops through bytes and only place color if the area below has some alpha.
+  for ( var i = 0; i < main_imgData.length; i += 4 ) {
+    if ( main_imgData[i + 3] > 0 ) {
+      return_imgData[i] = pick_imgData[i];
+      return_imgData[i+1] = pick_imgData[i+1];
+      return_imgData[i+2] = pick_imgData[i+2];
+      return_imgData[i+3] = pick_imgData[i+3];
     }
-    pick_canvas = drawSkyGradient(pick_canvas, palette, opacity);
-    
-    return_canvas.width = stencil_canvas.width;
-    return_canvas.height = stencil_canvas.height;
-
-    // With our color info loaded, we apply the color itself to its own canvas
-    let main_imgData = stencil_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height).data;
-    let pick_imgData = pick_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height).data;
-    let return_img = return_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height);
-    let return_imgData = return_img.data;
-    // Loops through bytes and only place color if the area below has some alpha.
-    for ( var i = 0; i < main_imgData.length; i += 4 ) {
-        if ( main_imgData[i + 3] > 0 ) {
-          return_imgData[i] = pick_imgData[i];
-          return_imgData[i+1] = pick_imgData[i+1];
-          return_imgData[i+2] = pick_imgData[i+2];
-          return_imgData[i+3] = pick_imgData[i+3];
-        }}
-        return_ctx.putImageData(return_img, 0, 0);
-    stencil_ctx.drawImage(return_canvas,0,0);
-    return({"canvas": return_canvas, "x_pos": 0, "y_pos": 0, "width": return_canvas.width, "height": return_canvas.height});
+  }
+  return_ctx.putImageData(return_img, 0, 0);
+  stencil_ctx.drawImage(return_canvas,0,0);
+  return({"canvas": return_canvas, "x_pos": 0, "y_pos": 0, "width": return_canvas.width, "height": return_canvas.height});
 }
 
 // tile an image left to right across a canvas at some y
@@ -346,8 +352,8 @@ function applyOverlay(stencil_canvas, palette, opacity){
 function tileAlongY(tileCtx, img, yPos, width, xOffset=0){
   let groundXPos = xOffset;
   while(groundXPos < width){
-      tileCtx.drawImage(img, groundXPos, yPos, img.width*2, img.height*2);
-      groundXPos += img.width*2;
+    tileCtx.drawImage(img, groundXPos, yPos, img.width*2, img.height*2);
+    groundXPos += img.width*2;
   }
 }
 
@@ -361,101 +367,73 @@ function clearCanvas(canvas){
 // This is far jankier than it needs to be since Javascript only pauses for prompt, alert, and confirm
 // Largely taken from https://soshace.com/the-ultimate-guide-to-drag-and-drop-image-uploading-with-pure-javascript/
 async function imageFromPopup(parent, name_of_image, callback){
-    var form = document.createElement("div");
-    form.className = "wildcard-popup";
-    let helptext = document.createElement("div");
-    helptext.innerHTML = "<h3>"+name_of_image+"</h3>Paste an image (or image URL), or drag-and-drop one from your files:";
-    helptext.style.padding = "1vw";
-    helptext.style.textAlign = "center";
-    let urlTaker = document.createElement("input");
-    urlTaker.style.min_height = "3vh";
-    var preview = document.createElement("img");
-    let preview_container = document.createElement("div");
-    preview_container.className = "scaled_preview_container";
-    preview_container.appendChild(preview);
-    let confirm_button = document.createElement("input");
-    confirm_button.type = "button";
-    confirm_button.value = "Confirm";
-    confirm_button.style.width = "auto";
-    urlTaker.addEventListener("input", async function() {
-        if(urlTaker.files == null){
-            preview.src = await resize_for_garden(name_of_image, urlTaker.value);
-        } else {
-            await handleImage(urlTaker.files, name_of_image, preview);
-        }
-    })
-    urlTaker.addEventListener("paste", function(event) {
-      var items = (event.clipboardData || event.originalEvent.clipboardData).items;
-      for (index in items) {
-        var item = items[index];
-        if (item.kind === 'file') {
-          var blob = item.getAsFile();
-          handleImage([blob], name_of_image, preview);
-        }
+  var form = document.createElement("div");
+  form.className = "wildcard-popup";
+  let helptext = document.createElement("div");
+  helptext.innerHTML = "<h3>"+name_of_image+"</h3>Paste an image (or image URL), or drag-and-drop one from your files:";
+  helptext.style.padding = "1vw";
+  helptext.style.textAlign = "center";
+  let urlTaker = document.createElement("input");
+  urlTaker.style.min_height = "3vh";
+  var preview = document.createElement("img");
+  let preview_container = document.createElement("div");
+  preview_container.className = "scaled_preview_container";
+  preview_container.appendChild(preview);
+  let confirm_button = document.createElement("input");
+  confirm_button.type = "button";
+  confirm_button.value = "Confirm";
+  confirm_button.style.width = "auto";
+  urlTaker.addEventListener("input", async function() {
+    if(urlTaker.files == null){
+      preview.src = await resize_for_garden(name_of_image, urlTaker.value);
+    } else {
+      await handleImage(urlTaker.files, name_of_image, preview);
+    }
+  })
+  urlTaker.addEventListener("paste", function(event) {
+    var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    for (let index in items) {
+      var item = items[index];
+      if (item.kind === 'file') {
+        var blob = item.getAsFile();
+        handleImage([blob], name_of_image, preview);
       }
-    })
-    confirm_button.addEventListener("click", function() {
-        parent.removeChild(form); 
-        // we got here by interrupting initial garden generation; restart it
-        callback();
-    })
-    function preventDefault(e) { e.preventDefault(); e.stopPropagation;}
-    function handleDrop(e) {handleImage(e.dataTransfer.files, name_of_image, preview);}
-    form.addEventListener("dragenter", preventDefault, false);
-    form.addEventListener("dragleave", preventDefault, false);
-    form.addEventListener("dragover", preventDefault, false);
-    form.addEventListener("drop", preventDefault, false);
-    form.addEventListener("drop", handleDrop, false);
-    form.appendChild(helptext);
-    form.appendChild(urlTaker);
-    form.appendChild(preview_container);
-    form.appendChild(confirm_button);
-    parent.appendChild(form);
-    urlTaker.focus();
-    return form;
+    }
+  })
+  confirm_button.addEventListener("click", function() {
+    parent.removeChild(form); 
+    // we got here by interrupting initial garden generation; restart it
+    callback();
+  })
+  function preventDefault(e) { e.preventDefault(); e.stopPropagation();}
+  function handleDrop(e) {handleImage(e.dataTransfer.files, name_of_image, preview);}
+  form.addEventListener("dragenter", preventDefault, false);
+  form.addEventListener("dragleave", preventDefault, false);
+  form.addEventListener("dragover", preventDefault, false);
+  form.addEventListener("drop", preventDefault, false);
+  form.addEventListener("drop", handleDrop, false);
+  form.appendChild(helptext);
+  form.appendChild(urlTaker);
+  form.appendChild(preview_container);
+  form.appendChild(confirm_button);
+  parent.appendChild(form);
+  urlTaker.focus();
+  return form;
 }
 
 // Helper for imageFromPopup, handles image file validation
 async function handleImage(files, name_of_image, preview_img) {
-    if(files.length > 1){
-        alert("Multiple uploads detected, only the first will be used");
-    }
-    let file = files[0];
-    let validTypes = ["image/jpeg", "image/png", "image/gif"];
-    if (validTypes.indexOf( file.type ) == -1){
-        alert("Bad file type, please use a png, gif, or jpeg");
-    } else {
-        let dataURL = await getBase64(file)
-        preview_img.src = await resize_for_garden(name_of_image, dataURL);
-    }
-}
-
-// Shrinks an image at a URL down to 32, then up to 64, then loads it into our refs
-async function resize_for_garden(name_of_image, sourceURL){
-    let refURL = name_of_image+"_wildcard_data_url"
-    all_named[name_of_image] = refURL;
-    let temp_img = await preload_single_image(sourceURL);
-    // Forcibly resize to 32x32
-    let wildcard_canvas = document.createElement("canvas");
-    wildcard_canvas.width = 32;
-    wildcard_canvas.height = 32;
-    let max_side = Math.max(temp_img.naturalHeight, temp_img.naturalWidth);
-    let wildcard_ctx = wildcard_canvas.getContext("2d");
-    wildcard_ctx.imageSmoothingEnabled = false;
-    // Do a bit of math so that, if the image isn't a perfect square, we don't squash it.
-    wildcard_ctx.drawImage(temp_img, 0, 32-temp_img.naturalHeight*(32/max_side),
-                           temp_img.naturalWidth*(32/max_side),
-                           temp_img.naturalHeight*(32/max_side));
-    //let resized_dataURL = wildcard_canvas.toDataURL(temp_img.type);
-    //refs[refURL] = await preload_single_image(resized_dataURL);
-    wildcard_canvases[name_of_image] = wildcard_canvas;
-    let preview_canvas = document.createElement("canvas");
-    let preview_context = preview_canvas.getContext("2d");
-    preview_canvas.width = 64;
-    preview_canvas.height = 64;
-    preview_context.imageSmoothingEnabled = false;
-    preview_context.drawImage(refs[refURL], 0, 0, 64, 64);
-    return preview_canvas.toDataURL(temp_img.type);
+  if(files.length > 1){
+    alert("Multiple uploads detected, only the first will be used");
+  }
+  let file = files[0];
+  let validTypes = ["image/jpeg", "image/png", "image/gif"];
+  if (validTypes.indexOf( file.type ) == -1){
+    alert("Bad file type, please use a png, gif, or jpeg");
+  } else {
+    let dataURL = await getBase64(file)
+    preview_img.src = await resize_for_garden(name_of_image, dataURL);
+  }
 }
 
 
@@ -481,8 +459,8 @@ function addRadioButton(parent, name, label, checked, onclick=null) {
 
 function getRadioValue(name) {
   var ele = document.getElementsByName(name);
-  for(i = 0; i < ele.length; i++) {
-      if(ele[i].checked) {return ele[i].value};
+  for(let i = 0; i < ele.length; i++) {
+    if(ele[i].checked) {return ele[i].value};
   }
 }
 
@@ -493,7 +471,7 @@ function makeSortCheckmark(prefix, name, parent, checked=false) {
   checkbox.value = name;
   checkbox.id = prefix+name;
   checkbox.checked = checked
-  label = document.createElement("label");
+  let label = document.createElement("label");
   label.setAttribute("for", checkbox.id);
   label.innerHTML = name;
   label.classList.add("unselectable");
@@ -506,27 +484,27 @@ function makeSortCheckmark(prefix, name, parent, checked=false) {
 
 // Radiobuttons are weird and cursed
 // https://stackoverflow.com/questions/118693/how-do-you-dynamically-create-a-radio-button-in-javascript-that-works-in-all-bro
-function makeRadioButtonCursed(name, label, checked, onclick=false) {
-  let id = name + "_" + label;
-  function makeRadioButtonViaDiv(){
-    var radioHtml = '<input type="radio" id="' + id + ' "name="' + name + '"';
-    if ( checked ) {
-        radioHtml += ' checked="checked"';
-    }
-    if ( onclick ) {
-        radioHtml += ' onclick=' + onclick;
-    }
-    radioHtml += '/>';
-    var radioFragment = document.createElement('div');
-    radioFragment.innerHTML = radioHtml;
-    return radioFragment.firstChild;
-  }
-  let radio_button_label = document.createElement('label');
-  radio_button_label.setAttribute('for', id);
-  radio_button_label.setAttribute('value', label);
-  radio_button_label.appendChild(makeRadioButtonViaDiv());
-  return radio_button_label;
+/*function makeRadioButtonCursed(name, label, checked, onclick=false) {
+let id = name + "_" + label;
+function makeRadioButtonViaDiv(){
+var radioHtml = '<input type="radio" id="' + id + ' "name="' + name + '"';
+if ( checked ) {
+radioHtml += ' checked="checked"';
 }
+if ( onclick ) {
+radioHtml += ' onclick=' + onclick;
+}
+radioHtml += '/>';
+var radioFragment = document.createElement('div');
+radioFragment.innerHTML = radioHtml;
+return radioFragment.firstChild;
+}
+let radio_button_label = document.createElement('label');
+radio_button_label.setAttribute('for', id);
+radio_button_label.setAttribute('value', label);
+radio_button_label.appendChild(makeRadioButtonViaDiv());
+return radio_button_label;
+}*/
 
 
 // From https://css-tricks.com/converting-color-spaces-in-javascript/
@@ -548,12 +526,11 @@ function toHue(H){
   g /= 255;
   b /= 255;
   let cmin = Math.min(r,g,b),
-      cmax = Math.max(r,g,b),
-      delta = cmax - cmin,
-      h = 0,
-      s = 0,
-      l = 0;
-
+  cmax = Math.max(r,g,b),
+  delta = cmax - cmin,
+  h = 0,
+  l = 0;
+  
   if (delta == 0)
     h = 0;
   else if (cmax == r)
@@ -561,30 +538,28 @@ function toHue(H){
   else if (cmax == g)
     h = (b - r) / delta + 2;
   else
-    h = (r - g) / delta + 4;
-
+  h = (r - g) / delta + 4;
+  
   h = Math.round(h * 60);
-
+  
   if (h < 0)
     h += 360;
-
+  
   l = (cmax + cmin) / 2;
-  s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
-  s = +(s * 100).toFixed(1);
   l = +(l * 100).toFixed(1);
-
+  
   return h+(1-l/100);
 }
 
 
 function getBase64(file) {
-    return new Promise(function(resolve) {
-      var reader = new FileReader();
-      reader.onloadend = function() {
-        resolve(reader.result)
-      }
-      reader.readAsDataURL(file);
-    })
+  return new Promise(function(resolve) {
+    var reader = new FileReader();
+    reader.onloadend = function() {
+      resolve(reader.result)
+    }
+    reader.readAsDataURL(file);
+  })
 }
 
 // TODO: this was hastily-written. Really needs some cleanup
@@ -605,10 +580,10 @@ function draw_outline_v2(template_canvas){
   // We try to be smart with transparent overlays; we search for a background color.
   // We expect this loop to either die early or let us leave early
   for (let i=0; i < main_imgData.length; i += 4) {
-      if ( main_imgData[i + 3] < 255 ) {
-          outline_color = [main_imgData[i], main_imgData[i+1], main_imgData[i+2], main_imgData[i+3]];
-          break;
-      }
+    if ( main_imgData[i + 3] < 255 ) {
+      outline_color = [main_imgData[i], main_imgData[i+1], main_imgData[i+2], main_imgData[i+3]];
+      break;
+    }
   }
   // If we didn't find any non-opaque pixels, we have nothing to outline.
   if(outline_color == undefined){return;}
@@ -617,85 +592,129 @@ function draw_outline_v2(template_canvas){
   let this_is_background;
   let most_recent_color = [0, 0, 0];
   for (let i=4; i < main_imgData.length; i += 4) {
-      // Preemptive optimization is the enemy of progress, and yet. And yet.
-      if ( main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] &&
-               main_imgData[i + 1] == outline_color[1] &&  main_imgData[i + 2] == outline_color[2])) {
-          this_is_background = true;
-      } else {
-          this_is_background = false;
-          most_recent_color = [main_imgData[i] * 0.8, main_imgData[i+1] * 0.8, main_imgData[i+2] * 0.8, 255];
-          //most_recent_color = [main_imgData[i] * 1, main_imgData[i + 1] * 1, main_imgData[i + 2] * 1, 255];
-      }
-      // Note: because our "pixels" are 2x2, this shouldn't cause troubles at the corners...I think
-      if(last_was_background && !this_is_background){
-          points_to_color.push(i-4);
-          //points_to_color.push(i-8);
-          // NOTE: push twice due to double-thickness
-          // TODO: could we do this before the resize? Easy 4x efficiency
-          colors_to_use.push(most_recent_color);
-          //colors_to_use.push(most_recent_color);
-
-      } else if (this_is_background && !last_was_background){
-          points_to_color.push(i);
-          colors_to_use.push(most_recent_color);
-          //points_to_color.push(i+4);
-          //colors_to_use.push(most_recent_color);
-      }
-      last_was_background = this_is_background;
+    // Preemptive optimization is the enemy of progress, and yet. And yet.
+    if ( main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] && main_imgData[i + 1] == outline_color[1] &&  main_imgData[i + 2] == outline_color[2])) {
+      this_is_background = true;
+    } else {
+      this_is_background = false;
+      most_recent_color = [main_imgData[i] * 0.8, main_imgData[i+1] * 0.8, main_imgData[i+2] * 0.8, 255];
+      //most_recent_color = [main_imgData[i] * 1, main_imgData[i + 1] * 1, main_imgData[i + 2] * 1, 255];
+    }
+    // Note: because our "pixels" are 2x2, this shouldn't cause troubles at the corners...I think
+    if(last_was_background && !this_is_background){
+      points_to_color.push(i-4);
+      //points_to_color.push(i-8);
+      // NOTE: push twice due to double-thickness
+      // TODO: could we do this before the resize? Easy 4x efficiency
+      colors_to_use.push(most_recent_color);
+      //colors_to_use.push(most_recent_color);
+      
+    } else if (this_is_background && !last_was_background){
+      points_to_color.push(i);
+      colors_to_use.push(most_recent_color);
+      //points_to_color.push(i+4);
+      //colors_to_use.push(most_recent_color);
+    }
+    last_was_background = this_is_background;
   }
   // Now we repeat, drawing our lines top to bottom.
   last_was_background = (main_imgData.slice(0,4).toString() == outline_color.toString());
   this_is_background = undefined;
   for (let j=0; j < template_canvas.width; j ++) {
-      for (let k=0; k < template_canvas.height; k++){
-          // This is so, so silly...
-          if( j==0 && k==0 ){k=4};  // skip our first again.
-          // We use our loops to format us up so we look like the prior inner loop for easier troubleshooting.
-          // TODO: At this point, I think the remainder could be refactored into a function. Would be a lot cleaner.
-          let i = (j + k*template_canvas.width)*4;
-          if ( main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] &&
-               main_imgData[i + 1] == outline_color[1] &&  main_imgData[i + 2] == outline_color[2])) {
-              this_is_background = true;
-          } else {
-              this_is_background = false;
-              most_recent_color = [main_imgData[i] * 0.8, main_imgData[i+1] * 0.8, main_imgData[i+2] * 0.8, 255];
-          }
-          if(last_was_background && !this_is_background){
-              points_to_color.push(i-template_canvas.width*4);
-              //points_to_color.push(i-output_canvas.width*2*4);
-              colors_to_use.push(most_recent_color);
-              //colors_to_use.push(most_recent_color);
-          } else if (this_is_background && !last_was_background){
-              points_to_color.push(i);
-              //points_to_color.push(i+output_canvas.width*4);
-              colors_to_use.push(most_recent_color);
-              //colors_to_use.push(most_recent_color);
-          }
-          last_was_background = this_is_background;
+    for (let k=0; k < template_canvas.height; k++){
+      // This is so, so silly...
+      if( j==0 && k==0 ){k=4};  // skip our first again.
+      // We use our loops to format us up so we look like the prior inner loop for easier troubleshooting.
+      // TODO: At this point, I think the remainder could be refactored into a function. Would be a lot cleaner.
+      let i = (j + k*template_canvas.width)*4;
+      if ( main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] && main_imgData[i + 1] == outline_color[1] &&  main_imgData[i + 2] == outline_color[2])) {
+        this_is_background = true;
+      } else {
+        this_is_background = false;
+        most_recent_color = [main_imgData[i] * 0.8, main_imgData[i+1] * 0.8, main_imgData[i+2] * 0.8, 255];
       }
+      if(last_was_background && !this_is_background){
+        points_to_color.push(i-template_canvas.width*4);
+        //points_to_color.push(i-output_canvas.width*2*4);
+        colors_to_use.push(most_recent_color);
+        //colors_to_use.push(most_recent_color);
+      } else if (this_is_background && !last_was_background){
+        points_to_color.push(i);
+        //points_to_color.push(i+output_canvas.width*4);
+        colors_to_use.push(most_recent_color);
+        //colors_to_use.push(most_recent_color);
+      }
+      last_was_background = this_is_background;
+    }
   }
-   // And now we apply the color!
-   // Note the reason we store points instead of coloring them in place is to avoid the top-down picking up the left-right
-   // we want that little "curve" on the pixel outlines.
-   for (let i=0; i<points_to_color.length; i++){
-       color_to_use = colors_to_use[i];
-       main_imgData[points_to_color[i]] = color_to_use[0];
-       main_imgData[points_to_color[i]+1] = color_to_use[1];
-       main_imgData[points_to_color[i]+2] = color_to_use[2];
-       main_imgData[points_to_color[i]+3] = color_to_use[3];
+  // And now we apply the color!
+  // Note the reason we store points instead of coloring them in place is to avoid the top-down picking up the left-right
+  // we want that little "curve" on the pixel outlines.
+  for (let i=0; i<points_to_color.length; i++){
+    let color_to_use = colors_to_use[i];
+    main_imgData[points_to_color[i]] = color_to_use[0];
+    main_imgData[points_to_color[i]+1] = color_to_use[1];
+    main_imgData[points_to_color[i]+2] = color_to_use[2];
+    main_imgData[points_to_color[i]+3] = color_to_use[3];
   }
   ctx.putImageData(main_img, 0, 0);
   //alert(output_canvas.toDataURL());
   //return output_canvas;
 }
 
-function cloneCanvas(orig) {
-  let clone = document.createElement('canvas');
-  let clone_ctx = clone.getContext('2d');
-  clone.width = orig.width; clone.height = orig.height;
-  clone_ctx.drawImage(orig, 0, 0);
-  return clone;
+/**function cloneCanvas(orig) {
+let clone = document.createElement('canvas');
+let clone_ctx = clone.getContext('2d');
+clone.width = orig.width; clone.height = orig.height;
+clone_ctx.drawImage(orig, 0, 0);
+return clone;
+}**/
+
+function gen_toggle_button(target_var, target_func, initial_val=true){
+  let button = document.createElement("div");
+  button.id = target_var + "_setting_toggle";
+  button.className = "bingo_button";
+  button.onclick = cycle_toggle_value.bind(button, target_var, target_func);
+  button.textContent = "["+target_var.slice(0,1).toUpperCase()+target_var.slice(1)+": "+bool_to_text(initial_val)+"]";
+  return button
 }
 
+function gen_func_button(text, target_func){
+  let button = document.createElement("div");
+  button.id = text;
+  button.className = "bingo_button";
+  button.onclick = target_func;
+  button.textContent = "["+text+"]";
+  return button
+}
 
+function get_toggle_button_setting(setting){
+  let target_elem = document.getElementById(setting + "_setting_toggle");
+  if(!target_elem){ return true;}
+  let start_pos = setting.length+4;
+  let val = target_elem.textContent.slice(start_pos, start_pos+1);
+  if(val=="N"){return true;}else{return false;}  // ON or OFF
+}
 
+function cycle_toggle_value(target_var, target_func){
+  let target_elem = document.getElementById(target_var + "_setting_toggle");
+  let val = !get_toggle_button_setting(target_var);
+  target_elem.textContent = "["+target_var.slice(0,1).toUpperCase()+target_var.slice(1)+": "+bool_to_text(val)+"]";
+  target_func();
+}
+
+function bool_to_text(bool){
+  if(bool){return "ON";}
+  else{return "OFF";}
+}
+
+export {gen_toggle_button, gen_func_button, applyOverlay, createSpacedPlacementQueue, shuffleArray, hasPixelInRow,
+  draw_outline_v2, tileAlongY, drawSkyGradient, get_overlay_color_from_name, imageFromPopup, clearCanvas, claimCanvas,
+  collectSeed, drawPlantForSquare, buildColorMessage, getDissolvingRS, getSeedCollection, getSeedPoints, collectGoodie,
+  randomFromArray, randomValueFromObject, getRandomKeyFromObj, getMainPaletteFromSeed, addRadioButton, makeSortCheckmark,
+  getRadioValue, toHue, hexToRgb, addSeedPoints, getSeedCollectionAsString, getGoodieCollection, getMarkedBases,
+  getMarkedPalettes, getOffsetColor, get_toggle_button_setting, sortAndVerifySeedList};
+  
+  
+  
+  
