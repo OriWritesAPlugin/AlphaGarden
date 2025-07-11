@@ -684,7 +684,7 @@ class CelestialLayer extends Layer {
       } else {
         actingPalette = this.customPalette;
       }
-      applyOverlay(place_onto_canvas, actingPalette, this.opacity);
+      applyOverlay(place_onto_canvas, actingPalette, this.opacity, true);
     }
   }
 

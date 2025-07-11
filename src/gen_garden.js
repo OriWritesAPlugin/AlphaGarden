@@ -1,7 +1,7 @@
 import { available_midgrounds, all_named, all_palettes, available_ground, GROUND_BASE_SPRITESHEET, available_ground_base } from "./data.js";
 import { createSpacedPlacementQueue, claimCanvas, hasPixelInRow, hexToRgb } from "./shared.js";
 import { overall_palette, base_foliage_palette, gen_named, decode_plant_data, gen_plant, random_from_list } from "./gen_plant.js";
-import { refs, preload_single_image, preload_spritesheet, imageFromPopup, tile_along_y, replace_color_palette_single_image } from "./image_handling.js";
+import { refs, preload_single_image, preload_spritesheet, imageFromPopup, tile_along_y, replace_color_palette_single_image, wildcard_canvases } from "./image_handling.js";
 
 var current_ground = "grass [palette]";
 const available_overlay_colors = {
@@ -34,7 +34,6 @@ const available_tileables = available_midgrounds;
 
 var custom_background_colors = [];
 const star_colors = ["ffbbff", "bbffff", "ffffbb", "ffdddd", "ddffdd", "ffdddd", "dddddd"];
-var wildcard_canvases = {};
 
 const scaled_seed_width = 64;  // not used everywhere, being refactored in.
 var x_coords = [];
@@ -530,6 +529,7 @@ function gen_background_style_selection(dropdown_id){
 
 function get_canvas_for_named_component(name){
     // The great de-async-ening definitely breaks wildcards.
+    console.log(name);
     if(name.startsWith("*")){
         console.log(wildcard_canvases[name]);
         return wildcard_canvases[name];

@@ -3,6 +3,7 @@ import { work_canvas_size } from "./gen_plant.js";
 
 // Holder for all the images we'll need
 const refs = {};
+const wildcard_canvases = {};
 
 // In case of error (probably CORS)
 const BAD_IMG_URL = "https://i.imgur.com/kxStIJE.png";
@@ -102,10 +103,9 @@ function replace_color_palette(old_palette: string[], new_palette: string[], ctx
     ctx.putImageData(imageData, 0, 0);
 }
 
-function applyOverlay(stencil_canvas: HTMLCanvasElement, palette: string | string[], opacity: number) {
+function applyOverlay(stencil_canvas: HTMLCanvasElement, palette: string | string[], opacity: number, full_screen=false) {
     const stencil_ctx = stencil_canvas.getContext("2d");
     const return_canvas = document.createElement("canvas");
-    const return_ctx = return_canvas.getContext("2d");
     let pick_canvas = document.createElement("canvas");
     const pick_ctx = pick_canvas.getContext("2d");
     return_canvas.width = stencil_canvas.width;
@@ -122,20 +122,18 @@ function applyOverlay(stencil_canvas: HTMLCanvasElement, palette: string | strin
 
     // With our color info loaded, we apply the color itself to its own canvas
     const main_imgData = stencil_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height).data;
-    const pick_imgData = pick_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height).data;
-    const return_img = return_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height);
-    const return_imgData = return_img.data;
-    // Loops through bytes and only place color if the area below has some alpha.
-    for (let i = 0; i < main_imgData.length; i += 4) {
-        if (main_imgData[i + 3] > 0) {
-            return_imgData[i] = pick_imgData[i];
-            return_imgData[i + 1] = pick_imgData[i + 1];
-            return_imgData[i + 2] = pick_imgData[i + 2];
-            return_imgData[i + 3] = pick_imgData[i + 3];
+    // Zero out the opacity if there's nothing below
+    if(!full_screen){
+        const pick_imgData = pick_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height);
+        for (let i = 0; i < main_imgData.length; i += 4) {
+            if (main_imgData[i + 3] == 0) {
+                pick_imgData.data[i + 3] = 0;
+            }
         }
+        pick_ctx.putImageData(pick_imgData, 0, 0);
     }
-    return_ctx.putImageData(return_img, 0, 0);
-    stencil_ctx.drawImage(return_canvas, 0, 0);
+    //return_ctx.putImageData(return_img, 0, 0);
+    stencil_ctx.drawImage(pick_canvas, 0, 0);
     return ({ "canvas": return_canvas, "x_pos": 0, "y_pos": 0, "width": return_canvas.width, "height": return_canvas.height });
 }
 
@@ -345,6 +343,7 @@ async function resize_for_garden(name_of_image: string, sourceURL: string) {
         temp_img.naturalWidth * (32 / max_side),
         temp_img.naturalHeight * (32 / max_side));
     const resized_dataURL = wildcard_canvas.toDataURL();//(temp_img.type);
+    wildcard_canvases[name_of_image] = wildcard_canvas;
     refs[refURL] = await preload_single_image(resized_dataURL);
     const preview_canvas = document.createElement("canvas");
     const preview_context = preview_canvas.getContext("2d");
@@ -371,5 +370,5 @@ function drawSkyGradient(canvas: HTMLCanvasElement, actingPalette: string[], opa
 
 export {
     refs, replace_color_palette_single_image, preload_single_image, preload_spritesheet, replace_color_palette,
-    applyOverlay, draw_outline_v2, tile_along_y, imageFromPopup, clearCanvas, drawSkyGradient
+    applyOverlay, draw_outline_v2, tile_along_y, imageFromPopup, clearCanvas, drawSkyGradient, wildcard_canvases
 };

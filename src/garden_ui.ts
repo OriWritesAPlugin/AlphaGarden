@@ -591,8 +591,8 @@ class LayerManager {
     this.layerHolderDiv.appendChild(newLayerDiv.selfDiv);
     if (openEditMode) {
       setTimeout(() => { newLayerDiv.toggleEditMode(); }, 10);
+      this.updateCallback();
     }
-    this.updateCallback();
     return newLayerDiv;
   }
 
