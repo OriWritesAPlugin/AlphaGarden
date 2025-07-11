@@ -19,13 +19,11 @@
         <title>Self-Care Bingo</title>
     </head>
     <a href="./" class="index_link"><--Home</a>
-    <body onload="do_setup()">
+    <body>
         <div class='center-parent'>
           <label id="smaller-title"><b>Self-Care Bingo</b></label><br><br>
           <div style="text-align: center">
-               <input id="extra_icons" type="checkbox" name="extra_icons" onchange="toggle_extra_icons()" checked> Use extra icons
-               <input id="display_hints" type="checkbox" name="display_hints" onchange="toggle_hints()" style="margin-left: 10px;" checked> Display hints
-               <input id="dark_mode" type="checkbox" name="dark_mode" onchange="toggle_dark_mode()" style="margin-left: 10px;" checked> Dark mode
+          <div class='inline-flex-parent' style="justify-content: center" id="settings_div"></div>
           </div>
           <p id="load_text">Loading plants...</p>
           <p id="bingo_seed_list">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> earned yet!</p>

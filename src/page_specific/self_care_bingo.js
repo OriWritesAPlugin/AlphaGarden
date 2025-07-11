@@ -1,12 +1,13 @@
 import {gen_plant_data, encode_plant_data_v2, drawPlantForSquare} from "../gen_plant.js"
 import {shuffleArray} from "../shared.js"
-import {restoreBingoStateIfPresent, generate_board} from "../bingo.js"
+import {restoreBingoStateIfPresent, generate_board, setForcedSeed} from "../bingo.js"
 
 const d = new Date();
 
 // Fun fact! Javascript apparently numbers days 1-31 but months 0-11. We toString so it doesn't matter, but it's interesting.
 // Anyways, this (messily) ensures a fixed set of plants each day. I'd prefer something more OO come refactor time.
 var forced_random_seed = d.getDate().toString() + d.getMonth().toString() + d.getFullYear().toString() + "caresalt";
+setForcedSeed(forced_random_seed);
 var selected_seeds = new Set();
 const choose_from = 25;
 const max_choose = 7;
@@ -15,7 +16,7 @@ async function do_setup() {
     document.getElementById("load_text").remove();
     let restored_state = false;
     try {
-        restored_state = restoreBingoStateIfPresent();
+        restored_state = restoreBingoStateIfPresent(true);
     } catch (e) {
         console.log(e);
         alert("Malformed old bingo state, generating a new board!");

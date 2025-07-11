@@ -327,6 +327,7 @@ let revealed_seeds = [];
 let current_difficulty;
 let bingo_plant_generated = false;  // Used to track whether the bonus bingo seed has been revealed. We don't re-hide seeds.
 let forced_random_seed = null;  // "Child" pages can overwrite with a fixed seed, ex: self_care uses the date as a seed.
+function setForcedSeed(seed){forced_random_seed = seed;}
 let rewards = {};  // the seeds to be rewarded, excepting the special bingo seed
 let bingo_reward;  // the special bingo seed reward
 let had_bingo_last_turn = false;  // used to skip re-running bingo display code if our status hasn't changed
@@ -1047,8 +1048,10 @@ function setBoardInfo() {
   board_size = Number(getRadioValue("size_select").split("x").slice(0, 1));
 }
 
-function do_bingo_setup() {
-  launch_config_dialogue();
+function do_bingo_setup(with_config) {
+  if(with_config){
+    launch_config_dialogue();
+  }
   toggle_dark_mode();
   let settings_div = document.getElementById("settings_div");
   settings_div.appendChild(gen_func_button("Configure", launch_config_dialogue));
@@ -1081,6 +1084,7 @@ function completeSetup() {
   }
 }
 
-do_bingo_setup();
+do_bingo_setup(document.getElementById("stupid_hack") != undefined); // check for a magic id that tells us we want a config screen. oop.
 
-export { difficulties, bingo_challenge_extras, current_difficulty, generate_board, export_bingo_onclick, import_bingo_onclick, restoreBingoStateIfPresent, toggle_extra_icons, toggle_hints, toggle_dark_mode, update_squares_til_if_present, stashBingoState, setModifiedBingoSeedChances, do_bingo_setup };
+
+export { difficulties, bingo_challenge_extras, current_difficulty, setForcedSeed, generate_board, export_bingo_onclick, import_bingo_onclick, restoreBingoStateIfPresent, toggle_extra_icons, toggle_hints, toggle_dark_mode, update_squares_til_if_present, stashBingoState, setModifiedBingoSeedChances, do_bingo_setup };

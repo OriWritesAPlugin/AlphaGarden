@@ -1,108 +1,26 @@
 <!DOCTYPE html>
 <html>
-    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1" />
-    <head>
-        <title>Seed Swap</title>
-        <link rel="stylesheet" type="text/css"  href="nature.css" />
-        <link rel="stylesheet" type="text/css"  href="shared.css" />
-        <link rel="icon" href="https://i.imgur.com/ufm0hIO.png">
-    </head>
-    <body onload="do_preload()" style="background: #201920; display:flex; flex-direction:column; justify-content:center;">
-        <a href="./" class="index_link"><--Home</a>
-        <h1 id="title">Seed Swap</h1>
-        <h2 id="subtitle">Trade (discard) unwanted seeds to earn new ones! New seeds every day!</h2>
-          <div id="content_div" class='center-parent' style="text-align: center">
-          <p id="seeds_earned">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> claimed yet<br></p>
-          </div>
-    </body>
-    <script src="built/data.js"></script>
-    <script src="built/gen_plant.js"></script>
-    <script src="built/bingo.js"></script>
-    <script src="built/shared.js"></script>
-    <script type="text/javascript">
+<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1" />
 
-        const days_to_gen = 3;
-        const prices = [2, 3, 3, 4, 4, 5, 4, 4, 3, 3, 2];
-        const d = new Date();
-        var random_seed;
-        var swappable_seeds = {};
-        const text = {0: "Today's offerings:", 1: "Yesterday's offerings:", 2: "Offerings from 2 days ago (disappear tomorrow)"};
-        var swapped_seeds = [];
+<head>
+    <title>Seed Swap</title>
+    <link rel="stylesheet" type="text/css" href="shared.css" />
+    <link rel="icon" href="https://i.imgur.com/ufm0hIO.png">
+</head>
 
+<body style="background: #201920; display:flex; flex-direction:column; justify-content:center;">
+    <a href="./" class="index_link"><--Home </a>
+            <h1 id="title">Seed Swap</h1>
+            <h2 id="subtitle">Trade in your raw seedstuff for seeds! You get raw seedstuff by recycling unwanted seeds
+                in the Collection. New seeds every day!</h2>
+            <h3 id="sp_count" style="text-align: center;">Current raw seedstuff: 0</h3>
+            <div id="content_div" class='center-parent'>
+                <p id="seeds_earned">No <a href="https://www1.flightrising.com/forums/adopt/3112071">seeds</a> claimed
+                    yet<br></p>
+                <p id="load_text">Loading plants...</p>
+            </div>
+            </h3>
+            <script type="module" src="built/page_specific/seed_swap_shop.js"></script>
+</body>
 
-        async function gen_divs() {
-            let parent = document.getElementById("content_div");
-            for(let i=0; i<days_to_gen; i++){
-                let d = new Date();
-                d.setDate(d.getDate()-i);
-                random_seed = d.getDate().toString()+d.getMonth().toString()+d.getFullYear().toString() + "_shop_salty";
-                let new_text = document.createElement('h3');
-                new_text.innerHTML = text[i];
-                let new_row = document.createElement('div');
-                new_row.className = "collection_display";
-                parent.appendChild(new_text);
-                parent.appendChild(new_row);
-                for(let j=0; j<prices.length; j++){
-                    let id = i + "_" + j;
-                    await add_swap_square(new_row, j, id, prices[j]);
-                }
-            }
-        }
-
-        // Largely similar to bingo squares
-        async function add_swap_square(parent, column_offset, id, price){
-            let swap_square = document.createElement('div');
-            swap_square.id = id;
-            swap_square.className = 'bingo_box';
-            swap_square.addEventListener("click", claim_swap);
-            swap_square.addEventListener('touchend', function(e){
-                    claim_swap(e);
-                    e.preventDefault();
-                })
-            swap_square.style.display = "inline";  // to align the label
-            let rarity;
-            if(price==2){rarity=7;}
-            else if(price==3){rarity=10;}
-            else if(price==4){rarity=7;}  // Using this for release seeds
-            else if(price==5){rarity=99;}
-            else{alert("Price "+price+" has no assigned rarity")};
-            let plant_data = gen_plant_data(rarity, random_seed+String(column_offset));
-            if(price==4 && temp_boost_foliage.length > 0){
-                let recent_release_prng = mulberry32(xmur3(random_seed+String(column_offset))());
-                plant_data["foliage"] = random_from_foliage(temp_boost_foliage, recent_release_prng);}
-            let seed = encode_plant_data_v2(plant_data);
-            let data_url = await drawPlantForSquare(seed);
-            swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
-            swappable_seeds[id] = seed;
-
-            let label = document.createElement('label')
-            label.htmlFor = id;
-            label.className = 'todo_plant_label';
-            let label_text = price.toString()+" Seed";
-            if(price>1){label_text += "s"};
-            label.appendChild(document.createTextNode(label_text));
-            label.style.verticalAlign = "top";
-            swap_square.appendChild(label);
-            parent.appendChild(swap_square);
-            return id;
-        }
-
-        async function claim_swap(e){
-            var id = e.target.id;
-            var bingo_square = document.getElementById(id);
-            bingo_square.lastChild.style.opacity = 0.2;  // Make label translucent
-            bingo_square.lastChild.innerHTML = "Owned!";
-            if(swapped_seeds.indexOf(swappable_seeds[id]) == -1){
-              swapped_seeds.push(swappable_seeds[id]);
-            }
-            document.getElementById("seeds_earned").innerHTML = swapped_seeds.join(", ");
-            collectSeed(swappable_seeds[id]);
-        }
-
-        async function do_preload() {
-            await preload_plants();
-            await gen_divs();
-        }
-    </script>
-    </body>
 </html>

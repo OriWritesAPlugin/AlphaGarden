@@ -50,7 +50,7 @@ class LayerDiv {
       if (this.layer) { await this.layer.update(); }
       onEditCallback();
     }.bind(this);
-    this.selfDiv.addEventListener('mousedown', draggableLayerMouseDownHandler.bind(onEditCallback));
+    this.selfDiv.addEventListener('mousedown', draggableLayerMouseDownHandler.bind({callOnDrag: onEditCallback}));
     this.selfDiv.style.border = "3px solid " + this.accentColor;
     this.layer = layer
     this.id = "layer_" + id;
@@ -586,9 +586,13 @@ class LayerManager {
     return layerButton;
   }
 
-  addLayerAndAnimate(newLayerDiv: LayerDiv, openEditMode: boolean) {
+  addLayerAndAnimate(newLayerDiv: LayerDiv, openEditMode: boolean, pushFirst=false) {
     this.divToLayerMapper[newLayerDiv.selfDiv.id] = newLayerDiv;
-    this.layerHolderDiv.appendChild(newLayerDiv.selfDiv);
+    if(pushFirst){
+      this.layerHolderDiv.insertBefore(newLayerDiv.selfDiv, this.layerHolderDiv.childNodes[0]);
+    } else {
+      this.layerHolderDiv.appendChild(newLayerDiv.selfDiv);
+    }
     if (openEditMode) {
       setTimeout(() => { newLayerDiv.toggleEditMode(); }, 10);
       this.updateCallback();
@@ -730,4 +734,4 @@ class LayerManager {
   }
 }
 
-export { LayerManager, GardenLayerDiv };
+export { LayerManager, GardenLayerDiv, CelestialLayerDiv };

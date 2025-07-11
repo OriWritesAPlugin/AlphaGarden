@@ -239,7 +239,7 @@ class GardenLayer extends Layer {
   draw_outline: false;
 
   constructor(width: number, height: number, x_offset: number, y_offset: number, seedList: string[], groundPaletteSeed: string, groundCover: string, ground: string, scale: number) {
-    super(width, height, x_offset, y_offset, scale);
+    super(1, 1, x_offset, y_offset, scale);
     this.seedList = seedList;
     this.generateContent();
     this.assignSmartPositions();
@@ -458,20 +458,25 @@ class GardenLayer extends Layer {
   async setHeight(height: number) {
     // All the + LAYER_HEIGHT is to create a canvas large enough for someone to y_offset all the way to the top of the screen.
     // If we had it exactly equal to the expected canvas size, there'd be LAYER_HEIGHT of empty space at the bottom if they tried.
-    this.height = height + LAYER_HEIGHT;
-    this.canvas.height = height + LAYER_HEIGHT;
-    this.canvasGround.height = height + LAYER_HEIGHT;
-    // The main garden canvas, being stacked on top of the ground, never needs to care about height
-    await this.updateGround();
+    const new_height = height + LAYER_HEIGHT;
+    if(this.height != new_height){
+      this.height = new_height;
+      this.canvas.height = new_height;
+      this.canvasGround.height = new_height;
+      // The main garden canvas, being stacked on top of the ground, never needs to care about height
+      await this.updateGround();
+    }
   }
 
   async setWidth(width: number) {
-    this.width = width;
-    this.canvas.width = width;
-    this.canvasGround.width = width;
-    this.canvasGarden.width = width;
-    await this.updateMain();
-    this.updateGround();
+    if(this.width != width){
+      this.width = width;
+      this.canvas.width = width;
+      this.canvasGround.width = width;
+      this.canvasGarden.width = width;
+      await this.updateMain();
+      this.updateGround();
+    }
   }
 }
 

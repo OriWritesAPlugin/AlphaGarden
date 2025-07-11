@@ -15,9 +15,9 @@
         </br>
         <label for="seed_list">Seed list (comma-separated):</label><br>
         <textarea id="seed_list" name="seed_list" size="4" placeholder="Click here and paste!"></textarea><br>
-        <label for="quantity">Width:</label> <input class="garden-dim-bar" type="number" id="garden_width" name="quantity" min="64" value=450>
-        <label for="garden_height">Height:</label> <input class="garden-dim-bar" type="number" id="garden_height" name="garden_height" min="70" value=90>
-        <label for="garden_scale">Scale:</label> <input class="garden-dim-bar" type="number" id="garden_scale" name="garden_scale" value=1 step="0.25">
+        <label for="quantity">Width:</label> <input class="garden-dim-bar" type="text" inputmode="numeric" style="width: 1.5em" id="garden_width" name="quantity" min="64" value=450>
+        <label for="garden_height">Height:</label> <input class="garden-dim-bar" type="text" inputmode="numeric" style="width: 1.5em" id="garden_height" name="garden_height" min="70" value=90>
+        <label for="garden_scale">Scale:</label> <input class="garden-dim-bar" type="text" inputmode="numeric" style="width: 1.5em" id="garden_scale" name="garden_scale" value=1 step="0.25">
         <input type="button" class="chunky_wrap" value="Sync sizes" id="size_syncer" title="Apply the overall image's size (to the left) to all its layers">
         <input type="button" class="chunky_wrap" value="Randomize" id="randomizer" title="Create a randomized garden using seeds from your collection">
         <input type="button" class="chunky_wrap" value="Load" id="loader" title="Load a garden from a text blob. You get that when you claim a garden.">

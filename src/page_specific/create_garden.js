@@ -2,8 +2,8 @@ import { FOLIAGE_SPRITE_DATA, all_foliage } from "../data.js";
 import { buildColorMessage, getSeedCollection, randomFromArray, randomValueFromObject, getGoodieCollection, getRandomKeyFromObj, claimCanvas } from "../shared.js";
 import { gen_plant, decode_plant_data, parse_plant_data, gen_named, getMainPaletteFromSeed } from "../gen_plant.js";
 import { available_tileables, available_backgrounds, do_preload_initial, available_ground_base } from "../gen_garden.js"
-import { GardenLayer } from "../garden_layers.js";
-import { LayerManager, GardenLayerDiv } from "../garden_ui.js";
+import { CelestialLayer, GardenLayer } from "../garden_layers.js";
+import { LayerManager, GardenLayerDiv, CelestialLayerDiv } from "../garden_ui.js";
 
 var gl;
 var da_canvas;
@@ -187,16 +187,33 @@ async function random_from_collection() {
         doThisRegen();
         return;
     }
+    let target_width = document.getElementById("garden_width").value;
+    gl.setWidth(target_width);
+    gl.setHeight(da_canvas.height);
     gm.clearAllButActive();
     if (Math.random() < 0.8) {
         let skyPalette = getRandomKeyFromObj(available_backgrounds);
         gl.groundPaletteSeed = groundPaletteSeed;
+        if (Math.random() < 0.3) {
+            let foreFog = new CelestialLayer(target_width, da_canvas.height, 0, 0, "Fog", skyPalette, [], (Math.random() * 0.75 + 0.1).toFixed(2), 0);
+            let foreFogDiv = new CelestialLayerDiv(foreFog, gm.get_id(), gm.updateCallback, gm.gardenToggleCallback);
+            await gm.addLayerAndAnimate(foreFogDiv, false, true);
+        }
+        if (Math.random() < 0.2) {
+            let foreSeeds = chosen_seeds.slice(chosen_seeds.length / 2);
+            let foreGarden = new GardenLayer(target_width, da_canvas.height, -32, -30, foreSeeds.concat(foreSeeds), groundPaletteSeed,
+                "grass [palette]", getRandomKeyFromObj(available_ground_base), 1.5);
+            let foreGardenDiv = new GardenLayerDiv(foreGarden, gm.get_id(), gm.updateCallback, gm.gardenToggleCallback);
+            await foreGarden.updateMain();
+            await foreGarden.updateGround();
+            await gm.addLayerAndAnimate(foreGardenDiv, false, true);
+        }
         if (Math.random() < 0.92) {
             await gm.makeCelestialLayer(false, "Fog", skyPalette, (Math.random() * 0.5 + 0.2).toFixed(2));
         }
         if (Math.random() < 0.15) {
             let secondSeeds = chosen_seeds.slice(0, chosen_seeds.length / 2 << 0);
-            let secondGarden = new GardenLayer(da_canvas.width, da_canvas.height, -32, da_canvas.height / 10 << 0, secondSeeds.concat(secondSeeds).concat(secondSeeds), groundPaletteSeed,
+            let secondGarden = new GardenLayer(target_width, da_canvas.height, -32, da_canvas.height / 10 << 0, secondSeeds.concat(secondSeeds).concat(secondSeeds), groundPaletteSeed,
                 "grass [palette]", getRandomKeyFromObj(available_ground_base), 1.5);
             let secondGardenDiv = new GardenLayerDiv(secondGarden, gm.get_id(), gm.updateCallback, gm.gardenToggleCallback);
             await secondGarden.updateMain();
@@ -208,7 +225,7 @@ async function random_from_collection() {
         }
         if (Math.random() < 0.075) {
             // TO-DO: reimplements makeGardenLayer() just to get the y offset.
-            let wallLayer = new GardenLayer(da_canvas.width, da_canvas.height, 0, da_canvas.height, [], groundPaletteSeed, "none", getRandomKeyFromObj(available_ground_base), 1);
+            let wallLayer = new GardenLayer(target_width, da_canvas.height, 0, da_canvas.height, [], groundPaletteSeed, "none", getRandomKeyFromObj(available_ground_base), 1);
             let wallLayerDiv = new GardenLayerDiv(wallLayer, gm.get_id(), gm.updateCallback, gm.gardenToggleCallback);
             await wallLayer.updateMain();
             await wallLayer.updateGround();
