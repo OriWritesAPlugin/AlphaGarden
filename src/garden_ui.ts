@@ -2,7 +2,7 @@
 import { all_named, available_ground, available_ground_base } from "./data.js";
 import { Layer, GardenLayer, DecorLayer, OverlayLayer, CelestialLayer, CelestialType, LayerType } from "./garden_layers.js";
 import { available_backgrounds, available_tileables } from "./gen_garden.js";
-import { clearCanvas, imageFromPopup } from "./shared.js";
+import { clearCanvas, imageFromPopup } from "./image_handling.js";
 import { draggableLayerMouseDownHandler } from "./drag_and_drop.js";
 
 const PROPERTIES = {

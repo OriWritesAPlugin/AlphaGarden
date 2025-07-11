@@ -1,6 +1,6 @@
 import { FOLIAGE_SPRITE_DATA, all_foliage } from "../data.js";
-import { buildColorMessage, getSeedCollection, randomFromArray, randomValueFromObject, getMainPaletteFromSeed, getGoodieCollection, getRandomKeyFromObj, claimCanvas } from "../shared.js";
-import { gen_plant, decode_plant_data, parse_plant_data, gen_named } from "../gen_plant.js";
+import { buildColorMessage, getSeedCollection, randomFromArray, randomValueFromObject, getGoodieCollection, getRandomKeyFromObj, claimCanvas } from "../shared.js";
+import { gen_plant, decode_plant_data, parse_plant_data, gen_named, getMainPaletteFromSeed } from "../gen_plant.js";
 import { available_tileables, available_backgrounds, do_preload_initial, available_ground_base } from "../gen_garden.js"
 import { GardenLayer } from "../garden_layers.js";
 import { LayerManager, GardenLayerDiv } from "../garden_ui.js";

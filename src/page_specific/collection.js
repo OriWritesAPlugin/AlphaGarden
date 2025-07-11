@@ -1,6 +1,7 @@
 import { all_palettes, FOLIAGE_SPRITE_DATA, PALETTE_PREVIEW_IMG, all_foliage } from "../data.js";
 import { getSeedCollectionAsString, addSeedPoints, getSeedPoints, collectSeed, makeSortCheckmark, buildColorMessage, toHue, getSeedCollection } from "../shared.js";
-import { gen_plant, decode_plant_data, encode_plant_data_v2, foliage_by_category, palettes_by_category, parse_plant_data, replace_color_palette, overall_palette } from "../gen_plant.js";
+import { gen_plant, decode_plant_data, encode_plant_data_v2, foliage_by_category, palettes_by_category, parse_plant_data, overall_palette } from "../gen_plant.js";
+import { replace_color_palette } from "../image_handling.js";
 
 var collection_filter = { "base": new Set(), "palette": new Set() };
 var sort_intervals = [];
@@ -529,14 +530,9 @@ function analyze_seed(seed_string) {
     preview_ctx.imageSmoothingEnabled = false;
     preview_ctx.drawImage(plant_canvas, 0, 0, preview_canvas.width, preview_canvas.height);
     var text_output = document.getElementById("analysis_output_text");
-    /*if(seed_string[0] == "!"){
-    text_output.innerText = "Name: " + item_name + "\nArtist: " + reformatted_named[item_name]["artist"]
-    } else {*/
     let color_msg = buildColorMessage(raw_plant_data);
     text_output.innerHTML = "Name: " + "<a href='javascript:forceFilter(" + plant_data["foliage"] + ", -1);'>" + all_foliage[plant_data["foliage"]]["name"] + "</a>";
     text_output.innerHTML += ("<br>Artist: " + all_foliage[plant_data["foliage"]]["artist"] + "<br>Type: " + all_foliage[plant_data["foliage"]]["categories"] + "<br>Colors: " + color_msg);
-    //"<br>Colors: <a href='javascript:forceFilter(-1, " + plant_data["foliage_palette"] + ");'>"+all_palettes[raw_plant_data["foliage_palette"]]["categories"]+"<\a>");
-    //}//text_output.innerText = `Base: ${raw_plant_data["foliage"]}`+"\n"+`Simple Feature: ${raw_plant_data["simple_feature"]}`+"\n"+`Complex Feature: ${raw_plant_data["complex_feature"]}`;
 }
 
 function doCollectionPreload() {

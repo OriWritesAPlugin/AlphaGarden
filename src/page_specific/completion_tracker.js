@@ -1,7 +1,8 @@
 
-import { getSeedCollection, getMarkedBases, getMarkedPalettes, buildColorMessage, getGoodieCollection, drawPlantForSquare, collectGoodie, getOffsetColor } from "../shared.js";
-import { decode_plant_data, foliage_by_category, palettes_by_category, overall_palette, replace_color_palette, gen_plant_data, encode_plant_data_v2, gen_named } from "../gen_plant.js";
+import { getSeedCollection, getMarkedBases, getMarkedPalettes, buildColorMessage, getGoodieCollection, collectGoodie, getOffsetColor } from "../shared.js";
+import { decode_plant_data, foliage_by_category, palettes_by_category, overall_palette, gen_plant_data, encode_plant_data_v2, gen_named, drawPlantForSquare } from "../gen_plant.js";
 import { PALETTE_PREVIEW_IMG, all_palettes, reformatted_named } from "../data.js";
+import { replace_color_palette } from "../image_handling.js";
 
 let marking_bases = false;
 let marking_palettes = false;

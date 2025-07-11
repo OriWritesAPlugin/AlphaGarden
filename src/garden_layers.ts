@@ -16,9 +16,10 @@ there's quite a bit of logic in this module.
 **/
 
 import { all_palettes, available_ground, available_ground_base, FOLIAGE_SPRITE_DATA, NAMED_SPRITE_DATA, reformatted_named } from "./data.js";
-import { decode_plant_data, overall_palette, refs, replace_color_palette_single_image } from "./gen_plant.js";
-import { applyOverlay, createSpacedPlacementQueue, shuffleArray, hasPixelInRow, draw_outline_v2, tileAlongY, drawSkyGradient, get_overlay_color_from_name } from "./shared.js";
+import { decode_plant_data, overall_palette } from "./gen_plant.js";
+import { createSpacedPlacementQueue, shuffleArray, hasPixelInRow, get_overlay_color_from_name } from "./shared.js";
 import { get_canvas_for_named_component, get_canvas_for_plant, available_tileables, available_backgrounds } from "./gen_garden.js";
+import { refs, replace_color_palette_single_image, applyOverlay,  draw_outline_v2, tile_along_y, drawSkyGradient} from "./image_handling.js"
 
 const LAYER_HEIGHT = 70;
 const GARDEN_ITEM_SIZE = 32;
@@ -411,7 +412,7 @@ class GardenLayer extends Layer {
     let groundYPos = LAYER_HEIGHT;
     // The *2 in the LAYER_HEIGHT is a buffer in case someone, for some reason, sets an offset greater than the functional size.
     while (groundYPos < (LAYER_HEIGHT + this.y_offset)) {
-      tileAlongY(ctxGround, recoloredGround, groundYPos, this.width);
+      tile_along_y(ctxGround, recoloredGround, groundYPos, this.width);
       groundYPos += incrementBy;
     }
     // Draw the groundcover...and ONLY the groundcover.
@@ -497,7 +498,7 @@ class DecorLayer extends Layer {
       let acting_bottom = "bottom";
       if (!Object.prototype.hasOwnProperty.call(available_tileables[this.content], "bottom")) { acting_bottom = "middle" };
       const bottom = await this.recolorOwnTileable(acting_bottom);
-      tileAlongY(tileCtx, bottom, this.canvas.height - bottom.height * 2, this.width);
+      tile_along_y(tileCtx, bottom, this.canvas.height - bottom.height * 2, this.width);
       // "middle" only has any meaning if there's also a bottom
       if (Object.prototype.hasOwnProperty.call(available_tileables[this.content], "middle")) {
         const middle = await this.recolorOwnTileable("middle");
@@ -505,14 +506,14 @@ class DecorLayer extends Layer {
         const middle_img_height = refs[available_tileables[this.content]["middle"]].height * 2;
         let current_y = this.canvas.height - bottom_img_height - middle_img_height;
         while (current_y > -middle_img_height) {
-          tileAlongY(tileCtx, middle, current_y, this.width);
+          tile_along_y(tileCtx, middle, current_y, this.width);
           current_y -= middle_img_height;
         }
       }
     }
     if (Object.prototype.hasOwnProperty.call(available_tileables[this.content], "top")) {
       const top = await this.recolorOwnTileable("top");
-      tileAlongY(tileCtx, top, 0, this.width);
+      tile_along_y(tileCtx, top, 0, this.width);
     }
   }
 

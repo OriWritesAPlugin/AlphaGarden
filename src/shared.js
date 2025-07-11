@@ -1,6 +1,5 @@
-import { decode_plant_data, work_canvas_size, gen_plant } from "./gen_plant.js";
-import { available_overlay_colors, resize_for_garden } from "./gen_garden.js";
-import { all_palettes, FOLIAGE_SPRITE_DATA } from "./data.js";
+import { available_overlay_colors } from "./gen_garden.js";
+import { all_palettes } from "./data.js";
 
 // Contains general utility functions used by multiple pages.
 // Modified version of the Okabe-Ito colorblind palette, replacing black with white due to dark website background
@@ -46,19 +45,6 @@ function collectSeed(seed){
   } else {
     localStorage.seed_collection = seeds + "," + localStorage.seed_collection;
   }
-}
-
-
-// Draws a plant that's meant to go in a 96x96 (or otherwise) square
-function drawPlantForSquare(seed, size=96, mark_wanted_palettes=true){
-  const plant_data = decode_plant_data(seed);
-  let plant_canvas;
-  if(mark_wanted_palettes){
-    plant_canvas = addMarkings(plant_data, gen_plant(plant_data, false, size/work_canvas_size));
-  } else {
-    plant_canvas = gen_plant(plant_data, false, size/work_canvas_size);
-  }
-  return plant_canvas.toDataURL();
 }
 
 
@@ -159,29 +145,6 @@ function getMarkedBases(){
   return localStorage.marked_bases.split(",").map(Number);
 }
 
-// Check if plant_data fulfills any "mark" criteria
-// (which users set up in the completion tracker, lets them tag plants using
-// a certain palette, etc) and adds the corresponding marks.
-function addMarkings(plant_data, plant_canvas){
-  const ctx = plant_canvas.getContext("2d");
-  let colors = getMarkedPalettes();
-  let draw_offset = 0;
-  for (const palette of ["foliage_palette", "feature_palette", "accent_palette"]){
-    let color_offset = colors.indexOf(plant_data[palette]);
-    if(color_offset != -1){
-      ctx.fillStyle = getOffsetColor(color_offset);
-      ctx.fillRect(plant_canvas.width - 4, draw_offset, 4, 4);
-      draw_offset += 4;
-    }
-  }
-  let base_offset = getMarkedBases().indexOf(plant_data["foliage"]);
-  if(base_offset != -1){
-    ctx.fillStyle = getOffsetColor(base_offset);
-    ctx.strokeRect(plant_canvas.width - 4, 0, 4, 4);
-  }
-  return plant_canvas;
-}
-
 function getMarkedPalettes(){
   if (localStorage.marked_palettes == undefined) {
     return [];
@@ -252,18 +215,6 @@ const randomValueFromObject = (obj) => {
   return obj[keys[ keys.length * Math.random() << 0]];
 };
 
-const getMainPaletteFromSeed = (seed) => {
-  let data = decode_plant_data(seed);
-  let main = FOLIAGE_SPRITE_DATA[data["foliage"]]["m"];
-  if(main==0){
-    return data["foliage_palette"];
-  } else if(main==1){
-    return data["feature_palette"];
-  } else {
-    return data["accent_palette"];
-  }
-}
-
 function hexToRgb(hex) {
   // taken from https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
   var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -282,158 +233,14 @@ function get_overlay_color_from_name(color, alpha){
   return rgb_code;
 }
 
-function get_hex_from_name(){
-  let color = color.slice(1);
+function get_hex_from_name(color){
+  color = color.slice(1);
   if(Object.prototype.hasOwnProperty.call(available_overlay_colors, color)){ color = available_overlay_colors[color]; }
   return color;
 }
 
-
-function drawSkyGradient(canvas, actingPalette, opacity){
-  let ctx = canvas.getContext("2d");
-  ctx.globalAlpha = opacity;
-  let grad =  ctx.createLinearGradient(0, 0, 0, canvas.height);
-  let step = 1/(actingPalette.length);
-  for(let i=0; i<actingPalette.length-1; i++){
-    grad.addColorStop(i*step, actingPalette[i]);
-  }
-  grad.addColorStop(1, actingPalette[actingPalette.length-1]);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  return canvas;
-}
-
-
 function getRandomKeyFromObj(obj){
   return Object.keys(obj)[Math.floor(Math.random() * Object.keys(obj).length)];
-}
-
-
-function applyOverlay(stencil_canvas, palette, opacity){
-  let stencil_ctx = stencil_canvas.getContext("2d");
-  let return_canvas = document.createElement("canvas");
-  let return_ctx = return_canvas.getContext("2d");
-  let pick_canvas = document.createElement("canvas");
-  let pick_ctx = pick_canvas.getContext("2d");
-  return_canvas.width = stencil_canvas.width;
-  pick_canvas.width = stencil_canvas.width;
-  return_canvas.height = stencil_canvas.height;
-  pick_canvas.height = stencil_canvas.height;
-  if(!Array.isArray(palette)){
-    palette = ["#"+get_hex_from_name(palette, opacity)];
-  }
-  pick_canvas = drawSkyGradient(pick_canvas, palette, opacity);
-  
-  return_canvas.width = stencil_canvas.width;
-  return_canvas.height = stencil_canvas.height;
-  
-  // With our color info loaded, we apply the color itself to its own canvas
-  let main_imgData = stencil_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height).data;
-  let pick_imgData = pick_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height).data;
-  let return_img = return_ctx.getImageData(0, 0, return_canvas.width, return_canvas.height);
-  let return_imgData = return_img.data;
-  // Loops through bytes and only place color if the area below has some alpha.
-  for ( var i = 0; i < main_imgData.length; i += 4 ) {
-    if ( main_imgData[i + 3] > 0 ) {
-      return_imgData[i] = pick_imgData[i];
-      return_imgData[i+1] = pick_imgData[i+1];
-      return_imgData[i+2] = pick_imgData[i+2];
-      return_imgData[i+3] = pick_imgData[i+3];
-    }
-  }
-  return_ctx.putImageData(return_img, 0, 0);
-  stencil_ctx.drawImage(return_canvas,0,0);
-  return({"canvas": return_canvas, "x_pos": 0, "y_pos": 0, "width": return_canvas.width, "height": return_canvas.height});
-}
-
-// tile an image left to right across a canvas at some y
-// optionally, offset them all to the left (or right, if you prefer) to
-// make the tileables look somewhat different from garden to garden
-function tileAlongY(tileCtx, img, yPos, width, xOffset=0){
-  let groundXPos = xOffset;
-  while(groundXPos < width){
-    tileCtx.drawImage(img, groundXPos, yPos, img.width*2, img.height*2);
-    groundXPos += img.width*2;
-  }
-}
-
-function clearCanvas(canvas){
-  let ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-// Flexibly take input (URL, drag-and-drop, paste, or file upload) for a wildcard by creating a popup box
-// attached to some parent. Load whatever we find into all_named
-// This is far jankier than it needs to be since Javascript only pauses for prompt, alert, and confirm
-// Largely taken from https://soshace.com/the-ultimate-guide-to-drag-and-drop-image-uploading-with-pure-javascript/
-async function imageFromPopup(parent, name_of_image, callback){
-  var form = document.createElement("div");
-  form.className = "wildcard-popup";
-  let helptext = document.createElement("div");
-  helptext.innerHTML = "<h3>"+name_of_image+"</h3>Paste an image (or image URL), or drag-and-drop one from your files:";
-  helptext.style.padding = "1vw";
-  helptext.style.textAlign = "center";
-  let urlTaker = document.createElement("input");
-  urlTaker.style.min_height = "3vh";
-  var preview = document.createElement("img");
-  let preview_container = document.createElement("div");
-  preview_container.className = "scaled_preview_container";
-  preview_container.appendChild(preview);
-  let confirm_button = document.createElement("input");
-  confirm_button.type = "button";
-  confirm_button.value = "Confirm";
-  confirm_button.style.width = "auto";
-  urlTaker.addEventListener("input", async function() {
-    if(urlTaker.files == null){
-      preview.src = await resize_for_garden(name_of_image, urlTaker.value);
-    } else {
-      await handleImage(urlTaker.files, name_of_image, preview);
-    }
-  })
-  urlTaker.addEventListener("paste", function(event) {
-    var items = (event.clipboardData || event.originalEvent.clipboardData).items;
-    for (let index in items) {
-      var item = items[index];
-      if (item.kind === 'file') {
-        var blob = item.getAsFile();
-        handleImage([blob], name_of_image, preview);
-      }
-    }
-  })
-  confirm_button.addEventListener("click", function() {
-    parent.removeChild(form); 
-    // we got here by interrupting initial garden generation; restart it
-    callback();
-  })
-  function preventDefault(e) { e.preventDefault(); e.stopPropagation();}
-  function handleDrop(e) {handleImage(e.dataTransfer.files, name_of_image, preview);}
-  form.addEventListener("dragenter", preventDefault, false);
-  form.addEventListener("dragleave", preventDefault, false);
-  form.addEventListener("dragover", preventDefault, false);
-  form.addEventListener("drop", preventDefault, false);
-  form.addEventListener("drop", handleDrop, false);
-  form.appendChild(helptext);
-  form.appendChild(urlTaker);
-  form.appendChild(preview_container);
-  form.appendChild(confirm_button);
-  parent.appendChild(form);
-  urlTaker.focus();
-  return form;
-}
-
-// Helper for imageFromPopup, handles image file validation
-async function handleImage(files, name_of_image, preview_img) {
-  if(files.length > 1){
-    alert("Multiple uploads detected, only the first will be used");
-  }
-  let file = files[0];
-  let validTypes = ["image/jpeg", "image/png", "image/gif"];
-  if (validTypes.indexOf( file.type ) == -1){
-    alert("Bad file type, please use a png, gif, or jpeg");
-  } else {
-    let dataURL = await getBase64(file)
-    preview_img.src = await resize_for_garden(name_of_image, dataURL);
-  }
 }
 
 
@@ -480,32 +287,6 @@ function makeSortCheckmark(prefix, name, parent, checked=false) {
   parent.appendChild(label);
   parent.appendChild(document.createElement("br"));
 }
-
-
-// Radiobuttons are weird and cursed
-// https://stackoverflow.com/questions/118693/how-do-you-dynamically-create-a-radio-button-in-javascript-that-works-in-all-bro
-/*function makeRadioButtonCursed(name, label, checked, onclick=false) {
-let id = name + "_" + label;
-function makeRadioButtonViaDiv(){
-var radioHtml = '<input type="radio" id="' + id + ' "name="' + name + '"';
-if ( checked ) {
-radioHtml += ' checked="checked"';
-}
-if ( onclick ) {
-radioHtml += ' onclick=' + onclick;
-}
-radioHtml += '/>';
-var radioFragment = document.createElement('div');
-radioFragment.innerHTML = radioHtml;
-return radioFragment.firstChild;
-}
-let radio_button_label = document.createElement('label');
-radio_button_label.setAttribute('for', id);
-radio_button_label.setAttribute('value', label);
-radio_button_label.appendChild(makeRadioButtonViaDiv());
-return radio_button_label;
-}*/
-
 
 // From https://css-tricks.com/converting-color-spaces-in-javascript/
 // Slight modification: we only need hue, and use lightness to break ties.
@@ -562,106 +343,6 @@ function getBase64(file) {
   })
 }
 
-// TODO: this was hastily-written. Really needs some cleanup
-// NOTE: only v2 because of a name collision in gen_garden.js. Can probably replace that with this...
-function draw_outline_v2(template_canvas){
-  let ctx = template_canvas.getContext("2d");
-  let output_canvas = document.createElement("canvas");
-  output_canvas.width = template_canvas.width;
-  output_canvas.height = template_canvas.height;
-  let main_img = ctx.getImageData(0, 0, template_canvas.width, template_canvas.height);
-  let main_imgData = main_img.data;
-  // We go left to right, marking each position where we switch from background to non-background and vice versa
-  // we also get an additional pixel to the left or right to create a 2 pixel wide outline
-  let points_to_color = [];
-  // If no color is specified, we'll use the nearest (more or less) and darken it
-  let colors_to_use = [];
-  var outline_color;
-  // We try to be smart with transparent overlays; we search for a background color.
-  // We expect this loop to either die early or let us leave early
-  for (let i=0; i < main_imgData.length; i += 4) {
-    if ( main_imgData[i + 3] < 255 ) {
-      outline_color = [main_imgData[i], main_imgData[i+1], main_imgData[i+2], main_imgData[i+3]];
-      break;
-    }
-  }
-  // If we didn't find any non-opaque pixels, we have nothing to outline.
-  if(outline_color == undefined){return;}
-  // Otherwise, we start the first proper loop, left to right.
-  let last_was_background = (main_imgData.slice(0,4).toString() == outline_color.toString());
-  let this_is_background;
-  let most_recent_color = [0, 0, 0];
-  for (let i=4; i < main_imgData.length; i += 4) {
-    // Preemptive optimization is the enemy of progress, and yet. And yet.
-    if ( main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] && main_imgData[i + 1] == outline_color[1] &&  main_imgData[i + 2] == outline_color[2])) {
-      this_is_background = true;
-    } else {
-      this_is_background = false;
-      most_recent_color = [main_imgData[i] * 0.8, main_imgData[i+1] * 0.8, main_imgData[i+2] * 0.8, 255];
-      //most_recent_color = [main_imgData[i] * 1, main_imgData[i + 1] * 1, main_imgData[i + 2] * 1, 255];
-    }
-    // Note: because our "pixels" are 2x2, this shouldn't cause troubles at the corners...I think
-    if(last_was_background && !this_is_background){
-      points_to_color.push(i-4);
-      //points_to_color.push(i-8);
-      // NOTE: push twice due to double-thickness
-      // TODO: could we do this before the resize? Easy 4x efficiency
-      colors_to_use.push(most_recent_color);
-      //colors_to_use.push(most_recent_color);
-      
-    } else if (this_is_background && !last_was_background){
-      points_to_color.push(i);
-      colors_to_use.push(most_recent_color);
-      //points_to_color.push(i+4);
-      //colors_to_use.push(most_recent_color);
-    }
-    last_was_background = this_is_background;
-  }
-  // Now we repeat, drawing our lines top to bottom.
-  last_was_background = (main_imgData.slice(0,4).toString() == outline_color.toString());
-  this_is_background = undefined;
-  for (let j=0; j < template_canvas.width; j ++) {
-    for (let k=0; k < template_canvas.height; k++){
-      // This is so, so silly...
-      if( j==0 && k==0 ){k=4};  // skip our first again.
-      // We use our loops to format us up so we look like the prior inner loop for easier troubleshooting.
-      // TODO: At this point, I think the remainder could be refactored into a function. Would be a lot cleaner.
-      let i = (j + k*template_canvas.width)*4;
-      if ( main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] && main_imgData[i + 1] == outline_color[1] &&  main_imgData[i + 2] == outline_color[2])) {
-        this_is_background = true;
-      } else {
-        this_is_background = false;
-        most_recent_color = [main_imgData[i] * 0.8, main_imgData[i+1] * 0.8, main_imgData[i+2] * 0.8, 255];
-      }
-      if(last_was_background && !this_is_background){
-        points_to_color.push(i-template_canvas.width*4);
-        //points_to_color.push(i-output_canvas.width*2*4);
-        colors_to_use.push(most_recent_color);
-        //colors_to_use.push(most_recent_color);
-      } else if (this_is_background && !last_was_background){
-        points_to_color.push(i);
-        //points_to_color.push(i+output_canvas.width*4);
-        colors_to_use.push(most_recent_color);
-        //colors_to_use.push(most_recent_color);
-      }
-      last_was_background = this_is_background;
-    }
-  }
-  // And now we apply the color!
-  // Note the reason we store points instead of coloring them in place is to avoid the top-down picking up the left-right
-  // we want that little "curve" on the pixel outlines.
-  for (let i=0; i<points_to_color.length; i++){
-    let color_to_use = colors_to_use[i];
-    main_imgData[points_to_color[i]] = color_to_use[0];
-    main_imgData[points_to_color[i]+1] = color_to_use[1];
-    main_imgData[points_to_color[i]+2] = color_to_use[2];
-    main_imgData[points_to_color[i]+3] = color_to_use[3];
-  }
-  ctx.putImageData(main_img, 0, 0);
-  //alert(output_canvas.toDataURL());
-  //return output_canvas;
-}
-
 /**function cloneCanvas(orig) {
 let clone = document.createElement('canvas');
 let clone_ctx = clone.getContext('2d');
@@ -708,13 +389,12 @@ function bool_to_text(bool){
   else{return "OFF";}
 }
 
-export {gen_toggle_button, gen_func_button, applyOverlay, createSpacedPlacementQueue, shuffleArray, hasPixelInRow,
-  draw_outline_v2, tileAlongY, drawSkyGradient, get_overlay_color_from_name, imageFromPopup, clearCanvas, claimCanvas,
-  collectSeed, drawPlantForSquare, buildColorMessage, getDissolvingRS, getSeedCollection, getSeedPoints, collectGoodie,
-  randomFromArray, randomValueFromObject, getRandomKeyFromObj, getMainPaletteFromSeed, addRadioButton, makeSortCheckmark,
+export {gen_toggle_button, gen_func_button, createSpacedPlacementQueue, shuffleArray, hasPixelInRow,
+  get_overlay_color_from_name, claimCanvas, getBase64, get_hex_from_name,
+  collectSeed, buildColorMessage, getDissolvingRS, getSeedCollection, getSeedPoints, collectGoodie,
+  randomFromArray, randomValueFromObject, getRandomKeyFromObj, addRadioButton, makeSortCheckmark,
   getRadioValue, toHue, hexToRgb, addSeedPoints, getSeedCollectionAsString, getGoodieCollection, getMarkedBases,
   getMarkedPalettes, getOffsetColor, get_toggle_button_setting, sortAndVerifySeedList};
-  
   
   
   

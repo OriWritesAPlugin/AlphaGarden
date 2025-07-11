@@ -1,5 +1,5 @@
-import {gen_plant_data, encode_plant_data_v2} from "../gen_plant.js"
-import {drawPlantForSquare, shuffleArray} from "../shared.js"
+import {gen_plant_data, encode_plant_data_v2, drawPlantForSquare} from "../gen_plant.js"
+import {shuffleArray} from "../shared.js"
 import {restoreBingoStateIfPresent, generate_board} from "../bingo.js"
 
 const d = new Date();

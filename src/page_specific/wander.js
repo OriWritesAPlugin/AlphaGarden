@@ -1,7 +1,7 @@
 
 import { WORLD, BACKDROPS, ITEMS } from "../wander_data.js"
-import { refs, preload_single_image } from "../gen_plant.js"
-import { imageFromPopup, randomFromArray } from "../shared.js"
+import { refs, preload_single_image, imageFromPopup } from "../image_handling.js"
+import { randomFromArray } from "../shared.js"
 import { do_preload_initial } from "../gen_garden.js"
 import { LayerManager } from "../garden_ui.js"
 

@@ -1,6 +1,6 @@
 
-import { gen_plant_data, encode_plant_data_v2, gen_plant, decode_plant_data } from "../gen_plant.js";
-import { drawPlantForSquare, getDissolvingRS, collectSeed } from "../shared.js";
+import { drawPlantForSquare, gen_plant_data, encode_plant_data_v2, gen_plant, decode_plant_data } from "../gen_plant.js";
+import { getDissolvingRS, collectSeed } from "../shared.js";
 
 const d = new Date();
 //const available_sounds = [new Audio("sounds/fsharp_3_bell.mp3"), new Audio("sounds/asharp_bell.mp3"),

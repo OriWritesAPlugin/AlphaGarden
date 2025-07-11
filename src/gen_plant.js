@@ -1,6 +1,6 @@
 // This contains the code for generating a single, random plant badge.
 import { all_features, all_foliage, all_palettes, FOLIAGE_SPRITE_DATA, NAMED_SPRITE_DATA, ADDON_SPRITE_DATA, reformatted_named } from "./data.js";
-import { hexToRgb } from "./shared.js"
+import { hexToRgb, getMarkedPalettes, getOffsetColor, getMarkedBases } from "./shared.js"
 
 // The colors we'll be replacing. Touch at your peril!
 const base_foliage_palette = ["#aed740", "#76c935", "#50aa37", "#2f902b"];
@@ -9,20 +9,6 @@ const base_feature_palette = ["f3addd", "d87fbc", "c059a0", "aa3384"];
 const overall_palette = base_foliage_palette.concat(base_accent_palette).concat(base_feature_palette);
 
 const work_canvas_size = 32 // in pixels
-
-// A pixel of these colors indicates we should place the corresponding feature type
-const place_complex_feature = "ff943a";
-const place_simple_feature = "e900ff";
-// A pixel of this color indicates we should place the brightest accent color at 25% alpha (used for glow)
-const place_25a_accent = "c8ffb7";
-// As above, but 10% for a fainter glow
-const place_10a_accent = "9fe389";
-
-// Holder for all the images we'll need
-var refs = {};
-
-// In case of error (probably CORS)
-const BAD_IMG_URL = "https://i.imgur.com/kxStIJE.png";
 
 // In case of error (probably subtly malformed seed)
 const ERROR_PLANT = {
@@ -124,75 +110,6 @@ accent_palettes_base_odds["earthen"] = 1;
 const foliage_palettes = assemble_choice_list_given_odds(palettes_by_category, foliage_palettes_base_odds);
 const feature_palettes = assemble_choice_list_given_odds(palettes_by_category, feature_palettes_base_odds);
 const accent_palettes = assemble_choice_list_given_odds(palettes_by_category, accent_palettes_base_odds);
-
-
-async function place_image_at_coords_with_chance(img_url, list_of_coords, ctx, chance, anchor_to_bottom = false) {
-    // In canvas context ctx, place image at img_path "centered" at each (x,y) in list_of_coords with chance odds (ex 0.66 for 66%)
-    let img = await refs[img_url];
-    var w_offset = Math.floor(img.width / 2);
-    let h_offset;
-    if (!anchor_to_bottom) {
-        h_offset = Math.floor(img.height / 2) - 1;
-    } else {
-        h_offset = -img.height + 1;
-    }
-    for (var i = 0; i < list_of_coords.length; i++) {
-        if (Math.random() < chance) {
-            let [x, y] = list_of_coords[i];
-            ctx.drawImage(img, x - w_offset, y + h_offset);
-        }
-    }
-}
-
-// Sound of me not being 100% confident in my async usage yet
-function preload_single_image(url) {
-    return new Promise(resolve => {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.onload = () => { resolve(img) };
-        img.onerror = function () { img.src = BAD_IMG_URL; };
-        img.src = url;
-    });
-    // Not yet supported in common versions of Safari
-    /*return fetch(url)
-    .then(response => response.blob())
-    .then(blob => createImageBitmap(blob));*/
-}
-
-function load_sprite_from_spritesheet(img, offset) {
-    return new Promise(resolve => {
-        const new_img = new Image();
-        new_img.onload = () => { resolve(new_img); };
-        new_img.onerror = function () { new_img.src = BAD_IMG_URL; };
-        let canvas = document.createElement("canvas");
-        canvas.width = 32;
-        canvas.height = 32;
-        let ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, 32, 32);
-        // All spritesheets are 10 wide, N tall
-        let source_offset_y = Math.floor(offset / 10) * 32;
-        let source_offset_x = (offset % 10) * 32;
-        ctx.drawImage(img, source_offset_x, source_offset_y, 32, 32, 0, 0, 32, 32);
-        new_img.src = canvas.toDataURL();
-    }).then(x => { x.decode(); return x; }, () => { console.log("Failed loading at offset " + offset); });
-}
-
-async function preload_spritesheet(name, URL, count) {
-    let img = await new Promise(resolve => {
-        const base64img = new Image();
-        base64img.crossOrigin = "anonymous";
-        base64img.onload = () => { resolve(base64img) };
-        base64img.onerror = function () { base64img.src = BAD_IMG_URL; };
-        base64img.src = URL;
-    });
-    return img.decode().then(() => {
-        let offset = 0;
-        while (offset < count) {
-            refs[name + offset.toString()] = load_sprite_from_spritesheet(img, offset);
-            offset++;
-        }
-    });
-}
 
 
 function random_from_list(list, prng = null) {
@@ -424,6 +341,18 @@ function gen_plant(plant_data, with_color_key = false, with_scale = 1) {
     }
 }
 
+// Draws a plant that's meant to go in a 96x96 (or otherwise) square
+function drawPlantForSquare(seed, size=96, mark_wanted_palettes=true){
+  const plant_data = decode_plant_data(seed);
+  let plant_canvas;
+  if(mark_wanted_palettes){
+    plant_canvas = addMarkings(plant_data, gen_plant(plant_data, false, size/work_canvas_size));
+  } else {
+    plant_canvas = gen_plant(plant_data, false, size/work_canvas_size);
+  }
+  return plant_canvas.toDataURL();
+}
+
 function gen_named(name) {
     let work_canvas = document.createElement("canvas");
     let work_ctx = work_canvas.getContext("2d");
@@ -432,64 +361,6 @@ function gen_named(name) {
     let imageData = draw_arbitrary_onto_imageData_without_color_palette(work_ctx.getImageData(0, 0, work_canvas_size, work_canvas_size), NAMED_SPRITE_DATA[reformatted_named[name]["offset"]], true, 0)
     work_ctx.putImageData(imageData, 0, 0);
     return work_canvas;
-}
-
-
-function replace_color(old_rgb, new_rgb, ctx, width = work_canvas_size, height = work_canvas_size) {
-    // `old_rgb` and `new_rgb`: (r, g, b)
-    // taken from https://stackoverflow.com/questions/16228048/replace-a-specific-color-by-another-in-an-image-sprite
-    var imageData = ctx.getImageData(0, 0, width, height);
-    var oldRed, oldGreen, oldBlue;
-    var newRed, newGreen, newBlue;
-    [oldRed, oldGreen, oldBlue] = old_rgb;
-    [newRed, newGreen, newBlue] = new_rgb;
-    for (var i = 0; i < imageData.data.length; i += 4) {
-        // is this pixel the old rgb?
-        if (imageData.data[i] == oldRed &&
-            imageData.data[i + 1] == oldGreen &&
-            imageData.data[i + 2] == oldBlue
-        ) {
-            // change to your new rgb
-            imageData.data[i] = newRed;
-            imageData.data[i + 1] = newGreen;
-            imageData.data[i + 2] = newBlue;
-        }
-    }
-    // put the data back on the canvas
-    ctx.putImageData(imageData, 0, 0);
-}
-
-
-// Basically just wraps replace_color_palette
-function replace_color_palette_single_image(old_palette, new_palette, img) {
-    var work_canvas = document.createElement("canvas");
-    var work_ctx = work_canvas.getContext("2d");
-    work_canvas.width = img.width;
-    work_canvas.height = img.height;
-    work_ctx.drawImage(img, 0, 0);
-    replace_color_palette(old_palette, new_palette, work_ctx, img.width, img.height);
-    return work_canvas;
-}
-
-// Palettes MUST be the same length, FYI
-function replace_color_palette(old_palette, new_palette, ctx, work_canvas_width = work_canvas_size, work_canvas_height = work_canvas_size, alpha = null) {
-    const paletteSwap = buildPaletteSwapLookup(old_palette, new_palette);
-    let newRGB;
-    // taken from https://stackoverflow.com/questions/16228048/replace-a-specific-color-by-another-in-an-image-sprite
-    let imageData;
-    imageData = ctx.getImageData(0, 0, work_canvas_width, work_canvas_height);
-    for (let i = 0; i < imageData.data.length; i += 4) {
-        // god this is painful to look at. I'm sorry.
-        if (inPaletteSwapLookup(paletteSwap, [imageData.data[i], imageData.data[i + 1], imageData.data[i + 2]])) {
-            newRGB = paletteSwap[imageData.data[i]][imageData.data[i + 1]][imageData.data[i + 2]];
-            imageData.data[i] = newRGB[0];
-            imageData.data[i + 1] = newRGB[1];
-            imageData.data[i + 2] = newRGB[2];
-            if (alpha != null) { imageData.data[i + 3] = alpha };
-        }
-    }
-    // put the data back on the canvas
-    ctx.putImageData(imageData, 0, 0);
 }
 
 function draw_plant_with_color_palette(ctx, plant_data, center) {
@@ -501,7 +372,7 @@ function draw_plant_with_color_palette(ctx, plant_data, center) {
     ctx.putImageData(imageData, 0, 0);
 }
 
-// Get hype for COORDINATE MATH
+// Get hype for COORDINATE MATH. Helper for the draw_arbitraries
 function get_absolute_offset(inner_offset, offset_data, center_factor) {
     // First line is x pos: offset within the row plus however far we need to shift in to center. Second is y: number of rows finished plus rows from top
     let x_coord = inner_offset % offset_data["w"] + center_factor;
@@ -556,7 +427,7 @@ function draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data,
     return imageData;
 }
 
-// Basically, draw named components (perhaps this should go in shared but it's near identical to the above)
+// Basically, draw named components (perhaps this should go elsewhere but it's near identical to the above)
 function draw_arbitrary_onto_imageData_without_color_palette(imageData, offset_data, center, initial_offset = 0) {
     let i = 0;
     let raw_data = offset_data['e'];
@@ -577,40 +448,6 @@ function draw_arbitrary_onto_imageData_without_color_palette(imageData, offset_d
         i++;
     }
     return imageData;
-}
-
-// Build a "lookup tree" (implemented as a nested obj) used for checking if some pixel exists in a set of palettes.
-// new_palettes must be the same length as old_palettes, and its corresponding idx'd palette RGB will be the leaf.
-function buildPaletteSwapLookup(old_palettes, new_palettes) {
-    let lookup = {};
-    for (let i = 0; i < old_palettes.length; i++) {
-        let old_rgb = hexToRgb(old_palettes[i]);
-        if (lookup[old_rgb[0]] == undefined) { lookup[old_rgb[0]] = {}; }
-        if (lookup[old_rgb[0]][old_rgb[1]] == undefined) { lookup[old_rgb[0]][old_rgb[1]] = {}; }
-        lookup[old_rgb[0]][old_rgb[1]][old_rgb[2]] = hexToRgb(new_palettes[i]);
-    }
-    return lookup
-}
-const inPaletteSwapLookup = function (lookup, rgb) { return lookup[rgb[0]] != undefined && lookup[rgb[0]][rgb[1]] != undefined && lookup[rgb[0]][rgb[1]][rgb[2]] != undefined }
-
-function getSpecialMarkers(ctx) {
-    const swappables = [place_simple_feature, place_complex_feature, place_25a_accent, place_10a_accent];
-    let lookup = buildPaletteSwapLookup(swappables, swappables);
-    let coords = {};
-    for (const key of swappables) { coords[key] = []; }
-    let rgb;
-    let hexmap = {};
-    for (const key of swappables) { hexmap[hexToRgb(key)] = key; }
-    const imageData = ctx.getImageData(0, 0, work_canvas_size, work_canvas_size);
-    let pixel = 0;
-    for (var i = 0; i < imageData.data.length; i += 4) {
-        rgb = [imageData.data[i], imageData.data[i + 1], imageData.data[i + 2]];
-        if (inPaletteSwapLookup(lookup, rgb)) {
-            pixel = i / 4;
-            coords[hexmap[lookup[rgb[0]][rgb[1]][rgb[2]]]].push([pixel % work_canvas_size, Math.floor(pixel / work_canvas_size)]);
-        }
-    }
-    return coords;
 }
 
 // Note that for a screen to make use of this one, it MUST implement a bunch of select/deselect toggles
@@ -641,10 +478,44 @@ function calculateSeedChances() {
     ];
 }
 
+// Check if plant_data fulfills any "mark" criteria
+// (which users set up in the completion tracker, lets them tag plants using
+// a certain palette, etc) and adds the corresponding marks.
+function addMarkings(plant_data, plant_canvas){
+  const ctx = plant_canvas.getContext("2d");
+  let colors = getMarkedPalettes();
+  let draw_offset = 0;
+  for (const palette of ["foliage_palette", "feature_palette", "accent_palette"]){
+    let color_offset = colors.indexOf(plant_data[palette]);
+    if(color_offset != -1){
+      ctx.fillStyle = getOffsetColor(color_offset);
+      ctx.fillRect(plant_canvas.width - 4, draw_offset, 4, 4);
+      draw_offset += 4;
+    }
+  }
+  let base_offset = getMarkedBases().indexOf(plant_data["foliage"]);
+  if(base_offset != -1){
+    ctx.fillStyle = getOffsetColor(base_offset);
+    ctx.strokeRect(plant_canvas.width - 4, 0, 4, 4);
+  }
+  return plant_canvas;
+}
+
+const getMainPaletteFromSeed = (seed) => {
+  let data = decode_plant_data(seed);
+  let main = FOLIAGE_SPRITE_DATA[data["foliage"]]["m"];
+  if(main==0){
+    return data["foliage_palette"];
+  } else if(main==1){
+    return data["feature_palette"];
+  } else {
+    return data["accent_palette"];
+  }
+}
+
 export {
     genWithModifiedSeedChances, palettes_by_category, foliage_by_category, calculateSeedChances, decode_plant_data,
-    encode_plant_data_v2, replace_color_palette_single_image, refs, overall_palette, place_image_at_coords_with_chance,
-    preload_single_image, preload_spritesheet, gen_plant_data, gen_plant, gen_named, replace_color, getSpecialMarkers,
-    base_foliage_palette, base_feature_palette, base_accent_palette, random_from_list, work_canvas_size, parse_plant_data,
-    replace_color_palette, assemble_categories, xmur3, mulberry32
+    encode_plant_data_v2, overall_palette, gen_plant_data, gen_plant, gen_named, base_foliage_palette,
+    base_feature_palette, base_accent_palette, random_from_list, work_canvas_size, parse_plant_data,
+    assemble_categories, xmur3, mulberry32, drawPlantForSquare, addMarkings, getMainPaletteFromSeed
 };

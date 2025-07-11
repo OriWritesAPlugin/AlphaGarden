@@ -1,8 +1,9 @@
 import { all_foliage, FOLIAGE_SPRITE_DATA } from "../data.js";
-import { preload_single_image, gen_plant_data, encode_plant_data_v2 } from "../gen_plant.js";
+import { gen_plant_data, encode_plant_data_v2, drawPlantForSquare } from "../gen_plant.js";
 import { do_preload_initial } from "../gen_garden.js";
-import { sortAndVerifySeedList, drawPlantForSquare } from "../shared.js";
+import { sortAndVerifySeedList } from "../shared.js";
 import { LayerManager } from "../garden_ui.js";
+import { preload_single_image } from "../image_handling.js";
 
 const add_plant_idx = all_foliage.length;  // We can only ever test one plant at a time using this patched-together system.
 var gm;
@@ -72,5 +73,5 @@ async function genTestGarden() {
     }
 }
 
-await preloadSeedTester();
+preloadSeedTester();
 document.getElementById("gen_sprite_test_garden").onclick = genTestGarden;

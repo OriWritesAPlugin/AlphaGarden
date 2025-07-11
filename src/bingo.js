@@ -1,5 +1,5 @@
-import { gen_plant_data, encode_plant_data_v2, genWithModifiedSeedChances, calculateSeedChances, foliage_by_category, palettes_by_category } from "./gen_plant.js";
-import { drawPlantForSquare, randomFromArray, getDissolvingRS, collectSeed, getSeedCollection, gen_toggle_button, gen_func_button, addRadioButton, makeSortCheckmark, getRadioValue, get_toggle_button_setting } from "./shared.js";
+import { drawPlantForSquare, gen_plant_data, encode_plant_data_v2, genWithModifiedSeedChances, calculateSeedChances, foliage_by_category, palettes_by_category } from "./gen_plant.js";
+import { randomFromArray, getDissolvingRS, collectSeed, getSeedCollection, gen_toggle_button, gen_func_button, addRadioButton, makeSortCheckmark, getRadioValue, get_toggle_button_setting } from "./shared.js";
 
 const all_challenges = {
   "e": {
