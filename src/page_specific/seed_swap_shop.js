@@ -1,5 +1,5 @@
 
-import { drawPlantForSquare, random_from_list, gen_plant_data, mulberry32, foliage_by_category, palettes_by_category, xmur3, encode_plant_data_v2 } from "../gen_plant.js"
+import { drawPlantForSquare, random_from_list, gen_plant_data, mulberry32, foliage_by_category, palettes_by_category, xmur3, encode_plant_data_v2, work_canvas_size } from "../gen_plant.js"
 import { getSeedPoints, collectSeed, addSeedPoints, getSeedCollection } from "../shared.js"
 
 const days_to_gen = 3;
@@ -80,11 +80,10 @@ function gen_daily_specials() {
 
 // Largely similar to bingo squares
 function add_swap_square(parent, column_offset, id, price, day) {
-    let swap_square = document.createElement('div');
+    let swap_square = document.createElement('button');
     swap_square.id = id;
     swap_square.className = 'swap_box';
     swap_square.setAttribute("data-price", price);
-    swap_square.style.display = "inline";  // to align the label
     let plant_data = gen_plant_data(0, random_seed + String(column_offset));
     if (price == 4 || price == 5) {
         let specials_prng = mulberry32(xmur3(random_seed + String(column_offset))());
@@ -96,10 +95,11 @@ function add_swap_square(parent, column_offset, id, price, day) {
     let seed = encode_plant_data_v2(plant_data);
     let data_url = drawPlantForSquare(seed);
     swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
+    swap_square.style.backgroundSize = work_canvas_size*3 + "px";
     swappable_seeds[id] = seed;
     let label = document.createElement('label')
     label.htmlFor = id;
-    label.className = 'todo_plant_label';
+    label.className = 'label_over_plant_canvas';
     label.style.position = "relative";
     label.style.top = "5%";
     label.style.color = price_colors[price];
@@ -122,7 +122,7 @@ function add_swap_square(parent, column_offset, id, price, day) {
 
 function mark_swap_claimed(id) {
     var bingo_square = document.getElementById(id);
-    bingo_square.lastChild.style.opacity = 0.2;  // Make label translucent
+    bingo_square.className = "swap_box_bought";
     bingo_square.lastChild.innerHTML = "Owned!";
     bingo_square = bingo_square.cloneNode(true);  // Kill the event listeners
 }

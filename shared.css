@@ -1,74 +1,491 @@
 @charset "utf-8";
-body, textarea {
+
+:root {
+    --background-color: #201920;
+    --input-color: #2F252D;
+    --hover-color: #3F353D;
+    --flash-color: #81309c;
+    --text-outline: #806e4b;
+    --font-color: #DFC48C;
+    --link-color: #FFF4DC;
+    --accent-medium: #71b280;
+    --accent-bright: #c4fad1;
+    --plant-display: 110px;
+    --min-plant-display: 90px;
+}
+
+body,
+textarea {
     font-family: monospace, Verdana, sans-serif;
-    color: #DFC48C;
-    background-color: #201920;
+    color: var(--font-color);
+    background-color: var(--background-color);
 }
 
-select {
-    margin: 6px
-}
 a {
-    color: #FFF4DC
+    color: var(--link-color);
 }
 
-a[name=lightmode]{
-    color: #FFF4DC
-}
-
-img {
+/*img {
     image-rendering: -moz-crisp-edges;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
     -ms-interpolation-mode: nearest-neighbor;
+}*/
+
+button, input {
+    background-color: var(--input-color);
+    color: var(--font-color);
+    font-family: monospace, Verdana, sans-serif;
 }
 
-input[type=text],
-select {
-    width: 100%;
-    padding: 8px 8px;
-    margin: 0;
-    display: inline-block;
-    border: 0px;
-    color: #DFC48C;
-    background-color: #2F252D;
-}
 input[type=button] {
-    width: 5%;
     font-family: monospace, Verdana, sans-serif;
+    /*width: 5%;
     border-radius: 5px;
     padding: 8px;
     margin: 0 12px 12px 12px;
     display: inline-block;
-    border: 0px;
-    color: #DFC48C;
-    background-color: #2F252D;
+    border: 0px;*/
 }
-input[type=button]:hover {
-    background-color: #3F353D;
+
+button:hover, input[type=button]:hover {
+    background-color: var(--hover-color);
 }
 
 input[name="form_type"] {
     margin-left: 10px;
 }
 
-input.chunky, input.chunky_wrap, button.chunky, input.chunky_fullwidth {
-    width: 400px;
-    font-family: monospace, Verdana, sans-serif;
-    border-radius: 5px;
-    padding: 4px;
-    margin: 0px;
-    display: inline-block;
-    border: 0px;
-    color: #DFC48C;
-    background-color: #2F252D;
-    font-size: 1.4rem;
+#title {
+    text-align: center;
+    margin-bottom: 10px;
 }
 
-button.chunky {
+#subtitle {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+
+input.chunky_wrap,
+input.chunky_fullwidth,
+button.chunky_fullwidth,
+button.todo_chunky {
+    font-family: monospace, Verdana, sans-serif;
+    border-radius: 10px;
+    padding: 0.2em 1em;
+    margin: 0.1em 0em;
+    display: inline-block;
+    border: 0px;
+    font-size: 1.4em;
+}
+
+input.chunky_wrap {
     width: auto;
-    border-radius: 20px;
+}
+
+button.todo_chunky {
+    width: 25vw;
+}
+
+input.chunky_fullwidth, button.chunky_fullwidth {
+    width: 100%;
+}
+
+@media (max-height: 40rem) {
+    input.chunky_fullwidth, button.chunky_fullwidth  {
+        font-size: 1rem;
+    }
+}
+
+.center-parent {
+    text-align: center;
+    width: 95%;
+    margin: 0 auto;
+}
+
+.center-what-i-hold {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+}
+
+/** GENERALLY USEFUL **/
+.basic-text-entry {
+    width: auto;
+    height: auto;
+    font-size: 1.2em;
     padding: 4px;
+}
+
+.basic-text-entry:focus {
+    -webkit-box-shadow: none;
+    box-shadow: 0px 0px 2px 2px var(--font-color);
+    outline: var(--text-outline);
+}
+
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 0.65;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.plant_box, .dotted_plant_box, .got_bingo_box, .swap_box, .swap_box_bought, .plant_box_nohover {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    width: var(--min-plant-display);
+    height: var(--min-plant-display);
+    min-width: var(--min-plant-display);
+    min-height: var(--min-plant-display);
+    border-color: var(--accent-medium);
+    border-style: none;
+    border-width: thin;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    border-style: none;
+    transition: all 0.5s ease-out;
+}
+
+.dotted_plant_box, .swap_box, .swap_box_bought {
+    border-style: dashed;
+}
+
+.dotted_plant_box:hover, .swap_box:hover {
+    background-color: var(--hover-color);
+    border-color: var(--accent-bright);
+    color: var(--accent-bright);
+    background-blend-mode: screen;
+}
+
+.dotted_plant_box:hover .label_over_plant_canvas, .swap_box:hover .label_over_plant_canvas {
+    text-shadow:
+        -2px -2px 2px #000,
+        2px -2px 2px #000,
+        -2px 2px 0 #000,
+        2px 2px 0 #000,
+        0em 0em 0.3em var(--background-color),
+        0em 0em 0.3em var(--background-color),
+        0em 0em 0.2em var(--background-color),
+        0em 0em 0.2em var(--background-color) !important;
+    color: var(--accent-bright) !important;
+}
+
+.plant_box:hover {
+    -webkit-filter: drop-shadow(1px 1px 2px var(--accent-bright))
+                    drop-shadow(-1px -1px 2px var(--accent-bright));
+    filter: drop-shadow(1px 1px 2px var(--accent-bright)) 
+            drop-shadow(-1px -1px 2px var(--accent-bright));
+}
+
+.swap_box, .swap_box_bought {
+    justify-content: flex-start;
+    width: var(--plant-display);
+    height: var(--plant-display);   
+}
+
+.swap_box_bought, .swap_box_bought .label_over_plant_canvas {
+    opacity: 0.5;
+    border-color: var(--flash-color);
+    color: var(--hover-color);
+}
+
+.bingo_label,
+.label_over_plant_canvas {
+    word-wrap: break-word;
+    pointer-events: none;
+    padding: 0.6vh;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.label_over_plant_canvas {
+    font-size: 1.6em;
+    text-shadow:
+        -2px -2px 2px #000,
+        2px -2px 2px #000,
+        -2px 2px 0 #000,
+        2px 2px 0 #000,
+        0em 0em 0.3em var(--background-color),
+        0em 0em 0.3em var(--background-color),
+        0em 0em 0.2em var(--background-color),
+        0em 0em 0.2em var(--background-color);
+    transition: all 0.5s ease-in-out;
+}
+
+.got_bingo_box {
+    margin: auto;
+}
+
+.block_window {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(100, 100, 100, 0.5);
+    top: 0px;
+    left: 0px;
+    position: fixed;
+}
+
+.toggle_button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-style: none;
+    padding: 0em;
+    background-color: #0000;
+    font-size: 1em;
+    margin: 0.5em;
+}
+
+.toggle_button:hover {
+    background-color: #0000;
+    color: var(--accent-medium);
+}
+
+/** SHARED STRUCTURAL **/
+#content_div {
+    display: inline-block;
+    box-sizing: border-box;
+    text-align: center;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 16px;
+}
+
+#output_text {
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    margin: 0px;
+    padding: 4px;
+}
+
+.collection_row,
+.collection_display,
+#self_care_plant_selector {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.collection_display,
+#self_care_plant_selector,
+.todo_plant_selector_standard,
+.todo_plant_selector_minified,
+#seed_positioning_grid_div,
+.swap_row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--min-plant-display), max-content));
+    width: 100%;
+    margin: 2vh auto;
+    justify-content: center;
+    align-content: center;
+}
+
+.todo_plant_selector_minified {
+    grid-template-columns: repeat(auto-fit, minmax(60px, max-content));
+    margin: inherit;
+}
+
+.swap_row, #self_care_plant_selector {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#seed_positioning_grid_div {
+    justify-content: left;
+    margin: 0vh auto;
+}
+
+.popup,
+.bingo-popup,
+.wildcard-popup {
+    position: fixed;
+    border-radius: 20px;
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.2);
+    border-color: var(--font-color);
+    border-width: thin;
+    border-style: solid;
+    width: 40rem;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -20%);
+    background-color: var(--background-color);
+    overflow-y: scroll;
+    align-items: center;
+    justify-content: center;
+    max-height: 90vh;
+    overflow-y: scroll;
+    z-index: 1;
+    margin: auto;
+    box-sizing: border-box;
+}
+
+.wildcard-popup {
+    width: 30rem;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+@media screen and (max-width: 600px) {
+
+    .popup,
+    .bingo-popup,
+    .wildcard-popup {
+        top: 5%;
+        left: 0%;
+        transform: unset;
+        width: 100vw;
+    }
+}
+
+/** TODO LIST **/
+#top_spacer {
+    opacity: 0;
+    height: 10vh;
+    display: inline-block;
+}
+
+.dotted-fill-in, .garden-dim-bar {
+    border: none;
+    outline: none;
+    border-bottom-color: var(--font-color);
+    border-bottom-style: dashed;
+    border-bottom-width: thin;
+    display: inline-block;
+    padding-top: 72px;
+    width: 10vw;
+    color: var(--font-color);
+    vertical-align: middle;
+    background-color: transparent;
+    font-size: 1.2em;
+    transition: width 1s;
+    padding-bottom: 4px;
+    resize: none;
+    text-align: left;
+    max-height: min(20vh, 120px);
+    overflow: scroll;
+}
+
+.dotted-fill-in:focus {
+    border-bottom-color: var(--accent-bright);
+}
+
+.dotted-fill-in::placeholder {
+    color: transparent;
+}
+
+.dotted-fill-in:hover::placeholder {
+    color: #999999;
+}
+
+.garden-dim-bar {
+    font-size: 1em;
+    outline: none;
+    padding: 0px;
+    overflow: visible;
+    text-align: center;
+    width: 2.5em;
+    /*text-align: left;
+    color: var(--font-color);
+    background-color: var(--input-color);
+    width: 5em;
+    min-width: 40px;
+    margin: 2px 4px 2px 2px;
+    border-style: solid;
+    border-color: #DFC48C00;*/
+}
+
+.garden-dim-bar:focus {
+    border-color: #DFC48CA0;
+    outline: none;
+}
+
+@media (min-width: 800px) {
+
+    /* hide scrollbars on wide screens */
+    .dotted-fill-in {
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    /* Chromium */
+    .dotted-fill-in::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@media (max-width: 450px) {
+    .dotted-fill-in {
+        font-size: 1rem;
+    }
+}
+
+.inline-flex-parent {
+    display: inline-flex;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+}
+
+.todo_checkbox {
+    accent-color: var(--flash-color);
+    min-width: 36px;
+    min-height: 36px;
+    margin-top: 60px;
+    margin-right: 8px;
+    transition: accent-color 0.5s ease;
+}
+
+.todo_glowing {
+    box-shadow: 0px 0px 8px 4px var(--font-color);
+}
+
+.disabled_cust {
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+#task_div {
+    margin-bottom: 16px;
+    transition: height 1s linear;
+}
+
+#todo_plant_selector_container {
+    transition: height 0.75s;
+    border-style: dashed;
+    border-width: thin;
+    border-top-width: 0px;
+    box-sizing: border-box;
 }
 
 #todo_add_new {
@@ -83,113 +500,15 @@ button.chunky {
     min-width: min(50vw, 200px);
 }
 
-button.chunky:hover {
-    background-color: #3F353D;
-}
-
-input.chunky_wrap {
-    width: auto;
-}
-
-input.chunky_fullwidth {
-    width: 100%;
-    margin-bottom: 5px;
-}
-
-input.chunky_fullwidth:active, input.chunky_fullwidth.active {
-    background-color: #3F353D;
-}
-
-.center-parent{
-    text-align: center;
-    width: 95%;
-    margin: 0 auto;
-}
-
-.center-what-i-hold{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    text-align: center;
-}
-
-.directory-img{
-    width: 32px;
-    height: auto;
-    margin-left: 5px;
-    margin-right: 5px;
-}
-
-.basic-text-entry{
-    width: auto;
-    height: auto;
-    font-size: 1.2rem;
-    color: #DFC48C;
-    font-family: monospace, Verdana, sans-serif;
-    padding: 4px;
-}
-
-.basic-text-entry:focus{
-    -webkit-box-shadow: none;
-    box-shadow: 0px 0px 2px 2px #DFC48C;
-    outline: #806e4b;
-}
-
-#top_spacer{
-    opacity: 0;
-}
-
-#top_spacer:hover{
-    opacity: 1;
-    color: #DFC48C;
-}
-
-.dotted-fill-in {
-    border: none;
-    outline: none;
-    border-bottom-color: #ffffff;
-    border-bottom-style: dashed;
-    border-bottom-width: thin;
-    display: inline-block;
-    padding-top: 72px;
-    width: 10vw;
-    color: #DFC48C;
-    vertical-align: middle;
-    background-color: transparent;
-    font-size: 1.2rem;
-    transition: width 1s;
-    padding-bottom: 4px;
-    resize: none;
-    text-align: left;
-    max-height: min(20vh, 120px);
-    overflow: scroll; 
-}
-
-.dotted-fill-in:focus {
-    border-bottom-color: #ffaaff;
-}
-
-.dotted-fill-in::placeholder {
-    color: transparent;
-}
-
-.dotted-fill-in:hover::placeholder {
-    color: #999999;
-}
-
-.inline-flex-parent {
-    display: inline-flex;
-}
-
+/** CREATE GARDEN **/
 .garden_dropdown {
     width: auto;
     padding: 8px 8px;
     margin: 0;
     display: inline-block;
     border: 0px;
-    color: #DFC48C;
-    background-color: #2F252D;
+    color: var(--font-color);
+    background-color: var(--input-color);
 }
 
 .garden_settings_option {
@@ -201,14 +520,10 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     align-items: center;
 }
 
-#inline-spacer-div {
-    width: 3%;
-}
-
-.garden-dim-bar {
+/**.garden-dim-bar {
     text-align: left;
-    color: #DFC48C;
-    background-color: #2F252D;
+    color: var(--font-color);
+    background-color: var(--input-color);
     width: 5em;
     min-width: 40px;
     margin: 2px 4px 2px 2px;
@@ -218,53 +533,25 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
 }
 
 .garden-dim-bar:focus {
-  border-color: #DFC48CA0;
-  outline: none;
-}
+    border-color: #DFC48CA0;
+    outline: none;
+}**/
 
-.todo_checkbox {
-    accent-color: #81309c;
-    min-width: 36px;
-    min-height: 36px;
-    margin-top: 60px;
-    margin-right: 8px;
-    transition: accent-color 0.5s ease;
-  }
-
-  .todo_glowing {
-    box-shadow: 0px 0px 8px 4px #DFC48C;
-  }
-
-  .disabled_cust{
-    pointer-events: none;
-    cursor: not-allowed;
-}
-
-.todo_checkbox_old {
-    accent-color: #81309c;
-    transform: scale(3.2);
-}
-
-.form-container {
-    text-align: left;
-    padding: 15px;
+.layer_div,
+.draggable_layer_div,
+#layer_manager,
+#layer_holder,
+#garden_options_menu {
+    width: fit-content;
+    height: 15vh;
     border-radius: 5px;
-    color: #DFC48C;
-    background-color: #2F252D;
-    width: 50%;
-}
-
-.layer_div, .draggable_layer_div, #layer_manager, #layer_holder {
-      width: fit-content;
-      height: 15vh;
-      border-radius: 5px;
-      padding: 1vh;
-      margin: 0px;
-      display: block;
-      border: 0px;
-      color: #DFC48C;
-      overflow: hidden;
-      transition: height 0.40s ease-in-out;
+    padding: 1vh;
+    margin: 0px;
+    display: block;
+    border: 0px;
+    color: var(--font-color);
+    overflow: hidden;
+    transition: height 0.40s ease-in-out;
 }
 
 .draggable_layer_div {
@@ -273,49 +560,59 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     height: fit-content;
 }
 
-#layer_manager {
-  height: 100%;
-  float: right;
-  width: 30%;
-  min-width: 200px;
-  border-color: #2F252D;
-  border-style: solid;
-  border-width: thin;
+#layer_manager, #garden_options_menu {
+    height: 100%;
+    float: right;
+    width: 20vw;
+    min-width: 150px;
+    border-color: #2F252D;
+    border-style: solid;
+    border-width: thin;
+    transition: all 0.75s linear;
+}
+
+#garden_options_menu {
+    float:left;
 }
 
 #layer_holder {
-  width: 28vw;
-  height: auto;
+    width: 28vw;
+    height: auto;
 }
 
-#printout {
-    font-family: monospace, Verdana, sans-serif;
-    border-radius: 5px;
-    padding: 5px;
-    margin: 0px 20px 0px 0px;
-    border: 0px;
-    color: #DFC48C;
-    background-color: #2F252D;
-    width: 170px;
-    white-space: normal;
+/** DIRECTORY **/
+.directory-img {
+    width: 32px;
+    height: auto;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
-#printout:hover {
-    background-color: #3F353D;
+.directory_link,
+.index_link {
+    font-size: 1.4rem;
+    line-height: 1.4;
+    text-decoration: none;
+    margin-left: 5px;
 }
 
-#task_div {
-    margin-bottom: 16px;
-    transition: height 1s linear;
+.directory_link:hover,
+.index_link:hover {
+    text-decoration: underline
 }
 
-.unselectable {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+.index_link {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+/** FLOURISHES **/
+.rs_message {
+    position: relative;
+    top: -50px;
+    margin: 0px;
+    height: 0px;
 }
 
 .growing-fadeout {
@@ -325,238 +622,56 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     transition: visibility 0s 1s, opacity 1s linear, width 1s;
 }
 
-.disabled{
-    pointer-events: none;
-    cursor: not-allowed;
-    opacity: 0.65;
-    filter: alpha(opacity=65);
-    -webkit-box-shadow: none;
-    box-shadow: none;
-}
-
-.rs_message {
-    position: relative;
-    top: -50px;
-    margin: 0px;
-    height: 0px;
-}
-
-#page_div {
-    margin: 0px 10px 0px 10px
-}
-#content_div {
-    display: inline-block;
-    box-sizing: border-box;
-    text-align: center;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 16px;
-}
-#header_div {
-    margin-left: 220px
-}
-#buttons_div {
-    display: inline-block;
-    float: left;
-    margin-right: 30px;
-    height: 100%
-}
-#title {
-    text-align: center;
-    margin-bottom: 10px;
-}
-#subtitle {
-    text-align: center;
-    margin-bottom: 10px;
-}
-#output_div {
-    color: #DFC48C;
-    margin-left: 575px;
-    margin-right: 10px;
-    background-color: #201920;
-    border: none;
-    font-family: monospace;
-    resize: vertical;
-}
-#output_container {
-    display: inline;
-    height: 100%;
-    width: 50%;
-}
-#output_text {
-    display: inline-block;
-    text-align: center;
-    width: 100%;
-    margin: 0px;
-    padding: 4px;
-}
-#input_form {
-    color: #DFC48C;
-    background-color: #201920;
-    border: none;
-    font-family: monospace;
-    resize: vertical;
-}
-
-#light_div {
-    border-radius: 3px;
-    padding: 7px 5px 0px 5px;
-    background-color: #DFC48C;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-    min-height: 36px;
-}
-#canvas_back_div{
-    vertical-align: top;
-    display: inline-block;
-    background-color: #201920;
-    margin: 0px 1% 0px 1%;
-    overflow: hidden;
-}
-.collection_row, .collection_display, #self_care_plant_selector {
-   display: flex;
-   justify-content: center;
-   align-content: center;
-}
-
-.collection_display, #self_care_plant_selector, .todo_plant_selector_standard, .todo_plant_selector_minified, #seed_positioning_grid_div {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(90px, max-content));
-    width: 100%;
-    margin: 2vh auto;
-    justify-content: center;
-    align-content: center;
-}
-
-#seed_positioning_grid_div {
-    justify-content: left;
-    margin: 0vh auto;
-}
-
-.todo_plant_selector_standard {
-    grid-template-columns: repeat(auto-fit, minmax(90px, 120px));
-}
-
-.todo_plant_selector_minified {
-    grid-template-columns: repeat(auto-fit, minmax(60px, max-content));
-    margin: inherit;
-}
-
-.collection_display{
-    grid-template-columns: repeat(auto-fill, minmax(90px, max-content));
-}
-
-#todo_plant_selector_container {
-    transition: height 0.75s;
-    border-style: dashed;
-    border-width: thin;
-    border-color: #ffaaff;
-    border-top-width: 0px;
-    box-sizing: border-box;
-}
-
 #load_text {
     opacity: 0;
     animation: load_in 3s;
 }
 
 @keyframes load_in {
-  0%   {opacity: 0;}
-  10%  {opacity: 0;}
-  100% {opacity: 1;}
-}
-
-#viewport_spacer {
-    box-sizing: border-box;
-    padding: 8px;
-    max-width: 100vw;
- }
-
- #base_info_div {
-    display: flex;
-    width: 70%;
-    position: relative;
-    left: 20%
- }
-
- @media screen and (max-width: 600px) {
-    #base_info_div {
-        top: 5%;
-        left: 0%;
-        width: 100%;
+    0% {
+        opacity: 0;
     }
-  }
 
-  .bingo_box, .prize_select_plant_box {
-    display: flex;
+    10% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+plant_particle {
+    border-radius: 50%;
+    left: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    opacity: 0;
+}
+
+particle {
+    border-radius: 50%;
+    left: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    opacity: 0;
+}
+
+/** COLLECTION **/
+.garden_util_box,
+.garden_util_box_fixed,
+#seed_positioning_display {
     align-items: center;
     justify-content: center;
-    flex-direction:column;
-    text-align:center;
-    min-width: 96px;
-    min-height: 96px;
-    border-color: #71b280;
-    border-style: none;
-    border-width: thin;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-.bingo_box {
-    border-style: dashed;
-}
-
-.prize_select_plant_box {
-    border-style: "none";
-    margin-bottom: "5px;";
-    width: "auto";
-    height: "auto";
-    min-width: "96px";
-    min-height: "96px";
-}
-
-.swap_row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-content: center;
-    grid-template-columns: repeat(auto-fill, 112px);
-    margin: auto;
- }
-
- .swap_box {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction:column;
-    text-align:center;
-    width: 7rem;
-    height: 7rem;
-    min-width: 75px;
-    min-height: 75px;
-    border-color: #71b280;
+    flex-direction: column;
+    text-align: center;
+    border-color: var(--font-color);
     border-style: dashed;
     border-width: thin;
-    background-position: center;
-    background-repeat: no-repeat;
-    box-sizing: border-box;
-}
-
-#self_care_plant_selector {
-    max-width: calc(112*5)px;
-    grid-template-columns: repeat(auto-fit, minmax(112px, max-content));
-}
-
-.garden_util_box, .garden_util_box_fixed, #seed_positioning_display {
-    align-items: center;
-    justify-content: center;
-    flex-direction:column;
-    text-align:center;
-    border-color: #DFC48C;
-    border-style: dashed;
-    border-width: thin;
+    overflow-x: hidden;
+    white-space: nowrap;
 }
 
 #seed_positioning_display {
@@ -564,59 +679,67 @@ input.chunky_fullwidth:active, input.chunky_fullwidth.active {
     padding-right: 20px;
 }
 
-.garden_util_box, .garden_util_box_fixed {
+.garden_util_box,
+.garden_util_box_fixed {
     padding: 0.5em;
+    -webkit-transition: all 0.75s linear;
+    -moz-transition: all 0.75s linear;
+    -o-transition: all 0.75s linear;
+    transition: all 0.75s linear;
+    overflow-x: hidden;
 }
 
 .garden_util_box_fixed {
-    width:18.8%;
+    width: 18.8%;
     height: 85%;
     min-width: 100px;
-    position:fixed;
+    position: fixed;
     overflow-y: scroll;
 }
-  
+
 .radio-button input[type="radio"] {
     display: none;
-  } 
-     
+}
+
 .radio-button label {
-display: inline-block;
-color: #DFC48C;
-padding: 4px 11px;
-cursor: pointer;
-}      
+    display: inline-block;
+    color: var(--font-color);
+    padding: 4px 11px;
+    cursor: pointer;
+}
+
 .radio-button input[type="radio"]:checked+label {
-color: #fff;
-font-weight: bold;
+    color: #fff;
+    font-weight: bold;
 }
 
 .splice-check input[type="checkbox"] {
     display: none;
-  } 
-     
+}
+
 .splice-check label {
-display: inline-block;
-color: #1a88d1;
-padding: 4px 11px;
-cursor: pointer;
-font-weight: bold;
-}      
+    display: inline-block;
+    color: #1a88d1;
+    padding: 4px 11px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
 .splice-check input[type="checkbox"]:checked+label {
     color: #d1941a;
 }
 
-.collection_box, .showcase_collection_box {
+.collection_box,
+.showcase_collection_box {
     display: flex;
     align-items: center;
-    /*justify-content: center;  we're gonna try anchoring to the top and letting things wrap...*/
-    flex-direction:column;
-    text-align:center;
-    width: 90px;
-    height: 90px;
-    border-color: #DFC48C;
+    flex-direction: column;
+    text-align: center;
+    width: var(--min-plant-display);
+    height: var(--min-plant-display);
+    border-color: var(--font-color);
     border-style: dashed;
-    border-width: thin;
+    border-width: 1px;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -627,106 +750,46 @@ font-weight: bold;
     border-style: none;
 }
 
-.collection_label, .showcase_collection_label {
-  word-wrap: break-word;
-  white-space: nowrap;
-  padding: 0.6vh;
-  font-size: 0.75rem;
+.collection_label,
+.showcase_collection_label {
+    word-wrap: break-word;
+    white-space: nowrap;
+    padding: 0.6vh;
+    font-size: 0.75rem;
 }
 
 .showcase_collection_label {
     opacity: 0.25;
 }
 
-.directory_link, .index_link {
-    font-size: 1.4rem;
-    line-height:1.4;
-    text-decoration:none;
-    margin-left: 5px;}
-
-.directory_link:hover, .index_link:hover {text-decoration:underline}
-
-.index_link { position: fixed; top: 0; left: 0;}
-
-.popup, .bingo-popup, .wildcard-popup {
-  position: fixed;
-  border-radius:20px;
-  box-shadow: 0 0 35px rgba(0, 0, 0, 0.2);
-  border-color: #DFC48C;
-  border-width: thin;
-  border-style: solid;
-  width: 40rem;
-  top: 20%;
-  left: 50%;
-  transform: translate(-50%, -20%);
-  background-color: #201920;
-  overflow-y: scroll;
-  align-items: center;
-  justify-content: center;
-  max-height: 90vh;
-  overflow-y: scroll;
-  z-index: 1;
-  margin: auto;
-  box-sizing: border-box;
-}
-
-.wildcard-popup{
-  width: 30rem;
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
+/** COMPLETION **/
+#base_info_div {
+    display: flex;
+    width: 70%;
+    position: relative;
+    left: 20%
 }
 
 @media screen and (max-width: 600px) {
-    .popup, .bingo-popup, .wildcard-popup {
+    #base_info_div {
         top: 5%;
         left: 0%;
-        transform: unset;
-        width: 100vw;
+        width: 100%;
     }
-  }
-
-@media (min-width: 800px) { /* hide scrollbars on wide screens */
-      .dotted-fill-in{
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
-      }
-      /* Chromium */
-      .dotted-fill-in::-webkit-scrollbar {
-          display: none;
-        }
 }
 
+/** BINGO **/
 .side-by-side {
     display: flex;
     width: 100%;
     justify-content: center;
 }
 
-@media (max-height: 40rem) {
-    input.chunky_fullwidth {
-        font-size: 1rem;
-    }
-    #title, #subtitle {
-        font-size: 1em;
-    }  
-}
-
 @media (max-width: 50vh) {
-        .side-by-side {
-            flex-direction: column;
-        }
-        #title, #subtitle {
-            font-size: 1em;
-        }
-}
-
-@media (max-width: 450px) {
-    .dotted-fill-in {
-        font-size: 1rem;
+    .side-by-side {
+        flex-direction: column;
     }
 }
-
 
 .bingo-settings-title {
     text-align: center;
@@ -734,62 +797,55 @@ font-weight: bold;
     margin-top: 10px;
 }
 
-.block_window {
-  width: 100%;
-  height: 100%;
-  background-color: rgba(100, 100, 100, 0.5);
-  top: 0px;
-  left: 0px;
-  position: fixed;
+.got_bingo_box {
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+    margin: auto;
 }
 
-.scaled_preview_container{
-  min-width: 70px;
-  min-height: 70px;
-  margin: 5px;
+.bingo_row {
+   display: flex;
+   justify-content: center;
+   align-content: center;
 }
 
-#seed_list{
-  border-style: solid;
-  border-color: #DFC48CA0;
-  width: 98%;
-  height: 12vh;
+/** GARDEN **/
+#seed_list {
+    border-style: solid;
+    border-color: #DFC48CA0;
+    width: 98%;
+    height: 12vh;
 }
 
 #seed_list:focus {
-  border-color: #DFC48C;
-  outline: none;
+    border-color: var(--font-color);
+    outline: none;
 }
 
+/** WANDER **/
 .wander_choice {
-width: 100%;
-background-color: #2F252D;
-border: none;
-color: #DFC48C;
-border-color: #DFC48C;
-font-size: initial;
-font-family: monospace, Verdana, sans-serif;
-border-style: solid;
-border-radius: 1em;
-padding: 0.75em;
-margin: 0.25em;
-border-color: #000;
-border-width: thin;
+    width: 100%;
+    background-color: #2F252D;
+    border: none;
+    color: var(--font-color);
+    border-color: var(--font-color);
+    font-size: initial;
+    font-family: monospace, Verdana, sans-serif;
+    border-style: solid;
+    border-radius: 1em;
+    padding: 0.75em;
+    margin: 0.25em;
+    border-color: #000;
+    border-width: thin;
 }
+
 .wander_choice:hover {
     background-color: #3F353D;
 }
+
 .wander_choice:disabled {
     pointer-events: none;
     cursor: not-allowed;
     opacity: 0.35;
 }
-
-plant_particle {
-    border-radius: 50%;
-    left: 0;
-    pointer-events: none;
-    position: fixed;
-    top: 0;
-    opacity: 0;
-  }

@@ -4,14 +4,14 @@
     <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1" />
     <head>
         <title>Self-Care Bingo Extras[EG]</title>
-        <link rel="stylesheet" type="text/css"  href="nature.css" />
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
         <link rel="icon" href="https://i.imgur.com/AiYQLSq.png">
         <style>
         body {
             background: #2f1847; /* fallback for old browsers */
             background: linear-gradient(to right, #240f3a, #8d5185); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
         }
-        .bingo_box {
+        .dotted_plant_box {
             border-color: #cfa8ca;
         }
         </style>
@@ -31,7 +31,7 @@
         </div>
         <div id="board_div" class='center-parent'></div>
         <div class='center-parent'><br><span id="bingo_hint" style="margin: 10px;"></span></div>
-        <div id="bingo_plant_container_div" class='center-parent'><div id=bingo_plant_div class=bingo_plant_box></div>Fantastic work!!</div>
+        <div id="bingo_plant_container_div" class='center-parent'><div id=bingo_plant_div class=got_bingo_box></div>Fantastic work!!</div>
     </body>
     <script type="module" src="./built/bingo.js"></script>
     <script type="text/javascript">
@@ -41,31 +41,5 @@
     // Fun fact! Javascript apparently numbers days 1-31 but months 0-11. We toString so it doesn't matter, but it's interesting.
     // Anyways, this (messily) ensures a fixed set of plants each day. I'd prefer something more OO come refactor time.
     var forced_random_seed = d.getDate().toString()+d.getMonth().toString()+d.getFullYear().toString()+"extracare_salt";
-
-    function do_setup(){
-        generate_board(5, "Self-Care Extra", 7);
-        toggle_extra_icons();
-        toggle_hints();
-        toggle_dark_mode();
-    }
-
-    function toggle_dark_mode(color) {
-       dark_mode = document.getElementById("dark_mode").checked;
-       if(dark_mode){
-           document.body.style.background = "#201920";
-           document.body.style.color = "#DFC48C";
-       } else {
-           document.body.style.background = "linear-gradient(to right, #240f3a, #8d5185)";
-           document.body.style.color = "#FFFFFF";
-       }
-    }
-
-    function toggle_hints() {
-        if(document.getElementById("display_hints").checked){
-            document.getElementById("bingo_hint").style.visibility = "visible";
-        } else {
-            document.getElementById("bingo_hint").style.visibility = "hidden";
-        }
-    }
     </script>
 </html>

@@ -716,7 +716,7 @@ function add_bingo_square(parent, column, row, challenge_name) {
   let id = column + "_" + row;
   let bingo_square = document.createElement('div');
   bingo_square.id = id;
-  bingo_square.className = 'bingo_box';
+  bingo_square.className = 'dotted_plant_box';
   bingo_square.onmouseover = function () { document.getElementById("bingo_hint").textContent = challenge["full"]; };
   let label = document.createElement('label')
   let challenge;

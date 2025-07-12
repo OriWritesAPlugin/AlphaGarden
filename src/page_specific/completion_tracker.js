@@ -151,12 +151,7 @@ function gen_goodie_divs() {
 function add_swap_square(parent, column_offset, id, base_to_use) {
     let swap_square = document.createElement('div');
     swap_square.id = id;
-    swap_square.className = 'swap_box';
-    swap_square.style.display = "inline";  // to align the label
-    swap_square.style.borderStyle = "none";
-    swap_square.style.marginBottom = "5px;"
-    swap_square.style.boxSizing = "border-box";
-    swap_square.style.borderStyle = "solid";
+    swap_square.className = 'plant_box_nohover';
     let border_offset = marked_bases.indexOf(id);
     swap_square.style.borderColor = border_offset == -1 ? "transparent" : getOffsetColor(border_offset);
     swap_square.style.borderWidth = "thick";
@@ -188,10 +183,7 @@ function add_swap_square(parent, column_offset, id, base_to_use) {
 function add_goodie_square(parent, name) {
     let goodie_square = document.createElement('div');
     goodie_square.id = name + "_goodie_square";
-    goodie_square.className = 'swap_box';
-    goodie_square.style.display = "inline";  // to align the label
-    goodie_square.style.borderStyle = "none";
-    goodie_square.style.marginBottom = "5px;"
+    goodie_square.className = 'plant_box_nohover';
     let work_canvas = gen_named(name);
     let canvas = document.createElement("canvas");
     canvas.width = 96;

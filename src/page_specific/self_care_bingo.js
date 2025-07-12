@@ -65,7 +65,7 @@ function update_remaining() {
 async function add_self_care_square(parent, id) {
     let swap_square = document.createElement('button');
     swap_square.id = "selfcare_plant_" + id;
-    swap_square.classList.add('prize_select_plant_box');
+    swap_square.classList.add('plant_box');
     swap_square.onclick = function (e) {
         let square = document.getElementById(e.target.id);
         let was_active = square.classList.contains("active");

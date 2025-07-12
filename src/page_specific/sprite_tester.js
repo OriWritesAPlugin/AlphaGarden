@@ -1,5 +1,5 @@
 import { all_foliage, FOLIAGE_SPRITE_DATA } from "../data.js";
-import { gen_plant_data, encode_plant_data_v2, drawPlantForSquare } from "../gen_plant.js";
+import { gen_plant_data, encode_plant_data_v2, drawPlantForSquare, work_canvas_size } from "../gen_plant.js";
 import { do_preload_initial } from "../gen_garden.js";
 import { sortAndVerifySeedList } from "../shared.js";
 import { LayerManager } from "../garden_ui.js";
@@ -28,7 +28,7 @@ async function genTestGarden() {
     var canvas = document.createElement('canvas');
     var context = canvas.getContext('2d');
     context.drawImage(img, 0, 0);
-    let img_data = context.getImageData(0, 0, 32, 32).data;
+    let img_data = context.getImageData(0, 0, work_canvas_size, work_canvas_size).data;
     let data = "";
     let custom_colors = {};
     let accursed_color_lookup = structuredClone(color_lookup);
@@ -46,7 +46,7 @@ async function genTestGarden() {
             data += char_code;
         }
     }
-    FOLIAGE_SPRITE_DATA[add_plant_idx] = { "w": 32, "h": 32, "l": 0, "m": 0, "e": data, "x": custom_colors, "s": 1 };
+    FOLIAGE_SPRITE_DATA[add_plant_idx] = { "w": work_canvas_size, "h": work_canvas_size, "l": 0, "m": 0, "e": data, "x": custom_colors, "s": 1 };
     for (let i = 0; i < num_to_gen; i++) {
         let new_data = gen_plant_data(7);
         new_data["foliage"] = add_plant_idx;
@@ -62,8 +62,8 @@ async function genTestGarden() {
     let color_div = document.getElementById("sprite_color_tester");
     color_div.innerHTML = "";
     for (let i = 0; i < 20; i++) {
-        let swap_square = document.createElement('div');
-        swap_square.className = 'bingo_box';
+        let swap_square = document.createElement('button');
+        swap_square.className = 'dotted_plant_box';
         swap_square.style.borderWidth = 0;
         let plant_data = gen_plant_data(0);
         plant_data["foliage"] = add_plant_idx;
