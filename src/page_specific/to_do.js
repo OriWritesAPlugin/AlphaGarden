@@ -1,6 +1,6 @@
 
-import { drawPlantForSquare, gen_plant_data, encode_plant_data_v2, gen_plant, decode_plant_data } from "../gen_plant.js";
-import { getDissolvingRS, collectSeed } from "../shared.js";
+import { drawPlantForSquare, gen_plant_data, encode_plant_data_v2 } from "../gen_plant.js";
+import { getDissolvingRS, bubble_out, bubble_up } from "../shared.js";
 
 const d = new Date();
 //const available_sounds = [new Audio("sounds/fsharp_3_bell.mp3"), new Audio("sounds/asharp_bell.mp3"),
@@ -8,7 +8,6 @@ const d = new Date();
 
 const num_tasks_per_set = 3;  // Every X, increment the salt
 const plants_to_choose_from = 7; // How many plants each tasks presents
-const fallback_colors = [[255, 102, 99], [254, 177, 68], [253, 253, 151], [158, 224, 158], [158, 193, 207], [204, 153, 201]];  // RGB colors to use if the plant sampler fails to find any
 const forced_random_seed = d.getDate().toString() + d.getMonth().toString() + d.getFullYear().toString() + "todo";
 const max_outstanding_tasks = 10;  // To incentivize avoiding overwhelming yourself, the max number of tasks you can have outstanding while still choosing plants
 var task_sets_generated = 0;
@@ -32,7 +31,6 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     let list_item = document.createElement("li");
     list_item.setAttribute("idx", id);
     list_item.classList.add("center-what-i-hold");
-
     // Textbox, handles saving tasks and spawning selection box
     let textbox_holder = document.createElement("div");
     let textbox = document.createElement("span");
@@ -43,10 +41,13 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     textbox.id = "desc_" + id;
     textbox.placeholder = task_hints[Math.floor(Math.random() * task_hints.length)];
     if (desc != "") { textbox.textContent = desc };
-    textbox.addEventListener("click", makePlantSelector, true);
     textbox.addEventListener("focusout", saveTasks, true);
     let target_width = window.matchMedia('(min-width: 600px)') ? "60vw" : "90vw";
     setTimeout(function () { textbox.style.width = target_width }, 20);
+
+    // We'll come back to this, we just need it up front for the bind.
+    let prize_display_square = document.createElement('button');
+    let prize_choose_function = function() {makePlantSelector(textbox)};
 
     // Checkbox, handles animation, overall state tracking, and strikethrough
     let checkbox = document.createElement("input");
@@ -57,7 +58,7 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     checkbox.addEventListener('change', function () {
         textbox.disabled = true;
         checkbox.classList.add("disabled_cust");
-        textbox.removeEventListener("click", makePlantSelector, true);
+        prize_display_square.removeEventListener("click", prize_choose_function, true);
         textbox.style.textDecoration = "line-through";
         textbox.contentEditable = false;
         if (setup_complete) {
@@ -70,7 +71,7 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
             }
         }
         setTimeout(function () { checkbox.style.accentColor = "#36243c"; }, 5)
-    }.bind(textbox, checkbox, id))
+    }.bind({"textbox": textbox, "checkbox": checkbox, "id": id, "prize_display_square": prize_display_square}));
     if (is_checked) {
         checkbox.checked = true;
         setTimeout(function () { checkbox.dispatchEvent(new CustomEvent("change")) }, 75); // Let task creation finish
@@ -81,9 +82,8 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     list_item.appendChild(textbox_holder);
 
     // Prize display, defaults to first awardable prize for the set
-    let prize_display_square = document.createElement('button');
     prize_display_square.id = "task_" + id + "_reward";
-    prize_display_square.classList.add('prize_select_plant_box');
+    prize_display_square.classList.add('plant_box');
     list_item.appendChild(prize_display_square);
     if (reward_seed == "") {
         let salt = forced_random_seed + (Math.floor(id / num_tasks_per_set) * plants_to_choose_from + id % num_tasks_per_set);
@@ -93,6 +93,7 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     let data_url = drawPlantForSquare(reward_seed);
     prize_display_square.setAttribute("data-seed", reward_seed);
     prize_display_square.style.background = 'url(' + data_url + ')  no-repeat center center';
+    prize_display_square.addEventListener("click", prize_choose_function, true);
 
     document.getElementById("task_div").appendChild(list_item);
     if (setup_complete) {
@@ -104,11 +105,11 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
 
 
 // Generate the "reward box" that displays while editing a task. Contains plants to pick from.
-function makePlantSelector(e) {
+function makePlantSelector(element) {
 
     // First off, handle existing reward boxes--we only want one open at a time for coherence
     if (active_plant_selector != undefined) {
-        if (active_plant_selector.getAttribute("idx") == e.target.parentNode.parentNode.getAttribute("idx")) {
+        if (active_plant_selector.getAttribute("idx") == element.parentNode.parentNode.getAttribute("idx")) {
             // Toggle display
             if (active_plant_selector.getBoundingClientRect()["height"] > 5) {
                 setTimeout(function () { active_plant_selector.style.height = "0px" }, 5);
@@ -123,7 +124,7 @@ function makePlantSelector(e) {
 
     // Set up some mildly nightmarish nesting to handle the expand/contract animations
     // Our textbox receiving focus is in a div for handling alignment, the element above that is our list entry.
-    let id = e.target.parentNode.parentNode.getAttribute("idx");
+    let id = element.parentNode.parentNode.getAttribute("idx");
     let plant_select_hider_div = document.createElement("div");
     plant_select_hider_div.style.overflow = "hidden";
     plant_select_hider_div.style.height = "fit-content";
@@ -151,7 +152,7 @@ function makePlantSelector(e) {
     let prize_display_square = document.getElementById("task_" + id + "_reward");
     for (let i = 0; i < plants_to_choose_from; i++) {
         let prize_select_square = document.createElement('button');
-        prize_select_square.classList.add('prize_select_plant_box');
+        prize_select_square.classList.add('plant_box');
         if (size == 64) {
             prize_select_square.style.minWidth = "64px";
             prize_select_square.style.minHeight = "64px";
@@ -168,8 +169,10 @@ function makePlantSelector(e) {
         } // Return to realsize for the display.
         if (can_select) {
             prize_select_square.onclick = function () {
+                console.log(seed);
                 prize_display_square.setAttribute("data-seed", seed);
-                prize_display_square.style.background = 'url(' + prize_url + ')  no-repeat center center';
+                setTimeout(function(){prize_display_square.style.background = 'url(' + prize_url + ')  no-repeat center center';}, 100);
+                bubble_out(prize_display_square, seed);
                 setTimeout(function () { plant_select_div.style.height = "0px" }, 5);
                 // This feels like such a bad idea, but it works...eat the next call to this function, then return focus to the task.
                 document.getElementById('desc_' + id).focus();
@@ -184,7 +187,7 @@ function makePlantSelector(e) {
     // Stitch it all together
     plant_select_div.appendChild(grid);
     plant_select_hider_div.appendChild(plant_select_div);
-    e.target.parentNode.appendChild(plant_select_hider_div);
+    element.parentNode.appendChild(plant_select_hider_div);
     plant_select_div.setAttribute("target-height", plant_select_div.getBoundingClientRect()["height"] + "px")
     plant_select_div.style.height = "0px";
     setTimeout(function () { plant_select_div.style.height = plant_select_div.getAttribute("target-height") }, 5);
@@ -207,7 +210,7 @@ function rememberTasks() {
     let text;
     let force_fill_plants = false;
     if (localStorage.todo_tasks == undefined) {
-        text = "uD3TIPCX7mOWelcome to the to-do list! Click a task to edit it & pick a reward. The selection changes every three tasks, and you can pick duplicates.|SEP|uD1BB2COlGNClick the box on the left to mark a task complete, earning the reward you picked. These first three are all freebies!|SEP|uCMq71B-AIsClearing completed tasks (bottom button) may reward RS. The chance doubles once the button starts glowing. Happy tasking!"
+        text = "uD3TIPCX7mOWelcome to the to-do list! Click a task to edit it, click the sprite to its right to pick a reward. The selection changes every three tasks, and you can pick duplicates.|SEP|uD1BB2COlGNClick the box on the left to mark a task complete, earning the reward you picked. These first three are all freebies!|SEP|uCMq71B-AIsClearing completed tasks (bottom button) may reward RS. The chance doubles once the button starts glowing. Happy tasking!"
         force_fill_plants = true;
     } else {
         text = localStorage.todo_tasks;
@@ -304,6 +307,7 @@ function clearCompleted() {
             checked++;
             setTimeout(function () {
                 node.classList.add("fadeout");
+                document.getElementById("desc_" + idx).style.whiteSpace = "nowrap";
                 document.getElementById("desc_" + idx).style.width = "0px";
                 reward_rs();
                 setTimeout(function () { node.remove(); }, 760)
@@ -313,94 +317,6 @@ function clearCompleted() {
     setTimeout(function () { saveTasks() }, 800 + checked * 200);
 }
 
-
-// This next bit was shamelessly stolen from https://css-tricks.com/playing-with-particles-using-the-web-animations-api/
-// Genuinely learning a lot here...maybe I'll even learn Javascript some day? :)
-// But really, it's a fantastic tutorial. I should (TODO) revisit
-function bubble_up(e) {
-    if (!setup_complete) { return; }
-    let reward_seed = document.getElementById(e.target.id + "_reward").getAttribute("data-seed");
-    collectSeed(reward_seed);
-    document.getElementById("top_spacer").innerHTML += reward_seed + ",";
-    let bubble_palette = samplePlantColor(reward_seed);
-    for (let i = 0; i < 75; i++) {
-        // We root them to a random location slightly below the bottom of the window
-        createPlantParticle(Math.random() * window.innerWidth, window.innerHeight + 10, bubble_palette);
-    }
-}
-
-
-function createPlantParticle(x, y, base_palette) {
-    // Create a custom particle element
-    const particle = document.createElement('plant_particle');
-    // Append the element into the body
-    document.body.appendChild(particle);
-    // Calculate a random size from 10px to 50px
-    const size = Math.floor(Math.random() * 40 + 10);
-    // Apply the size on each particle
-    particle.style.width = `${size}px`;
-    particle.style.height = `${size}px`;
-    // Generate a random color in a purple/pink palette
-    // TODO: would be cute to pull from the reward plant's palette
-    particle.style.background = getRandomizedColorFrom(base_palette);
-    // Generate a random y destination within the bottom half-ish of the screen
-    const destinationX = x;  // TODO: dumb
-    const destinationY = y - Math.random() * window.innerHeight / 2 - 50;
-
-    // Store the animation in a variable because we will need it later
-    const animation = particle.animate([
-        {
-            // Set the origin position of the particle
-            // We offset the particle with half its size to center it
-            transform: `translate(${x - (size / 2)}px, ${y - (size / 2)}px)`,
-            opacity: 1
-        },
-        {
-            // We define the final coordinates as the second keyframe
-            transform: `translate(${destinationX}px, ${destinationY}px)`,
-            opacity: 0
-        }
-    ], {
-        // Set a random duration from 1500 to 2500ms
-        duration: 1500 + Math.random() * 1000,
-        easing: 'cubic-bezier(0, .9, .57, 1)',
-        // Delay every particle with a random value from 0ms to 200ms
-        delay: Math.random() * 200
-    });
-    animation.onfinish = () => {
-        particle.remove();
-    };
-}
-
-// Take a bunch of random samples of the plant's color
-// Return as RGB for mathing. Ignore transparent pixels.
-// Gets us around the thing where not all bases use all palettes
-function samplePlantColor(seed) {
-    let sample_canvas = gen_plant(decode_plant_data(seed));
-    let sample_ctx = sample_canvas.getContext("2d");
-    // We take X samples from the plant image. If we don't get any colors in this many, we use a fallback.
-    let sample_attempts = 128;
-    var found_colors = [];
-    let samples_attempted = 0;
-    while (samples_attempted < sample_attempts) {
-        let x = Math.floor(Math.random() * (sample_canvas.width - 1));
-        let y = Math.floor(Math.random() * (sample_canvas.width - 1));
-        let color_data = sample_ctx.getImageData(x, y, 1, 1).data
-        if (color_data[3] != 0) {
-            found_colors.push(color_data.slice(0, 3));
-        }
-        samples_attempted++;
-    }
-    if (found_colors.length < 3) { return fallback_colors };
-    return found_colors;
-}
-
-// picks a random color, makes it more pastel and varies it a bit.
-function getRandomizedColorFrom(palette) {
-    const rgb_color = palette[Math.floor(Math.random() * palette.length)];
-    return `rgb(${rgb_color[0] + 50}, ${rgb_color[1] + 50}, ${rgb_color[2] + 50})`;
-}
-
 function doSetup() {
     rememberTasks();
     document.getElementById("load_text").remove();
@@ -408,5 +324,5 @@ function doSetup() {
 }
 
 doSetup();
-document.getElementById("todo_add_new").onclick = generateTask;
+document.getElementById("todo_add_new").onclick = function(){generateTask(false, "", "")};
 document.getElementById("todo_clear_completed").onclick = clearCompleted;

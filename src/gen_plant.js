@@ -7,6 +7,7 @@ const base_foliage_palette = ["#aed740", "#76c935", "#50aa37", "#2f902b"];
 const base_accent_palette = ["fef4cc", "fde47b", "ffd430", "ecb600"];
 const base_feature_palette = ["f3addd", "d87fbc", "c059a0", "aa3384"];
 const overall_palette = base_foliage_palette.concat(base_accent_palette).concat(base_feature_palette);
+const fallback_colors = [[255, 102, 99], [254, 177, 68], [253, 253, 151], [158, 224, 158], [158, 193, 207], [204, 153, 201]];  // RGB colors to use if the plant sampler fails to find any
 
 const work_canvas_size = 32 // in pixels
 
@@ -289,7 +290,7 @@ function gen_plant(plant_data, with_color_key = false, with_scale = 1) {
     var plant_gen_ctx = plant_gen_canvas.getContext("2d");
     plant_gen_canvas.width = work_canvas_size;
     plant_gen_canvas.height = work_canvas_size;
-    plant_gen_ctx.clearRect(0, 0, 32, 32);
+    plant_gen_ctx.clearRect(0, 0, work_canvas_size, work_canvas_size);
     plant_data = parse_plant_data(plant_data);
     if (with_color_key) {
         // We need a new canvas to handle layering
@@ -304,7 +305,7 @@ function gen_plant(plant_data, with_color_key = false, with_scale = 1) {
         draw_plant_with_color_palette(plant_gen_ctx, color_key_data, false);
 
         // Now draw up the plant on the other canvas
-        plant_gen_overlay_ctx.clearRect(0, 0, 32, 32);
+        plant_gen_overlay_ctx.clearRect(0, 0, work_canvas_size, work_canvas_size);
         plant_gen_overlay_ctx.scale(with_scale, with_scale);
         draw_plant_with_color_palette(plant_gen_overlay_ctx, plant_data, true);
 
@@ -513,9 +514,32 @@ const getMainPaletteFromSeed = (seed) => {
   }
 }
 
+// Take a bunch of random samples of the plant's color
+// Return as RGB for mathing. Ignore transparent pixels.
+// Gets us around the thing where not all bases use all palettes
+function samplePlantColor(seed) {
+    let sample_canvas = gen_plant(decode_plant_data(seed));
+    let sample_ctx = sample_canvas.getContext("2d");
+    // We take X samples from the plant image. If we don't get any colors in this many, we use a fallback.
+    let sample_attempts = 128;
+    var found_colors = [];
+    let samples_attempted = 0;
+    while (samples_attempted < sample_attempts) {
+        let x = Math.floor(Math.random() * (sample_canvas.width - 1));
+        let y = Math.floor(Math.random() * (sample_canvas.width - 1));
+        let color_data = sample_ctx.getImageData(x, y, 1, 1).data
+        if (color_data[3] != 0) {
+            found_colors.push(color_data.slice(0, 3));
+        }
+        samples_attempted++;
+    }
+    if (found_colors.length < 3) { return fallback_colors };
+    return found_colors;
+}
+
 export {
     genWithModifiedSeedChances, palettes_by_category, foliage_by_category, calculateSeedChances, decode_plant_data,
     encode_plant_data_v2, overall_palette, gen_plant_data, gen_plant, gen_named, base_foliage_palette,
-    base_feature_palette, base_accent_palette, random_from_list, work_canvas_size, parse_plant_data,
+    base_feature_palette, base_accent_palette, random_from_list, work_canvas_size, parse_plant_data, samplePlantColor,
     assemble_categories, xmur3, mulberry32, drawPlantForSquare, addMarkings, getMainPaletteFromSeed
 };

@@ -16,13 +16,13 @@ there's quite a bit of logic in this module.
 **/
 
 import { all_palettes, available_ground, available_ground_base, FOLIAGE_SPRITE_DATA, NAMED_SPRITE_DATA, reformatted_named } from "./data.js";
-import { decode_plant_data, overall_palette } from "./gen_plant.js";
+import { decode_plant_data, overall_palette, work_canvas_size } from "./gen_plant.js";
 import { createSpacedPlacementQueue, shuffleArray, hasPixelInRow, get_overlay_color_from_name } from "./shared.js";
 import { get_canvas_for_named_component, get_canvas_for_plant, available_tileables, available_backgrounds } from "./gen_garden.js";
 import { refs, replace_color_palette_single_image, applyOverlay,  draw_outline_v2, tile_along_y, drawSkyGradient} from "./image_handling.js"
 
 const LAYER_HEIGHT = 70;
-const GARDEN_ITEM_SIZE = 32;
+const GARDEN_ITEM_SIZE = work_canvas_size;
 
 ///////////////////////  GENERIC LAYER   ///////////////////////////////////////
 
@@ -367,20 +367,20 @@ class GardenLayer extends Layer {
   **/
   classifyHeight(canvas: HTMLCanvasElement) {
     const image_data = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
-    if (hasPixelInRow(image_data, 32 - 24, canvas.width)) {
+    if (hasPixelInRow(image_data, work_canvas_size * 0.75, canvas.width)) {
       return GardenItemHeightCategory.Tall;
     }
-    else if (hasPixelInRow(image_data, 32 - 16, canvas.width)) {
+    else if (hasPixelInRow(image_data, work_canvas_size * 0.5, canvas.width)) {
       return GardenItemHeightCategory.Medium;
     }
-    else if (!hasPixelInRow(image_data, 32 - 8, canvas.width)) {
+    else if (!hasPixelInRow(image_data, work_canvas_size * 0.25, canvas.width)) {
       return GardenItemHeightCategory.Short;
     }
     return GardenItemHeightCategory.Tiny;
   }
 
   heightClassFromHeight(num: number) {
-    // The num-1 is for the case of a height of 32 (0 offset)
+    // The num-1 is for the case of a height of work_canvas_size (0 offset)
     return Math.ceil((num - 1) / 8);
   }
 

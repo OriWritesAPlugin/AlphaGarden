@@ -485,8 +485,6 @@ class LayerManager {
   constructor(managedCanvas: HTMLCanvasElement, activeGardenSeeds: HTMLTextAreaElement) {
     this.selfDiv = document.createElement("div");
     this.selfDiv.id = "layer_manager";
-    this.selfDiv.style.minWidth = "150px";
-    this.selfDiv.style.width = "25vw";
     this.layerHolderDiv = document.createElement("div");
     this.layerHolderDiv.id = "layer_holder";
     this.layerHolderDiv.style.width = "100%";

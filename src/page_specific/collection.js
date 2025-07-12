@@ -1,6 +1,6 @@
 import { all_palettes, FOLIAGE_SPRITE_DATA, PALETTE_PREVIEW_IMG, all_foliage } from "../data.js";
-import { getSeedCollectionAsString, addSeedPoints, getSeedPoints, collectSeed, makeSortCheckmark, buildColorMessage, toHue, getSeedCollection } from "../shared.js";
-import { gen_plant, decode_plant_data, encode_plant_data_v2, foliage_by_category, palettes_by_category, parse_plant_data, overall_palette } from "../gen_plant.js";
+import { getSeedCollectionAsString, addSeedPoints, getSeedPoints, collectSeed, makeSortCheckmark, buildColorMessage, toHue, getSeedCollection, bubble_out } from "../shared.js";
+import { gen_plant, decode_plant_data, encode_plant_data_v2, foliage_by_category, palettes_by_category, parse_plant_data, overall_palette, work_canvas_size } from "../gen_plant.js";
 import { replace_color_palette } from "../image_handling.js";
 
 var collection_filter = { "base": new Set(), "palette": new Set() };
@@ -197,6 +197,7 @@ function update_cycle() {
                     alert("Couldn't find the seed you're rotating in your collection! Palette rotation cancelled.");
                     return;
                 }
+                bubble_out(e.target, e.target.getAttribute("data-seed"));
                 addSeedPoints(-2);
                 updateSeedPoints();
                 collectSeed(e.target.getAttribute("data-seed"));
@@ -245,6 +246,7 @@ function claim_splice() {
     let new_seed = document.getElementById("mutate_preview_canvas").getAttribute("data-seed");
     collectSeed(new_seed);
     prep_mutate_seed(new_seed, true);
+    bubble_out(document.getElementById("mutate_preview_canvas"), new_seed);
     display_collection();
 }
 
@@ -476,14 +478,14 @@ function create_collection_entry(offset, seed, hide_seed, show_palette, premade_
     entry.onclick = doSeedOnclick;
     var label = document.createElement('label');
     label.style.pointerEvents = "none";
-    let final_size = showcase_mode ? 32 * 3 : 64;
+    let final_size = showcase_mode ? work_canvas_size * 3 : work_canvas_size * 2;
     // Strip any positional info
     seed = seed.replace(/%[\d .]*/g, '');
     if (seed.length != 10) {
         alert("You seem to have a malformed seed! Seeds are 10 characters long, but got \"" + seed + "\". Skipping!");
     }
     else {
-        var plant_canvas = gen_plant(decode_plant_data(seed), show_palette, final_size / 32);
+        var plant_canvas = gen_plant(decode_plant_data(seed), show_palette, final_size / work_canvas_size);
     }
     label.htmlFor = id;
     label.className = showcase_mode ? 'showcase_collection_label' : 'collection_label';

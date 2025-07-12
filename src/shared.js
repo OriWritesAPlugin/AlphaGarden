@@ -1,5 +1,6 @@
 import { available_overlay_colors } from "./gen_garden.js";
 import { all_palettes } from "./data.js";
+import { work_canvas_size, samplePlantColor } from "./gen_plant.js";
 
 // Contains general utility functions used by multiple pages.
 // Modified version of the Okabe-Ito colorblind palette, replacing black with white due to dark website background
@@ -188,7 +189,7 @@ function getOffsetColor(idx){
 
 // Returns true if there's a non-transparent pixel in `row` in ImageData `image_data`. Row is 0-indexed.
 // Modified from https://stackoverflow.com/questions/11796554/automatically-crop-html5-canvas-to-contents
-function hasPixelInRow(image_data, row, width=32){
+function hasPixelInRow(image_data, row, width=work_canvas_size){
   var index, x;
   for (x = 0; x < width; x++) {
     index = (row * width + x) * 4;
@@ -352,18 +353,18 @@ return clone;
 }**/
 
 function gen_toggle_button(target_var, target_func, initial_val=true){
-  let button = document.createElement("div");
+  let button = document.createElement("button");
   button.id = target_var + "_setting_toggle";
-  button.className = "bingo_button";
+  button.className = "toggle_button";
   button.onclick = cycle_toggle_value.bind(button, target_var, target_func);
   button.textContent = "["+target_var.slice(0,1).toUpperCase()+target_var.slice(1)+": "+bool_to_text(initial_val)+"]";
   return button
 }
 
 function gen_func_button(text, target_func){
-  let button = document.createElement("div");
+  let button = document.createElement("button");
   button.id = text;
-  button.className = "bingo_button";
+  button.className = "toggle_button";
   button.onclick = target_func;
   button.textContent = "["+text+"]";
   return button
@@ -389,8 +390,90 @@ function bool_to_text(bool){
   else{return "OFF";}
 }
 
+// This next bit was shamelessly stolen from https://css-tricks.com/playing-with-particles-using-the-web-animations-api/
+// Genuinely learning a lot here...maybe I'll even learn Javascript some day? :)
+// But really, it's a fantastic tutorial. I should (TODO) revisit
+function bubble_up(e) {
+    let reward_seed = document.getElementById(e.target.id + "_reward").getAttribute("data-seed");
+    collectSeed(reward_seed);
+    document.getElementById("top_spacer").innerHTML += reward_seed + ",";
+    let bubble_palette = samplePlantColor(reward_seed);
+    for (let i = 0; i < 75; i++) {
+        // We root them to a random location slightly below the bottom of the window
+        createPlantParticle(Math.random() * window.innerWidth, window.innerHeight + 10, bubble_palette);
+    }
+}
+
+function bubble_out(element, seed=null) {
+    if(seed === null){
+        seed = document.getElementById(element.id + "_reward").getAttribute("data-seed");
+    }
+    let bubble_palette = samplePlantColor(seed);
+    let rect = element.getBoundingClientRect();
+    let x = (rect.right-rect.left)/2+rect.left;
+    let y = (rect.bottom-rect.top)/2+rect.top;
+    for (let i = 0; i < 10; i++) {
+        createPlantParticle(x, y, bubble_palette, false);
+    }
+}
+
+
+function createPlantParticle(x, y, base_palette, up_only=true) {
+    // Create a custom particle element
+    const particle = document.createElement('plant_particle');
+    // Append the element into the body
+    document.body.appendChild(particle);
+    // Calculate a random size from 10px to 50px
+    const size = Math.floor(Math.random() * 40 + 10);
+    // Apply the size on each particle
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    // Grab a color from a (plant) palette
+    particle.style.background = getRandomizedColorFrom(base_palette);
+    // Generate a random y destination within the bottom half-ish of the screen
+    // or some random position within 100px
+    let destinationX, destinationY;
+    if(up_only){
+        destinationX = x;  // TODO: dumb
+        destinationY = y - Math.random() * window.innerHeight / 2 - 50;
+    } else {
+        destinationX = x + (Math.random() - 0.5) * 200;
+        destinationY = y + (Math.random() - 0.5) * 200;
+    }
+
+    // Store the animation in a variable because we will need it later
+    const animation = particle.animate([
+        {
+            // Set the origin position of the particle
+            // We offset the particle with half its size to center it
+            transform: `translate(${x - (size / 2)}px, ${y - (size / 2)}px)`,
+            opacity: 1
+        },
+        {
+            // We define the final coordinates as the second keyframe
+            transform: `translate(${destinationX}px, ${destinationY}px)`,
+            opacity: 0
+        }
+    ], {
+        // Set a random duration from 1500 to 2500ms
+        duration: 1500 + Math.random() * 1000,
+        easing: 'cubic-bezier(0, .9, .57, 1)',
+        // Delay every particle with a random value from 0ms to 200ms
+        delay: Math.random() * 200
+    });
+    animation.onfinish = () => {
+        particle.remove();
+    };
+}
+
+// picks a random color, makes it more pastel and varies it a bit.
+function getRandomizedColorFrom(palette) {
+    const rgb_color = palette[Math.floor(Math.random() * palette.length)];
+    return `rgb(${rgb_color[0] + 50}, ${rgb_color[1] + 50}, ${rgb_color[2] + 50})`;
+}
+
 export {gen_toggle_button, gen_func_button, createSpacedPlacementQueue, shuffleArray, hasPixelInRow,
-  get_overlay_color_from_name, claimCanvas, getBase64, get_hex_from_name,
+  get_overlay_color_from_name, claimCanvas, getBase64, get_hex_from_name, bubble_up, bubble_out,
   collectSeed, buildColorMessage, getDissolvingRS, getSeedCollection, getSeedPoints, collectGoodie,
   randomFromArray, randomValueFromObject, getRandomKeyFromObj, addRadioButton, makeSortCheckmark,
   getRadioValue, toHue, hexToRgb, addSeedPoints, getSeedCollectionAsString, getGoodieCollection, getMarkedBases,

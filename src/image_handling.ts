@@ -29,14 +29,14 @@ function load_sprite_from_spritesheet(img: HTMLImageElement, offset: number) {
         new_img.onload = () => { resolve(new_img); };
         new_img.onerror = function () { new_img.src = BAD_IMG_URL; };
         const canvas = document.createElement("canvas");
-        canvas.width = 32;
-        canvas.height = 32;
+        canvas.width = work_canvas_size;
+        canvas.height = work_canvas_size;
         const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, 32, 32);
+        ctx.clearRect(0, 0, work_canvas_size, work_canvas_size);
         // All spritesheets are 10 wide, N tall
-        const source_offset_y = Math.floor(offset / 10) * 32;
-        const source_offset_x = (offset % 10) * 32;
-        ctx.drawImage(img, source_offset_x, source_offset_y, 32, 32, 0, 0, 32, 32);
+        const source_offset_y = Math.floor(offset / 10) * work_canvas_size;
+        const source_offset_x = (offset % 10) * work_canvas_size;
+        ctx.drawImage(img, source_offset_x, source_offset_y, work_canvas_size, work_canvas_size, 0, 0, work_canvas_size, work_canvas_size);
         new_img.src = canvas.toDataURL();
     }).then(x => { (<HTMLImageElement>x).decode(); return x; }, () => { console.log("Failed loading at offset " + offset); });
 }
@@ -168,7 +168,7 @@ async function imageFromPopup(parent: HTMLElement, name_of_image: string, callba
     urlTaker.style.minHeight = "3vh";
     const preview = document.createElement("img");
     const preview_container = document.createElement("div");
-    preview_container.className = "scaled_preview_container";
+    preview_container.className = "plant_box";
     preview_container.appendChild(preview);
     const confirm_button = document.createElement("input");
     confirm_button.type = "button";
@@ -327,30 +327,30 @@ function draw_outline_v2(template_canvas: HTMLCanvasElement) {
     //return output_canvas;
 }
 
-// Shrinks an image at a URL down to 32, then up to 64, then loads it into our refs
+// Shrinks an image at a URL down to work_canvas_size, then up to x2, then loads it into our refs
 async function resize_for_garden(name_of_image: string, sourceURL: string) {
     const refURL = name_of_image + "_wildcard_data_url"
     const temp_img = <HTMLImageElement> await preload_single_image(sourceURL);
-    // Forcibly resize to 32x32
+    // Forcibly resize down
     const wildcard_canvas = document.createElement("canvas");
-    wildcard_canvas.width = 32;
-    wildcard_canvas.height = 32;
+    wildcard_canvas.width = work_canvas_size;
+    wildcard_canvas.height = work_canvas_size;
     const max_side = Math.max(temp_img.naturalHeight, temp_img.naturalWidth);
     const wildcard_ctx = wildcard_canvas.getContext("2d");
     wildcard_ctx.imageSmoothingEnabled = false;
     // Do a bit of math so that, if the image isn't a perfect square, we don't squash it.
-    wildcard_ctx.drawImage(temp_img, 0, 32 - temp_img.naturalHeight * (32 / max_side),
-        temp_img.naturalWidth * (32 / max_side),
-        temp_img.naturalHeight * (32 / max_side));
+    wildcard_ctx.drawImage(temp_img, 0, work_canvas_size - temp_img.naturalHeight * (work_canvas_size / max_side),
+        temp_img.naturalWidth * (work_canvas_size / max_side),
+        temp_img.naturalHeight * (work_canvas_size / max_side));
     const resized_dataURL = wildcard_canvas.toDataURL();//(temp_img.type);
     wildcard_canvases[name_of_image] = wildcard_canvas;
     refs[refURL] = await preload_single_image(resized_dataURL);
     const preview_canvas = document.createElement("canvas");
     const preview_context = preview_canvas.getContext("2d");
-    preview_canvas.width = 64;
-    preview_canvas.height = 64;
+    preview_canvas.width = work_canvas_size * 2;
+    preview_canvas.height = work_canvas_size * 2;
     preview_context.imageSmoothingEnabled = false;
-    preview_context.drawImage(refs[refURL], 0, 0, 64, 64);
+    preview_context.drawImage(refs[refURL], 0, 0, work_canvas_size * 2, work_canvas_size * 2);
     return preview_canvas.toDataURL();//(temp_img.type);
 }
 

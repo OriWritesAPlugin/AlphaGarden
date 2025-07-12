@@ -1,5 +1,5 @@
 import { FOLIAGE_SPRITE_DATA, all_foliage } from "../data.js";
-import { buildColorMessage, getSeedCollection, randomFromArray, randomValueFromObject, getGoodieCollection, getRandomKeyFromObj, claimCanvas } from "../shared.js";
+import { buildColorMessage, getSeedCollection, randomFromArray, randomValueFromObject, getGoodieCollection, getRandomKeyFromObj, claimCanvas, gen_toggle_button, gen_func_button, get_toggle_button_setting } from "../shared.js";
 import { gen_plant, decode_plant_data, parse_plant_data, gen_named, getMainPaletteFromSeed } from "../gen_plant.js";
 import { available_tileables, available_backgrounds, do_preload_initial, available_ground_base } from "../gen_garden.js"
 import { CelestialLayer, GardenLayer } from "../garden_layers.js";
@@ -46,6 +46,17 @@ async function do_stuff() {
     // We need to pre-prime the ground canvas, since it and the seed list update independently
     await gl.updateGround();
     await gm.redraw();
+    let options_parent = document.getElementById("garden_toggles_div");
+    options_parent.appendChild(gen_toggle_button("outlines", gm.redraw, true));
+    options_parent.appendChild(gen_toggle_button("palette lock", gm.redraw, false));
+    options_parent.appendChild(gen_toggle_button("background lock", gm.redraw, false));
+    const toggle_adjuster_menu = function() {
+        let adjuster_div = document.getElementById("manual_seed_control_div");
+        if(get_toggle_button_setting("plant adjuster")){ adjuster_div.style.display="block" }
+        else {adjuster_div.style.display="none"}}
+    options_parent.appendChild(gen_toggle_button("plant inspector", toggle_adjuster_menu, true));
+    let utilities_parent = document.getElementById("garden_utilities_div");
+    utilities_parent.appendChild(gen_func_button("SYNC SIZES", sync_sizes));
     // I'd like to do SOMETHING to indicate how to initially use the tool, but without it being obnoxious
     // for returning users.
     /*if(!document.getElementById("seed_list").value){
@@ -137,7 +148,7 @@ async function random_from_collection() {
     let matchColors = Math.random() < 0.9;
     let decorPaletteSeed;
     let groundPaletteSeed;
-    let keep_last_palette = document.getElementById("freeze_check").checked && gl.content.length > 0;
+    let keep_last_palette = get_toggle_button_setting("palette lock") && gl.content.length > 0;
     // Logic for "matchy" colors
     if (keep_last_palette) {
         for (let i = 0; i < gl.content.length; i++) {
@@ -183,7 +194,7 @@ async function random_from_collection() {
     }
     chosen_seeds = chosen_seeds.map(apply_random_permutations_to_seed);
     document.getElementById("seed_list").value = chosen_seeds.join(", ");
-    if (document.getElementById("freeze_bg_check").checked) {
+    if (get_toggle_button_setting("background lock")) {
         doThisRegen();
         return;
     }
@@ -256,7 +267,7 @@ async function doThisRegen() {
         alert("WARNING: No active garden layer! Click the star mark on one of the garden (green) layers. If you don't have any, click the green button in the top right.")
         return;
     }
-    gl.draw_outline = document.getElementById("outline_check").checked;
+    gl.draw_outline = get_toggle_button_setting("outlines");
     await gm.setHeight(parseInt(document.getElementById("garden_height").value));
     gm.setWidth(parseInt(document.getElementById("garden_width").value));
     gm.setScale(parseFloat(document.getElementById("garden_scale").value));
@@ -369,8 +380,6 @@ async function create_manip_entry(offset, gardenitem) {
 
 do_stuff();
 document.getElementById("seed_positioning_offset").onpointerup = setPositionFixed;
-document.getElementById("freeze_check").checked = false;
-document.getElementById("size_syncer").onclick = sync_sizes;
 document.getElementById("randomizer").onclick = random_from_collection;
 document.getElementById("loader").onclick = load;
 document.getElementById("regenerator").onclick = doThisRegen;

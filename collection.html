@@ -13,7 +13,7 @@
         <div id=content_div style="padding: 0px;">
             <div id="collection_horiz_div", class="collection_row">
               <div id=seed_collection_display_spacer class=garden_util_box style="width:20%; min-width: 100px; border-width: 0px"></div>
-                <div id=seed_collection_display_container class=garden_util_box_fixed style="text-align: left; left: 0.5%">
+                <div id=seed_collection_display_container class=garden_util_box_fixed style="text-align: left; left: 0%;  padding-left: 1%">
                   <input type="button" class="chunky_fullwidth" id="refresh_collection_button" value="Sort/Refresh">
                   <h3>Sort By</h2>
                   <input type="radio" id="none_opt" name="sort_order" value="None" checked><label for="none_opt">Age</label><br>
@@ -58,12 +58,12 @@
                   </div>
               </div>
               <div id="seed_collection_utility_spacer" class=garden_util_box style="width:20%; min-width: 100px; border-width: 0px"></div>
-              <div id=seed_collection_utility_container class=garden_util_box_fixed style="right: 0.5%">
+              <div id=seed_collection_utility_container class=garden_util_box_fixed style="right: -0.1%; padding-right: 1%">
                 <div id="utility_button_box">
                   <input id="analyze_button" type="button" title="Choose a seed to view info about it" class="chunky_fullwidth active" onclick='changeSelectedFunction("analyze")' value="Analyze"></input></br>
                   <input id="select_button" type="button" title="Choose seeds to copy them their text to your clipboard (for making gardens). Click a chosen seed to deselect. You can select seeds multiple times!" class="chunky_fullwidth" onclick='changeSelectedFunction("select")' value="Select"></input></br>
                   <input id="mutate_button" type="button" title="Choose seeds to splice or color-cycle" class="chunky_fullwidth" onclick='changeSelectedFunction("mutate")' value="Mutate"></input></br>
-                  <input id="recycle_button" type="button" title="Choose seeds to remove from your collection (has confirmation dialogue)" class="chunky_fullwidth" onclick='changeSelectedFunction("recycle")' value="Recycle"></input>
+                  <input id="recycle_button" type="button" title="Choose seeds to remove from your collection (has confirmation dialogue)" class="chunky_fullwidth" onclick='changeSelectedFunction("recycle")' value="Recycle"></input></br>
                   <input id="doBackup_button" type="button" title="Back up your seed collection to your computer. Do it early and often! :) You get 3 rs per day for it (max 15)" class="chunky_fullwidth" value="Backup"></input>
                 </div>
                 <div id=analyze_div class=garden_util_box style="min-height: 60vh">
@@ -118,12 +118,24 @@
     let state = side == "left"? clicked.innerText.slice(3,7) : clicked.innerText.slice(0,4);
     let new_state = state == "hide" ? "show" : "hide";
     clicked.innerText = side == "left" ? clicked.innerText.slice(0,3) + new_state + clicked.innerText.slice(7) : new_state + clicked.innerText.slice(4);
-    if(state == "hide"){
-        document.getElementById(targets[1]).style.display = "none";
-        document.getElementById(targets[2]).style.display = "none";
+    let trait;
+    if(side == "left"){
     } else {
-        document.getElementById(targets[1]).style.display = "block";
-        document.getElementById(targets[2]).style.display = "block";     
+    }
+    if(state == "hide"){
+        document.getElementById(targets[1]).style.width = "0%";
+        document.getElementById(targets[2]).style.width = "0%";
+        document.getElementById(targets[1]).style.minWidth = "0px";
+        document.getElementById(targets[2]).style.minWidth = "0px";
+        document.getElementById(targets[2]).style[side] = "-1.5%";
+    } else {
+        document.getElementById(targets[1]).style.width = "20%";
+        document.getElementById(targets[2]).style.width = "20%";   
+        document.getElementById(targets[2]).style[side] = "0%"; 
+        setTimeout(function(){ 
+          document.getElementById(targets[1]).style.minWidth = "100px";
+          document.getElementById(targets[2]).style.minWidth = "100px";
+        }, 750);
     }
   }
 

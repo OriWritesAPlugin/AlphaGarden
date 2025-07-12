@@ -7,37 +7,44 @@
         <link rel="icon" href="https://i.imgur.com/U7WgCMt.png">
     </head>
     <body onload="">
-    <div id=create_garden_organizer style="display: flex">
-      <div style="width: 100%">
-        <a href="./" class="index_link"><--Home</a>
-        <h1 id="title">Endless Garden Creator</h1>
-        <h2 id="subtitle">This is the updated garden creator tool. Check out the <a href=https://www1.flightrising.com/forums/cc/3159765/1#post_57883467>tutorial</a>!</h2>
-        </br>
+    
+    <div id=create_garden_organizer class="collection_row" style="display: flex">
+      <div id=garden_utils_display_spacer class=garden_util_box style="width:25vw; min-width: 100px; border-width: 0px"></div>
+        <div id=garden_options_menu class=garden_util_box style="position: absolute; left: 0%;  padding-left: 1%; height:fit-content">
+          <div>
+            <h3>Settings</h3>
+              <label for="quantity">Width:</label> <input class="garden-dim-bar" type="text" inputmode="numeric" id="garden_width" name="quantity" min="64" value=450>
+          <label for="garden_height">Height:</label>
+          <input class="garden-dim-bar" type="text" inputmode="numeric" id="garden_height" name="garden_height" min="70" value=90>
+        <label for="garden_scale">Scale:</label> <input class="garden-dim-bar" type="text" inputmode="numeric" id="garden_scale" name="garden_scale" value=1 step="0.25">
+            </br>
+        </div>
+        <h3>Options</h3>
+        <div id="garden_toggles_div"></div>
+        <h3>Utilities</h3>
+        <div id="garden_utilities_div"></div>
+  </div>
+  <a href="./" class="index_link" style="left: 10px; top: 20px"><--Home</a>
+                  <div id=seed_collection_display_container class=garden_util_box style="border: none; flex-grow: 100">
+                    <h1 id="title">Endless Garden Creator</h1>
+                <div style="display: block">
+                  <a href='javascript:toggleGardenSideMenu("left");' id="toggle_left_menu" title="Toggle the visibility of the sort/display menu"><< hide options</a>
+                  <span> || </span>
+                  <a href='javascript:toggleGardenSideMenu("right");' id="toggle_right_menu" title="Toggle the visibility of the seed interactions menu">hide layers >></a><br><br>
+                </div>
         <label for="seed_list">Seed list (comma-separated):</label><br>
         <textarea id="seed_list" name="seed_list" size="4" placeholder="Click here and paste!"></textarea><br>
-        <label for="quantity">Width:</label> <input class="garden-dim-bar" type="text" inputmode="numeric" style="width: 1.5em" id="garden_width" name="quantity" min="64" value=450>
-        <label for="garden_height">Height:</label> <input class="garden-dim-bar" type="text" inputmode="numeric" style="width: 1.5em" id="garden_height" name="garden_height" min="70" value=90>
-        <label for="garden_scale">Scale:</label> <input class="garden-dim-bar" type="text" inputmode="numeric" style="width: 1.5em" id="garden_scale" name="garden_scale" value=1 step="0.25">
-        <input type="button" class="chunky_wrap" value="Sync sizes" id="size_syncer" title="Apply the overall image's size (to the left) to all its layers">
-        <input type="button" class="chunky_wrap" value="Randomize" id="randomizer" title="Create a randomized garden using seeds from your collection">
-        <input type="button" class="chunky_wrap" value="Load" id="loader" title="Load a garden from a text blob. You get that when you claim a garden.">
-        <label for="outline_check" value="Outline" title="Experimental: draw an outline to maybe increase contrast">Outline</label>
-        <input type="checkbox" id="outline_check" checked />
-        <label for="freeze_check" value="freeze palette" title="Experimental: try to maintain main palette colors when hitting random">Freeze palette</label>
-        <input type="checkbox" id="freeze_check" />
-        <label for="freeze_bg_check" value="freeze background" title="Experimental: don't randomize the background">Freeze background</label>
-        <input type="checkbox" id="freeze_bg_check" />
+                <input type="button" class="chunky_wrap" value="Randomize" id="randomizer" title="Create a randomized garden using seeds from your collection">
+                <input type="button" class="chunky_wrap" id="claimer" value="Save">
+        <input type="button" class="chunky_wrap" value="Load" id="loader" title="Load a garden from a text blob. You get that when you claim a garden."></br>
         <br><br>
         <div id=content_div>
-            </br></br>
-            <input type="button" class="chunky" id="regenerator" value="&gt;&gt; Generate a garden!&lt;&lt;">
-            </br></br>
             <div id="output"><canvas id="output_canvas" width="450" height="80"></canvas></div>
-            </br></br>
-            <input type="button" class="chunky_wrap" id="claimer" value="Claim Garden">
+            </br>
+            <input type="button" class="chunky_wrap" id="regenerator" value="&gt;&gt; Generate the garden!&lt;&lt;">
         </div>
         <br>
-        <span>Arrange plants manually:</span>
+        <div id="manual_seed_control_div">
         <div id=seed_positioning_grid_div></div>
         <div id=seed_positioning_menu_div style="display: none">
           <div id="seed_positioning_display">
@@ -54,11 +61,40 @@
               <input type="range" id="seed_positioning_offset" min="-10" max="100" style="width: 100%"/><br>
             </div>
           </div>
+          </div>
         </div>
       </div>
     </div>
-    </body>
+              </div>
+      </div>
+    </div>
     <script type="module" src="built/page_specific/create_garden.js"></script>
+
     <script type="text/javascript">
-    </script>
+    
+    function toggleGardenSideMenu(side="left"){
+    let targets = ["toggle_left_menu", "garden_utils_display_spacer", "garden_options_menu"];
+    if(side=="right"){
+        targets = ["toggle_right_menu", "layer_manager", document.createElement("p")]
+    }
+    let clicked = document.getElementById(targets[0]);
+    let state = side == "left"? clicked.innerText.slice(3,7) : clicked.innerText.slice(0,4);
+    let new_state = state == "hide" ? "show" : "hide";
+    clicked.innerText = side == "left" ? clicked.innerText.slice(0,3) + new_state + clicked.innerText.slice(7) : new_state + clicked.innerText.slice(4);
+    let margin_trait = side === "left" ? "marginLeft" : "marginRight";
+    if(state == "hide"){
+        document.getElementById(targets[1]).style[margin_trait] = "-26vw"
+        document.getElementById(targets[2]).style[margin_trait] = "-26vw"
+    } else {
+        document.getElementById(targets[1]).style[margin_trait] = "0vw"
+        document.getElementById(targets[2]).style[margin_trait] = "0vw"
+        setTimeout(function(){ 
+          document.getElementById(targets[1]).style.minWidth = "100px";
+          document.getElementById(targets[2]).style.minWidth = "100px";
+        }, 750);
+    }
+  }
+
+</script>
+    </body>
 </html>
