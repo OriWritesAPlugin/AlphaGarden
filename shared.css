@@ -52,6 +52,10 @@ input[type=button] {
     border: 0px;*/
 }
 
+input[type=checkbox] {
+    accent-color: var(--accent-medium);
+}
+
 button:hover, input[type=button]:hover {
     background-color: var(--hover-color);
 }
@@ -422,7 +426,7 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 }
 
 .dotted-fill-in:hover::placeholder {
-    color: #999999;
+    color: var(--accent-medium);
 }
 
 .garden-dim-bar {
@@ -443,7 +447,7 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 }
 
 .garden-dim-bar:focus {
-    border-color: #DFC48CA0;
+    border-color: var(--text-outline);
     outline: none;
 }
 
@@ -482,7 +486,7 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     min-height: 36px;
     margin-top: 60px;
     margin-right: 8px;
-    transition: accent-color 0.5s ease;
+    transition: accent-color 1.5s ease;
 }
 
 .todo_glowing {
@@ -588,7 +592,7 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     float: right;
     width: 20vw;
     min-width: 150px;
-    border-color: #2F252D;
+    border-color: var(--input-color);
     border-style: solid;
     border-width: thin;
     transition: all 0.75s linear;
@@ -732,8 +736,9 @@ particle {
 }
 
 .radio-button input[type="radio"]:checked+label {
-    color: #fff;
+    color: var(--link-color);
     font-weight: bold;
+    text-decoration-line: underline;
 }
 
 .splice-check input[type="checkbox"] {
@@ -836,7 +841,7 @@ particle {
 /** GARDEN **/
 #seed_list {
     border-style: solid;
-    border-color: #DFC48CA0;
+    border-color: var(--text-outline);
     width: 98%;
     height: 12vh;
 }
@@ -849,7 +854,7 @@ particle {
 /** WANDER **/
 .wander_choice {
     width: 100%;
-    background-color: #2F252D;
+    background-color: var(--input-color);
     border: none;
     color: var(--font-color);
     border-color: var(--font-color);
@@ -864,7 +869,7 @@ particle {
 }
 
 .wander_choice:hover {
-    background-color: #3F353D;
+    background-color: var(--hover-color);
 }
 
 .wander_choice:disabled {

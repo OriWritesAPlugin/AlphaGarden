@@ -23,6 +23,8 @@ const task_hints = ["Done anything nice for yourself lately?", "Anyone you've be
 ];
 var active_plant_selector;
 var setup_complete = false; // Sentinel so we don't spawn a bajillion bubbles on page load.
+const checkbox_flash = window.getComputedStyle(document.documentElement).getPropertyValue("--accent-bright");
+const checkbox_neutral = window.getComputedStyle(document.documentElement).getPropertyValue("--accent-medium");
 
 
 // Generate a brand new task; most logic is connected to task elements, so a bit beefy
@@ -61,6 +63,7 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
         prize_display_square.removeEventListener("click", prize_choose_function, true);
         textbox.style.textDecoration = "line-through";
         textbox.contentEditable = false;
+        checkbox.style.accentColor = checkbox_flash;
         if (setup_complete) {
             saveTasks();
             if (active_plant_selector != undefined && active_plant_selector.getAttribute("idx") == id) {
@@ -70,7 +73,8 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
                 document.getElementById("todo_clear_completed").classList.add("todo_glowing");
             }
         }
-        setTimeout(function () { checkbox.style.accentColor = "#36243c"; }, 5)
+        setTimeout(function () { checkbox.style.accentColor = checkbox_neutral}, 5)
+        //setTimeout(function () { checkbox.style.accentColor = "#36243c"; }, 5)
     }.bind({"textbox": textbox, "checkbox": checkbox, "id": id, "prize_display_square": prize_display_square}));
     if (is_checked) {
         checkbox.checked = true;

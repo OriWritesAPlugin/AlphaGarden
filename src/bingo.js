@@ -686,16 +686,6 @@ function toggle_extra_icons() {
   }
 }
 
-function toggle_dark_mode() {
-  if (get_toggle_button_setting("nightmode")) {
-    document.body.style.background = "#201920";
-    document.body.style.color = "#DFC48C";
-  } else {
-    document.body.style.background = "linear-gradient(to right, #093028, #227251)";
-    document.body.style.color = "#FFFFFF";
-  }
-}
-
 function shimmer_bingo_borders(original_color, new_color, origin_row, origin_column) {
   let root_delay = 100;  // in milliseconds
   for (let i = 0; i < current_board.length; i++) {
@@ -1052,10 +1042,8 @@ function do_bingo_setup(with_config) {
   if(with_config){
     launch_config_dialogue();
   }
-  toggle_dark_mode();
   let settings_div = document.getElementById("settings_div");
   settings_div.appendChild(gen_func_button("Configure", launch_config_dialogue));
-  settings_div.appendChild(gen_toggle_button("nightmode", toggle_dark_mode));
   settings_div.appendChild(gen_toggle_button("icons", toggle_extra_icons, false));
   settings_div.appendChild(gen_toggle_button("hints", toggle_hints));
   settings_div.appendChild(gen_func_button("New Board", relaunchBoard));
@@ -1087,4 +1075,4 @@ function completeSetup() {
 do_bingo_setup(document.getElementById("stupid_hack") != undefined); // check for a magic id that tells us we want a config screen. oop.
 
 
-export { difficulties, bingo_challenge_extras, current_difficulty, setForcedSeed, generate_board, export_bingo_onclick, import_bingo_onclick, restoreBingoStateIfPresent, toggle_extra_icons, toggle_hints, toggle_dark_mode, update_squares_til_if_present, stashBingoState, setModifiedBingoSeedChances, do_bingo_setup };
+export { difficulties, bingo_challenge_extras, current_difficulty, setForcedSeed, generate_board, export_bingo_onclick, import_bingo_onclick, restoreBingoStateIfPresent, toggle_extra_icons, toggle_hints, update_squares_til_if_present, stashBingoState, setModifiedBingoSeedChances, do_bingo_setup };
