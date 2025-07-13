@@ -15,7 +15,7 @@ DATA_FILE = "src/data.js"
 OUTPATH = "images"
 
 
-fetch_out = ["all_foliage",
+fetch_out = [#"all_foliage",
              #"reformatted_named",
              #"available_ground_base"
             ]
@@ -63,6 +63,8 @@ def extract_json_from_js_var(var_name):
         return[dict(name=x, **y) for x,y in formatted.items()]
     if var_name == "available_ground_base":
         return [y for y in formatted.values()]
+    if var_name == "all_palettes":
+        return[y["palette"] for y in formatted]
     return formatted        
 
 def assemble_spritesheet_from_list(var_name):
@@ -152,5 +154,9 @@ def assemble_spritesheet_from_list(var_name):
     subprocess.run(["sed", "-i", sedstr, os.path.abspath("./src/data.js")])
 
 if __name__ == "__main__":
+    # We do this every time because somehow this became the universal script and I don't want to forget to do this.
+    min_palettes = extract_json_from_js_var("all_palettes")
+    sedstr = f'/const all_palettes/c\ const all_palettes = {min_palettes};'
+    subprocess.run(["sed", "-i", sedstr, os.path.abspath("./src/virtually_universal_config.ts")])
     for var in fetch_out:
         assemble_spritesheet_from_list(var)
