@@ -1,7 +1,12 @@
-var img_loadup = [];
+import { available_midgrounds, all_named, all_palettes, available_ground, GROUND_BASE_SPRITESHEET, available_ground_base } from "./data.js";
+import { createSpacedPlacementQueue, claimCanvas, hasPixelInRow, hexToRgb } from "./shared.js";
+import { overall_palette, base_foliage_palette, gen_named, decode_plant_data, gen_plant, random_from_list } from "./gen_plant.js";
+import { refs, preload_single_image, preload_spritesheet, imageFromPopup, tile_along_y, replace_color_palette_single_image, wildcard_canvases } from "./image_handling.js";
 var current_ground = "grass [palette]";
-const available_overlay_colors = { "blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
-    "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2" };
+const available_overlay_colors = {
+    "blue": "0000FF", "red": "FF0000", "green": "00FF00", "black": "000000", "white": "FFFFFF", "default": "201920",
+    "murk": "31402d", "ocean": "015481", "fog": "c3cdcc", "sunset": "fdd35b", "night": "16121d", "midday": "438bd2"
+};
 // REMEMBER: TOP DOWN
 const available_backgrounds = { "custom": [],
     "dusk": ["#424270", "#4c4a73", "#5b5577", "#6f617f", "#7f6d82", "#8f7887", "#a2828a", "#b7938e", "#c29b8d"],
@@ -20,7 +25,8 @@ const available_backgrounds = { "custom": [],
     "sickly": ["#3a392f", "#424134", "#4c4d3a", "#595b41", "#606345", "#6a704a", "#737d4d", "#78854f", "#809552"],
     "soft sunset": ["#eb8d7c", "#ed9489", "#efa38f", "#f1b296", "#f5c8a3", "#f7d2a9", "#fae0b2", "#fff5c2",],
     "sunrise": ["#ffd0db", "#ffc7cd", "#fdc3bb", "#fcc8ae", "#fbcda8", "#fde795"],
-    "sunset": ["#68267a", "#843681", "#9a4d7f", "#a86080", "#b47084", "#bd7f88", "#c58c8d", "#d1a49e", "#efe4d7"] };
+    "sunset": ["#68267a", "#843681", "#9a4d7f", "#a86080", "#b47084", "#bd7f88", "#c58c8d", "#d1a49e", "#efe4d7"]
+};
 // TODO: merge available_ground into this once I do the UI refactor.
 const available_tileables = available_midgrounds;
 var custom_background_colors = [];
@@ -29,8 +35,6 @@ const scaled_seed_width = 64; // not used everywhere, being refactored in.
 var x_coords = [];
 var smart_coords = {};
 var garden_width = 450;
-var current_x_coord;
-var used_fallback_coords;
 var midground;
 var use_smart_spacing = true;
 var last_non_overlay_component_idx = 0; // Used for adding overlays to the ground
@@ -55,7 +59,7 @@ async function gen_randogarden(reuse_and_scramble_positions = false) {
         for (let i = 0; i < seeds.length; i++) {
             if (seeds[i][0] == "*") {
                 let cleaned_seed = seeds[i].split("%")[0];
-                if (!all_named.hasOwnProperty(cleaned_seed)) {
+                if (!Object.prototype.hasOwnProperty.call(all_named, cleaned_seed)) {
                     imageFromPopup(document.body, cleaned_seed);
                     return;
                 }
@@ -74,7 +78,7 @@ async function gen_randogarden(reuse_and_scramble_positions = false) {
     }
     use_smart_spacing = document.getElementById("use_smart_spacing").checked;
     garden_width = Math.max(64, document.getElementById("garden_width").value);
-    garden_height = Math.max(70, document.getElementById("garden_height").value);
+    let garden_height = Math.max(70, document.getElementById("garden_height").value);
     document.getElementById("garden_width").value = garden_width; // min in the HTML doesn't seem to enforce itself.
     document.getElementById("garden_height").value = garden_height;
     canvas.width = garden_width;
@@ -88,15 +92,14 @@ async function gen_randogarden(reuse_and_scramble_positions = false) {
         components_to_place = [];
         // Remove spaces and leading/trailing commas and newlines, then split on remaining commas
         // Fun fact: we have to do two replaces so that newline commas don't get flagged as trailing ones. Smarter regex might fix this...
-        var seeds = document.getElementById("seed_list").value.split(" ").join("").replace(/[\r\n]+/gm, '').replace(/(^,)|(,$)/g, '').split(",");
-        var promises = [];
+        seeds = document.getElementById("seed_list").value.split(" ").join("").replace(/[\r\n]+/gm, '').replace(/(^,)|(,$)/g, '').split(",");
         // Generate a set of coordinates to place items at
         if (use_smart_spacing) {
             smart_coords = {};
             // TODO: Surely I can simplify this
-            smart_coords["short"] = createSpacedPlacementQueue(garden_width, with_spacing = 32);
-            smart_coords["medium"] = createSpacedPlacementQueue(garden_width, with_spacing = 40);
-            smart_coords["tall"] = createSpacedPlacementQueue(garden_width, with_spacing = 64);
+            smart_coords["short"] = createSpacedPlacementQueue(garden_width, 32);
+            smart_coords["medium"] = createSpacedPlacementQueue(garden_width, 40);
+            smart_coords["tall"] = createSpacedPlacementQueue(garden_width, 64);
         }
         // Even when using smart spacing, we want these as a fallback, in case we have more seeds than smart spaces
         x_coords = [];
@@ -151,7 +154,7 @@ async function gen_randogarden(reuse_and_scramble_positions = false) {
         if (use_smart_spacing) {
             smart_coords = { "short": [], "medium": [], "tall": [] };
             for (let i = 0; i < components_to_place.length; i++) {
-                component = components_to_place[i];
+                let component = components_to_place[i];
                 if (component.do_not_scramble_pos) {
                     continue;
                 }
@@ -204,7 +207,7 @@ async function gen_randogarden(reuse_and_scramble_positions = false) {
         place_tileable(midground);
     }
     // Wait for logic to complete and place plants and etc. (this is how we maintain a layering order)
-    for (var i = 0; i < components_to_place.length; i++) {
+    for (let i = 0; i < components_to_place.length; i++) {
         if (i == 0 && background_overlay != null) {
             continue;
         }
@@ -226,7 +229,7 @@ async function gen_randogarden(reuse_and_scramble_positions = false) {
         let underlay_ctx = underlay_canvas.getContext("2d");
         underlay_canvas.width = garden_width;
         underlay_canvas.height = garden_height;
-        rgb_code = get_rgb_from_overlay_name(background_overlay["color"]);
+        let rgb_code = get_rgb_from_overlay_name(background_overlay["color"]);
         rgb_code[3] = rgb_code[3] / 255.0; // we need to convert to fillStyle's form
         underlay_ctx.fillStyle = 'rgba(' + rgb_code.toString() + ')';
         underlay_ctx.fillRect(0, 0, underlay_canvas.width, underlay_canvas.height);
@@ -248,7 +251,7 @@ async function gen_randogarden(reuse_and_scramble_positions = false) {
         let colors = [];
         if (background_color == "from overlays (all)") {
             for (let i = 0; i < components_to_place.length; i++) {
-                if (components_to_place[i].hasOwnProperty("color")) {
+                if (Object.prototype.hasOwnProperty.call(components_to_place[i], "color")) {
                     colors.push("#" + get_hex_from_overlay_name(components_to_place[i]["color"]));
                 }
             }
@@ -293,8 +296,9 @@ async function gen_randogarden(reuse_and_scramble_positions = false) {
 async function place_tileable(tileable_name) {
     let tile_canvas = document.getElementById("output_canvas");
     let tile_ctx = tile_canvas.getContext("2d");
-    if (available_tileables[tileable_name].hasOwnProperty("bottom") || available_tileables[tileable_name].hasOwnProperty("middle")) {
-        if (!available_tileables[tileable_name].hasOwnProperty("bottom")) {
+    if (Object.prototype.hasOwnProperty.call(available_tileables[tileable_name], "bottom") || Object.prototype.hasOwnProperty.call(available_tileables[tileable_name], "middle")) {
+        let bottom_canvas;
+        if (!Object.prototype.hasOwnProperty.call(available_tileables[tileable_name], "bottom")) {
             bottom_canvas = await get_recolored_with_ground_palette(refs[available_tileables[tileable_name]["middle"]]);
         }
         else {
@@ -302,7 +306,7 @@ async function place_tileable(tileable_name) {
         }
         tile_along_y(bottom_canvas, tile_ctx, tile_canvas.height - bottom_canvas.height * 2);
         // "middle" only has any meaning if there's also a bottom
-        if (available_tileables[tileable_name].hasOwnProperty("middle")) {
+        if (Object.prototype.hasOwnProperty.call(available_tileables[tileable_name], "middle")) {
             const middle_canvas = await get_recolored_with_ground_palette(refs[available_tileables[tileable_name]["middle"]]);
             const bottom_img_height = bottom_canvas.height * 2;
             const middle_img_height = refs[available_tileables[tileable_name]["middle"]].height * 2;
@@ -313,20 +317,9 @@ async function place_tileable(tileable_name) {
             }
         }
     }
-    if (available_tileables[tileable_name].hasOwnProperty("top")) {
+    if (Object.prototype.hasOwnProperty.call(available_tileables[tileable_name], "top")) {
         const top_canvas = await get_recolored_with_ground_palette(refs[available_tileables[tileable_name]["top"]]);
-        const top_img_height = refs[available_tileables[tileable_name]["top"]].height * 2;
         tile_along_y(top_canvas, tile_ctx, 0);
-    }
-}
-// tile an image left to right across the main canvas at some y
-// optionally, offset them all to the left (or right, if you prefer) to
-// make the tileables look somewhat different from garden to garden
-async function tile_along_y(img, tile_ctx, y_pos, x_offset = 0) {
-    let ground_x_pos = x_offset;
-    while (ground_x_pos < garden_width) {
-        tile_ctx.drawImage(img, ground_x_pos, y_pos, img.width * 2, img.height * 2);
-        ground_x_pos += img.width * 2;
     }
 }
 // palette swap using the ground palettes
@@ -347,14 +340,14 @@ async function place_ground(scramble_ground = false) {
     let ctx = canvas.getContext("2d");
     let ground_ctx = await draw_ground_canvas(scramble_ground);
     for (let i = last_non_overlay_component_idx + 1; i < components_to_place.length; i++) {
-        component = await components_to_place[i];
+        let component = await components_to_place[i];
         await place_component(ground_ctx, component);
     }
     //purge_transparency(ground_ctx.canvas);
     ctx.drawImage(ground_ctx.canvas, 0, height_offset);
 }
 async function scramble_randogarden() {
-    gen_randogarden(reuse_and_scramble_positions = true);
+    gen_randogarden(true);
 }
 // Replace the current palette with another from the image, trying to avoid
 // picking the same one twice
@@ -382,18 +375,6 @@ async function scramble_tileable_palette() {
             }
         }
     }
-}
-function purge_transparency(canvas) {
-    let ctx = canvas.getContext("2d");
-    let img = ctx.getImageData(0, 0, canvas.width, canvas.height), imgData = img.data;
-    // Loops through bytes and change pixel to white if alpha is not zero.
-    for (var i = 0; i < imgData.length; i += 4) {
-        if (imgData[i + 3] < 255) {
-            imgData[i + 3] = 0;
-        }
-    }
-    // Draw the results
-    ctx.putImageData(img, 0, 0);
 }
 // Draw a field of stars onto an existing canvas, with a specified color for star trails/distant stars
 function generate_starfield(star_canvas, star_ctx) {
@@ -464,7 +445,7 @@ function generate_starfield(star_canvas, star_ctx) {
 // Simple: my pixel art is trash. The original version of this function contained a bug that slightly squashes
 // the art vertically, which somehow makes it look much, *much* better, especially the riverbed and meat ones.
 // Until I can make something that looks equally good, this "bug" is promoted to feature
-async function draw_ground_canvas(scramble_ground = false) {
+async function draw_ground_canvas() {
     let canvas = document.createElement("canvas");
     let ctx = canvas.getContext("2d");
     canvas.width = garden_width;
@@ -501,10 +482,10 @@ async function assign_component(canvas, x_pos, seed, use_smart_spacing) {
         // That does mean we think clouds are short...but those go behind everything else anyways.
         var image_data = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
         var height;
-        if (!hasPixelInRow(image_data, 32 - 7, width = canvas.width)) {
+        if (!hasPixelInRow(image_data, 32 - 7, canvas.width)) {
             height = "short";
         }
-        else if (!hasPixelInRow(image_data, 32 - 19, width = canvas.width)) {
+        else if (!hasPixelInRow(image_data, 32 - 19, canvas.width)) {
             height = "medium";
         }
         else {
@@ -521,7 +502,7 @@ async function assign_component(canvas, x_pos, seed, use_smart_spacing) {
     return component_info;
 }
 async function place_component(ctx, component) {
-    if (component.hasOwnProperty("IOU")) {
+    if (Object.prototype.hasOwnProperty.call(component, "IOU")) {
         // Is reliant on other seeds going first. Really only applies to overlays, so...
         component = await assign_overlay_canvas(component["color"], ctx);
     }
@@ -529,46 +510,41 @@ async function place_component(ctx, component) {
 }
 // Gets a dropdown by ID and sets its content to be the ground names
 function gen_ground_selection(dropdown_id) {
-    select = document.getElementById(dropdown_id);
-    for (key in available_ground) {
+    let select = document.getElementById(dropdown_id);
+    for (let key in available_ground) {
         select.options[select.options.length] = (new Option(key, key));
     }
 }
 // Gets a dropdown by ID and sets its content to be the background colors
 function gen_background_color_selection(dropdown_id) {
-    select = document.getElementById(dropdown_id);
-    for (key in available_backgrounds) {
+    let select = document.getElementById(dropdown_id);
+    for (let key in available_backgrounds) {
         select.options[select.options.length] = (new Option(key, key));
     }
     select.value = "none";
 }
 // Gets a dropdown by ID and sets its content to be the available midgrounds
 function gen_midground_selection(dropdown_id) {
-    select = document.getElementById(dropdown_id);
-    for (key in available_midgrounds) {
+    let select = document.getElementById(dropdown_id);
+    for (let key in available_midgrounds) {
         select.options[select.options.length] = (new Option(key, key));
     }
     select.value = "none";
 }
 // Gets a dropdown by ID and sets its content to be the background styles
 function gen_background_style_selection(dropdown_id) {
-    let styles = ["gradient", "chunks"];
-    select = document.getElementById(dropdown_id);
+    let select = document.getElementById(dropdown_id);
     select.options[0] = (new Option("gradient", "gradient"));
     select.options[1] = (new Option("chunks", "chunks"));
 }
-function set_ground_selection(opt) {
-    current_ground = opt;
-}
-async function get_canvas_for_named_component(name) {
-    // TODO: This is hideous and terrible but I am very tired and wanted to write something before bed
-    var work_canvas = document.createElement("canvas");
-    var work_ctx = work_canvas.getContext("2d");
-    work_canvas.width = work_canvas_size;
-    work_canvas.height = work_canvas_size;
-    name = name.startsWith("*") ? name + "_wildcard_data_url" : "named" + reformatted_named[name]["offset"];
-    place_image_at_coords_with_chance(name, [[Math.floor(work_canvas_size / 2), work_canvas_size - 1]], work_ctx, 1, true);
-    return work_canvas;
+function get_canvas_for_named_component(name) {
+    // The great de-async-ening definitely breaks wildcards.
+    console.log(name);
+    if (name.startsWith("*")) {
+        console.log(wildcard_canvases[name]);
+        return wildcard_canvases[name];
+    }
+    return gen_named(name);
 }
 function get_rgb_from_overlay_name(color) {
     let color_cutoff = color.indexOf("%");
@@ -587,7 +563,7 @@ function get_hex_from_overlay_name(color) {
         hex_code = color.slice(0, color_cutoff);
     }
     // We also let folks input the names of colors as shortcuts
-    if (available_overlay_colors.hasOwnProperty(hex_code)) {
+    if (Object.prototype.hasOwnProperty.call(available_overlay_colors, hex_code)) {
         hex_code = available_overlay_colors[hex_code];
     }
     return hex_code;
@@ -622,8 +598,7 @@ async function draw_outline(color, ctx) {
     let most_recent_color = [0, 0, 0];
     for (let i = 4; i < main_imgData.length; i += 4) {
         // Preemptive optimization is the enemy of progress, and yet. And yet.
-        if (main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] &&
-            main_imgData[i + 1] == outline_color[1] && main_imgData[i + 2] == outline_color[2])) {
+        if (main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] && main_imgData[i + 1] == outline_color[1] && main_imgData[i + 2] == outline_color[2])) {
             this_is_background = true;
         }
         else {
@@ -660,8 +635,7 @@ async function draw_outline(color, ctx) {
             // We use our loops to format us up so we look like the prior inner loop for easier troubleshooting.
             // TODO: At this point, I think the remainder could be refactored into a function. Would be a lot cleaner.
             let i = (j + k * output_canvas.width) * 4;
-            if (main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] &&
-                main_imgData[i + 1] == outline_color[1] && main_imgData[i + 2] == outline_color[2])) {
+            if (main_imgData[i + 3] < 200 || (main_imgData[i + 3] == outline_color[3] && main_imgData[i + 0] == outline_color[0] && main_imgData[i + 1] == outline_color[1] && main_imgData[i + 2] == outline_color[2])) {
                 this_is_background = true;
             }
             else {
@@ -725,24 +699,24 @@ async function assign_overlay_canvas(color, ctx) {
     color_ctx.putImageData(color_img, 0, 0);
     return ({ "canvas": color_canvas, "x_pos": 0, "y_pos": 0, "width": color_canvas.width, "height": color_canvas.height });
 }
-async function get_canvas_for_plant(seed) {
-    return await gen_plant_from_seed(seed);
+function get_canvas_for_plant(seed) {
+    return gen_plant_from_seed(seed);
 }
-async function gen_plant_from_seed(seed) {
+function gen_plant_from_seed(seed) {
     var plant_data = decode_plant_data(seed);
     for (const palette_type of Object.keys(possible_ground_palettes)) {
         possible_ground_palettes[palette_type].push(plant_data[palette_type + "_palette"]);
     }
-    var ret_canvas = await gen_plant(plant_data);
+    var ret_canvas = gen_plant(plant_data);
     return ret_canvas;
 }
 // Mmm, scuff.
 function garden_to_string() {
-    outstring = "";
+    let outstring = "";
     for (let i = 0; i < components_to_place.length; i++) {
         let component = components_to_place[i];
         if (!component.seed.startsWith("#")) {
-            if (all_named.hasOwnProperty(component.seed) && !component.seed.startsWith("*")) {
+            if (Object.prototype.hasOwnProperty.call(all_named, component.seed) && !component.seed.startsWith("*")) {
                 outstring += "!";
             }
             outstring += component.seed + "%" + (((component.x_pos + scaled_seed_width / 2) / garden_width) * 100).toFixed(2);
@@ -753,112 +727,6 @@ function garden_to_string() {
         outstring += ", ";
     }
     return outstring;
-}
-// Flexibly take input (URL, drag-and-drop, paste, or file upload) for a wildcard by creating a popup box
-// attached to some parent. Load whatever we find into all_named
-// This is far jankier than it needs to be since Javascript only pauses for prompt, alert, and confirm
-// Largely taken from https://soshace.com/the-ultimate-guide-to-drag-and-drop-image-uploading-with-pure-javascript/
-async function imageFromPopup(parent, name_of_image) {
-    var form = document.createElement("div");
-    form.className = "popup";
-    let helptext = document.createElement("div");
-    helptext.innerHTML = "<h3>" + name_of_image + "</h3>Paste an image (or image URL), or drag-and-drop one from your files:";
-    helptext.style.padding = "1vw";
-    helptext.style.textAlign = "center";
-    let urlTaker = document.createElement("input");
-    urlTaker.style.min_height = "3vh";
-    var preview = document.createElement("img");
-    let preview_container = document.createElement("div");
-    preview_container.className = "scaled_preview_container";
-    preview_container.appendChild(preview);
-    let confirm_button = document.createElement("input");
-    confirm_button.type = "button";
-    confirm_button.value = "Confirm";
-    confirm_button.style.width = "auto";
-    urlTaker.addEventListener("input", async function () {
-        if (urlTaker.files == null) {
-            preview.src = await resize_for_garden(name_of_image, urlTaker.value);
-        }
-        else {
-            handleImage(urlTaker.files, name_of_image, preview);
-        }
-    });
-    urlTaker.addEventListener("paste", function (event) {
-        var items = (event.clipboardData || event.originalEvent.clipboardData).items;
-        for (index in items) {
-            var item = items[index];
-            if (item.kind === 'file') {
-                var blob = item.getAsFile();
-                handleImage([blob], name_of_image, preview);
-            }
-        }
-    });
-    confirm_button.addEventListener("click", function () {
-        parent.removeChild(form);
-        // we got here by interrupting initial garden generation; restart it
-        gen_randogarden(false);
-    });
-    function preventDefault(e) { e.preventDefault(); e.stopPropagation; }
-    function handleDrop(e) { handleImage(e.dataTransfer.files, name_of_image, preview); }
-    form.addEventListener("dragenter", preventDefault, false);
-    form.addEventListener("dragleave", preventDefault, false);
-    form.addEventListener("dragover", preventDefault, false);
-    form.addEventListener("drop", preventDefault, false);
-    form.addEventListener("drop", handleDrop, false);
-    form.appendChild(helptext);
-    form.appendChild(urlTaker);
-    form.appendChild(preview_container);
-    form.appendChild(confirm_button);
-    parent.appendChild(form);
-    urlTaker.focus();
-}
-// Helper for imageFromPopup, handles image file validation
-async function handleImage(files, name_of_image, preview_img) {
-    if (files.length > 1) {
-        alert("Multiple uploads detected, only the first will be used");
-    }
-    let file = files[0];
-    let validTypes = ["image/jpeg", "image/png", "image/gif"];
-    if (validTypes.indexOf(file.type) == -1) {
-        alert("Bad file type, please use a png, gif, or jpeg");
-    }
-    else {
-        let dataURL = await getBase64(file);
-        preview_img.src = await resize_for_garden(name_of_image, dataURL);
-    }
-}
-// Shrinks an image at a URL down to 32, then up to 64, then loads it into our refs
-async function resize_for_garden(name_of_image, sourceURL) {
-    let refURL = name_of_image + "_wildcard_data_url";
-    all_named[name_of_image] = refURL;
-    let temp_img = await preload_single_image(sourceURL);
-    // Forcibly resize to 32x32
-    let wildcard_canvas = document.createElement("canvas");
-    wildcard_canvas.width = 32;
-    wildcard_canvas.height = 32;
-    let max_side = Math.max(temp_img.naturalHeight, temp_img.naturalWidth);
-    let wildcard_ctx = wildcard_canvas.getContext("2d");
-    wildcard_ctx.imageSmoothingEnabled = false;
-    // Do a bit of math so that, if the image isn't a perfect square, we don't squash it.
-    wildcard_ctx.drawImage(temp_img, 0, 32 - temp_img.naturalHeight * (32 / max_side), temp_img.naturalWidth * (32 / max_side), temp_img.naturalHeight * (32 / max_side));
-    let resized_dataURL = wildcard_canvas.toDataURL(temp_img.type);
-    refs[refURL] = await preload_single_image(resized_dataURL);
-    let preview_canvas = document.createElement("canvas");
-    let preview_context = preview_canvas.getContext("2d");
-    preview_canvas.width = 64;
-    preview_canvas.height = 64;
-    preview_context.imageSmoothingEnabled = false;
-    preview_context.drawImage(refs[refURL], 0, 0, 64, 64);
-    return preview_canvas.toDataURL(temp_img.type);
-}
-function getBase64(file) {
-    return new Promise(function (resolve) {
-        var reader = new FileReader();
-        reader.onloadend = function () {
-            resolve(reader.result);
-        };
-        reader.readAsDataURL(file);
-    });
 }
 async function do_preload() {
     await do_preload_initial();
@@ -873,16 +741,15 @@ async function preload_ground_bases() {
 // This is the only portion that needs run for the new layer-based interface, so for now they live in parallel.
 async function do_preload_initial() {
     await preload_ground_bases(); // Chrome demands this come first
-    await preload_plants();
-    await preload_named();
-    tileables = new Set();
+    //await preload_named();
+    let tileables = new Set();
     // Grounds and midgrounds have variable sizes, so can't be stored in spritesheets
     for (const key in available_ground) {
         tileables.add(available_ground[key]);
     }
     /*for (const key in available_ground_base){
-        tileables.add(available_ground_base[key]);
-      }*/
+    tileables.add(available_ground_base[key]);
+    }*/
     for (const key in available_midgrounds) {
         for (const subkey in available_midgrounds[key]) {
             tileables.add(available_midgrounds[key][subkey]);
@@ -893,3 +760,4 @@ async function do_preload_initial() {
         refs[img] = await preload_single_image(img);
     }
 }
+export { scramble_randogarden, claim_garden, do_preload, get_canvas_for_named_component, get_canvas_for_plant, available_overlay_colors, available_tileables, available_backgrounds, do_preload_initial, available_ground_base };

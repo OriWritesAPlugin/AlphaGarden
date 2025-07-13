@@ -1,9 +1,16 @@
 /** This module holds the UI logic for garden creation. **/
-const PROPERTIES = { "base": { "defaultPalette": "CunEjC0KIh", "mainColor": "#FF0000", "secondColor": "#AA0000", "accentColor": "#FFAA00", "icon": "▒", "hovertext": "unused..." },
+import { all_named, available_ground, available_ground_base } from "./data.js";
+import { GardenLayer, DecorLayer, OverlayLayer, CelestialLayer, CelestialType, LayerType } from "./garden_layers.js";
+import { available_backgrounds, available_tileables } from "./gen_garden.js";
+import { clearCanvas, imageFromPopup } from "./image_handling.js";
+import { draggableLayerMouseDownHandler } from "./drag_and_drop.js";
+const PROPERTIES = {
+    "base": { "defaultPalette": "CunEjC0KIh", "mainColor": "#FF0000", "secondColor": "#AA0000", "accentColor": "#FFAA00", "icon": "▒", "hovertext": "unused..." },
     "garden": { "defaultPalette": "CunEjC0KIh", "mainColor": "#1C2121", "secondColor": "#151818", "accentColor": "#273831", "icon": "⚘", "hovertext": "Create a new garden layer. This is where all the plants and goodies go!" },
     "decor": { "defaultPalette": "CunEjC0KIh", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains", "accentColor": "#3D362B", "icon": "ꕔ", "hovertext": "Create a new decor layer. This lets you add mountains and the like." },
     "overlay": { "mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "⚙", "hovertext": "Currently unused, how mysterious!" },
-    "celestial": { "defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "defaultCustomPalette": ["#192446", "#335366", "#426f7a"], "icon": "☾", "hovertext": "Create a new celestial layer, for adding skies, stars, fog, etc. Don't forget to drag the new layer up a bit if you're doing fog!" } }; // old overlay: 1F191A
+    "celestial": { "defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "defaultCustomPalette": ["#192446", "#335366", "#426f7a"], "icon": "☾", "hovertext": "Create a new celestial layer, for adding skies, stars, fog, etc. Don't forget to drag the new layer up a bit if you're doing fog!" }
+}; // old overlay: 1F191A
 class LayerDiv {
     type;
     selfDiv;
@@ -41,21 +48,21 @@ class LayerDiv {
             }
             onEditCallback();
         }.bind(this);
-        this.selfDiv.addEventListener('mousedown', draggableLayerMouseDownHandler);
+        this.selfDiv.addEventListener('mousedown', draggableLayerMouseDownHandler.bind({ callOnDrag: onEditCallback }));
         this.selfDiv.style.border = "3px solid " + this.accentColor;
         this.layer = layer;
         this.id = "layer_" + id;
         this.selfDiv.id = this.id;
-        let decorDiv = this.buildGenericDiv(this.mainColor);
+        const decorDiv = this.buildGenericDiv(this.mainColor);
         this.editButton = this.buildEditButton();
         this.hideButton = this.buildHideButton();
-        let deleteButton = this.buildDeleteButton();
+        const deleteButton = this.buildDeleteButton();
         this.editDiv = this.buildEditDiv();
         decorDiv.style.padding = "0vh";
         decorDiv.style.margin = "0vh";
         decorDiv.style.width = "95%";
         this.selfDiv.appendChild(this.editButton);
-        let namePlate = document.createElement("input");
+        const namePlate = document.createElement("input");
         namePlate.value = this.id;
         this.selfDiv.appendChild(this.hideButton);
         this.selfDiv.appendChild(namePlate);
@@ -67,7 +74,7 @@ class LayerDiv {
         this.toggleEditMode();
     }
     buildGenericDiv(color) {
-        let genericDiv = document.createElement("div");
+        const genericDiv = document.createElement("div");
         genericDiv.className = "layer_div";
         genericDiv.style.backgroundColor = color;
         //genericDiv.id = this.generateId("generic");
@@ -78,7 +85,7 @@ class LayerDiv {
         return genericDiv;
     }
     buildOptionsHolderDiv() {
-        let optionsHolderDiv = this.buildGenericDiv(this.mainColor);
+        const optionsHolderDiv = this.buildGenericDiv(this.mainColor);
         optionsHolderDiv.style.display = "inline-block";
         optionsHolderDiv.style.height = "80%";
         optionsHolderDiv.style.textAlign = "left";
@@ -106,7 +113,7 @@ class LayerDiv {
         this.onEditCallback();
     }
     buildEditButton() {
-        let editButton = document.createElement("input");
+        const editButton = document.createElement("input");
         editButton.type = "button";
         editButton.className = "chunky_wrap";
         editButton.value = "✎";
@@ -116,7 +123,7 @@ class LayerDiv {
         return editButton;
     }
     buildHideButton() {
-        let hideButton = document.createElement("input");
+        const hideButton = document.createElement("input");
         hideButton.type = "button";
         hideButton.className = "chunky_wrap";
         hideButton.value = "•";
@@ -126,7 +133,7 @@ class LayerDiv {
         return hideButton;
     }
     buildDeleteButton() {
-        let deleteButton = document.createElement("input");
+        const deleteButton = document.createElement("input");
         deleteButton.type = "button";
         deleteButton.className = "chunky_wrap";
         deleteButton.value = "✕";
@@ -141,12 +148,12 @@ class LayerDiv {
         this.onEditCallback();
     }
     buildGenericDropdown(target, optionList) {
-        let selectBox = document.createElement("select");
+        const selectBox = document.createElement("select");
         selectBox.id = this.generateId("selectbox", target);
         selectBox.className = "garden_dropdown";
         selectBox.style.width = "90%";
-        for (let option of optionList) {
-            let newOption = new Option(option, option);
+        for (const option of optionList) {
+            const newOption = new Option(option, option);
             if (option == this.layer[target]) {
                 newOption.selected = true;
             }
@@ -164,11 +171,11 @@ class LayerDiv {
         return selectBox;
     }
     generateId(childType, descriptor) {
-        let id = this.id + "_" + childType + "_" + descriptor;
+        const id = this.id + "_" + childType + "_" + descriptor;
         return id;
     }
     buildGenericFillIn(target, labelText, color, hovertext, coerceNumber = false) {
-        let fillIn = document.createElement("input");
+        const fillIn = document.createElement("input");
         fillIn.className = "garden-dim-bar";
         fillIn.id = this.generateId("fillin", target);
         fillIn.style.width = "50%";
@@ -184,7 +191,7 @@ class LayerDiv {
             await this.onEditCallback();
         }.bind(this, target);
         fillIn.value = this.layer[target] == 1 ? this.layer[target].toPrecision(2) : this.layer[target];
-        let label = document.createElement("label");
+        const label = document.createElement("label");
         label.setAttribute("for", fillIn.id);
         label.setAttribute("title", hovertext);
         label.innerHTML = labelText;
@@ -192,12 +199,12 @@ class LayerDiv {
     }
     buildPositionDiv() {
         const pairs = [["x_offset", "x:", "layer's horizontal offset"], ["y_offset", "y:", "layer's vertical offset"], ["width", "<br>width:", "width of layer"], ["scale", "scale:", "multiply layer size by this amount"]];
-        let holdDiv = this.buildGenericDiv(this.mainColor);
+        const holdDiv = this.buildGenericDiv(this.mainColor);
         holdDiv.style.display = "inline-block";
         holdDiv.style.height = "auto";
         holdDiv.style.textAlign = "right";
         for (let i = 0; i < pairs.length; i++) {
-            let [fillIn, label] = this.buildGenericFillIn(pairs[i][0], pairs[i][1], this.secondColor, pairs[i][2], true);
+            const [fillIn, label] = this.buildGenericFillIn(pairs[i][0], pairs[i][1], this.secondColor, pairs[i][2], true);
             fillIn.style.width = "2em";
             if (pairs[i][0] != "width") {
                 if (pairs[i][0] == "y_offset") {
@@ -227,7 +234,7 @@ class LayerDiv {
         return holdDiv;
     }
     buildEditDiv() {
-        let editDiv = document.createElement("div");
+        const editDiv = document.createElement("div");
         editDiv.className = "layer_div";
         editDiv.style.backgroundColor = this.secondColor;
         editDiv.style.textAlign = "right";
@@ -258,12 +265,12 @@ class GardenLayerDiv extends LayerDiv {
         }.bind(this);
     }
     buildEditDiv() {
-        let editDiv = document.createElement("div");
+        const editDiv = document.createElement("div");
         editDiv.className = "layer_div";
         editDiv.style.backgroundColor = this.secondColor;
-        let dropdownDiv = this.buildGenericDiv(this.mainColor);
-        let groundCoverSelect = this.buildGenericDropdown("groundCover", Object.keys(available_ground));
-        let groundSelect = this.buildGenericDropdown("ground", Object.keys(available_ground_base));
+        const dropdownDiv = this.buildGenericDiv(this.mainColor);
+        const groundCoverSelect = this.buildGenericDropdown("groundCover", Object.keys(available_ground));
+        const groundSelect = this.buildGenericDropdown("ground", Object.keys(available_ground_base));
         groundCoverSelect.onchange = async function () {
             this.layer.groundCover = groundCoverSelect.value;
             await this.layer.updateGround();
@@ -276,7 +283,7 @@ class GardenLayerDiv extends LayerDiv {
         }.bind(this);
         dropdownDiv.appendChild(groundCoverSelect);
         dropdownDiv.appendChild(groundSelect);
-        let [fillIn, label] = this.buildGenericFillIn("groundPaletteSeed", "colors:", this.secondColor, "seed providing colors for ground");
+        const [fillIn, label] = this.buildGenericFillIn("groundPaletteSeed", "colors:", this.secondColor, "seed providing colors for ground");
         fillIn.onchange = async function () {
             this.layer.groundPaletteSeed = fillIn.value;
             await this.layer.updateGround();
@@ -293,7 +300,7 @@ class GardenLayerDiv extends LayerDiv {
         return editDiv;
     }
     buildSwapButton() {
-        let swapButton = document.createElement("input");
+        const swapButton = document.createElement("input");
         swapButton.type = "button";
         swapButton.className = "chunky_wrap";
         swapButton.value = "☆"; // ★
@@ -320,13 +327,13 @@ class DecorLayerDiv extends LayerDiv {
         super(layer, id, onEditCallback, "decor");
     }
     buildEditDiv() {
-        let editDiv = document.createElement("div");
+        const editDiv = document.createElement("div");
         editDiv.className = "layer_div";
         editDiv.style.backgroundColor = this.secondColor;
-        let dropdownDiv = this.buildOptionsHolderDiv();
-        let contentSelect = this.buildGenericDropdown("content", Object.keys(available_tileables));
+        const dropdownDiv = this.buildOptionsHolderDiv();
+        const contentSelect = this.buildGenericDropdown("content", Object.keys(available_tileables));
         dropdownDiv.appendChild(contentSelect);
-        let [fillIn, label] = this.buildGenericFillIn("contentPaletteSeed", "colors:", this.secondColor, "seed providing colors for decor");
+        const [fillIn, label] = this.buildGenericFillIn("contentPaletteSeed", "colors:", this.secondColor, "seed providing colors for decor");
         dropdownDiv.appendChild(label);
         dropdownDiv.appendChild(fillIn);
         editDiv.appendChild(dropdownDiv);
@@ -339,7 +346,7 @@ class OverlayLayerDiv extends LayerDiv {
         super(layer, id, onEditCallback, "overlay");
     }
     buildEditDiv() {
-        let editDiv = document.createElement("div");
+        const editDiv = document.createElement("div");
         editDiv.className = "layer_div";
         editDiv.style.backgroundColor = this.secondColor;
         editDiv.innerHTML = "Effects layer under construction! The overlay stuff was moved to the celestial (blue moon) tab, pick \"fog\".<br><br>Eventually, I want this to handle decor like picture frames";
@@ -365,13 +372,13 @@ class CelestialLayerDiv extends LayerDiv {
         super(layer, id, onEditCallback, "celestial");
     }
     buildEditDiv() {
-        let editDiv = document.createElement("div");
+        const editDiv = document.createElement("div");
         editDiv.className = "layer_div";
         editDiv.style.backgroundColor = this.secondColor;
-        let dropdownDiv = this.buildGenericDiv(this.secondColor);
+        const dropdownDiv = this.buildGenericDiv(this.secondColor);
         // TODO: Typescript is amazing fantastic awesome but the enums might be worth holding off on
-        let contentSelect = this.buildGenericDropdown("content", Object.keys(CelestialType).filter(value => isNaN(Number(value))));
-        let skyPaletteSelect = this.buildGenericDropdown("skyPalette", Object.keys(available_backgrounds));
+        const contentSelect = this.buildGenericDropdown("content", Object.keys(CelestialType).filter(value => isNaN(Number(value))));
+        const skyPaletteSelect = this.buildGenericDropdown("skyPalette", Object.keys(available_backgrounds));
         skyPaletteSelect.onchange = async function () {
             this.layer["skyPalette"] = skyPaletteSelect.value;
             await this.onEditCallback();
@@ -379,7 +386,7 @@ class CelestialLayerDiv extends LayerDiv {
                 this.get_custom_palette(this.layer, this.onEditCallback);
             }
         }.bind(this, "skyPalette");
-        let [opacityFillIn, opacityLabel] = this.buildGenericFillIn("opacity", "opacity:", this.mainColor, "opacity of layer", true);
+        const [opacityFillIn, opacityLabel] = this.buildGenericFillIn("opacity", "opacity:", this.mainColor, "opacity of layer", true);
         dropdownDiv.appendChild(contentSelect);
         dropdownDiv.appendChild(skyPaletteSelect);
         dropdownDiv.appendChild(opacityLabel);
@@ -388,22 +395,22 @@ class CelestialLayerDiv extends LayerDiv {
         return editDiv;
     }
     get_custom_palette(cl, callback) {
-        let modal = document.createElement("div");
+        const modal = document.createElement("div");
         //modal.classList.add("block_window");
-        let modal_display = document.createElement("div");
+        const modal_display = document.createElement("div");
         modal_display.classList.add("popup");
         document.body.appendChild(modal);
-        let textbox = document.createElement("text");
+        const textbox = document.createElement("text");
         textbox.textContent = "Enter a comma-separated list of hex colors. You can also put just one for a solid color, or a seed to use its first palette";
-        let fillIn = document.createElement("input");
+        const fillIn = document.createElement("input");
         fillIn.value = cl.customPalette.toString();
         fillIn.oninput = async function () {
             cl.setCustomPalette(fillIn.value);
             await callback();
         };
-        let button_container = document.createElement("div");
+        const button_container = document.createElement("div");
         button_container.style.padding = "20px";
-        let accept_button = document.createElement("input");
+        const accept_button = document.createElement("input");
         accept_button.type = "button";
         accept_button.onclick = async function () {
             cl.setCustomPalette(fillIn.value);
@@ -447,7 +454,6 @@ class LayerManager {
     constructor(managedCanvas, activeGardenSeeds) {
         this.selfDiv = document.createElement("div");
         this.selfDiv.id = "layer_manager";
-        this.selfDiv.style.minWidth = "450px";
         this.layerHolderDiv = document.createElement("div");
         this.layerHolderDiv.id = "layer_holder";
         this.layerHolderDiv.style.width = "100%";
@@ -469,16 +475,16 @@ class LayerManager {
         this.selfDiv.appendChild(this.buildLayerButton("overlay", this.makeOverlayLayer));
         this.selfDiv.appendChild(this.layerHolderDiv);
         // Usually we await. Can't in the constructor, so we do it a little funky
-        let newGardenLayer = new GardenLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, [], PROPERTIES["garden"]["defaultPalette"], "grass [palette]", "clumpy dirt", 1);
-        let newGardenLayerDiv = new GardenLayerDiv(newGardenLayer, this.get_id(), this.updateCallback, this.gardenToggleCallback);
+        const newGardenLayer = new GardenLayer(this.fullCanvas.width, this.fullCanvas.height, 0, 0, [], PROPERTIES["garden"]["defaultPalette"], "grass [palette]", "clumpy dirt", 1);
+        const newGardenLayerDiv = new GardenLayerDiv(newGardenLayer, this.get_id(), this.updateCallback, this.gardenToggleCallback);
         this.activeGardenDiv = newGardenLayerDiv;
         newGardenLayerDiv.setActiveGarden();
         this.divToLayerMapper[newGardenLayerDiv.selfDiv.id] = newGardenLayerDiv;
         this.layerHolderDiv.insertBefore(newGardenLayerDiv.selfDiv, this.layerHolderDiv.firstChild);
     }
     clearAllButActive() {
-        for (let id of Object.keys(this.divToLayerMapper)) {
-            let layerDiv = this.divToLayerMapper[id];
+        for (const id of Object.keys(this.divToLayerMapper)) {
+            const layerDiv = this.divToLayerMapper[id];
             // TODO: See swapActiveGarden(), there's something odd in deletion propagation
             // While we could probably clean that up "in post", it might be better served as refactor.
             if (layerDiv.layer === undefined) {
@@ -505,7 +511,7 @@ class LayerManager {
         this.foreCanvas.height = height;
         this.backCanvas.height = height;
         for (let i = this.layerHolderDiv.children.length; i > 0; i--) {
-            let layerDivObj = this.divToLayerMapper[this.layerHolderDiv.children[i - 1].id];
+            const layerDivObj = this.divToLayerMapper[this.layerHolderDiv.children[i - 1].id];
             if (layerDivObj.layer === undefined) {
                 continue;
             }
@@ -518,7 +524,7 @@ class LayerManager {
         this.foreCanvas.width = width;
         this.backCanvas.width = width;
         for (let i = this.layerHolderDiv.children.length; i > 0; i--) {
-            let layer = this.divToLayerMapper[this.layerHolderDiv.children[i - 1].id].layer;
+            const layer = this.divToLayerMapper[this.layerHolderDiv.children[i - 1].id].layer;
             if (layer === undefined) {
                 continue;
             }
@@ -531,7 +537,7 @@ class LayerManager {
         this.scale = scale;
     }
     buildLayerButton(type, callback) {
-        let layerButton = document.createElement("input");
+        const layerButton = document.createElement("input");
         layerButton.type = "button";
         layerButton.className = "chunky_wrap";
         layerButton.value = PROPERTIES[type]["icon"];
@@ -542,13 +548,18 @@ class LayerManager {
         layerButton.style.height = "3vw";
         return layerButton;
     }
-    addLayerAndAnimate(newLayerDiv, openEditMode) {
+    addLayerAndAnimate(newLayerDiv, openEditMode, pushFirst = false) {
         this.divToLayerMapper[newLayerDiv.selfDiv.id] = newLayerDiv;
-        this.layerHolderDiv.appendChild(newLayerDiv.selfDiv);
+        if (pushFirst) {
+            this.layerHolderDiv.insertBefore(newLayerDiv.selfDiv, this.layerHolderDiv.childNodes[0]);
+        }
+        else {
+            this.layerHolderDiv.appendChild(newLayerDiv.selfDiv);
+        }
         if (openEditMode) {
             setTimeout(() => { newLayerDiv.toggleEditMode(); }, 10);
+            this.updateCallback();
         }
-        this.updateCallback();
         return newLayerDiv;
     }
     async loadFromSaveString(save_string) {
@@ -572,38 +583,37 @@ class LayerManager {
                 await this.makeCelestialLayer(false, layer["content"], layer["palette"], layer["a"], cust);
             }
         }
-        ;
     }
     async makeGardenLayer(openEditMode = true, seedList = [], palette = PROPERTIES["garden"]["defaultPalette"], groundCover = "grass [palette]", ground = "clumpy dirt", width = this.fullCanvas.width / this.scale, height = this.fullCanvas.height / this.scale, x_offset = 0, y_offset = 0, scale = 1) {
-        let newGardenLayer = new GardenLayer(width, height, x_offset, y_offset, seedList, palette, groundCover, ground, scale);
-        let newGardenLayerDiv = new GardenLayerDiv(newGardenLayer, this.get_id(), this.updateCallback, this.gardenToggleCallback);
+        const newGardenLayer = new GardenLayer(width, height, x_offset, y_offset, seedList, palette, groundCover, ground, scale);
+        const newGardenLayerDiv = new GardenLayerDiv(newGardenLayer, this.get_id(), this.updateCallback, this.gardenToggleCallback);
         //await newGardenLayer.updateMain().then(_ => newGardenLayer.updateGround());
         return this.addLayerAndAnimate(newGardenLayerDiv, openEditMode);
     }
     async makeDecorLayer(openEditMode = true, content = PROPERTIES["decor"]["defaultContent"], palette = PROPERTIES["decor"]["defaultPalette"], width = this.fullCanvas.width / this.scale, height = this.fullCanvas.height / this.scale, x_offset = 0, y_offset = 0, scale = 1) {
-        let newDecorLayer = new DecorLayer(width, height, x_offset, y_offset, content, palette, scale);
-        let newDecorLayerDiv = new DecorLayerDiv(newDecorLayer, this.get_id(), this.updateCallback);
+        const newDecorLayer = new DecorLayer(width, height, x_offset, y_offset, content, palette, scale);
+        const newDecorLayerDiv = new DecorLayerDiv(newDecorLayer, this.get_id(), this.updateCallback);
         await newDecorLayer.update();
         return this.addLayerAndAnimate(newDecorLayerDiv, openEditMode);
     }
     async makeOverlayLayer(openEditMode = true) {
-        let newOverlayLayer = new OverlayLayer(this.fullCanvas.width / this.scale, this.fullCanvas.height / this.scale, 0, 0, PROPERTIES["overlay"]["defaultColor"], PROPERTIES["overlay"]["default_opacity"], false, 1);
-        let newOverlayLayerDiv = new OverlayLayerDiv(newOverlayLayer, this.get_id(), this.updateCallback);
+        const newOverlayLayer = new OverlayLayer(this.fullCanvas.width / this.scale, this.fullCanvas.height / this.scale, 0, 0, PROPERTIES["overlay"]["defaultColor"], PROPERTIES["overlay"]["default_opacity"], false, 1);
+        const newOverlayLayerDiv = new OverlayLayerDiv(newOverlayLayer, this.get_id(), this.updateCallback);
         return this.addLayerAndAnimate(newOverlayLayerDiv, openEditMode);
     }
     // If you're wondering why palette and customPalette are split -- bad JS "overloading", the customPalette-free form is useful for the randomize button
     async makeCelestialLayer(openEditMode = true, type = PROPERTIES["celestial"]["defaultContent"], palette = PROPERTIES["celestial"]["defaultPalette"], opacity = 1, customPalette = PROPERTIES["celestial"]["defaultCustomPalette"]) {
-        let newCelestialLayer = new CelestialLayer(this.fullCanvas.width / this.scale, this.fullCanvas.height / this.scale, 0, 0, type, palette, customPalette, opacity, 1);
-        let newCelestialLayerDiv = new CelestialLayerDiv(newCelestialLayer, this.get_id(), this.updateCallback);
+        const newCelestialLayer = new CelestialLayer(this.fullCanvas.width / this.scale, this.fullCanvas.height / this.scale, 0, 0, type, palette, customPalette, opacity, 1);
+        const newCelestialLayerDiv = new CelestialLayerDiv(newCelestialLayer, this.get_id(), this.updateCallback);
         newCelestialLayer.update();
         return this.addLayerAndAnimate(newCelestialLayerDiv, openEditMode);
     }
     parseSeedList(seedList, callback) {
-        var seeds = seedList.split(" ").join("").replace(/[\r\n]+/gm, '').replace(/(^,)|(,$)/g, '').split(",");
+        const seeds = seedList.split(" ").join("").replace(/[\r\n]+/gm, '').replace(/(^,)|(,$)/g, '').split(",");
         for (let i = 0; i < seeds.length; i++) {
             if (seeds[i][0] == "*") {
-                let cleaned_seed = seeds[i].split("%")[0].replace("<", "");
-                if (!all_named.hasOwnProperty(cleaned_seed)) {
+                const cleaned_seed = seeds[i].split("%")[0].replace("<", "");
+                if (!Object.prototype.hasOwnProperty.call(all_named, cleaned_seed)) {
                     imageFromPopup(document.body, cleaned_seed, callback.bind(seedList));
                     return [];
                 }
@@ -626,12 +636,12 @@ class LayerManager {
         await this.activeGardenDiv.layer.updateGround();
         this.redraw();
     }
-    swapActiveGarden(delete_old = false) {
-        var oldActiveGarden;
-        var newActiveGarden;
+    swapActiveGarden() {
+        let oldActiveGarden;
+        let newActiveGarden;
         for (let i = this.layerHolderDiv.children.length; i > 0; i--) {
             // TODO: right now we just free the layer. Should propagate the deletion fully to the manager.
-            let layerDivObj = this.divToLayerMapper[this.layerHolderDiv.children[i - 1].id];
+            const layerDivObj = this.divToLayerMapper[this.layerHolderDiv.children[i - 1].id];
             if (layerDivObj.layer === undefined) {
                 continue;
             }
@@ -654,7 +664,7 @@ class LayerManager {
         }
     }
     getSaveString() {
-        let save_struct = { "version": 0.1, "w": this.width, "h": this.height, "s": this.scale, "layers": [] };
+        const save_struct = { "version": 0.1, "w": this.width, "h": this.height, "s": this.scale, "layers": [] };
         for (let i = 0; i < this.layerHolderDiv.children.length; i++) {
             save_struct["layers"].push(this.divToLayerMapper[this.layerHolderDiv.children[i].id].layer.getSaveData());
         }
@@ -666,13 +676,13 @@ class LayerManager {
         clearCanvas(this.fullCanvas);
         for (let i = this.layerHolderDiv.children.length; i > 0; i--) {
             // TODO: right now we just free the layer. Should propagate the deletion fully to the manager.
-            let layerDivObj = this.divToLayerMapper[this.layerHolderDiv.children[i - 1].id];
+            const layerDivObj = this.divToLayerMapper[this.layerHolderDiv.children[i - 1].id];
             if (layerDivObj.layer === undefined || !layerDivObj.layer.isVisible) {
                 continue;
             }
             layerDivObj.layer.place(this.foreCanvas, this.backCanvas);
         }
-        let fullCtx = this.fullCanvas.getContext("2d");
+        const fullCtx = this.fullCanvas.getContext("2d");
         this.fullCanvas.height = this.height * this.scale;
         this.fullCanvas.width = this.width * this.scale;
         fullCtx.imageSmoothingEnabled = false;
@@ -680,3 +690,4 @@ class LayerManager {
         fullCtx.drawImage(this.foreCanvas, 0, 0, this.width * this.scale, this.height * this.scale);
     }
 }
+export { LayerManager, GardenLayerDiv, CelestialLayerDiv };

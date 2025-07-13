@@ -8,7 +8,7 @@ A scrollY was added to fix a snap-to-top issue on scrolled pages.
 let draggingEle;
 let placeholder;
 let isDraggingStarted = false;
-var callOnDrag;
+//let callOnDrag: () => void;
 // The current position of mouse relative to the dragging element
 let draggingY = 0;
 // swap two nodes
@@ -37,7 +37,7 @@ const draggableLayerMouseDownHandler = function (e) {
     draggingY = e.pageY - rect.top;
     // Attach the listeners to `document`
     document.addEventListener('mousemove', draggableLayerMouseMoveHandler);
-    document.addEventListener('mouseup', draggableLayerMouseUpHandler);
+    document.addEventListener('mouseup', draggableLayerMouseUpHandler.bind(this));
 };
 const draggableLayerMouseMoveHandler = function (e) {
     const draggingRect = draggingEle.getBoundingClientRect();
@@ -82,22 +82,21 @@ const draggableLayerMouseMoveHandler = function (e) {
         swapDraggableNodes(nextEle, draggingEle);
     }
 };
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const draggableLayerMouseUpHandler = function (e) {
     // Remove the placeholder
-    placeholder && placeholder.parentNode.removeChild(placeholder);
+    if (placeholder) {
+        placeholder.parentNode.removeChild(placeholder);
+    }
     draggingEle.style.removeProperty('top');
     draggingEle.style.removeProperty('left');
     draggingEle.style.removeProperty('position');
     draggingY = null;
     draggingEle = null;
     isDraggingStarted = false;
+    this.callOnDrag();
     // Remove the handlers of `mousemove` and `mouseup`
     document.removeEventListener('mousemove', draggableLayerMouseMoveHandler);
     document.removeEventListener('mouseup', draggableLayerMouseUpHandler);
-    // I genuinely hate that I'm doing this. I feel like passing a callback through
-    // should be possible--and probably straightforward to boot--but I've been playing
-    // with it for an hour now and don't feel any closer to success. I'll return
-    // when my uderstanding of bind, arrow operators, and the intricacies of their use
-    // has improved. TODO!
-    callOnDrag();
 };
+export { draggableLayerMouseDownHandler };

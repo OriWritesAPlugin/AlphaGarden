@@ -14,8 +14,13 @@ Each should be able to build its completed canvas from its raw "save form", gene
 its content (image URL, list of seeds, ...), a seed palette, width, and offset. So
 there's quite a bit of logic in this module.
 **/
+import { all_palettes, available_ground, available_ground_base, FOLIAGE_SPRITE_DATA, NAMED_SPRITE_DATA, reformatted_named } from "./data.js";
+import { decode_plant_data, overall_palette, work_canvas_size } from "./gen_plant.js";
+import { createSpacedPlacementQueue, shuffleArray, hasPixelInRow, get_overlay_color_from_name } from "./shared.js";
+import { get_canvas_for_named_component, get_canvas_for_plant, available_tileables, available_backgrounds } from "./gen_garden.js";
+import { refs, replace_color_palette_single_image, applyOverlay, draw_outline_v2, tile_along_y, drawSkyGradient } from "./image_handling.js";
 const LAYER_HEIGHT = 70;
-const GARDEN_ITEM_SIZE = 32;
+const GARDEN_ITEM_SIZE = work_canvas_size;
 ///////////////////////  GENERIC LAYER   ///////////////////////////////////////
 /**
 The base, abstract Layer.
@@ -50,12 +55,12 @@ class Layer {
         this.isVisible = true;
     }
     place_fore(place_onto_canvas) {
-        let place_onto_ctx = place_onto_canvas.getContext("2d");
+        const place_onto_ctx = place_onto_canvas.getContext("2d");
         place_onto_ctx.imageSmoothingEnabled = false; // In case of scaling
         place_onto_ctx.drawImage(this.canvas, this.x_offset, this.y_offset * -1, this.width * this.scale, this.height * this.scale);
     }
     place_back(place_onto_canvas) {
-        let place_onto_ctx = place_onto_canvas.getContext("2d");
+        const place_onto_ctx = place_onto_canvas.getContext("2d");
         place_onto_ctx.drawImage(this.canvas, this.x_offset, this.y_offset * -1, this.canvas.width, this.canvas.height);
     }
     place(fore_canvas, back_canvas) {
@@ -63,7 +68,7 @@ class Layer {
         this.place_back(back_canvas);
     }
     clearCanvas() {
-        let ctx = this.canvas.getContext("2d");
+        const ctx = this.canvas.getContext("2d");
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
     setHeight(height) {
@@ -142,25 +147,23 @@ class GardenPlacedItem extends GardenItem {
         this.offsetSpecified = offsetSpecified;
         this.isFlipped = isFlipped;
     }
-    async place(place_onto_canvas, use_offset = true) {
-        let place_onto_ctx = place_onto_canvas.getContext("2d");
-        let acting_offset = use_offset ? this.offset : 1;
+    place(place_onto_canvas, use_offset = true) {
+        const place_onto_ctx = place_onto_canvas.getContext("2d");
+        const acting_offset = use_offset ? this.offset : 1;
         place_onto_ctx.imageSmoothingEnabled = false;
-        place_onto_ctx.drawImage(await this.canvas, place_onto_canvas.width * acting_offset, place_onto_canvas.height - 70, GARDEN_ITEM_SIZE * 2, GARDEN_ITEM_SIZE * 2);
+        place_onto_ctx.drawImage(this.canvas, place_onto_canvas.width * acting_offset, place_onto_canvas.height - 70, GARDEN_ITEM_SIZE * 2, GARDEN_ITEM_SIZE * 2);
     }
     async flipCanvas() {
-        this.canvas = this.canvas.then((resolved_canvas) => {
-            let flip_canvas = document.createElement("canvas");
-            flip_canvas.width = resolved_canvas.width;
-            flip_canvas.height = resolved_canvas.height;
-            let ctx = flip_canvas.getContext("2d");
-            ctx.setTransform(-1, 0, 0, 1, resolved_canvas.width, 0);
-            ctx.drawImage(resolved_canvas, 0, 0);
-            return flip_canvas;
-        });
+        const flip_canvas = document.createElement("canvas");
+        flip_canvas.width = this.canvas.width;
+        flip_canvas.height = this.canvas.height;
+        const ctx = flip_canvas.getContext("2d");
+        ctx.setTransform(-1, 0, 0, 1, flip_canvas.width, 0);
+        ctx.drawImage(flip_canvas, 0, 0);
+        return flip_canvas;
     }
     getSeed(force_position = true) {
-        let pos = force_position || this.offsetSpecified ? "%" + (this.offset * 100).toFixed(2).toString() : "";
+        const pos = force_position || this.offsetSpecified ? "%" + (this.offset * 100).toFixed(2).toString() : "";
         return this.identity + pos + (this.isFlipped ? "<" : "");
     }
 }
@@ -204,7 +207,7 @@ class GardenLayer extends Layer {
     ground;
     draw_outline;
     constructor(width, height, x_offset, y_offset, seedList, groundPaletteSeed, groundCover, ground, scale) {
-        super(width, height, x_offset, y_offset, scale);
+        super(1, 1, x_offset, y_offset, scale);
         this.seedList = seedList;
         this.generateContent();
         this.assignSmartPositions();
@@ -219,7 +222,8 @@ class GardenLayer extends Layer {
         this.setWidth(width);
     }
     getSaveData() {
-        return { "type": LayerType.Garden,
+        return {
+            "type": LayerType.Garden,
             "x": this.x_offset,
             "y": this.y_offset,
             "w": this.width,
@@ -228,7 +232,8 @@ class GardenLayer extends Layer {
             "palette": this.groundPaletteSeed,
             "gcover": this.groundCover,
             "ground": this.ground,
-            "s": this.scale, };
+            "s": this.scale,
+        };
     }
     generateContent() {
         // Iterating over Typescript enums is very strange and perhaps not worth it? Do NOT remove that filter.
@@ -249,11 +254,11 @@ class GardenLayer extends Layer {
         Object.values(GardenItemHeightCategory).filter(value => !isNaN(Number(value))).forEach(height => {
             shuffleArray(this.smart_coords[height]);
         });
-        let assign_offset = [0, 0, 0, 0, 0];
-        for (let gardenItem of this.content) {
+        const assign_offset = [0, 0, 0, 0, 0];
+        for (const gardenItem of this.content) {
             if ((gardenItem instanceof GardenPlacedItem) && !gardenItem.offsetSpecified) {
-                let placeable = gardenItem;
-                let height = placeable.heightCategory;
+                const placeable = gardenItem;
+                const height = placeable.heightCategory;
                 if (assign_offset[height] >= this.smart_coords[height].length) {
                     // TODO: generating a spaced placement queue and then converting to fraction either
                     // either way is a little silly. We do want fractions, though, in case the garden's resized
@@ -271,9 +276,9 @@ class GardenLayer extends Layer {
         let type;
         let canvas;
         let height;
-        let canvas_func;
-        let percent_pos = identity.indexOf('%');
-        let is_flipped = identity.endsWith("<");
+        let canvas_func; // todo: appeasing, real sig will be identity: string => canvas
+        const percent_pos = identity.indexOf('%');
+        const is_flipped = identity.endsWith("<");
         if (is_flipped) {
             identity = identity.slice(0, identity.length - 1);
         }
@@ -309,18 +314,16 @@ class GardenLayer extends Layer {
             height = this.heightClassFromHeight(FOLIAGE_SPRITE_DATA[decode_plant_data(identity)["foliage"]]["h"]);
             canvas_func = get_canvas_for_plant;
         }
-        canvas = canvas_func(identity).then((resolved_canvas) => {
-            if (is_flipped) {
-                let flip_canvas = document.createElement("canvas");
-                flip_canvas.width = resolved_canvas.width;
-                flip_canvas.height = resolved_canvas.height;
-                let ctx = flip_canvas.getContext("2d");
-                ctx.setTransform(-1, 0, 0, 1, resolved_canvas.width, 0);
-                ctx.drawImage(resolved_canvas, 0, 0);
-                return flip_canvas;
-            }
-            return resolved_canvas;
-        });
+        canvas = canvas_func(identity);
+        if (is_flipped) {
+            const flip_canvas = document.createElement("canvas");
+            flip_canvas.width = canvas.width;
+            flip_canvas.height = canvas.height;
+            const ctx = flip_canvas.getContext("2d");
+            ctx.setTransform(-1, 0, 0, 1, canvas.width, 0);
+            ctx.drawImage(canvas, 0, 0);
+            canvas = flip_canvas;
+        }
         if (percent_pos == null) {
             percent_val = Math.random();
         }
@@ -328,37 +331,37 @@ class GardenLayer extends Layer {
     }
     /**
     Figure out something's GardenItemHeightCategory based on its first fully-transparent row.
-  
+    
     "Fully-transparent row" meaning a y-coordinate in the image with no alpha anywhere.
-  
+    
     We go top-down to account for hovering sprites like fish.
     **/
     classifyHeight(canvas) {
-        let image_data = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
-        if (hasPixelInRow(image_data, 32 - 24, canvas.width)) {
+        const image_data = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
+        if (hasPixelInRow(image_data, work_canvas_size * 0.75, canvas.width)) {
             return GardenItemHeightCategory.Tall;
         }
-        else if (hasPixelInRow(image_data, 32 - 16, canvas.width)) {
+        else if (hasPixelInRow(image_data, work_canvas_size * 0.5, canvas.width)) {
             return GardenItemHeightCategory.Medium;
         }
-        else if (!hasPixelInRow(image_data, 32 - 8, canvas.width)) {
+        else if (!hasPixelInRow(image_data, work_canvas_size * 0.25, canvas.width)) {
             return GardenItemHeightCategory.Short;
         }
         return GardenItemHeightCategory.Tiny;
     }
     heightClassFromHeight(num) {
-        // The num-1 is for the case of a height of 32 (0 offset)
+        // The num-1 is for the case of a height of work_canvas_size (0 offset)
         return Math.ceil((num - 1) / 8);
     }
     /** Update the contents of the main canvas, which holds all the plants. **/
-    async updateMain() {
-        var ctxGarden = this.canvasGarden.getContext("2d");
+    updateMain() {
+        const ctxGarden = this.canvasGarden.getContext("2d");
         ctxGarden.clearRect(0, 0, this.canvasGarden.width, this.canvasGarden.height);
         for (let i = 0; i < this.content.length; i++) {
-            await this.content[i].place(this.canvasGarden);
+            this.content[i].place(this.canvasGarden);
         }
         if (this.draw_outline) {
-            await draw_outline_v2(this.canvasGarden);
+            draw_outline_v2(this.canvasGarden);
         }
         //alert(this.canvasGarden.toDataURL());
         //alert(this.canvasGarden.toDataURL());
@@ -367,19 +370,19 @@ class GardenLayer extends Layer {
     }
     /** Update the contents of the ground canvas, grass/sand/stone/etc.**/
     async updateGround() {
-        let ctxGround = this.canvasGround.getContext("2d");
+        const ctxGround = this.canvasGround.getContext("2d");
         ctxGround.imageSmoothingEnabled = false;
         ctxGround.clearRect(0, 0, this.canvasGround.width, this.canvasGround.height);
-        let colorData = decode_plant_data(this.groundPaletteSeed);
-        let newPalette = all_palettes[colorData["foliage_palette"]]["palette"].concat(all_palettes[colorData["accent_palette"]]["palette"]).concat(all_palettes[colorData["feature_palette"]]["palette"]);
-        let recoloredGround = replace_color_palette_single_image(overall_palette, newPalette, await refs["ground_base" + available_ground_base[this.ground]["offset"]]);
-        let recoloredGroundCover = replace_color_palette_single_image(overall_palette, newPalette, await refs[available_ground[this.groundCover]]);
+        const colorData = decode_plant_data(this.groundPaletteSeed);
+        const newPalette = all_palettes[colorData["foliage_palette"]]["palette"].concat(all_palettes[colorData["accent_palette"]]["palette"]).concat(all_palettes[colorData["feature_palette"]]["palette"]);
+        const recoloredGround = replace_color_palette_single_image(overall_palette, newPalette, await refs["ground_base" + available_ground_base[this.ground]["offset"]]);
+        const recoloredGroundCover = replace_color_palette_single_image(overall_palette, newPalette, await refs[available_ground[this.groundCover]]);
         // Draw everything but the groundcover. We keep going til we're fully off the canvas
-        let incrementBy = recoloredGround.height * 2;
+        const incrementBy = recoloredGround.height * 2;
         let groundYPos = LAYER_HEIGHT;
         // The *2 in the LAYER_HEIGHT is a buffer in case someone, for some reason, sets an offset greater than the functional size.
         while (groundYPos < (LAYER_HEIGHT + this.y_offset)) {
-            tileAlongY(ctxGround, recoloredGround, groundYPos, this.width);
+            tile_along_y(ctxGround, recoloredGround, groundYPos, this.width);
             groundYPos += incrementBy;
         }
         // Draw the groundcover...and ONLY the groundcover.
@@ -399,16 +402,17 @@ class GardenLayer extends Layer {
     /** Applies both canvases to the main one, preparing it to be drawn. **/
     update() {
         this.clearCanvas();
-        let ctx = this.canvas.getContext("2d");
+        const ctx = this.canvas.getContext("2d");
         ctx.drawImage(this.canvasGarden, 0, 6, this.canvasGarden.width, this.canvasGarden.height);
         ctx.drawImage(this.canvasGround, 0, 0, this.canvasGround.width, this.canvasGround.height);
     }
     /** Gardens never go on the background layer. **/
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     place_back(_place_onto_canvas) {
         return;
     }
     place_fore(place_onto_canvas) {
-        let place_onto_ctx = place_onto_canvas.getContext("2d");
+        const place_onto_ctx = place_onto_canvas.getContext("2d");
         // We place at the BOTTOM of the image, so the y_offset usually moves things upwards.
         // That's because folks are more likely to want sky than ground, and positive y "feels" better somehow
         // The LAYER_HEIGHT math is to account first for the height allowed for plants, then for the padding height
@@ -419,19 +423,24 @@ class GardenLayer extends Layer {
     async setHeight(height) {
         // All the + LAYER_HEIGHT is to create a canvas large enough for someone to y_offset all the way to the top of the screen.
         // If we had it exactly equal to the expected canvas size, there'd be LAYER_HEIGHT of empty space at the bottom if they tried.
-        this.height = height + LAYER_HEIGHT;
-        this.canvas.height = height + LAYER_HEIGHT;
-        this.canvasGround.height = height + LAYER_HEIGHT;
-        // The main garden canvas, being stacked on top of the ground, never needs to care about height
-        await this.updateGround();
+        const new_height = height + LAYER_HEIGHT;
+        if (this.height != new_height) {
+            this.height = new_height;
+            this.canvas.height = new_height;
+            this.canvasGround.height = new_height;
+            // The main garden canvas, being stacked on top of the ground, never needs to care about height
+            await this.updateGround();
+        }
     }
     async setWidth(width) {
-        this.width = width;
-        this.canvas.width = width;
-        this.canvasGround.width = width;
-        this.canvasGarden.width = width;
-        await this.updateMain();
-        this.updateGround();
+        if (this.width != width) {
+            this.width = width;
+            this.canvas.width = width;
+            this.canvasGround.width = width;
+            this.canvasGarden.width = width;
+            await this.updateMain();
+            this.updateGround();
+        }
     }
 }
 ///////////////////////  DECOR LAYER   /////////////////////////////////////////
@@ -448,43 +457,43 @@ class DecorLayer extends Layer {
     // Really, this can place any tileable, it's just our only tileables are decor.
     async placeDecor() {
         this.canvas.width = this.width;
-        let tileCtx = this.canvas.getContext("2d");
+        const tileCtx = this.canvas.getContext("2d");
         tileCtx.imageSmoothingEnabled = false;
-        let bottom;
-        if (available_tileables[this.content].hasOwnProperty("bottom") || available_tileables[this.content].hasOwnProperty("middle")) {
+        if (Object.prototype.hasOwnProperty.call(available_tileables[this.content], "bottom") || Object.prototype.hasOwnProperty.call(available_tileables[this.content], "middle")) {
             let acting_bottom = "bottom";
-            if (!available_tileables[this.content].hasOwnProperty("bottom")) {
+            if (!Object.prototype.hasOwnProperty.call(available_tileables[this.content], "bottom")) {
                 acting_bottom = "middle";
             }
             ;
             const bottom = await this.recolorOwnTileable(acting_bottom);
-            tileAlongY(tileCtx, bottom, this.canvas.height - bottom.height * 2, this.width);
+            tile_along_y(tileCtx, bottom, this.canvas.height - bottom.height * 2, this.width);
             // "middle" only has any meaning if there's also a bottom
-            if (available_tileables[this.content].hasOwnProperty("middle")) {
+            if (Object.prototype.hasOwnProperty.call(available_tileables[this.content], "middle")) {
                 const middle = await this.recolorOwnTileable("middle");
                 const bottom_img_height = refs[available_tileables[this.content][acting_bottom]].height * 2;
                 const middle_img_height = refs[available_tileables[this.content]["middle"]].height * 2;
                 let current_y = this.canvas.height - bottom_img_height - middle_img_height;
                 while (current_y > -middle_img_height) {
-                    tileAlongY(tileCtx, middle, current_y, this.width);
+                    tile_along_y(tileCtx, middle, current_y, this.width);
                     current_y -= middle_img_height;
                 }
             }
         }
-        if (available_tileables[this.content].hasOwnProperty("top")) {
+        if (Object.prototype.hasOwnProperty.call(available_tileables[this.content], "top")) {
             const top = await this.recolorOwnTileable("top");
-            tileAlongY(tileCtx, top, 0, this.width);
+            tile_along_y(tileCtx, top, 0, this.width);
         }
     }
     async recolorOwnTileable(portion) {
         return replace_color_palette_single_image(overall_palette, this.palette, await refs[available_tileables[this.content][portion]]);
     }
     async update() {
-        let colorData = decode_plant_data(this.contentPaletteSeed);
+        const colorData = decode_plant_data(this.contentPaletteSeed);
         this.palette = all_palettes[colorData["foliage_palette"]]["palette"].concat(all_palettes[colorData["accent_palette"]]["palette"]).concat(all_palettes[colorData["feature_palette"]]["palette"]);
         this.clearCanvas();
         await this.placeDecor();
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     place_back(_place_onto_canvas) {
         return;
     }
@@ -550,10 +559,10 @@ class CelestialLayer extends Layer {
     }
     update() {
         this.clearCanvas();
-        let type = CelestialType[this.content];
+        const type = CelestialType[this.content];
         // First, we parse the sky color(s)
         let actingPalette;
-        let ctx = this.canvas.getContext("2d");
+        const ctx = this.canvas.getContext("2d");
         ctx.imageSmoothingEnabled = false;
         ctx.globalAlpha = this.opacity;
         if (this.skyPalette == "custom") {
@@ -566,7 +575,7 @@ class CelestialLayer extends Layer {
             drawSkyGradient(this.canvas, actingPalette, this.opacity);
         }
         else if (type == CelestialType.Sky_Chunked) {
-            let step = 1 / (actingPalette.length);
+            const step = 1 / (actingPalette.length);
             for (let i = actingPalette.length - 1; i >= 0; i--) {
                 ctx.fillStyle = actingPalette[i];
                 ctx.fillRect(0, 0, this.canvas.width, this.canvas.height * step * (i + 1));
@@ -582,13 +591,13 @@ class CelestialLayer extends Layer {
     generateStarfield(accentColor) {
         // First we need to decide how many stars to make relative to pixels in the canvas, at max
         // There's essentially 4 levels: [1, 2, 3, 4] in a thousand
-        let star_ratio = (Math.random() * 4 + 1) / 1000;
-        let pixel_indices = this.canvas.width * this.canvas.height - 1; // Let's get that 0 index out of the way
+        const star_ratio = (Math.random() * 4 + 1) / 1000;
+        const pixel_indices = this.canvas.width * this.canvas.height - 1; // Let's get that 0 index out of the way
         // Now we pick our potential star positions
-        let dim_pixel_pos = [];
-        let bright_pixel_pos = [];
+        const dim_pixel_pos = [];
+        const bright_pixel_pos = [];
         for (let i = 0; i < (pixel_indices * star_ratio); i++) {
-            let star_roll = Math.random() * 1000;
+            const star_roll = Math.random() * 1000;
             // To give some variation in the star count, there's a 30% chance that any given star gets cut.
             if (star_roll < 300) {
                 continue;
@@ -602,7 +611,7 @@ class CelestialLayer extends Layer {
             }
             else {
                 // Math out the large, cross-shaped stars
-                let star_core = Math.round(Math.random() * pixel_indices);
+                const star_core = Math.round(Math.random() * pixel_indices);
                 bright_pixel_pos.push(star_core);
                 if (star_core > 0) {
                     dim_pixel_pos.push(star_core - 1);
@@ -618,20 +627,20 @@ class CelestialLayer extends Layer {
                 }
             } // Might add shooting stars and the like later
         }
-        let ctx = this.canvas.getContext("2d");
+        const ctx = this.canvas.getContext("2d");
         ctx.imageSmoothingEnabled = false;
-        let main_img = ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-        let main_imgData = main_img.data;
-        let rgb_to_use = get_overlay_color_from_name(accentColor, 1);
+        const main_img = ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        const main_imgData = main_img.data;
+        const rgb_to_use = get_overlay_color_from_name(accentColor, 1);
         for (let i = 0; i < bright_pixel_pos.length; i++) {
-            let pos = bright_pixel_pos[i] * 4;
+            const pos = bright_pixel_pos[i] * 4;
             main_imgData[pos] = 255;
             main_imgData[pos + 1] = 255;
             main_imgData[pos + 2] = 255;
             main_imgData[pos + 3] = 255;
         }
         for (let i = 0; i < dim_pixel_pos.length; i++) {
-            let pos = dim_pixel_pos[i] * 4;
+            const pos = dim_pixel_pos[i] * 4;
             main_imgData[pos] = rgb_to_use[0];
             main_imgData[pos + 1] = rgb_to_use[1];
             main_imgData[pos + 2] = rgb_to_use[2];
@@ -648,7 +657,7 @@ class CelestialLayer extends Layer {
             else {
                 actingPalette = this.customPalette;
             }
-            applyOverlay(place_onto_canvas, actingPalette, this.opacity);
+            applyOverlay(place_onto_canvas, actingPalette, this.opacity, true);
         }
     }
     setCustomPalette(paletteText) {
@@ -675,14 +684,15 @@ Shallow clone a garden layer from another garden layer. Mostly used by the layer
 
 Some day I, too, will be able to structuredClone()
 **/
-function cloneGardenLayer(gardenLayer) {
-    // Empty seed list to start so we don't waste time regenerating canvases
-    let newGarden = new GardenLayer(gardenLayer.width, gardenLayer.height, gardenLayer.x_offset, gardenLayer.y_offset, [], gardenLayer.groundPaletteSeed, gardenLayer.groundCover, gardenLayer.ground, 1);
-    newGarden.smart_coords = gardenLayer.smart_coords;
-    newGarden.content = gardenLayer.content;
-    newGarden.canvasGarden = gardenLayer.canvasGarden;
-    newGarden.canvasGround = gardenLayer.canvasGround;
-    newGarden.canvas = gardenLayer.canvas;
-    newGarden.seedList = gardenLayer.seedList;
-    return newGarden;
-}
+/**function cloneGardenLayer(gardenLayer: GardenLayer){
+// Empty seed list to start so we don't waste time regenerating canvases
+const newGarden = new GardenLayer(gardenLayer.width, gardenLayer.height, gardenLayer.x_offset, gardenLayer.y_offset, [], gardenLayer.groundPaletteSeed, gardenLayer.groundCover, gardenLayer.ground, 1);
+newGarden.smart_coords = gardenLayer.smart_coords;
+newGarden.content = gardenLayer.content;
+newGarden.canvasGarden = gardenLayer.canvasGarden;
+newGarden.canvasGround = gardenLayer.canvasGround;
+newGarden.canvas = gardenLayer.canvas;
+newGarden.seedList = gardenLayer.seedList;
+return newGarden;
+}**/
+export { Layer, GardenLayer, DecorLayer, OverlayLayer, CelestialLayer, CelestialType, LayerType };
