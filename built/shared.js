@@ -1,7 +1,6 @@
 import { available_overlay_colors } from "./gen_garden.js";
 import { all_palettes } from "./data.js";
 import { work_canvas_size, samplePlantColor } from "./gen_plant.js";
-import { load_customizations } from "./virtually_universal_config.js";
 // Contains general utility functions used by multiple pages.
 // Modified version of the Okabe-Ito colorblind palette, replacing black with white due to dark website background
 const OFFSET_COLORS = ["#FFFFFF", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999"];
@@ -508,7 +507,7 @@ function import_save() {
             for (let entry in newLocalData) {
                 localStorage[entry] = newLocalData[entry];
             }
-            load_customizations();
+            location.reload();
             document.getElementById("import_data_button").innerText = "Save Loaded!";
             setTimeout(function () { document.getElementById("import_data_button").innerText = "Import Save"; }, 1500);
         }
