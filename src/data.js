@@ -533,7 +533,13 @@ var all_palettes = [{"palette": ['aed740', '76c935', '50aa37', '2f902b'], "name"
                     {"palette": ['ffa600', 'ff6361', 'bc5090', '58508d'], "name": "dusk", "categories": ["celestial"]},
                     {"palette": ['ffe600', 'ffa600', 'ff4800', '290700'], "name": "inferno", "categories": ["strange"]},
                     {"palette": ['fef0a2', 'dfcfb0', 'bfaebd', 'a08dcb'], "name": "crocus", "categories": ["pastel"]},
-                    {"palette": ['fff6e6', 'ffddd6', 'efc4d6', 'c6b6d6'], "name": "firstlight", "categories": ["pastel"]}
+                    {"palette": ['fff6e6', 'ffddd6', 'efc4d6', 'c6b6d6'], "name": "firstlight", "categories": ["pastel"]},
+                    {"palette": ['5b4457', '3f353d', '2f252d', '201920'], "name": "shade", "categories": ["dark"]},
+                    {"palette": ['fff4dc', 'dfc48c', 'a89265', '806e4b'], "name": "flaxmetal", "categories": ["metallic"]},
+                    {"palette": ['c4fad1', '94d3a2', '71b280', '5e9e80'], "name": "wintergreen", "categories": ["verdant"]},
+                    {"palette": ['433a36', '332b28', '26211e', '16100b'], "name": "charcoal", "categories": ["dark"]},
+                    {"palette": ['dde5f6', 'ffffff', 'bbf0fa', 'aabbee'], "name": "snowblind", "categories": ["strange"]},
+                    
                     //{"palette": ['339324', 'adef94', '46d01b', '21372a'], "categories": ["strange"]},
                     //{"palette": ['ecc4d7', 'eba2c1', 'ec8db6', 'd973a0'], "categories": ["pastel"]}   
                     //sandglint: fff6cf,d8a36a,c77745,a9371d (partner to sanguine)

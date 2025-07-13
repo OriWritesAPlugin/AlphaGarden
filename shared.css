@@ -4,7 +4,7 @@
     --background-color: #201920;
     --input-color: #2F252D;
     --hover-color: #3F353D;
-    --flash-color: #81309c;
+    --flash-color: #7b4487;
     --text-outline: #806e4b;
     --font-color: #DFC48C;
     --link-color: #FFF4DC;
@@ -23,6 +23,10 @@ textarea {
 
 a {
     color: var(--link-color);
+}
+
+a:hover {
+    color: var(--accent-bright);
 }
 
 /*img {
@@ -68,6 +72,7 @@ input[name="form_type"] {
 
 
 input.chunky_wrap,
+button.chunky_wrap,
 input.chunky_fullwidth,
 button.chunky_fullwidth,
 button.todo_chunky {
@@ -80,7 +85,7 @@ button.todo_chunky {
     font-size: 1.4em;
 }
 
-input.chunky_wrap {
+input.chunky_wrap, button.chunky_wrap {
     width: auto;
 }
 
@@ -104,12 +109,18 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     margin: 0 auto;
 }
 
-.center-what-i-hold {
+.center-what-i-hold, .center-what-i-hold-fullvert {
     width: 100%;
     display: flex;
     justify-content: center;
     align-content: center;
     text-align: center;
+}
+
+.center-what-i-hold-fullvert {
+    flex-direction: column;
+    padding:auto;
+    align-items: center;
 }
 
 /** GENERALLY USEFUL **/
@@ -176,16 +187,7 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 }
 
 .dotted_plant_box:hover .label_over_plant_canvas, .swap_box:hover .label_over_plant_canvas {
-    text-shadow:
-        -2px -2px 2px #000,
-        2px -2px 2px #000,
-        -2px 2px 0 #000,
-        2px 2px 0 #000,
-        0em 0em 0.3em var(--background-color),
-        0em 0em 0.3em var(--background-color),
-        0em 0em 0.2em var(--background-color),
-        0em 0em 0.2em var(--background-color) !important;
-    color: var(--accent-bright) !important;
+    color: var(--accent-bright);
 }
 
 .plant_box:hover {
@@ -223,10 +225,10 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 .label_over_plant_canvas {
     font-size: 1.6em;
     text-shadow:
-        -2px -2px 2px #000,
-        2px -2px 2px #000,
-        -2px 2px 0 #000,
-        2px 2px 0 #000,
+        -2px -2px 2px var(--background-color),
+        2px -2px 2px var(--background-color),
+        -2px 2px 0 var(--background-color),
+        2px 2px 0 var(--background-color),
         0em 0em 0.3em var(--background-color),
         0em 0em 0.3em var(--background-color),
         0em 0em 0.2em var(--background-color),
@@ -258,13 +260,30 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     border-style: none;
     padding: 0em;
     background-color: #0000;
+    color: var(--link-color);
     font-size: 1em;
     margin: 0.5em;
 }
 
 .toggle_button:hover {
     background-color: #0000;
-    color: var(--accent-medium);
+    color: var(--accent-bright);
+}
+
+.generic_button_box {
+    border-radius: 20px;
+    border-color: var(--font-color);
+    border-width: thin;
+    border-style: solid;
+    width: 60%;
+    background-color: var(--background-color);
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    flex-direction: column;
+    display:flex;
+    padding:0 10em 1em 10vw;
+    margin:1em 0em;
 }
 
 /** SHARED STRUCTURAL **/
@@ -509,6 +528,10 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     border: 0px;
     color: var(--font-color);
     background-color: var(--input-color);
+}
+
+.garden_dropdown:hover, .garden_dropdown:open {
+    background-color: var(--hover-color);
 }
 
 .garden_settings_option {
@@ -848,4 +871,14 @@ particle {
     pointer-events: none;
     cursor: not-allowed;
     opacity: 0.35;
+}
+
+/** SETTINGS **/
+#delete_data_button:active{
+  transition: all 5s ease-in;
+  background-color: red;
+}
+
+.accent-text {
+    color: var(--accent-bright);
 }

@@ -1,6 +1,7 @@
 import { available_overlay_colors } from "./gen_garden.js";
 import { all_palettes } from "./data.js";
 import { work_canvas_size, samplePlantColor } from "./gen_plant.js";
+import {load_customizations} from "./virtually_universal_config.js"
 
 // Contains general utility functions used by multiple pages.
 // Modified version of the Okabe-Ito colorblind palette, replacing black with white due to dark website background
@@ -472,12 +473,141 @@ function getRandomizedColorFrom(palette) {
     return `rgb(${rgb_color[0] + 50}, ${rgb_color[1] + 50}, ${rgb_color[2] + 50})`;
 }
 
+// Gratefully taken from https://evanhahn.com/javascript-compression-streams-api-with-strings/#what-can-go-wrong
+// Really only used to deincentivize modifying save data. Not much of a hurdle, but perhaps enough.
+/**
+ * Convert a string to its UTF-8 bytes and compress it.
+ *
+ * @param {string} str
+ * @returns {Promise<Uint8Array>}
+ */
+async function compress(str) {
+  // Convert the string to a byte stream.
+  const stream = new Blob([str]).stream();
+
+  // Create a compressed stream.
+  const compressedStream = stream.pipeThrough(
+    new CompressionStream("gzip")
+  );
+
+  // Read all the bytes from this stream.
+  const chunks = [];
+  for await (const chunk of compressedStream) {
+    chunks.push(chunk);
+  }
+  return await concatUint8Arrays(chunks);
+}
+
+/**
+ * Decompress bytes into a UTF-8 string.
+ *
+ * @param {Uint8Array} compressedBytes
+ * @returns {Promise<string>}
+ */
+async function decompress(compressedBytes) {
+  // Convert the bytes to a stream.
+  const stream = new Blob([compressedBytes]).stream();
+
+  // Create a decompressed stream.
+  console.log(compressedBytes);
+  const decompressedStream = stream.pipeThrough(
+    new DecompressionStream("gzip")
+  );
+  console.log(decompressedStream);
+
+  // Read all the bytes from this stream.
+  const chunks = [];
+  for await (const chunk of decompressedStream) {
+    chunks.push(chunk);
+  }
+  const stringBytes = await concatUint8Arrays(chunks);
+
+  // Convert the bytes to a string.
+  console.log(stringBytes);
+  return new TextDecoder().decode(stringBytes);
+}
+
+/**
+ * Combine multiple Uint8Arrays into one.
+ *
+ * @param {ReadonlyArray<Uint8Array>} uint8arrays
+ * @returns {Promise<Uint8Array>}
+ */
+async function concatUint8Arrays(uint8arrays) {
+  const blob = new Blob(uint8arrays);
+  const buffer = await blob.arrayBuffer();
+  return new Uint8Array(buffer);
+}
+
+async function export_save(){
+  var a = document.createElement('a');
+  const compressedBytes = await compress(JSON.stringify(localStorage));
+  var blob = new Blob([compressedBytes], { 'type': 'application/octet-stream' });
+  a.href = window.URL.createObjectURL(blob);
+  a.download = "endless_garden_save_" + new Date().toJSON().slice(0, 10) + ".oct";
+  a.click();
+}
+
+// Meant to be attached to a filereader, see settings.html
+function import_save(){
+    document.getElementById("import_data_button").innerText = "Loading...";
+    const file = this.files[0];
+    const reader = new FileReader(file);
+    reader.onload = async function(content) {
+      try {
+        let parsed_content = new Uint8Array(content.target.result);
+        let save_data = await decompress(parsed_content);
+        let newLocalData = JSON.parse(save_data);
+        for(let entry in newLocalData){
+            localStorage[entry] = newLocalData[entry];
+        }
+        load_customizations();
+        document.getElementById("import_data_button").innerText = "Save Loaded!";
+        setTimeout(function(){document.getElementById("import_data_button").innerText = "Import Save";}, 1500);
+      } catch(e) {
+          alert("Something was wrong with the data! Contact Ora for troubleshooting");
+          document.getElementById("import_data_button").innerText = e;
+      }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function delete_save(e){
+  let t;
+    var repeat = function () {
+        let remaining = 5;
+        if(e.target.innerText[0] === "D"){
+            remaining = 6;
+        } else if(e.target.innerText[0] === "S"){
+            return;
+        } else {
+            remaining = Number(e.target.innerText.slice(e.target.innerText.length-1,));
+        }
+        if(remaining > 1){
+            e.target.innerText = "Hold for " + (remaining - 1);
+        } else {
+            e.target.innerText = "Save Deleted!";
+            return;
+        }
+        t = setTimeout(repeat, 1000);
+    e.target.onmouseup = function () {
+        clearTimeout(t);
+        e.target.innerText = "Delete Save (hold to confirm)";
+    };
+  }
+    repeat();
+};
+
+
+
+
 export {gen_toggle_button, gen_func_button, createSpacedPlacementQueue, shuffleArray, hasPixelInRow,
   get_overlay_color_from_name, claimCanvas, getBase64, get_hex_from_name, bubble_up, bubble_out,
   collectSeed, buildColorMessage, getDissolvingRS, getSeedCollection, getSeedPoints, collectGoodie,
   randomFromArray, randomValueFromObject, getRandomKeyFromObj, addRadioButton, makeSortCheckmark,
   getRadioValue, toHue, hexToRgb, addSeedPoints, getSeedCollectionAsString, getGoodieCollection, getMarkedBases,
-  getMarkedPalettes, getOffsetColor, get_toggle_button_setting, sortAndVerifySeedList};
+  getMarkedPalettes, getOffsetColor, get_toggle_button_setting, sortAndVerifySeedList,
+  export_save, import_save, delete_save};
   
   
   
