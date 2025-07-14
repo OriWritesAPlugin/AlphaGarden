@@ -15,6 +15,8 @@ const rainbow_offset = all_palettes.map((x, i) => toHue("#" + all_palettes[i]["p
 var first_chunk_on_last_sort = getSeedCollectionAsString().slice(0, 50);
 // TODO: Potentially nasty refactor: replacing all these palette names with an enum somewhere.
 const palette_codes = { 0: "foliage_palette", 1: "feature_palette", 2: "accent_palette" };
+// Thanks to https://stackoverflow.com/questions/31128855/comparing-ecma6-sets-for-equality for this clean oneliner
+const areSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
 
 
 window.addEventListener("storage", () => { checkIfRefreshNeeded(); });
@@ -303,6 +305,28 @@ function launch_recycle_dialogue() {
     modal.appendChild(modal_display);
 }
 
+function launch_add_dialogue() {
+    let modal = document.createElement("div");
+    modal.classList.add("block_window");
+    let modal_display = document.createElement("div");
+    modal_display.classList.add("popup");
+    document.body.appendChild(modal);
+    let textbox = document.createElement("text");
+    textbox.textContent = "Paste in a list of comma-separated seeds to add them to your collection! Won't do anything if the list is empty.";
+    modal_display.append(textbox);
+    let text_entry = document.createElement("input");
+    text_entry.type = "text";
+    text_entry.id = "seed_collection";
+    modal_display.append(text_entry);
+    let claim_button = document.createElement("button");
+    claim_button.onclick = function(){display_collection(); document.body.removeChild(modal);}
+    claim_button.value = "Add Seeds";
+    claim_button.innerText = "Add Seeds";
+    claim_button.classList.add("chunky_fullwidth");
+    modal_display.appendChild(claim_button);
+    modal.appendChild(modal_display);
+}
+
 function recycle_seeds(claim_sp) {
     let seed_list = document.getElementById("recycle_display_div");
     let earned_sp = 0;
@@ -325,8 +349,8 @@ function cancelOngoingSort() {
 }
 
 function doFilter() {
-    compileFilter();
-    display_collection();
+    let has_changed = compileFilter();
+    display_collection(has_changed);
 }
 
 function forceFilter(base, palette) {
@@ -344,12 +368,14 @@ function forceFilter(base, palette) {
 }
 
 function compileFilter() {
+    let has_changed = false;
     let new_base_set = new Set();
     for (let base_filter of document.getElementById("base_sort_categories_div").children) {
         if (base_filter.checked) {
             foliage_by_category[base_filter.value].forEach((item) => new_base_set.add(item));
         }
     }
+    has_changed = !areSetsEqual(collection_filter["base"],new_base_set);
     collection_filter["base"] = new_base_set;
     let new_palette_set = new Set();
     for (let palette_filter of document.getElementById("palette_sort_categories_div").children) {
@@ -357,7 +383,9 @@ function compileFilter() {
             palettes_by_category[palette_filter.value].forEach((item) => new_palette_set.add(item));
         }
     }
+    has_changed = has_changed || !areSetsEqual(collection_filter["palette"],new_palette_set);
     collection_filter["palette"] = new_palette_set;
+    return has_changed;
 }
 
 function applyFilter(filter_name, data_val) {
@@ -384,10 +412,14 @@ function passesFilter(plant_data, colorFilterMode) {
     return false;
 }
 
-function display_collection() {
+function display_collection(do_filter=true) {
     //clear what's already in there
     cancelOngoingSort();
+    let prior_options = localStorage.display_options;
     setDisplayOptions();
+    if(prior_options === localStorage.display_options && !do_filter){
+        return;
+    }
     first_chunk_on_last_sort = getSeedCollectionAsString().slice(0, 50);
     sort_intervals = [];
     var collection_div = document.getElementById("collection_display_div")
@@ -395,11 +427,13 @@ function display_collection() {
     showcase_mode = document.getElementById("showcase_display").checked;
     let show_palettes = document.getElementById("show_palettes").checked;
     while (collection_div.lastChild) { collection_div.removeChild(collection_div.lastChild); }
-    var seed_string = document.getElementById("seed_collection").value.split(" ").join("").replace(/(^,)|(,$)|"/g, '');
-    // This and the next line both "verify"--sloppy workaround for people putting !namedseeds in this field
-    //let [new_seeds, new_named] = sortAndVerifySeedList(seed_string);
-    collectSeed(seed_string);
-    document.getElementById("seed_collection").value = "";
+    if(document.getElementById("seed_collection")){
+        var seed_string = document.getElementById("seed_collection").value.split(" ").join("").replace(/(^,)|(,$)|"/g, '');
+        // This and the next line both "verify"--sloppy workaround for people putting !namedseeds in this field
+        //let [new_seeds, new_named] = sortAndVerifySeedList(seed_string);
+        collectSeed(seed_string);
+        document.getElementById("seed_collection").value = "";
+    }
     let collection = getSeedCollection();
     var sort_order_elem = document.getElementsByName('sort_order');
     var sort_order = "None";
@@ -408,6 +442,7 @@ function display_collection() {
             sort_order = sort_order_elem[i].value;
     }
     collection = get_seed_collection_sorted_by(collection, sort_order);
+    if (collection.length > 0 && !document.getElementById("first_splice").innerText) { prep_mutate_seed(collection[0]); }
     if (collection.length > 0 && !document.getElementById("analysis_output_text").innerText) { analyze_seed(collection[0]); }
     //var collection_width_elem = document.getElementsByName('collection_width');
     document.getElementById("title").title = "You have " + collection.length + " seeds and " + getSeedPoints() + " raw seedstuff!";
@@ -557,8 +592,8 @@ function doCollectionPreload() {
     updateSeedPoints();
 }
 
-document.getElementById("refresh_collection_button").onclick = doFilter;
-document.getElementById("display_collection_button").onclick = display_collection;
+document.getElementById("seed_collection_sort_container").onclick = doFilter;
+document.getElementById("add_button").onclick = launch_add_dialogue;
 document.getElementById("splice_select_foliage").onclick = update_splice;
 document.getElementById("splice_select_foliage_palette").onclick = update_splice;
 document.getElementById("splice_select_feature_palette").onclick = update_splice;
@@ -570,4 +605,4 @@ document.getElementById("doBackup_button").onclick = doBackup;
 
 doCollectionPreload();
 
-export { doBackup, launch_recycle_dialogue, doFilter, forceFilter }
+export { doBackup, launch_recycle_dialogue, doFilter, forceFilter };

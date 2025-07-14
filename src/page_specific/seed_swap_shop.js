@@ -11,6 +11,7 @@ var swapped_seeds = [];
 const daily_specials = gen_daily_specials();
 const price_colors = { 1: "#8CDF8F", 2: "#DFC48C", 4: "#DF8C9C", 5: "#CF8CDF" }
 let claimed_seeds = [];
+let dragging = false;
 
 
 function gen_divs() {
@@ -111,11 +112,12 @@ function add_swap_square(parent, column_offset, id, price, day) {
     if (claimed_seeds.has(seed)) {
         mark_swap_claimed(id);
     } else {
-        swap_square.addEventListener("click", claim_swap);
-        swap_square.addEventListener('touchend', function (e) {
+        swap_square.addEventListener("mouseup", claim_swap);
+        swap_square.addEventListener("touchmove", function(){dragging=true;});
+        /*swap_square.addEventListener('touchend', function (e) {
             claim_swap(e);
             e.preventDefault();
-        })
+        })*/
     }
     return id;
 }
@@ -128,6 +130,10 @@ function mark_swap_claimed(id) {
 }
 
 async function claim_swap(e) {
+    if(dragging){
+        dragging=false;
+        return;
+    }
     var id = e.target.id;
     var price = e.target.getAttribute("data-price");
     let seed_points = getSeedPoints();

@@ -12,6 +12,11 @@
     --accent-bright: #c4fad1;
     --plant-display: 110px;
     --min-plant-display: 90px;
+    --horiz-screen-cutoff: 992;  /*BEWARE! This can't be used in media selectors, hence lack of units. It's here for easy find-replace*/
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body,
@@ -53,6 +58,10 @@ input[type=button] {
 }
 
 input[type=checkbox] {
+    accent-color: var(--accent-medium);
+}
+
+input[type='radio'] {
     accent-color: var(--accent-medium);
 }
 
@@ -708,24 +717,70 @@ particle {
 
 .garden_util_box,
 .garden_util_box_fixed {
-    padding: 0.5em;
     -webkit-transition: all 0.75s linear;
     -moz-transition: all 0.75s linear;
     -o-transition: all 0.75s linear;
     transition: all 0.75s linear;
     overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .garden_util_box_fixed {
-    width: 18.8%;
+    width: 20%;
     height: 85%;
-    min-width: 100px;
     position: fixed;
     overflow-y: scroll;
 }
 
+.collection_sort_heading{
+    margin: 0.25em auto 0.5em auto;
+    text-align: left;
+}
+
+.collection-utility-text{
+    white-space: normal;
+    margin: auto;
+}
+
+.collection_mightcolumn {
+    flex-grow: 1;
+    padding: 0 0.5em 0 0.5em
+}
+
+@media screen and (max-width: 992px) {
+  .collection_row {
+    display:block;
+  }
+  .garden_util_box {
+    display:none;
+  }
+  .garden_util_box_fixed {
+    position: relative;
+    width: 98%;
+    height: auto;
+    overflow-y: auto;
+  }
+  .collection_mightflex {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content:center;
+  }
+
+  .collection_mightcolumn {
+    min-width: 150px;
+    padding: 0em 1.5% 0.5em 1.5%;
+    border-style: dashed;
+    border-width: thin;
+    margin: 1%;
+    overflow-wrap: break-word;
+    border-radius: 5px;
+    height: fit-content'
+  }
+}
+
 .radio-button input[type="radio"] {
     display: none;
+    accent-color: var(--accent-medium);
 }
 
 .radio-button label {
@@ -765,7 +820,7 @@ particle {
     text-align: center;
     width: var(--min-plant-display);
     height: var(--min-plant-display);
-    border-color: var(--font-color);
+    border-color: var(--text-outline);
     border-style: dashed;
     border-width: 1px;
     background-position: center;
