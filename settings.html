@@ -23,17 +23,18 @@
         <div id="data_management_div" class="generic_button_box">
             <h2><b class="accent-text">★~*</b>Graphics<b class="accent-text">*~★</b></h2>
             <h3>Presets</h3>
-            <div id="graphics_func_div" style="display: flex"></div>
+            <div id="graphics_func_div" style="display: flex; flex-wrap:wrap"></div>
             <h3>Customize</h3>
             <label>Main:<select type="select" id="pick_background" class="garden_dropdown" value="Main Color" onChange="update_colors"></select></label>
             <label>Font:<select type="select" id="pick_font" class="garden_dropdown" value="Font Color" onChange="update_colors"></select></label>
             <label>Else:<select type="select" id="pick_accent" class="garden_dropdown" value="Accent Color" onChange="update_colors"></select></br></label>
-            <div id="preview_img" style="margin: 1em;"></div>
+            <div id="graphics_toggle_div" style="margin: 1em; display: flex"></div>
+            <div id="preview_img" style="margin: 1em 0em;"></div>
             <p style="width: 80%;">This is a block of sample text, intending to let you sample the text elsewhere on the site while sampling the colors with which to color the text. You can also <a href="javascript:void();">sample how links look</a> within this sample text. Oh, fun fact, the backup button in the collection will but updated to do the exact same thing as the export button above. <a href="javascript:void();">Another fake link for you</a>. Good luck with your gardens!</p>
         </div>
         </div>
 <script type="module">
-import {delete_save, export_save, import_save, getSeedCollection, gen_func_button, randomFromArray} from "./built/shared.js"
+import {delete_save, export_save, import_save, getSeedCollection, gen_func_button, randomFromArray, gen_toggle_button, get_toggle_button_setting, cycle_toggle_value} from "./built/shared.js"
 import {decode_plant_data, gen_plant_data, encode_plant_data_v2, drawPlantForSquare, work_canvas_size} from "./built/gen_plant.js"
 import {all_palettes} from "./built/data.js"
 
@@ -83,33 +84,43 @@ function setup_options(){
         }
     }
     let jraphics;
-    if (localStorage.jraphicsTM == undefined) { jraphics = [124, 125, 126];}
+    if (localStorage.jraphicsTM == undefined) { jraphics = [124, 125, 126, 0, 0, 0];}
     else {jraphics = JSON.parse(localStorage.jraphicsTM);}
     color_pickers[0].selectedIndex = available_palettes.indexOf(all_palettes[jraphics[0]]["name"]);
     color_pickers[1].selectedIndex = available_palettes.indexOf(all_palettes[jraphics[1]]["name"]);
     color_pickers[2].selectedIndex = available_palettes.indexOf(all_palettes[jraphics[2]]["name"]);
-    color_pickers[0].onchange = update_colors.bind({"kind": "background"});
-    color_pickers[1].onchange = update_colors.bind({"kind": "font"});
-    color_pickers[2].onchange = update_colors.bind({"kind": "accent"});
+    color_pickers[0].onchange = function(){update_colors()};
+    color_pickers[1].onchange = function(){update_colors()};
+    color_pickers[2].onchange = function(){update_colors()};
+
+    add_preview_square(document.getElementById("preview_img"), "Hover");
+    add_preview_square(document.getElementById("preview_img"), "over");
+    add_preview_square(document.getElementById("preview_img"), "us");
+    document.getElementById("graphics_func_div").appendChild(gen_func_button("default", function(){load_palettes("shade", "flaxmetal", "wintergreen", false, false, false)}));
+    document.getElementById("graphics_func_div").appendChild(gen_func_button("light", function(){load_palettes("flaxmetal", "lignite", "ghost", true, false, false)}));
+    document.getElementById("graphics_func_div").appendChild(gen_func_button("dark", function(){load_palettes("lignite", "snowblind", "ghost", false, false, false)}));
+    document.getElementById("graphics_func_div").appendChild(gen_func_button("random", function(){load_palettes(randomFromArray(available_palettes), randomFromArray(available_palettes), randomFromArray(available_palettes), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()))}));
+    document.getElementById("graphics_toggle_div").appendChild(gen_toggle_button("Flip Main", update_colors, jraphics[3]));
+    document.getElementById("graphics_toggle_div").appendChild(gen_toggle_button("Flip Font", update_colors, jraphics[4]));
+    document.getElementById("graphics_toggle_div").appendChild(gen_toggle_button("Flip Else", update_colors, jraphics[5]));
 }
 
-function update_colors(e){
-    let palette = all_palettes[palette_lookup[e.target.value]]["palette"];
-    if(this.kind==="background"){
-        document.documentElement.style.setProperty("--background-color", "#"+palette[3]);
-        document.documentElement.style.setProperty("--input-color", "#"+palette[2]);
-        document.documentElement.style.setProperty("--hover-color", "#"+palette[1]);
-        document.documentElement.style.setProperty("--flash-color", "#"+palette[0]);
-    }
-    else if(this.kind==="font"){
-        document.documentElement.style.setProperty("--text-outline", "#"+palette[3]);
-        document.documentElement.style.setProperty("--font-color", "#"+palette[1]);
-        document.documentElement.style.setProperty("--link-color", "#"+palette[0]);
-    } 
-    else{
-        document.documentElement.style.setProperty("--accent-medium", "#"+palette[2]);
-        document.documentElement.style.setProperty("--accent-bright", "#"+palette[0]);
-    }
+function update_colors(){
+    let bg_palette = all_palettes[palette_lookup[color_pickers[0].value]]["palette"];
+    if(get_toggle_button_setting("Flip Main")){bg_palette = Array.from(bg_palette); bg_palette.reverse()};
+    document.documentElement.style.setProperty("--background-color", "#"+bg_palette[3]);
+    document.documentElement.style.setProperty("--input-color", "#"+bg_palette[2]);
+    document.documentElement.style.setProperty("--hover-color", "#"+bg_palette[1]);
+    document.documentElement.style.setProperty("--flash-color", "#"+bg_palette[0]);
+    let font_palette = Array.from(all_palettes[palette_lookup[color_pickers[1].value]]["palette"]);
+    if(get_toggle_button_setting("Flip Font")){font_palette = Array.from(font_palette); font_palette.reverse()};
+    document.documentElement.style.setProperty("--text-outline", "#"+font_palette[3]);
+    document.documentElement.style.setProperty("--font-color", "#"+font_palette[1]);
+    document.documentElement.style.setProperty("--link-color", "#"+font_palette[0]);
+    let else_palette = Array.from(all_palettes[palette_lookup[color_pickers[2].value]]["palette"]);
+    if(get_toggle_button_setting("Flip Else")){else_palette = Array.from(else_palette); else_palette.reverse()};
+    document.documentElement.style.setProperty("--accent-medium", "#"+else_palette[2]);
+    document.documentElement.style.setProperty("--accent-bright", "#"+else_palette[0]);
     saveColors();
 };
 
@@ -136,32 +147,26 @@ function add_preview_square(parent, msg) {
     parent.appendChild(swap_square);
 }
 
-function load_palettes(background, font, accent){
+function load_palettes(background, font, accent, reverse_background, reverse_font, reverse_accent){
     color_pickers[0].value = background;
-    color_pickers[0].onchange({"target": {"value": background}});
     color_pickers[1].value = font;
-    color_pickers[1].onchange({"target": {"value": font}});
     color_pickers[2].value = accent;
-    color_pickers[2].onchange({"target": {"value": accent}});
-    document.getElementById("pick_font").value = font;
-    document.getElementById("pick_accent").value = accent;
-    document.getElementById("pick_font").onchange({"target": {"value": font}});
-    document.getElementById("pick_accent").onchange({"target": {"value": accent}});
+    if(get_toggle_button_setting("Flip Main") != reverse_background){cycle_toggle_value("Flip Main", ()=>{});}
+    if(get_toggle_button_setting("Flip Font") != reverse_font){cycle_toggle_value("Flip Font", ()=>{});}
+    if(get_toggle_button_setting("Flip Else") != reverse_accent){cycle_toggle_value("Flip Else", ()=>{});}
+    update_colors();
 }
 
 function saveColors(){ localStorage["jraphicsTM"] = JSON.stringify([
     palette_lookup[color_pickers[0].value],
     palette_lookup[color_pickers[1].value],
-    palette_lookup[color_pickers[2].value]])}
+    palette_lookup[color_pickers[2].value],
+    get_toggle_button_setting("Flip Main"),
+    get_toggle_button_setting("Flip Font"),
+    get_toggle_button_setting("Flip Else")]
+)}
 
 setup_options();
-add_preview_square(document.getElementById("preview_img"), "Hover");
-add_preview_square(document.getElementById("preview_img"), "over");
-add_preview_square(document.getElementById("preview_img"), "us");
-document.getElementById("graphics_func_div").appendChild(gen_func_button("default", function(){load_palettes("shade", "flaxmetal", "wintergreen")}));
-document.getElementById("graphics_func_div").appendChild(gen_func_button("light", function(){load_palettes("ghost", "lignite", "ghost")}));
-document.getElementById("graphics_func_div").appendChild(gen_func_button("dark", function(){load_palettes("lignite", "snowblind", "ghost")}));
-document.getElementById("graphics_func_div").appendChild(gen_func_button("random", function(){load_palettes(randomFromArray(available_palettes), randomFromArray(available_palettes), randomFromArray(available_palettes))}));
 
 </script>
 </body>

@@ -294,9 +294,16 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     justify-content: center;
     box-sizing: border-box;
     flex-direction: column;
+    flex-wrap: wrap;
     display:flex;
-    padding:0 10em 1em 10vw;
+    padding:0 10vw 1em 10vw;
     margin:1em 0em;
+}
+
+@media screen and (max-width: 992px) {
+    .generic_button_box {
+        width: 95%;
+    }
 }
 
 /** SHARED STRUCTURAL **/
@@ -484,6 +491,7 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 
 .inline-flex-parent {
     display: inline-flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-content: center;
     text-align: center;
@@ -697,6 +705,7 @@ particle {
 
 /** COLLECTION **/
 .garden_util_box,
+.garden_util_spacer,
 .garden_util_box_fixed,
 #seed_positioning_display {
     align-items: center;
@@ -751,7 +760,7 @@ particle {
   .collection_row {
     display:block;
   }
-  .garden_util_box {
+  .garden_util_spacer {
     display:none;
   }
   .garden_util_box_fixed {
@@ -846,15 +855,15 @@ particle {
 }
 
 /** COMPLETION **/
-#base_info_div {
+.collection-info-div {
     display: flex;
     width: 70%;
     position: relative;
-    left: 20%
+    left: 20%;
 }
 
-@media screen and (max-width: 600px) {
-    #base_info_div {
+@media screen and (max-width: 992px) {
+    .collection-info-div {
         top: 5%;
         left: 0%;
         width: 100%;

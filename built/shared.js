@@ -341,10 +341,10 @@ function get_toggle_button_setting(setting) {
         return false;
     } // ON or OFF
 }
-function cycle_toggle_value(target_var, target_func) {
-    let target_elem = document.getElementById(target_var + "_setting_toggle");
-    let val = !get_toggle_button_setting(target_var);
-    target_elem.textContent = "[" + target_var.slice(0, 1).toUpperCase() + target_var.slice(1) + ": " + bool_to_text(val) + "]";
+function cycle_toggle_value(setting, target_func) {
+    let target_elem = document.getElementById(setting + "_setting_toggle");
+    let val = !get_toggle_button_setting(setting);
+    target_elem.textContent = "[" + setting.slice(0, 1).toUpperCase() + setting.slice(1) + ": " + bool_to_text(val) + "]";
     target_func();
 }
 function bool_to_text(bool) {
@@ -547,4 +547,4 @@ function delete_save(e) {
     repeat();
 }
 ;
-export { gen_toggle_button, gen_func_button, createSpacedPlacementQueue, shuffleArray, hasPixelInRow, get_overlay_color_from_name, claimCanvas, getBase64, get_hex_from_name, bubble_up, bubble_out, collectSeed, buildColorMessage, getDissolvingRS, getSeedCollection, getSeedPoints, collectGoodie, randomFromArray, randomValueFromObject, getRandomKeyFromObj, addRadioButton, makeSortCheckmark, getRadioValue, toHue, hexToRgb, addSeedPoints, getSeedCollectionAsString, getGoodieCollection, getMarkedBases, getMarkedPalettes, getOffsetColor, get_toggle_button_setting, sortAndVerifySeedList, export_save, import_save, delete_save };
+export { gen_toggle_button, gen_func_button, createSpacedPlacementQueue, shuffleArray, hasPixelInRow, get_overlay_color_from_name, claimCanvas, getBase64, get_hex_from_name, bubble_up, bubble_out, collectSeed, buildColorMessage, getDissolvingRS, getSeedCollection, getSeedPoints, collectGoodie, randomFromArray, randomValueFromObject, getRandomKeyFromObj, addRadioButton, makeSortCheckmark, getRadioValue, toHue, hexToRgb, addSeedPoints, getSeedCollectionAsString, getGoodieCollection, getMarkedBases, getMarkedPalettes, getOffsetColor, get_toggle_button_setting, sortAndVerifySeedList, export_save, import_save, delete_save, cycle_toggle_value };

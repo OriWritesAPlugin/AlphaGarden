@@ -330,6 +330,7 @@ function launch_add_dialogue() {
     let claim_button = document.createElement("button");
     claim_button.onclick = function () { display_collection(); document.body.removeChild(modal); };
     claim_button.value = "Add Seeds";
+    claim_button.innerText = "Add Seeds";
     claim_button.classList.add("chunky_fullwidth");
     modal_display.appendChild(claim_button);
     modal.appendChild(modal_display);

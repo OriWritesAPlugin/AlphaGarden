@@ -9,21 +9,33 @@ const all_palettes = [['aed740', '76c935', '50aa37', '2f902b'], ['a2ac4d', '8f97
 function load_customizations() {
     let jraphics;
     if (localStorage.jraphicsTM == undefined) {
-        jraphics = [124, 125, 126];
+        jraphics = [124, 125, 126, 0, 0, 0];
     }
     else {
         jraphics = JSON.parse(localStorage.jraphicsTM);
     }
     const bg_palette = all_palettes[jraphics[0]];
+    if (jraphics[3]) {
+        bg_palette.reverse();
+    }
+    ;
     document.documentElement.style.setProperty("--background-color", "#" + bg_palette[3]);
     document.documentElement.style.setProperty("--input-color", "#" + bg_palette[2]);
     document.documentElement.style.setProperty("--hover-color", "#" + bg_palette[1]);
     document.documentElement.style.setProperty("--flash-color", "#" + bg_palette[0]);
     const font_palette = all_palettes[jraphics[1]];
+    if (jraphics[4]) {
+        font_palette.reverse();
+    }
+    ;
     document.documentElement.style.setProperty("--text-outline", "#" + font_palette[3]);
     document.documentElement.style.setProperty("--font-color", "#" + font_palette[1]);
     document.documentElement.style.setProperty("--link-color", "#" + font_palette[0]);
     const accent_palette = all_palettes[jraphics[2]];
+    if (jraphics[5]) {
+        accent_palette.reverse();
+    }
+    ;
     document.documentElement.style.setProperty("--accent-medium", "#" + accent_palette[2]);
     document.documentElement.style.setProperty("--accent-bright", "#" + accent_palette[0]);
 }
