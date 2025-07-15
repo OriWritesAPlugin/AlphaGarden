@@ -8,9 +8,8 @@
     </head>
     <body onload="">
     <script type="text/javascript" src="./built/virtually_universal_config.js"></script>
-    <div id=create_garden_organizer class="collection_row" style="display: flex">
-      <div id=garden_utils_display_spacer class=garden_util_box style="width:25vw; min-width: 100px; border-width: 0px"></div>
-        <div id=garden_options_menu class=garden_util_box style="position: absolute; left: 0%;  padding-left: 1%; height:fit-content">
+    <div id=create_garden_organizer class="collection_row" style="display: flex; flex-wrap: wrap">
+        <div id=garden_options_menu class=garden_util_box style="width:25em; padding-left: 1%; height:fit-content;">
           <div>
             <h3>Settings</h3>
               <label for="quantity">Width:</label> <input class="garden-dim-bar" type="text" inputmode="numeric" id="garden_width" name="quantity" min="64" value=450>
@@ -25,12 +24,12 @@
         <div id="garden_utilities_div"></div>
   </div>
   <a href="./" class="index_link" style="left: 10px; top: 20px"><--Home</a>
-                  <div id=seed_collection_display_container class=garden_util_box style="border: none; flex-grow: 100">
+                  <div id=seed_collection_display_container class=garden_util_box style="border: none; flex-grow: 1">
                     <h1 id="title">Endless Garden Creator</h1>
                 <div style="display: block">
-                  <a href='javascript:toggleGardenSideMenu("left");' id="toggle_left_menu" title="Toggle the visibility of the sort/display menu"><< hide options</a>
+                  <a href='javascript:void(0);' id="toggle_left_menu" title="Toggle the visibility of the sort/display menu"><< hide options</a>
                   <span> || </span>
-                  <a href='javascript:toggleGardenSideMenu("right");' id="toggle_right_menu" title="Toggle the visibility of the seed interactions menu">hide layers >></a><br><br>
+                  <a href='javascript:void(0);' id="toggle_right_menu" title="Toggle the visibility of the seed interactions menu">hide layers >></a><br><br>
                 </div>
         <label for="seed_list">Seed list (comma-separated):</label><br>
         <textarea id="seed_list" name="seed_list" size="4" placeholder="Click here and paste!"></textarea><br>
@@ -71,30 +70,6 @@
     <script type="module" src="built/page_specific/create_garden.js"></script>
 
     <script type="text/javascript">
-    
-    function toggleGardenSideMenu(side="left"){
-    let targets = ["toggle_left_menu", "garden_utils_display_spacer", "garden_options_menu"];
-    if(side=="right"){
-        targets = ["toggle_right_menu", "layer_manager", document.createElement("p")]
-    }
-    let clicked = document.getElementById(targets[0]);
-    let state = side == "left"? clicked.innerText.slice(3,7) : clicked.innerText.slice(0,4);
-    let new_state = state == "hide" ? "show" : "hide";
-    clicked.innerText = side == "left" ? clicked.innerText.slice(0,3) + new_state + clicked.innerText.slice(7) : new_state + clicked.innerText.slice(4);
-    let margin_trait = side === "left" ? "marginLeft" : "marginRight";
-    if(state == "hide"){
-        document.getElementById(targets[1]).style[margin_trait] = "-26vw"
-        document.getElementById(targets[2]).style[margin_trait] = "-26vw"
-    } else {
-        document.getElementById(targets[1]).style[margin_trait] = "0vw"
-        document.getElementById(targets[2]).style[margin_trait] = "0vw"
-        setTimeout(function(){ 
-          document.getElementById(targets[1]).style.minWidth = "100px";
-          document.getElementById(targets[2]).style.minWidth = "100px";
-        }, 750);
-    }
-  }
-
 </script>
     </body>
 </html>

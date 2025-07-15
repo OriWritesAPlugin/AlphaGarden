@@ -746,5 +746,5 @@ async function do_preload_initial() {
         refs[img] = await preload_single_image(img);
     }
 }
-
+  
 export { scramble_randogarden, claim_garden, do_preload, get_canvas_for_named_component, get_canvas_for_plant, available_overlay_colors, available_tileables, available_backgrounds, do_preload_initial, available_ground_base };

@@ -13,6 +13,7 @@
     --plant-display: 110px;
     --min-plant-display: 90px;
     --horiz-screen-cutoff: 992;  /*BEWARE! This can't be used in media selectors, hence lack of units. It's here for easy find-replace*/
+    --garden-font-color: #001133 ;
 }
 
 * {
@@ -55,6 +56,21 @@ input[type=button] {
     margin: 0 12px 12px 12px;
     display: inline-block;
     border: 0px;*/
+
+}
+
+input[type="text"], textarea {
+    outline: none;
+    border: none;
+    border-bottom: var(--font-color);
+    border-bottom-width: thin;
+    border-bottom-style: dashed;
+    background-color: var(--background-color);
+    font-size: 1.2em;
+}
+
+input[type="text"]:focus, textarea:focus {
+    border-bottom-color: var(--accent-bright);
 }
 
 input[type=checkbox] {
@@ -88,7 +104,9 @@ input.chunky_wrap,
 button.chunky_wrap,
 input.chunky_fullwidth,
 button.chunky_fullwidth,
-button.todo_chunky {
+button.todo_chunky,
+button.layer_control,
+button.layer_create {
     font-family: monospace, Verdana, sans-serif;
     border-radius: 10px;
     padding: 0.2em 1em;
@@ -100,6 +118,24 @@ button.todo_chunky {
 
 input.chunky_wrap, button.chunky_wrap {
     width: auto;
+}
+
+button.layer_control {
+    width: 2em;
+    height: 1.5em;
+    padding: 0 0 0.25em 0;
+    margin: 1px;
+    color: var(--garden-font-color);
+}
+
+button.layer_create {
+    color: var(--garden-font-color);
+    flex-grow: 1;
+    min-height: 2em;
+}
+
+button.layer_control:hover, button.layer_create:hover {
+    filter: brightness(1.25);
 }
 
 button.todo_chunky {
@@ -541,17 +577,25 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 }
 
 /** CREATE GARDEN **/
-.garden_dropdown {
+.generic_dropdown, .garden_dropdown {
     width: auto;
     padding: 8px 8px;
     margin: 0;
     display: inline-block;
     border: 0px;
+    border-bottom-style: dashed;
+    border-bottom-width: thin;
+    background-color: #0000;
+    font-family: monospace, Verdana, sans-serif;
+    font-size: 0.9em;
     color: var(--font-color);
-    background-color: var(--input-color);
 }
 
-.garden_dropdown:hover, .garden_dropdown:open {
+.garden_dropdown {
+    color: var(--garden-font-color);
+}
+
+.generic_dropdown:open, .garden_dropdown:open {
     background-color: var(--hover-color);
 }
 
@@ -562,6 +606,7 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     display: flex;
     justify-content: center;
     align-items: center;
+    color: var(--garden-font-color);
 }
 
 /**.garden-dim-bar {
@@ -582,6 +627,9 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 }**/
 
 .layer_div,
+.layer_background_div,
+.layer_option_div,
+.layer_box_div,
 .draggable_layer_div,
 #layer_manager,
 #layer_holder,
@@ -589,7 +637,6 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     width: fit-content;
     height: 15vh;
     border-radius: 5px;
-    padding: 1vh;
     margin: 0px;
     display: block;
     border: 0px;
@@ -598,30 +645,71 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     transition: height 0.40s ease-in-out;
 }
 
+.layer_background_div {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.layer_option_div {
+    position: relative;
+    padding:0.25em;
+    margin: 0.5em;
+    display: flex;
+    flex-wrap: wrap;
+    width: 45%;
+    flex-grow: 1;
+    color: var(--garden-font-color);
+}
+
+.layer_option_div label, .layer_option_div input{
+    color: var(--garden-font-color);
+    border-bottom-color: var(--garden-font-color);
+    margin-top: 0.25em;
+}
+
 .draggable_layer_div {
     cursor: move;
     user-select: none;
     height: fit-content;
+    border-width: thin;
+    border-style: solid;
+    padding: 0.1em;
+    border-top-width: thick;
+    border-top-style: outset;
 }
 
 #layer_manager, #garden_options_menu {
     height: 100%;
     float: right;
-    width: 20vw;
-    min-width: 150px;
+    width: 25em;
+    /*min-width: 150px;*/
     border-color: var(--input-color);
     border-style: solid;
     border-width: thin;
     transition: all 0.75s linear;
+    /*min-width: min(20em, 60vw);*/
 }
 
-#garden_options_menu {
-    float:left;
+#layer_manager {
+    display: flex;
+    flex-wrap: wrap;
 }
 
 #layer_holder {
     width: 28vw;
     height: auto;
+    flex-grow: 1;
+}
+
+input.layer_label {
+    font-size: 1em;
+    height: 1.1em;
+    padding: 0;
+    margin: 1px;
+    width: 8em;
+    background-color: #0000;
+    color: var(--garden-font-color);
+    border-bottom-color: var(--garden-font-color);
 }
 
 /** DIRECTORY **/

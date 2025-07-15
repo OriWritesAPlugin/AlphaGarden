@@ -125,9 +125,6 @@
     let state = side == "left"? clicked.innerText.slice(3,7) : clicked.innerText.slice(0,4);
     let new_state = state == "hide" ? "show" : "hide";
     clicked.innerText = side == "left" ? clicked.innerText.slice(0,3) + new_state + clicked.innerText.slice(7) : new_state + clicked.innerText.slice(4);
-    console.log(window.innerWidth);
-    console.log(pc_width);
-    console.log(window.innerWidth <= pc_width);
     
     if(window.innerWidth <= pc_width){
       if(state == "hide"){

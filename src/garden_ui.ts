@@ -4,18 +4,58 @@ import { Layer, GardenLayer, DecorLayer, OverlayLayer, CelestialLayer, Celestial
 import { available_backgrounds, available_tileables } from "./gen_garden.js";
 import { clearCanvas, imageFromPopup } from "./image_handling.js";
 import { draggableLayerMouseDownHandler } from "./drag_and_drop.js";
+import { hexToRgb } from "./shared.js";
 
-const PROPERTIES = {
+/*const PROPERTIES = {
   "base": { "defaultPalette": "CunEjC0KIh", "mainColor": "#FF0000", "secondColor": "#AA0000", "accentColor": "#FFAA00", "icon": "▒", "hovertext": "unused..." },
   "garden": { "defaultPalette": "CunEjC0KIh", "mainColor": "#1C2121", "secondColor": "#151818", "accentColor": "#273831", "icon": "⚘", "hovertext": "Create a new garden layer. This is where all the plants and goodies go!" },
-  "decor": { "defaultPalette": "CunEjC0KIh", "mainColor": "#262221", "secondColor": "#1C1919", "defaultContent": "mountains", "accentColor": "#3D362B", "icon": "ꕔ", "hovertext": "Create a new decor layer. This lets you add mountains and the like." },
+  "decor": { "defaultPalette": "CunEjC0KIh", "mainColor": "#262221", "secondColor": "#1C1919", "accentColor": "#3D362B", "defaultContent": "mountains", "icon": "ꕔ", "hovertext": "Create a new decor layer. This lets you add mountains and the like." },
   "overlay": { "mainColor": "#211515", "secondColor": "#171213", "accentColor": "#3C2121", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "⚙", "hovertext": "Currently unused, how mysterious!" },
   "celestial": { "defaultPalette": "early evening", "mainColor": "#1B1D24", "secondColor": "#141519", "accentColor": "#252A3C", "defaultContent": "Sky_Gradient", "defaultCustomPalette": ["#192446", "#335366", "#426f7a"], "icon": "☾", "hovertext": "Create a new celestial layer, for adding skies, stars, fog, etc. Don't forget to drag the new layer up a bit if you're doing fog!" }
-}// old overlay: 1F191A
+}// old overlay: 1F191A*/
+
+const PROPERTIES = {
+  "base": { "defaultPalette": "CunEjC0KIh",         "mainColor": "#FF0000", "accentColor": "#AA0000", "mainColorLight": "#FF00FF", "accentColorLight": "#FFAA00", "icon": "▒", "hovertext": "unused..." },
+  "garden": { "defaultPalette": "CunEjC0KIh",       "mainColor": "#273831", "accentColor": "#375549", "mainColorLight": "#659683", "accentColorLight": "#7fcdad", "icon": "⚘", "hovertext": "Create a new garden layer. This is where all the plants and goodies go!" },
+  "decor": { "defaultPalette": "CunEjC0KIh",        "mainColor": "#3D362B", "accentColor": "#7d6d53", "mainColorLight": "#b39b75", "accentColorLight": "#f8d6a0", "defaultContent": "mountains", "icon": "⧋", "hovertext": "Create a new decor layer. This lets you add mountains and the like." },
+  "overlay": {                                      "mainColor": "#3C2121", "accentColor": "#6C4141", "mainColorLight": "#b17474", "accentColorLight": "#f5a4a4", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "⚙", "hovertext": "Currently unused, how mysterious!" },
+  "celestial": { "defaultPalette": "early evening", "mainColor": "#252A3C", "accentColor": "#353e60", "mainColorLight": "#647099", "accentColorLight": "#a1b3f3", "defaultContent": "Sky_Gradient", "defaultCustomPalette": ["#192446", "#335366", "#426f7a"], "icon": "☾", "hovertext": "Create a new celestial layer, for adding skies, stars, fog, etc. Don't forget to drag the new layer up a bit if you're doing fog!" }
+}
+
+console.log(document.body.style.backgroundColor);
+console.log(hexToRgb(document.body.style.backgroundColor));
+console.log(window.getComputedStyle( document.body , null).getPropertyValue( "background-color" )[0]);
+
+function regexDidntWork(rgbish_val){
+  // There was a polite rgb.match(/\d+/g) that kept failing on #ffffff, #fefeff..., so cast kitchen sink.
+  if(rgbish_val[0] === "#"){return hexToRgb(rgbish_val)}
+  return rgbish_val.match(/\d+/g).map(Number);
+}
+
+function pageInDarkMode(){
+  const rgb = window.getComputedStyle( document.body , null).getPropertyValue( "background-color" );
+  const rgb_average = (rgb.match(/\d+/g).map(Number).reduce((a, b) => a + b)) / 3
+  // TODO: side effect, but it's the best place to put it during the refactor. Move once I can
+  const font_rgb = window.getComputedStyle(document.documentElement).getPropertyValue("--font-color");
+  console.log(font_rgb);
+  const font_rgb_average = (regexDidntWork(font_rgb).reduce((a, b) => a + b)) / 3
+  console.log(font_rgb_average);
+  if(rgb_average < 50 && Math.abs(font_rgb_average-100) < 15) {
+      document.documentElement.style.setProperty("--garden-font-color", "rgb(255, 244, 220)");
+  } else if(rgb_average >= 50 && Math.abs(font_rgb_average-170) < 15){
+      document.documentElement.style.setProperty("--garden-font-color", "rgb(0, 17, 51)");
+  } else {
+      document.documentElement.style.setProperty("--garden-font-color", window.getComputedStyle(document.documentElement).getPropertyValue("--font-color"));
+  }
+  return rgb_average < 50;
+}
+
+const pageLoadedInDarkMode = pageInDarkMode();
 
 class LayerDiv {
   type: string;
   selfDiv: HTMLDivElement;
+  controlButtonDiv: HTMLDivElement;
   mainColor: string;
   editDiv: HTMLDivElement;
   secondColor: string;
@@ -38,60 +78,65 @@ class LayerDiv {
 
   constructor(layer: Layer, id: number, onEditCallback: () => void, type = "base") {
     // This properties stuff is to save some pain with super() and derived class colors
-    this.mainColor = PROPERTIES[type]["mainColor"];
-    this.secondColor = PROPERTIES[type]["secondColor"];
-    this.accentColor = PROPERTIES[type]["accentColor"];
+    this.mainColor = pageLoadedInDarkMode? PROPERTIES[type]["mainColor"] : PROPERTIES[type]["mainColorLight"];
+    this.accentColor = pageLoadedInDarkMode? PROPERTIES[type]["accentColor"] : PROPERTIES[type]["accentColorLight"];
     this.selfDiv = this.buildGenericDiv(this.mainColor);
     this.selfDiv.className = "draggable_layer_div";
     this.selfDiv.style.cursor = "move";
     this.selfDiv.style.userSelect = "none";
-    this.selfDiv.style.width = "95%";
     this.onEditCallback = async function () {
       if (this.layer) { await this.layer.update(); }
       onEditCallback();
     }.bind(this);
     this.selfDiv.addEventListener('mousedown', draggableLayerMouseDownHandler.bind({callOnDrag: onEditCallback}));
-    this.selfDiv.style.border = "3px solid " + this.accentColor;
+    this.selfDiv.style.borderColor = this.accentColor;
     this.layer = layer
     this.id = "layer_" + id;
     this.selfDiv.id = this.id;
     const decorDiv = this.buildGenericDiv(this.mainColor);
+    decorDiv.className = "layer_box_div";
+    this.controlButtonDiv = document.createElement("div");
+    this.controlButtonDiv.id = "controls_"
+    this.controlButtonDiv.style.display = "flex";
+    this.controlButtonDiv.style.flexWrap = "wrap";
     this.editButton = this.buildEditButton();
     this.hideButton = this.buildHideButton();
     const deleteButton = this.buildDeleteButton();
     this.editDiv = this.buildEditDiv();
     decorDiv.style.padding = "0vh";
     decorDiv.style.margin = "0vh";
-    decorDiv.style.width = "95%";
-    this.selfDiv.appendChild(this.editButton);
+    decorDiv.style.height = "fit-content";
+    this.controlButtonDiv.appendChild(this.editButton);
     const namePlate = document.createElement("input");
+    namePlate.type = "text";
+    namePlate.className = "layer_label";
+    namePlate.style.height = "1.75em";
+    namePlate.style.flexGrow = "1";
     namePlate.value = this.id
-    this.selfDiv.appendChild(this.hideButton);
-    this.selfDiv.appendChild(namePlate);
-    this.selfDiv.appendChild(deleteButton);
+    this.controlButtonDiv.appendChild(this.hideButton);
+    this.controlButtonDiv.appendChild(namePlate);
+    this.controlButtonDiv.appendChild(deleteButton);
+    decorDiv.appendChild(this.controlButtonDiv);
     decorDiv.appendChild(this.editDiv);
     this.selfDiv.appendChild(decorDiv);
-    this.editDiv.style.transition = "margin 0.4s ease-in-out 0s";
+    this.selfDiv.style.transition = "height 0.4s ease-in-out 0s";
     this.editDiv.style.height = "fit-content";
     this.toggleEditMode();
   }
 
   buildGenericDiv(color: string) {
     const genericDiv = document.createElement("div");
-    genericDiv.className = "layer_div";
+    genericDiv.className = "layer_option_div";
     genericDiv.style.backgroundColor = color;
     //genericDiv.id = this.generateId("generic");
     genericDiv.style.cursor = "default";
     genericDiv.style.userSelect = "default";
-    genericDiv.style.width = "fit-content";
     genericDiv.style.height = "fit-content";
     return genericDiv;
   }
 
   buildOptionsHolderDiv() {
-    const optionsHolderDiv = this.buildGenericDiv(this.mainColor);
-    optionsHolderDiv.style.display = "inline-block"
-    optionsHolderDiv.style.height = "80%"
+    const optionsHolderDiv = this.buildGenericDiv(this.accentColor);
     optionsHolderDiv.style.textAlign = "left";
     optionsHolderDiv.style.width = "43%";
     return optionsHolderDiv
@@ -100,13 +145,13 @@ class LayerDiv {
   toggleEditMode() {
     this.editMode = !this.editMode;
     if (!this.editMode) {
-      this.editDiv.style.marginTop = "-18vh";
-      this.selfDiv.style.height = "2em";
+      //this.editDiv.style.marginTop = "-18vh";
+      this.editDiv.style.height = "0em";
       //this.selfDiv.style.minHeight = "0vh";
     } else {
-      this.editDiv.style.marginTop = "0vh";
+      //this.editDiv.style.marginTop = "0vh";
       //this.selfDiv.style.minHeight = "fit-content";
-      this.selfDiv.style.height = "12em";
+      this.editDiv.style.height = "7.5em";
     }
     this.editButton.classList.toggle('active');
   }
@@ -114,15 +159,14 @@ class LayerDiv {
   toggleVisibility() {
     this.hideButton.classList.toggle('active');
     this.layer.isVisible = !this.layer.isVisible;
-    this.hideButton.value = this.layer.isVisible ? "•" : "–";
+    this.hideButton.innerText = this.layer.isVisible ? "👁" : "–";
     this.onEditCallback();
   }
 
   buildEditButton() {
-    const editButton = <HTMLButtonElement>document.createElement("input");
-    editButton.type = "button";
-    editButton.className = "chunky_wrap";
-    editButton.value = "✎";
+    const editButton = <HTMLButtonElement>document.createElement("button");
+    editButton.className = "layer_control";
+    editButton.innerText = "✎";
     editButton.title = "expand layer for editing";
     editButton.addEventListener('click', this.toggleEditMode.bind(this));
     editButton.style.backgroundColor = this.accentColor;
@@ -130,10 +174,9 @@ class LayerDiv {
   }
 
   buildHideButton() {
-    const hideButton = <HTMLButtonElement>document.createElement("input");
-    hideButton.type = "button";
-    hideButton.className = "chunky_wrap";
-    hideButton.value = "•";
+    const hideButton = <HTMLButtonElement>document.createElement("button");
+    hideButton.className = "layer_control";
+    hideButton.innerText = "👁";
     hideButton.title = "show or hide layer";
     hideButton.addEventListener('click', this.toggleVisibility.bind(this));
     hideButton.style.backgroundColor = this.accentColor;
@@ -141,10 +184,9 @@ class LayerDiv {
   }
 
   buildDeleteButton() {
-    const deleteButton = <HTMLButtonElement>document.createElement("input");
-    deleteButton.type = "button";
-    deleteButton.className = "chunky_wrap";
-    deleteButton.value = "✕";
+    const deleteButton = <HTMLButtonElement>document.createElement("button");
+    deleteButton.className = "layer_control";
+    deleteButton.innerText = "✕";
     deleteButton.title = "delete layer";
     deleteButton.addEventListener('click', function () { this.doDelete() }.bind(this));
     deleteButton.style.backgroundColor = this.accentColor;
@@ -175,7 +217,6 @@ class LayerDiv {
       this.layer[target] = selectBox.value;
       await this.onEditCallback();
     }.bind(this, target);
-    selectBox.style.backgroundColor = this.secondColor;
     selectBox.style.display = "block";
     return selectBox;
   }
@@ -190,8 +231,6 @@ class LayerDiv {
     fillIn.className = "garden-dim-bar";
     fillIn.id = this.generateId("fillin", target);
     fillIn.style.width = "50%";
-    fillIn.style.backgroundColor = color;
-    fillIn.style.backgroundColor = color;
     fillIn.onchange = async function () {
       if (coerceNumber) {
         this.layer[target] = parseFloat(fillIn.value);
@@ -209,13 +248,10 @@ class LayerDiv {
   }
 
   buildPositionDiv() {
-    const pairs = [["x_offset", "x:", "layer's horizontal offset"], ["y_offset", "y:", "layer's vertical offset"], ["width", "<br>width:", "width of layer"], ["scale", "scale:", "multiply layer size by this amount"]];
-    const holdDiv = this.buildGenericDiv(this.mainColor);
-    holdDiv.style.display = "inline-block";
-    holdDiv.style.height = "auto";
-    holdDiv.style.textAlign = "right";
+    const pairs = [["x_offset", "x:", "layer's horizontal offset"], ["y_offset", "y:", "layer's vertical offset"], ["width", "width:", "width of layer"], ["scale", "scale:", "multiply layer size by this amount"]];
+    const holdDiv = this.buildGenericDiv(this.accentColor);
     for (let i = 0; i < pairs.length; i++) {
-      const [fillIn, label] = this.buildGenericFillIn(pairs[i][0], pairs[i][1], this.secondColor, pairs[i][2], true);
+      const [fillIn, label] = this.buildGenericFillIn(pairs[i][0], pairs[i][1], this.mainColor, pairs[i][2], true);
       fillIn.style.width = "2em";
       if (pairs[i][0] != "width") {
         if (pairs[i][0] == "y_offset") {
@@ -234,25 +270,27 @@ class LayerDiv {
           await this.onEditCallback();
         }.bind(this);
       }
-      holdDiv.appendChild(label);
-      holdDiv.appendChild(fillIn);
+      const fragmentDiv = document.createElement("div");
+      fragmentDiv.style.display = "flex";
+      fragmentDiv.style.margin = "0.25em";
+      fragmentDiv.appendChild(label);
+      fragmentDiv.appendChild(fillIn);
+      holdDiv.appendChild(fragmentDiv);
     }
-    holdDiv.style.cssFloat = "right";
-    holdDiv.style.display = "inline";
-    holdDiv.style.height = "80%";
-    holdDiv.style.width = "43%";
+    //holdDiv.style.cssFloat = "right";
     return holdDiv;
   }
 
   buildEditDiv() {
     const editDiv = document.createElement("div");
-    editDiv.className = "layer_div";
-    editDiv.style.backgroundColor = this.secondColor;
+    editDiv.className = "layer_background_div";
+    editDiv.style.backgroundColor = this.mainColor;
     editDiv.style.textAlign = "right";
     editDiv.appendChild(this.buildGenericDropdown("name", ["Larry", "Moe", "Curly"]));
     editDiv.appendChild(this.buildGenericDropdown("name", ["Sue", "Anne", "Barbara"]));
     editDiv.appendChild(this.buildPositionDiv());
     editDiv.style.height = "10vh";
+    editDiv.style.padding = "0";
     editDiv.style.transition = "margin 0.4s ease-in-out 0s";
     return editDiv;
   }
@@ -271,7 +309,9 @@ class GardenLayerDiv extends LayerDiv {
     // but that's about it.
     this.onChangeGardenCallback = onChangeGardenCallback;
     this.swapButton = this.buildSwapButton();
-    this.selfDiv.insertBefore(this.swapButton, this.selfDiv.childNodes[3]);
+    const delete_button = this.selfDiv.childNodes[0].childNodes[0].lastChild
+    this.selfDiv.childNodes[0].childNodes[0].insertBefore(this.swapButton, delete_button);
+    //this.selfDiv.insertBefore(this.swapButton, this.selfDiv.childNodes[3]);
     this.yOffsetInput.onchange = async function () {
       this.layer["y_offset"] = parseFloat(this.yOffsetInput.value);
       await this.layer.updateMain();
@@ -282,9 +322,9 @@ class GardenLayerDiv extends LayerDiv {
 
   buildEditDiv() {
     const editDiv = document.createElement("div");
-    editDiv.className = "layer_div";
-    editDiv.style.backgroundColor = this.secondColor;
-    const dropdownDiv = this.buildGenericDiv(this.mainColor);
+    editDiv.className = "layer_background_div";
+    editDiv.style.backgroundColor = this.mainColor;
+    const dropdownDiv = this.buildGenericDiv(this.accentColor);
     const groundCoverSelect = this.buildGenericDropdown("groundCover", Object.keys(available_ground))
     const groundSelect = this.buildGenericDropdown("ground", Object.keys(available_ground_base))
     groundCoverSelect.onchange = async function () {
@@ -299,7 +339,7 @@ class GardenLayerDiv extends LayerDiv {
     }.bind(this);
     dropdownDiv.appendChild(groundCoverSelect);
     dropdownDiv.appendChild(groundSelect);
-    const [fillIn, label] = this.buildGenericFillIn("groundPaletteSeed", "colors:", this.secondColor, "seed providing colors for ground");
+    const [fillIn, label] = this.buildGenericFillIn("groundPaletteSeed", "colors:", this.mainColor, "seed providing colors for ground");
     fillIn.onchange = async function () {
       this.layer.groundPaletteSeed = (<HTMLInputElement>fillIn).value;
       await this.layer.updateGround();
@@ -307,20 +347,15 @@ class GardenLayerDiv extends LayerDiv {
     }.bind(this);
     dropdownDiv.appendChild(label);
     dropdownDiv.appendChild(fillIn);
-    dropdownDiv.style.display = "inline-block"
-    dropdownDiv.style.height = "80%"
-    dropdownDiv.style.textAlign = "left";
-    dropdownDiv.style.width = "43%";
     editDiv.appendChild(dropdownDiv);
     editDiv.appendChild(this.buildPositionDiv());
     return editDiv;
   }
 
   buildSwapButton() {
-    const swapButton = <HTMLButtonElement>document.createElement("input");
-    swapButton.type = "button";
-    swapButton.className = "chunky_wrap";
-    swapButton.value = "☆";  // ★
+    const swapButton = <HTMLButtonElement>document.createElement("button");
+    swapButton.className = "layer_control";
+    swapButton.innerText = "☆";  // ★
     swapButton.title = "edit this garden layer's seed list";
     swapButton.addEventListener('click', this.setActiveGarden.bind(this));
     swapButton.style.backgroundColor = this.accentColor;
@@ -332,13 +367,13 @@ class GardenLayerDiv extends LayerDiv {
       return;
     }
     this.layer.isActive = true;
-    this.swapButton.value = "★";
+    this.swapButton.innerText = "★";
     this.onChangeGardenCallback();
   }
 
   unsetActiveGarden() {
     this.layer.isActive = false;
-    this.swapButton.value = "☆";
+    this.swapButton.innerText = "☆";
   }
 
 }
@@ -350,12 +385,12 @@ class DecorLayerDiv extends LayerDiv {
 
   buildEditDiv() {
     const editDiv = document.createElement("div");
-    editDiv.className = "layer_div";
-    editDiv.style.backgroundColor = this.secondColor;
+    editDiv.className = "layer_background_div";
+    editDiv.style.backgroundColor = this.mainColor;
     const dropdownDiv = this.buildOptionsHolderDiv();
     const contentSelect = this.buildGenericDropdown("content", Object.keys(available_tileables))
     dropdownDiv.appendChild(contentSelect);
-    const [fillIn, label] = this.buildGenericFillIn("contentPaletteSeed", "colors:", this.secondColor, "seed providing colors for decor");
+    const [fillIn, label] = this.buildGenericFillIn("contentPaletteSeed", "colors:", this.accentColor, "seed providing colors for decor");
     dropdownDiv.appendChild(label);
     dropdownDiv.appendChild(fillIn);
 
@@ -372,8 +407,8 @@ class OverlayLayerDiv extends LayerDiv {
 
   buildEditDiv() {
     const editDiv = document.createElement("div");
-    editDiv.className = "layer_div";
-    editDiv.style.backgroundColor = this.secondColor;
+    editDiv.className = "layer_background_div";
+    editDiv.style.backgroundColor = this.mainColor;
     editDiv.innerHTML = "Effects layer under construction! The overlay stuff was moved to the celestial (blue moon) tab, pick \"fog\".<br><br>Eventually, I want this to handle decor like picture frames"
     /*let leftOptionsDiv = this.buildOptionsHolderDiv();
     let rightOptionsDiv = this.buildOptionsHolderDiv();
@@ -400,9 +435,9 @@ class CelestialLayerDiv extends LayerDiv {
 
   buildEditDiv() {
     const editDiv = document.createElement("div");
-    editDiv.className = "layer_div";
-    editDiv.style.backgroundColor = this.secondColor;
-    const dropdownDiv = this.buildGenericDiv(this.secondColor);
+    editDiv.className = "layer_background_div";
+    editDiv.style.backgroundColor = this.mainColor;
+    const dropdownDiv = this.buildGenericDiv(this.accentColor);
     // TODO: Typescript is amazing fantastic awesome but the enums might be worth holding off on
     const contentSelect = this.buildGenericDropdown("content", Object.keys(CelestialType).filter(value => isNaN(Number(value))));
     const skyPaletteSelect = this.buildGenericDropdown("skyPalette", Object.keys(available_backgrounds));
@@ -573,13 +608,12 @@ class LayerManager {
   }
 
   buildLayerButton(type: string, callback: () => void) {
-    const layerButton = document.createElement("input");
-    layerButton.type = "button";
-    layerButton.className = "chunky_wrap";
-    layerButton.value = PROPERTIES[type]["icon"];
+    const layerButton = document.createElement("button");
+    layerButton.className = "layer_create";
+    layerButton.innerText = PROPERTIES[type]["icon"];
     layerButton.title = PROPERTIES[type]["hovertext"];
     layerButton.addEventListener('click', callback.bind(this));
-    layerButton.style.backgroundColor = PROPERTIES[type]["accentColor"];
+    layerButton.style.backgroundColor = pageLoadedInDarkMode? PROPERTIES[type]["accentColor"] : PROPERTIES[type]["accentColorLight"];
     layerButton.style.width = "5vw";
     layerButton.style.height = "3vw";
     return layerButton;

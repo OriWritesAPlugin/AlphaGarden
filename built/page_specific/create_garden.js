@@ -11,6 +11,7 @@ var ready_to_random = false;
 var randomizer_timeout_id;
 var collection = getSeedCollection();
 var activeGardenItem;
+const pc_width = window.getComputedStyle(document.documentElement).getPropertyValue("--horiz-screen-cutoff");
 const max_from_random_palette = 6;
 const collection_by_main_color = function () {
     let by_color = {};
@@ -69,6 +70,10 @@ async function do_stuff() {
     document.getElementById("randomizer").classList.add("hint_glow");
     setTimeout(function(){document.getElementById("randomizer").classList.remove("hint_glow")}, 1000);
     }*/
+    if (window.innerWidth <= pc_width) {
+        toggleGardenSideMenu("left");
+        toggleGardenSideMenu("right");
+    }
 }
 async function load() {
     let modal = document.createElement("div");
@@ -379,6 +384,23 @@ async function create_manip_entry(offset, gardenitem) {
     entry.style.background = 'url(' + scale_canvas.toDataURL() + ')  no-repeat bottom center';
     return entry;
 }
+function toggleGardenSideMenu(side = "left") {
+    let targets = ["toggle_left_menu", "garden_options_menu"];
+    if (side == "right") {
+        targets = ["toggle_right_menu", "layer_manager"];
+    }
+    let clicked = document.getElementById(targets[0]);
+    let state = side == "left" ? clicked.innerText.slice(3, 7) : clicked.innerText.slice(0, 4);
+    let new_state = state == "hide" ? "show" : "hide";
+    clicked.innerText = side == "left" ? clicked.innerText.slice(0, 3) + new_state + clicked.innerText.slice(7) : new_state + clicked.innerText.slice(4);
+    let margin_trait = side === "left" ? "marginLeft" : "marginRight";
+    if (state == "hide") {
+        document.getElementById(targets[1]).style[margin_trait] = "-26em";
+    }
+    else {
+        document.getElementById(targets[1]).style[margin_trait] = "0em";
+    }
+}
 do_stuff();
 document.getElementById("seed_positioning_offset").onpointerup = setPositionFixed;
 document.getElementById("randomizer").onclick = random_from_collection;
@@ -388,3 +410,5 @@ document.getElementById("claimer").onclick = claim;
 document.getElementById("flipper").onclick = togglePositionFlipped;
 document.getElementById("seed_positioning_random").onclick = togglePositionFixed;
 document.getElementById("seed_positioning_fixed").onclick = togglePositionFixed;
+document.getElementById("toggle_left_menu").onclick = () => { toggleGardenSideMenu("left"); };
+document.getElementById("toggle_right_menu").onclick = () => { toggleGardenSideMenu("right"); };
