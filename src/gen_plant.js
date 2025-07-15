@@ -371,6 +371,7 @@ function draw_plant_with_color_palette(ctx, plant_data, center) {
     const palette = hex_palette.map(hexToRgb);
     imageData = draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, FOLIAGE_SPRITE_DATA[plant_num], palette, center);
     ctx.putImageData(imageData, 0, 0);
+    console.log(all_palettes[0]["palette"]);
 }
 
 // Get hype for COORDINATE MATH. Helper for the draw_arbitraries
@@ -541,5 +542,5 @@ export {
     genWithModifiedSeedChances, palettes_by_category, foliage_by_category, calculateSeedChances, decode_plant_data,
     encode_plant_data_v2, overall_palette, gen_plant_data, gen_plant, gen_named, base_foliage_palette,
     base_feature_palette, base_accent_palette, random_from_list, work_canvas_size, parse_plant_data, samplePlantColor,
-    assemble_categories, xmur3, mulberry32, drawPlantForSquare, addMarkings, getMainPaletteFromSeed
+    assemble_categories, xmur3, mulberry32, drawPlantForSquare, addMarkings, getMainPaletteFromSeed, plant_cache
 };

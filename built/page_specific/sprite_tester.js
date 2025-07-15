@@ -40,7 +40,9 @@ async function genTestGarden() {
             data += '1';
         }
         else {
-            let char_code = String.fromCharCode(97 + custom_colors.keys().size());
+            let char_code = String.fromCharCode(97 + Object.keys(custom_colors).length);
+            accursed_color_lookup[img_data[i]] = {};
+            accursed_color_lookup[img_data[i]][img_data[i + 1]] = {};
             accursed_color_lookup[img_data[i]][img_data[i + 1]][img_data[i + 2]] = char_code;
             custom_colors[char_code] = [img_data[i], img_data[i + 1], img_data[i + 2], img_data[i + 3]];
             data += char_code;

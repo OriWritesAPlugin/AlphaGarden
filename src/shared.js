@@ -585,7 +585,9 @@ function delete_save(e){
         if(remaining > 1){
             e.target.innerText = "Hold for " + (remaining - 1);
         } else {
+            localStorage.clear();
             e.target.innerText = "Save Deleted!";
+            setTimeout(location.reload(), 300);
             return;
         }
         t = setTimeout(repeat, 1000);

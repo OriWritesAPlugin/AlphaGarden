@@ -1,4 +1,4 @@
-import { decode_plant_data, assemble_categories, encode_plant_data_v2 } from "../gen_plant.js";
+import { decode_plant_data, assemble_categories, encode_plant_data_v2, plant_cache } from "../gen_plant.js";
 import { getSeedCollection, toHue } from "../shared.js";
 import { all_palettes } from "../data.js";
 import { LayerManager } from "../garden_ui.js";
@@ -174,18 +174,23 @@ function updatePalette() {
         }
     }
     let redirect = palette.getAttribute("data-offset");
-    console.log(redirect);
     let new_palette = palette.value.split(",");
     all_palettes[redirect]["palette"] = new_palette;
+    for (var member in plant_cache)
+        delete plant_cache[member];
     setPalette(document.getElementById("palette_" + redirect), new_palette, redirect);
+    console.log(all_palettes[0]["palette"]);
     regenWithPalette(redirect);
 }
 function tintedRegen(seed_list) {
-    gm.setHeight(parseInt(document.getElementById("garden_height").value));
-    gm.setWidth(parseInt(document.getElementById("garden_width").value));
+    console.log("tinted");
+    console.log(all_palettes[0]["palette"]);
+    //gm.setHeight(parseInt(document.getElementById("garden_height").value));
+    //gm.setWidth(parseInt(document.getElementById("garden_width").value));
     gm.regenActiveGarden(seed_list.toString());
 }
 function doThisRegen() {
+    console.log("regen");
     gm.setHeight(parseInt(document.getElementById("garden_height").value));
     gm.setWidth(parseInt(document.getElementById("garden_width").value));
     gm.regenActiveGarden(document.getElementById("seed_list").value);

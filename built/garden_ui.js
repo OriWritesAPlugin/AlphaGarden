@@ -19,9 +19,6 @@ const PROPERTIES = {
     "overlay": { "mainColor": "#3C2121", "accentColor": "#6C4141", "mainColorLight": "#b17474", "accentColorLight": "#f5a4a4", "defaultColor": "#night", "defaultOpacity": 0.25, "icon": "⚙", "hovertext": "Currently unused, how mysterious!" },
     "celestial": { "defaultPalette": "early evening", "mainColor": "#252A3C", "accentColor": "#353e60", "mainColorLight": "#647099", "accentColorLight": "#a1b3f3", "defaultContent": "Sky_Gradient", "defaultCustomPalette": ["#192446", "#335366", "#426f7a"], "icon": "☾", "hovertext": "Create a new celestial layer, for adding skies, stars, fog, etc. Don't forget to drag the new layer up a bit if you're doing fog!" }
 };
-console.log(document.body.style.backgroundColor);
-console.log(hexToRgb(document.body.style.backgroundColor));
-console.log(window.getComputedStyle(document.body, null).getPropertyValue("background-color")[0]);
 function regexDidntWork(rgbish_val) {
     // There was a polite rgb.match(/\d+/g) that kept failing on #ffffff, #fefeff..., so cast kitchen sink.
     if (rgbish_val[0] === "#") {
@@ -34,9 +31,7 @@ function pageInDarkMode() {
     const rgb_average = (rgb.match(/\d+/g).map(Number).reduce((a, b) => a + b)) / 3;
     // TODO: side effect, but it's the best place to put it during the refactor. Move once I can
     const font_rgb = window.getComputedStyle(document.documentElement).getPropertyValue("--font-color");
-    console.log(font_rgb);
     const font_rgb_average = (regexDidntWork(font_rgb).reduce((a, b) => a + b)) / 3;
-    console.log(font_rgb_average);
     if (rgb_average < 50 && Math.abs(font_rgb_average - 100) < 15) {
         document.documentElement.style.setProperty("--garden-font-color", "rgb(255, 244, 220)");
     }
