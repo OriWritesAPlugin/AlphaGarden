@@ -97,7 +97,7 @@ function setup_options(){
     add_preview_square(document.getElementById("preview_img"), "over");
     add_preview_square(document.getElementById("preview_img"), "us");
     document.getElementById("graphics_func_div").appendChild(gen_func_button("default", function(){load_palettes("shade", "flaxmetal", "wintergreen", false, false, false)}));
-    document.getElementById("graphics_func_div").appendChild(gen_func_button("light", function(){load_palettes("flaxmetal", "lignite", "ghost", true, false, false)}));
+    document.getElementById("graphics_func_div").appendChild(gen_func_button("light", function(){load_palettes("ghost", "lignite", "wintergreen", false, true, true)}));
     document.getElementById("graphics_func_div").appendChild(gen_func_button("dark", function(){load_palettes("lignite", "snowblind", "ghost", false, false, false)}));
     document.getElementById("graphics_func_div").appendChild(gen_func_button("random", function(){load_palettes(randomFromArray(available_palettes), randomFromArray(available_palettes), randomFromArray(available_palettes), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()))}));
     document.getElementById("graphics_toggle_div").appendChild(gen_toggle_button("Flip Main", update_colors, jraphics[3]));
