@@ -153,7 +153,7 @@ class LayerDiv {
   toggleVisibility() {
     this.hideButton.classList.toggle('active');
     this.layer.isVisible = !this.layer.isVisible;
-    this.hideButton.innerText = this.layer.isVisible ? "👁" : "–";
+    this.hideButton.innerText = this.layer.isVisible ? "👁&#xFE0E;" : "–";
     this.onEditCallback();
   }
 
