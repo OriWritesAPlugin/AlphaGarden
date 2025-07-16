@@ -153,7 +153,7 @@ class GardenPlacedItem extends GardenItem {
         place_onto_ctx.imageSmoothingEnabled = false;
         place_onto_ctx.drawImage(this.canvas, place_onto_canvas.width * acting_offset, place_onto_canvas.height - 70, GARDEN_ITEM_SIZE * 2, GARDEN_ITEM_SIZE * 2);
     }
-    async flipCanvas() {
+    flipCanvas() {
         const flip_canvas = document.createElement("canvas");
         flip_canvas.width = this.canvas.width;
         flip_canvas.height = this.canvas.height;
@@ -210,7 +210,6 @@ class GardenLayer extends Layer {
         super(1, 1, x_offset, y_offset, scale);
         this.seedList = seedList;
         this.generateContent();
-        this.assignSmartPositions();
         this.canvasGarden = document.createElement("canvas");
         this.canvasGarden.height = LAYER_HEIGHT;
         this.canvasGround = document.createElement("canvas");
@@ -220,6 +219,7 @@ class GardenLayer extends Layer {
         this.ground = ground;
         this.setHeight(height);
         this.setWidth(width);
+        this.assignSmartPositions();
     }
     getSaveData() {
         return {
@@ -438,8 +438,8 @@ class GardenLayer extends Layer {
             this.canvas.width = width;
             this.canvasGround.width = width;
             this.canvasGarden.width = width;
-            await this.updateMain();
-            this.updateGround();
+            this.updateMain();
+            await this.updateGround();
         }
     }
 }

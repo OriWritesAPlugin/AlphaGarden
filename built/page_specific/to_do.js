@@ -164,7 +164,6 @@ function makePlantSelector(element) {
         } // Return to realsize for the display.
         if (can_select) {
             prize_select_square.onclick = function () {
-                console.log(seed);
                 prize_display_square.setAttribute("data-seed", seed);
                 setTimeout(function () { prize_display_square.style.background = 'url(' + prize_url + ')  no-repeat center center'; }, 100);
                 bubble_out(prize_display_square, seed);

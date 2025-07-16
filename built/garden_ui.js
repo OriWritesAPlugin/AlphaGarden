@@ -614,8 +614,11 @@ class LayerManager {
     }
     async makeGardenLayer(openEditMode = true, seedList = [], palette = PROPERTIES["garden"]["defaultPalette"], groundCover = "grass [palette]", ground = "clumpy dirt", width = this.fullCanvas.width / this.scale, height = this.fullCanvas.height / this.scale, x_offset = 0, y_offset = 0, scale = 1) {
         const newGardenLayer = new GardenLayer(width, height, x_offset, y_offset, seedList, palette, groundCover, ground, scale);
+        //await newGardenLayer.updateMain();
+        //await newGardenLayer.updateGround();
         const newGardenLayerDiv = new GardenLayerDiv(newGardenLayer, this.get_id(), this.updateCallback, this.gardenToggleCallback);
-        //await newGardenLayer.updateMain().then(_ => newGardenLayer.updateGround());
+        await newGardenLayer.updateMain();
+        await newGardenLayer.updateGround();
         return this.addLayerAndAnimate(newGardenLayerDiv, openEditMode);
     }
     async makeDecorLayer(openEditMode = true, content = PROPERTIES["decor"]["defaultContent"], palette = PROPERTIES["decor"]["defaultPalette"], width = this.fullCanvas.width / this.scale, height = this.fullCanvas.height / this.scale, x_offset = 0, y_offset = 0, scale = 1) {

@@ -323,6 +323,7 @@ async function setPositionFixed() {
 }
 
 async function showManipMenu() {
+    if(!activeGardenItem){return;}
     let seed = activeGardenItem.identity;
     let cleaned_seed = seed.replace(/(?:%[\d .]*)?<?/g, '');
     let raw_plant_data = decode_plant_data(cleaned_seed);

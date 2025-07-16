@@ -346,7 +346,6 @@ function draw_plant_with_color_palette(ctx, plant_data, center) {
     const palette = hex_palette.map(hexToRgb);
     imageData = draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, FOLIAGE_SPRITE_DATA[plant_num], palette, center);
     ctx.putImageData(imageData, 0, 0);
-    console.log(all_palettes[0]["palette"]);
 }
 // Get hype for COORDINATE MATH. Helper for the draw_arbitraries
 function get_absolute_offset(inner_offset, offset_data, center_factor) {

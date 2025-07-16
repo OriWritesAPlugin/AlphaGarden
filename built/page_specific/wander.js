@@ -259,9 +259,6 @@ function loadScene(force_set_dims = false) {
 // Helper function, tests whether the inventory contains the named item at the amount required
 // Takes an entry from one of choice's relevant fields: needs, consumes, etc.
 function inventoryHas(entry) {
-    console.log(entry[0]);
-    console.log(entry[1]);
-    console.log(inventory[entry[0]]);
     return Object.hasOwn(inventory, entry[0]) && inventory[entry[0]] >= entry[1];
 }
 function updateTitles() {
@@ -311,7 +308,6 @@ function buildChoice(choice) {
             invert = to_check[i] === "blocked by";
             for (let j = 0; j < choice[to_check[i]].length; j++) {
                 // invert functioning as a xor
-                console.log(choice[to_check[i]]);
                 if (invert != !inventoryHas(choice[to_check[i]][j])) {
                     is_selectable = false;
                     break;

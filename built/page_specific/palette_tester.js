@@ -179,18 +179,14 @@ function updatePalette() {
     for (var member in plant_cache)
         delete plant_cache[member];
     setPalette(document.getElementById("palette_" + redirect), new_palette, redirect);
-    console.log(all_palettes[0]["palette"]);
     regenWithPalette(redirect);
 }
 function tintedRegen(seed_list) {
-    console.log("tinted");
-    console.log(all_palettes[0]["palette"]);
     //gm.setHeight(parseInt(document.getElementById("garden_height").value));
     //gm.setWidth(parseInt(document.getElementById("garden_width").value));
     gm.regenActiveGarden(seed_list.toString());
 }
 function doThisRegen() {
-    console.log("regen");
     gm.setHeight(parseInt(document.getElementById("garden_height").value));
     gm.setWidth(parseInt(document.getElementById("garden_width").value));
     gm.regenActiveGarden(document.getElementById("seed_list").value);

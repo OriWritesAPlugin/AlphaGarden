@@ -529,9 +529,7 @@ function gen_background_style_selection(dropdown_id){
 
 function get_canvas_for_named_component(name){
     // The great de-async-ening definitely breaks wildcards.
-    console.log(name);
     if(name.startsWith("*")){
-        console.log(wildcard_canvases[name]);
         return wildcard_canvases[name];
     }
     return gen_named(name);

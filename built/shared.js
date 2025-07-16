@@ -462,9 +462,7 @@ async function decompress(compressedBytes) {
     // Convert the bytes to a stream.
     const stream = new Blob([compressedBytes]).stream();
     // Create a decompressed stream.
-    console.log(compressedBytes);
     const decompressedStream = stream.pipeThrough(new DecompressionStream("gzip"));
-    console.log(decompressedStream);
     // Read all the bytes from this stream.
     const chunks = [];
     for await (const chunk of decompressedStream) {
@@ -472,7 +470,6 @@ async function decompress(compressedBytes) {
     }
     const stringBytes = await concatUint8Arrays(chunks);
     // Convert the bytes to a string.
-    console.log(stringBytes);
     return new TextDecoder().decode(stringBytes);
 }
 /**
