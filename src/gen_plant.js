@@ -3,9 +3,9 @@ import { all_features, all_foliage, all_palettes, FOLIAGE_SPRITE_DATA, NAMED_SPR
 import { hexToRgb, getMarkedPalettes, getOffsetColor, getMarkedBases } from "./shared.js"
 
 // The colors we'll be replacing. Touch at your peril!
-const base_foliage_palette = ["#aed740", "#76c935", "#50aa37", "#2f902b"];
-const base_accent_palette = ["fef4cc", "fde47b", "ffd430", "ecb600"];
-const base_feature_palette = ["f3addd", "d87fbc", "c059a0", "aa3384"];
+const base_foliage_palette = all_palettes[0]["palette"];
+const base_accent_palette = all_palettes[19]["palette"];
+const base_feature_palette = all_palettes[20]["palette"];
 const overall_palette = base_foliage_palette.concat(base_accent_palette).concat(base_feature_palette);
 const fallback_colors = [[255, 102, 99], [254, 177, 68], [253, 253, 151], [158, 224, 158], [158, 193, 207], [204, 153, 201]];  // RGB colors to use if the plant sampler fails to find any
 
@@ -420,7 +420,7 @@ function draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data,
             if (chance < Math.random()) { continue; }
             let mini_data = ADDON_SPRITE_DATA[addon_num];
             let centerpoint = work_canvas_size * work_canvas_size + Math.floor((work_canvas_size - mini_data["w"]) / 2) - work_canvas_size + Math.floor(mini_data["w"] / 2);
-            draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, ADDON_SPRITE_DATA[addon_num], palette, center, pos - 4 * centerpoint);
+            draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, ADDON_SPRITE_DATA[addon_num], palette, center, pos - 4 * centerpoint, true);
         } else if (char == 79 || char == 80) {
             imageData.data[pos] = palette[4][0];
             imageData.data[pos + 1] = palette[4][1];

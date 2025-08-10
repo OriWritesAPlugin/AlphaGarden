@@ -9,24 +9,31 @@
     <body draggable="false">
         <script type="text/javascript" src="./built/virtually_universal_config.js"></script>
         <a href="./" class="index_link"><--Home</a>
-        <h1 id="title">Sprite Sketcher</h1>
-        <h2 id="subtitle">Draw new plants and test them in realtime!</h2>
-        </br>
-        <div id="page_layout" style="display: flex; flex-wrap: wrap">
-            <div id="color_selector" style="display: grid"></div>
-            <div id="false_canvas">
-                <div id="settings"></div>
-                <div id="canvas_array" style="display: grid; grid-template-columns: repeat(32, 1fr); width: 30vw; height: 30vw"></div>
+        <div id="page_layout" style="display: flex; flex-wrap: wrap; flex-direction:column; align-content:center">
+            <h1 id="title">Sprite Sketcher</h1>
+            <p>Draw new plants and test them in realtime! This is best for tweaking; you can copy-paste image data from ex: GIMP with "Upload Image"</p>
+            <div id="sketcher_button_div" style="display: flex; justify-content: center;">
             </div>
-            <div id="plant_previews" style="display: grid; grid-template-columns: repeat(6, 1fr)"></div>
+            </br>
+            <div id="draw_layout" style="display: flex; flex-wrap: wrap; flex-direction:row">
+                <div id="color_selector" style="display: grid"></div>
+                <div id="false_canvas">
+                    <div id="settings"></div>
+                    <div id="canvas_array"></div>
+                </div>
+                <div id="plant_previews" style="display: grid; grid-template-columns: repeat(6, 1fr)"></div>
+            </div>
+            <canvas id="garden_preview" width="450" height="70" style="width: 450px; margin: auto"></canvas>
         </div>
-        <div id="garden_preview"></div>
 
     </body>
     <script type="module">
         import {FOLIAGE_SPRITE_DATA} from "./built/data.js";
         import {work_canvas_size, gen_plant_data, encode_plant_data_v2, drawPlantForSquare, draw_arbitrary_onto_imageData_with_color_palette, overall_palette, plant_cache} from "./built/gen_plant.js";
-        import {hexToRgb, rgbToHex} from "./built/shared.js";
+        import {hexToRgb, rgbToHex, gen_toggle_button, gen_func_button, get_toggle_button_setting} from "./built/shared.js";
+        import {imageFromPopup, wildcard_canvases} from "./built/image_handling.js";
+        import {LayerManager} from "./built/garden_ui.js";
+        import {do_preload_initial} from "./built/gen_garden.js"
 
         const colors = [["#aed740", "leaves/vines"], ["#76c935", "leaves/vines"], ["#50aa37", "leaves/vines"], ["#2f902b", "leaves/vines"],
                   ["#f3addd", "rock/wood"], ["#d87fbc", "rock/wood"], ["#c059a0", "rock/wood"], ["#aa3384", "rock/wood"],
@@ -41,9 +48,16 @@
             170: { 51: { 132: 'L' } }, 233: { 0: { 255: 'N' } }, 200: { 255: { 183: 'O' } }, 159: { 227: { 137: 'P' } }
         };
 
+        let gm;
+        do_preload_initial().then(()=>{
+            gm = new LayerManager(document.getElementById("garden_preview"), "");
+            gm.scale = 1;
+            gm.selfDiv.style.display="none";}
+        );
+
         const add_plant_idx = FOLIAGE_SPRITE_DATA.length;
         const num_plants_to_display = 24;
-        const display_plant_data = []
+        const display_plant_data = [];
         for(let i=0; i<num_plants_to_display; i++){
             let plant_data = gen_plant_data();
             if(i%3!=0){
@@ -75,7 +89,7 @@
             parent.appendChild(button);
         }
 
-        async function uploadSprite(){
+        /*async function uploadSprite(){
             let img = await preload_single_image(document.getElementById("image_injector").value);
             var canvas = document.createElement('canvas');
             var context = canvas.getContext('2d');
@@ -83,7 +97,7 @@
             let img_data = context.getImageData(0, 0, work_canvas_size, work_canvas_size).data;
             updatePlants();
             updateGrid();
-        }
+        }*/
 
         function doPaint(e){
             if(e.buttons === 1){
@@ -97,17 +111,16 @@
             }
         }
 
-        function updateGrid(){
+        function updateGrid(raw_img_data){
             let parent = document.getElementById("canvas_array");
             let plant_data = {"foliage": add_plant_idx, "simple_feature": -1, "complex_feature": -1};
-            draw_arbitrary_onto_imageData_with_color_palette(img_data, plant_data, FOLIAGE_SPRITE_DATA[add_plant_idx], overall_palette, false);
+            draw_arbitrary_onto_imageData_with_color_palette(raw_img_data, plant_data, FOLIAGE_SPRITE_DATA[add_plant_idx], overall_palette, false);
             for(let i=0; i<img_data.length; i+=4){
-                parent.childNodes[i/4] = rgbToHex(img_data[i], img_data[i+1], img_data[i+2]);
+                console.log(img_data);
+                if(img_data[i+3]>0){
+                    parent.childNodes[i/4].style.backgroundColor = rgbToHex(img_data[i], img_data[i+1], img_data[i+2]);
+                }
             }
-        }
-
-        function saveImage(){
-
         }
 
         function updatePlants(){
@@ -143,14 +156,62 @@
                 swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
                 color_div.appendChild(swap_square);
             }
+            genTestGarden();
         }
 
+        function genTestGarden() {
+            let modified_seed_list = ["yhNA2ysxuY", "y5Dm2y5HQq"].concat([encode_plant_data_v2(gen_plant_data()), encode_plant_data_v2(gen_plant_data())]);
+            let num_to_gen = 3;
+            // We "mix" the test seeds into the existing garden stuff, so long as there's seeds to mix into.
+            for (let i = 0; i < num_to_gen; i++) {
+                let plant_data = gen_plant_data();
+                plant_data["foliage"] = add_plant_idx;
+                modified_seed_list.splice(Math.floor(Math.random() * (modified_seed_list.length - 1)) + 1, 0, encode_plant_data_v2(plant_data));
+            }
+            gm.regenActiveGarden(modified_seed_list.join());
+        }
 
+        function toggle_borders(){
+            let border_style = "none";
+            if(get_toggle_button_setting("Show Grid")){ border_style="solid"; };
+            var children = document.getElementById("canvas_array").children;
+            for (var i = 0; i < children.length; i++) {
+                children[i].style.borderStyle = border_style;
+            }
+        }
 
         document.getElementById("canvas_array").style.gridTemplateColumns = "repeat("+work_canvas_size+", 1fr)";
         document.getElementById('canvas_array').addEventListener('mousedown', doPaint);
         document.getElementById('canvas_array').addEventListener('mousemove', doPaint);
         document.getElementById('canvas_array').addEventListener('mouseup', updatePlants);
+        document.getElementById('sketcher_button_div').appendChild(gen_func_button('Upload Image', function(){
+            imageFromPopup(document.body, "test_sprite", ()=>{
+            let canvas = wildcard_canvases["test_sprite"];
+            let context = canvas.getContext('2d');
+            let raw_img_data = context.getImageData(0, 0, work_canvas_size, work_canvas_size);
+            img_data = raw_img_data.data;
+            updatePlants();
+            updateGrid(raw_img_data);
+            });
+        }));
+        document.getElementById('sketcher_button_div').appendChild(gen_func_button('Download Image', function(){
+            let canvas = document.createElement('canvas');
+            let ctx = canvas.getContext('2d');
+            canvas.width = work_canvas_size;
+            canvas.height = work_canvas_size;
+            let imageData = ctx.getImageData(0, 0, work_canvas_size, work_canvas_size);
+            const palette = overall_palette.map(hexToRgb);
+            imageData = draw_arbitrary_onto_imageData_with_color_palette(imageData, {"foliage": add_plant_idx, "simple_feature": -1, "complex_feature": -1}, FOLIAGE_SPRITE_DATA[add_plant_idx], palette, false);
+            ctx.putImageData(imageData, 0, 0);
+            let link = document.createElement('a');
+            link.download = 'endless_garden_sprite.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }));
+
+        document.getElementById("sketcher_button_div").appendChild(gen_toggle_button("Show Grid", toggle_borders));
+        //document.getElementById("sketcher_button_div").appendChild(gen_toggle_button("alt colors", swap_colors));
+        updatePlants();
     </script>
     </body>
 </html>

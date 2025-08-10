@@ -1053,3 +1053,13 @@ particle {
    -ms-user-select: none;
    user-select: none;
 }
+
+#canvas_array{
+    display: grid;
+    grid-template-columns: repeat(32, 1fr);
+    width: 30vw;
+    height: 30vw;
+    border-style: solid;
+    border-width: thin;
+    border-color: var(--hover-color);
+}
