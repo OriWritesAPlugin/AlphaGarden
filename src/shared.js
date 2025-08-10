@@ -226,6 +226,15 @@ function hexToRgb(hex) {
   ] : null;
 }
 
+function componentToHex(c) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) {
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
 function get_overlay_color_from_name(color, alpha){
   color = color.slice(1);
   if(Object.prototype.hasOwnProperty.call(available_overlay_colors, color)){ color = available_overlay_colors[color]; }
@@ -605,7 +614,7 @@ export {gen_toggle_button, gen_func_button, createSpacedPlacementQueue, shuffleA
   randomFromArray, randomValueFromObject, getRandomKeyFromObj, addRadioButton, makeSortCheckmark,
   getRadioValue, toHue, hexToRgb, addSeedPoints, getSeedCollectionAsString, getGoodieCollection, getMarkedBases,
   getMarkedPalettes, getOffsetColor, get_toggle_button_setting, sortAndVerifySeedList,
-  export_save, import_save, delete_save, cycle_toggle_value};
+  export_save, import_save, delete_save, cycle_toggle_value, rgbToHex};
   
   
   

@@ -382,14 +382,14 @@ function get_absolute_offset(inner_offset, offset_data, center_factor) {
 }
 
 // Basically, draw plants
-function draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, offset_data, palette, center, initial_offset = 0) {
+function draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, offset_data, palette, center, initial_offset = 0, overwrite=false) {
     let i = 0;
     let raw_data = offset_data['e'];
     let x_center = center ? Math.floor((work_canvas_size - offset_data["w"]) / 2) : 0;
     while (i < raw_data.length) {
         let pos = initial_offset + get_absolute_offset(i, offset_data, x_center);
         let char = raw_data.charCodeAt(i);
-        if (char == 48 || imageData.data[pos]) { /* empty */ } // 0, an empty pixel, or we already drew something with the subpart system
+        if (char == 48 || (!overwrite && imageData.data[pos])) { /* empty */ } // 0, an empty pixel, or we already drew something with the subpart system
         // 1, a hard white pixel
         else if (char == 49) { imageData.data[pos] = 255; imageData.data[pos + 1] = 255; imageData.data[pos + 2] = 255; imageData.data[pos + 3] = 255; }
         // Our 12 colors, also a common case
@@ -403,9 +403,19 @@ function draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data,
             if (char === 77) {
                 addon_num = plant_data["complex_feature"];
                 chance = 0.8
+                if(addon_num == -1){  // Very special case: sprite sketcher doesn't want to do the replace
+                    imageData.data[pos] = 255; imageData.data[pos+1] = 255; imageData.data[pos+2] = 255; imageData.data[pos+3] = 255;
+                    i++;
+                    continue;
+                }
             } else {
                 addon_num = plant_data["simple_feature"];
                 chance = 0.4;
+                if(addon_num == -1){  // Very special case: sprite sketcher doesn't want to do the replace
+                    imageData.data[pos] = 255; imageData.data[pos+1] = 255; imageData.data[pos+2] = 255; imageData.data[pos+3] = 255;
+                    i++;
+                    continue;
+                }
             }
             if (chance < Math.random()) { continue; }
             let mini_data = ADDON_SPRITE_DATA[addon_num];
@@ -541,5 +551,6 @@ export {
     genWithModifiedSeedChances, palettes_by_category, foliage_by_category, calculateSeedChances, decode_plant_data,
     encode_plant_data_v2, overall_palette, gen_plant_data, gen_plant, gen_named, base_foliage_palette,
     base_feature_palette, base_accent_palette, random_from_list, work_canvas_size, parse_plant_data, samplePlantColor,
-    assemble_categories, xmur3, mulberry32, drawPlantForSquare, addMarkings, getMainPaletteFromSeed, plant_cache
+    assemble_categories, xmur3, mulberry32, drawPlantForSquare, addMarkings, getMainPaletteFromSeed, plant_cache,
+    draw_arbitrary_onto_imageData_with_color_palette
 };

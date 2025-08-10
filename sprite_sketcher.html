@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1" />
+    <head>
+        <title>Sprite Sketcher [EG]</title>
+        <link rel="stylesheet" type="text/css"  href="shared.css" />
+        <link rel="icon" href="https://i.imgur.com/fRqhbd7.png">
+    </head>
+    <body draggable="false">
+        <script type="text/javascript" src="./built/virtually_universal_config.js"></script>
+        <a href="./" class="index_link"><--Home</a>
+        <h1 id="title">Sprite Sketcher</h1>
+        <h2 id="subtitle">Draw new plants and test them in realtime!</h2>
+        </br>
+        <div id="page_layout" style="display: flex; flex-wrap: wrap">
+            <div id="color_selector" style="display: grid"></div>
+            <div id="false_canvas">
+                <div id="settings"></div>
+                <div id="canvas_array" style="display: grid; grid-template-columns: repeat(32, 1fr); width: 30vw; height: 30vw"></div>
+            </div>
+            <div id="plant_previews" style="display: grid; grid-template-columns: repeat(6, 1fr)"></div>
+        </div>
+        <div id="garden_preview"></div>
+
+    </body>
+    <script type="module">
+        import {FOLIAGE_SPRITE_DATA} from "./built/data.js";
+        import {work_canvas_size, gen_plant_data, encode_plant_data_v2, drawPlantForSquare, draw_arbitrary_onto_imageData_with_color_palette, overall_palette, plant_cache} from "./built/gen_plant.js";
+        import {hexToRgb, rgbToHex} from "./built/shared.js";
+
+        const colors = [["#aed740", "leaves/vines"], ["#76c935", "leaves/vines"], ["#50aa37", "leaves/vines"], ["#2f902b", "leaves/vines"],
+                  ["#f3addd", "rock/wood"], ["#d87fbc", "rock/wood"], ["#c059a0", "rock/wood"], ["#aa3384", "rock/wood"],
+                  ["#fef4cc", "flower/gem/accent"], ["#fde47b", "flower/gem/accent"], ["#ffd430", "flower/gem/accent"], ["#ecb600", "flower/gem/accent"],
+                  ["#e900ff", "simple feature"], ["#ff943a", "complex feature"],
+                  ["#9fe389", "10% glow"], ["#c8ffb7", "25% glow"], ["#ffffff", "white"], ["#0000", "erase"]];
+
+        const color_lookup = {
+            174: { 215: { 64: 'A' } }, 118: { 201: { 53: 'B' } }, 80: { 170: { 55: 'C' } }, 47: { 144: { 43: 'D' } },
+            254: { 244: { 204: 'E' } }, 253: { 228: { 123: 'F' } }, 255: { 212: { 48: 'G' }, 148: { 58: 'M' } },
+            236: { 182: { 0: 'H' } }, 243: { 173: { 221: 'I' } }, 216: { 127: { 188: 'J' } }, 192: { 89: { 160: 'K' } },
+            170: { 51: { 132: 'L' } }, 233: { 0: { 255: 'N' } }, 200: { 255: { 183: 'O' } }, 159: { 227: { 137: 'P' } }
+        };
+
+        const add_plant_idx = FOLIAGE_SPRITE_DATA.length;
+        const num_plants_to_display = 24;
+        const display_plant_data = []
+        for(let i=0; i<num_plants_to_display; i++){
+            let plant_data = gen_plant_data();
+            if(i%3!=0){
+                plant_data["foliage"] = add_plant_idx;
+            }
+            display_plant_data.push(plant_data);
+        }
+
+        let active_color = "#50aa37";
+
+        let img_data; {let canvas = document.createElement('canvas'); let context = canvas.getContext('2d');
+            img_data = context.getImageData(0, 0, work_canvas_size, work_canvas_size).data;};
+
+        let parent = document.getElementById("canvas_array");
+        for(let i=0; i<work_canvas_size*work_canvas_size; i++){
+            let pixel = document.createElement("div");
+            pixel.className = "pixel";
+            pixel.id = "px_"+i;
+            parent.appendChild(pixel);
+        }
+
+        parent = document.getElementById("color_selector");
+        for(let i=0; i<colors.length; i++){
+            let button = document.createElement("button");
+            button.style.backgroundColor = colors[i][0];
+            button.style.color = i==colors.length-1? "white" : "black";
+            button.innerText = colors[i][1];
+            button.onclick = function(){active_color = colors[i][0]};
+            parent.appendChild(button);
+        }
+
+        async function uploadSprite(){
+            let img = await preload_single_image(document.getElementById("image_injector").value);
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+            context.drawImage(img, 0, 0);
+            let img_data = context.getImageData(0, 0, work_canvas_size, work_canvas_size).data;
+            updatePlants();
+            updateGrid();
+        }
+
+        function doPaint(e){
+            if(e.buttons === 1){
+                e.target.style.backgroundColor=active_color;
+                let as_list = active_color === "#0000"? [0, 0, 0, 0] : hexToRgb(active_color).concat([255]); // silly given our fairly fixed set...
+                let offset = Number(e.target.id.slice(3))*4;
+                img_data[offset] = as_list[0];
+                img_data[offset+1] = as_list[1];
+                img_data[offset+2] = as_list[2];
+                img_data[offset+3] = as_list[3];
+            }
+        }
+
+        function updateGrid(){
+            let parent = document.getElementById("canvas_array");
+            let plant_data = {"foliage": add_plant_idx, "simple_feature": -1, "complex_feature": -1};
+            draw_arbitrary_onto_imageData_with_color_palette(img_data, plant_data, FOLIAGE_SPRITE_DATA[add_plant_idx], overall_palette, false);
+            for(let i=0; i<img_data.length; i+=4){
+                parent.childNodes[i/4] = rgbToHex(img_data[i], img_data[i+1], img_data[i+2]);
+            }
+        }
+
+        function saveImage(){
+
+        }
+
+        function updatePlants(){
+            let data = "";
+            let custom_colors = {};
+            let accursed_color_lookup = structuredClone(color_lookup);
+            for (let i = 0; i < img_data.length; i += 4) {
+                if (img_data[i + 3] < 40) { data += '0' }
+                else if (img_data[i] in accursed_color_lookup && img_data[i + 1] in accursed_color_lookup[img_data[i]] && img_data[i + 2] in accursed_color_lookup[img_data[i]][img_data[i + 1]]) {
+                    data += accursed_color_lookup[img_data[i]][img_data[i + 1]][img_data[i + 2]];
+                }
+                else if (img_data[i] == 255 && img_data[i] == 255 && img_data[i] == 255) {
+                    data += '1';
+                } else {
+                    let char_code = String.fromCharCode(97 + Object.keys(custom_colors).length);
+                    accursed_color_lookup[img_data[i]] = {};
+                    accursed_color_lookup[img_data[i]][img_data[i + 1]] = {};
+                    accursed_color_lookup[img_data[i]][img_data[i + 1]][img_data[i + 2]] = char_code;
+                    custom_colors[char_code] = [img_data[i], img_data[i + 1], img_data[i + 2], img_data[i + 3]];
+                    data += char_code;
+                }
+            }
+            for (var member in plant_cache) delete plant_cache[member];
+            FOLIAGE_SPRITE_DATA[add_plant_idx] = { "w": work_canvas_size, "h": work_canvas_size, "l": 0, "m": 0, "e": data, "x": custom_colors, "s": 1 };
+            let color_div = document.getElementById("plant_previews");
+            color_div.innerHTML = "";
+            for (let i = 0; i < num_plants_to_display; i++) {
+                let swap_square = document.createElement('button');
+                swap_square.className = 'dotted_plant_box';
+                swap_square.style.borderWidth = 0;
+                let plant_data = display_plant_data[i];
+                let data_url = drawPlantForSquare(encode_plant_data_v2(plant_data));
+                swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
+                color_div.appendChild(swap_square);
+            }
+        }
+
+
+
+        document.getElementById("canvas_array").style.gridTemplateColumns = "repeat("+work_canvas_size+", 1fr)";
+        document.getElementById('canvas_array').addEventListener('mousedown', doPaint);
+        document.getElementById('canvas_array').addEventListener('mousemove', doPaint);
+        document.getElementById('canvas_array').addEventListener('mouseup', updatePlants);
+    </script>
+    </body>
+</html>

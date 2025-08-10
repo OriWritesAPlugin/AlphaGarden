@@ -11,7 +11,7 @@
     --accent-medium: #71b280;
     --accent-bright: #c4fad1;
     --plant-display: 110px;
-    --min-plant-display: 90px;
+    --min-plant-display: 96px;
     --horiz-screen-cutoff: 992;  /*BEWARE! This can't be used in media selectors, hence lack of units. It's here for easy find-replace*/
     --garden-font-color: #001133 ;
 }
@@ -1038,4 +1038,18 @@ particle {
 
 .accent-text {
     color: var(--accent-bright);
+}
+
+/** SKETCHER **/
+.pixel{
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--input-color);
+    min-width: 3px;
+    min-height: 3px;
+   -moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
 }
