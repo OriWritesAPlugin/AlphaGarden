@@ -273,6 +273,28 @@ function addRadioButton(parent, name, label, checked, onclick=null) {
   parent.appendChild(radio_button_label);
 }
 
+function addStylizedRadioButton(parent, name, label, checked, onclick=null) {
+  let radio_button = document.createElement('input');
+  radio_button.setAttribute('type', 'radio');
+  radio_button.setAttribute('name', name);
+  radio_button.className = "radio-button";
+  radio_button.style.display = "none";
+  let id = name + "_" + label;
+  radio_button.id = id;
+  radio_button.checked = checked;
+  radio_button.value = label;
+  let radio_button_label = document.createElement('label');
+  radio_button_label.setAttribute('for', id);
+  radio_button_label.textContent = label;
+  radio_button_label.classList.add("unselectable");
+  radio_button_label.classList.add("prompt_label");
+  if(onclick != null){
+    radio_button.onclick = onclick;
+  }
+  parent.appendChild(radio_button);
+  parent.appendChild(radio_button_label);
+}
+
 
 function getRadioValue(name) {
   var ele = document.getElementsByName(name);
@@ -614,7 +636,7 @@ export {gen_toggle_button, gen_func_button, createSpacedPlacementQueue, shuffleA
   randomFromArray, randomValueFromObject, getRandomKeyFromObj, addRadioButton, makeSortCheckmark,
   getRadioValue, toHue, hexToRgb, addSeedPoints, getSeedCollectionAsString, getGoodieCollection, getMarkedBases,
   getMarkedPalettes, getOffsetColor, get_toggle_button_setting, sortAndVerifySeedList,
-  export_save, import_save, delete_save, cycle_toggle_value, rgbToHex};
+  export_save, import_save, delete_save, cycle_toggle_value, rgbToHex, addStylizedRadioButton};
   
   
   

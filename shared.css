@@ -42,7 +42,7 @@ a:hover {
     -ms-interpolation-mode: nearest-neighbor;
 }*/
 
-button, input {
+button, input, .prompt_label {
     background-color: var(--input-color);
     color: var(--font-color);
     font-family: monospace, Verdana, sans-serif;
@@ -106,7 +106,8 @@ input.chunky_fullwidth,
 button.chunky_fullwidth,
 button.todo_chunky,
 button.layer_control,
-button.layer_create {
+button.layer_create,
+.prompt_label {
     font-family: monospace, Verdana, sans-serif;
     border-radius: 10px;
     padding: 0.2em 1em;
@@ -114,6 +115,17 @@ button.layer_create {
     display: inline-block;
     border: 0px;
     font-size: 1.4em;
+}
+
+.prompt_label {
+    width: 100%;
+    text-align: center;
+    padding: 0 1em 0 1em;
+    margin: 5px;
+}
+
+.prompt_label:hover {
+    background-color: var(--hover-color);
 }
 
 input.chunky_wrap, button.chunky_wrap {
@@ -319,12 +331,11 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     color: var(--accent-bright);
 }
 
-.generic_button_box {
+.generic_button_box, .challenge_button_box {
     border-radius: 20px;
     border-color: var(--font-color);
     border-width: thin;
     border-style: solid;
-    width: 60%;
     background-color: var(--background-color);
     align-items: center;
     justify-content: center;
@@ -332,8 +343,14 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     flex-direction: column;
     flex-wrap: wrap;
     display:flex;
-    padding:0 10vw 1em 10vw;
+    padding:1em;
     margin:1em 0em;
+    width: fit-content;
+}
+
+.generic_button_box {
+    width: 60%;
+    padding:0 10vw 1em 10vw;
 }
 
 @media screen and (max-width: 992px) {
@@ -875,11 +892,6 @@ particle {
   }
 }
 
-.radio-button input[type="radio"] {
-    display: none;
-    accent-color: var(--accent-medium);
-}
-
 .radio-button label {
     display: inline-block;
     color: var(--font-color);
@@ -891,6 +903,18 @@ particle {
     color: var(--link-color);
     font-weight: bold;
     text-decoration-line: underline;
+}
+
+.radio-button input[type="radio"]:checked+.prompt_label {
+    color: var(--link-color);
+    background-color: var(--hover-color);
+    font-weight: normal;
+    text-decoration-line: none;
+}
+
+.prompt_plants{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
 }
 
 .splice-check input[type="checkbox"] {
@@ -1062,4 +1086,24 @@ particle {
     border-style: solid;
     border-width: thin;
     border-color: var(--hover-color);
+}
+
+/** CHALLENGES **/
+#prompt_organizer{
+    display:flex;
+    flex-direction:row;
+    justify-content:center
+}
+
+#prompt_text{
+    width: 20vw;
+}
+
+@media screen and (max-width: 992px) {
+    #prompt_organizer{
+        flex-direction: column;
+    }
+    #prompt_text{
+        width: 80vw;
+    }
 }
