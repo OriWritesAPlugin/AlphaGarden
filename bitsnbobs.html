@@ -11,8 +11,8 @@
   <script type="text/javascript" src="./built/virtually_universal_config.js"></script>
   <a href="./" class="index_link"><--Home </a>
   <div id="challenge_stacker" style="display:flex; flex-direction:column; align-content:center; width:fit-content; margin: auto">
-    <h1 id="title">Challenges</h1>
-    <p id="subtitle">Little one-off ways to earn plants. Suggest more!</p>
+    <h1 id="title">Bits 'n Bobs</h1>
+    <p id="subtitle">Littler ways to earn plants. Suggest more!</p>
     <h2 style="margin-bottom:0px">Writing/Art Prompts</h2>
     <div id="prompt_organizer">
       <div id="prompt_type_select" class="challenge_button_box" style="flex-grow: 1; justify-content: left; align-content: center;">
@@ -26,8 +26,17 @@
         <p>To claim this plant:</p>
         <div id="prompt_prize_box" style="width: 96px; height: 96px"></div>
         <p id="prompt_instructions" style="width: 25vw; margin-bottom: 0px;"></p>
-        <p id="prompt_text">[cool prompt here]</p>
+        <p id="prompt_text" style="min-height: 6em;">[cool prompt here]</p>
         <button id="prompt_claim">I did it!</button>
+      </div>
+    </div>
+    <h2 style="margin-bottom:0px">Plants by Name</h2>
+    <div id="seed_by_name_organizer">
+      <div id="seed_by_name_claimer" class="challenge_button_box" style="width: auto; flex-grow: 2; text-align: center;">
+        <p>This little thing turns a name/id/username/etc. into a plant. It's meant to allow you to get one unique to you! Doesn't have to be your "government name", really any snippet of text that's meaningful. If someone else enters that snippet, they'll get the same plant. Please also feel free to use it to get one for a friend, or for an OC near and dear to your heart :)</p>
+        <input type="text" id="seed_by_name_entry_field" placeholder="enter here"></input>
+        <button id="seed_by_name_button">Get it!</button>
+        <div id="seed_by_name_display" style="width: 96px; height: 96px"></div>
       </div>
     </div>
   </div>
@@ -36,7 +45,7 @@
 <script type="module">
   import {gen_plant_data, random_from_list, xmur3, mulberry32, drawPlantForSquare, encode_plant_data_v2} from "./built/gen_plant.js";
   import {all_foliage, all_palettes} from "./built/data.js";
-  import {addStylizedRadioButton, collectSeed} from "./built/shared.js";
+  import {addStylizedRadioButton, collectSeed, bubble_out} from "./built/shared.js";
 
   let active_prompt = "Writing";
   const d = new Date();
@@ -48,12 +57,12 @@
   }
   let num_claimed_this_day = localStorage["cprompt_claim"] ? parseInt(localStorage["cprompt_claim"]) : 0;
   let prompt_chosen_offsets = [0,0,0];
-  const color_arrangements = [[0, 1, 2], [2, 2, 1], [0, 2, 2], [1, 2, 1], [0, 0, 0]];
+  const color_arrangements = [[0, 1, 2], [2, 2, 1], [0, 2, 2], [1, 2, 1], [1, 0, 0]];
   const prompt_fragments = {
     "Character": [
       "How did they end up with their current profession, if they have one?",
       "How has their life turned out differently than they expected?",
-      "Where do they fall on the Kinsey scale? Are they aware of where they are? Do they think about things like that?",
+      "Do they feel romantic interest? If so, what trait(s), gender(s), etc. do they gravitate towards?",
       "Do a quick writeup of a recent text/email/letter/other written exchange they were involved in",
       "What would they bring to a party, and what would they do, broadly, on arrival? (Stay in the corner with the dog, DJ...)",
       "A diary entry from their last adventure",
@@ -63,24 +72,35 @@
       "How did their last major setback (or any standout setback) affect them longterm?",
       "When something bad happens, do they bounce back quickly or tend to dwell?",
       "Who would their favorite superhero (or celebrity, etc.) be?",
-      "Any embarrassing memories?"
+      "Any embarrassing memories?",
+      "Biggest goal they'll never reach?",
+      "Biggest goal they've already reached?",
+      "Who's their best friend?", "Any living family? Not-so-living?",
+      "Let's say they're meeting someone for the first time. How do they approach them? How do they get to know them?",
+      "Are they where they expected to be in life?",
+      "Do they have any comfort foods?",
+      "What subject are they most knowledgeable in?",
+      "What would they be doing if not for their current [mis]adventures?",
+      "Is there any authority they answer to?",
     ],
     "Worldbuilding": [
       "What was the last major conflict?",
       "Does the average person have many opportunities for travel? How do they get around?",
-      "Write an account of an in-universe religious ceremony",
-      "What's a profession fairly unique to this world?",
+      "Write an account of an in-universe religious ceremony", "How is disease handled?",
+      "What's a profession fairly unique to this setting?", "What 'bread and circuses' are offered to people, if any?",
       "Is the life of the world changing much? (Ex: rate of evolution, extinction...)",
-      "A quick writeup on a lifeform unique to this world",
+      "A quick writeup on a lifeform unique to this world", "What changes with the seasons (if any)?",
       "What would a fairly typical meal be in a larger settlement? What about in a smaller one?",
-      "Where does the food come from?",
-      "An overview of a major trade route and what's carried along it",
-      "A report from a recent major weather event",
-      "Who keeps the roads safe? Repaired?",
+      "Where does the food come from?", "What do most people do for a living?", "What sort of research is performed? Who funds it?",
+      "An overview of a major trade route and what's carried along it", "A recipe that makes reference to local cooking tech",
+      "A report from a recent major weather event", "What's the most immediately obvious difference between someone rich and poor?",
+      "Who keeps the roads safe? Repaired?", "How does the average person dress?",
       "Pick any two factions and do a quick writeup on their relations",
       "How optimistic/pessimistic is the average member of a given faction about the future? What do they think is coming?",
       "What does their idea of sci-fi look like (or historical fantasy, if you prefer)?",
-      "What's the current trend/fashion/craze?"
+      "What's the current trend/fashion/craze?", "What's the largest living thing?/biggest species overall?",
+      "What's the most common form of government?", "How does nature/wildlife change between day and night?",
+      "How big do families tend to be? Do they stick together or spread out?"
     ],
     "Writing": {"Composition": [
         "journal entry", "folk song", "dating bio", "rhyming poem", "punctuation-free stream-of-consciousness",
@@ -93,15 +113,15 @@
     ],
                 "Challenge": [
         "is exactly 1000 words long", "uses no words ending in -ly", "involves no dialogue OR is only dialogue", "was written long after the fact",
-        "takes place in the far past/future", "is written without using backspace", "is edited down to 2/3 the length once finished",
+        "is set in the far past/future", "is written without using backspace", "is edited down to 2/3 the length once finished",
         "was worked on for exactly 10 minutes (set a timer!)", "you read aloud while writing", "is about an existing character (including of yours)",
         "includes a response/attachment/commentary at the end by someone in-universe", "is written from two points of view",
         "would seem insane in-universe", "is edited for a drastic tone change (in as few words as possible)", "captures the cozy everyday",
         "involves speculative biology", "is for a genre you don't usually read/write", "includes an action scene", "includes dialogue",
-        "has an animal somewhere in it", "starts at the end (however you interpret that)", "takes place underwater or underground",
+        "has an animal somewhere in it", "starts at the end (however you interpret that)", "is set underwater or underground",
         "appreciates nature", "is a little cheesy", "lies", "gets interrupted partway through", "gets a little philosophical",
         "includes a snippet about where it's from/how it was discovered", "takes itself too seriously",
-        "uses only 'simple' words (however you interpret that)", "follows from a neat fact you learned recently",
+        "uses only simple words (however you interpret that)", "follows from a neat fact you learned recently",
         "starts with a sentence not your own (ex: look up a news story and pick one at random)"
     ]},
     "Drawing": {"Composition": [
@@ -116,26 +136,33 @@
 
   function change_prompt(){
     let prng = mulberry32(xmur3(daily_random_seed+num_claimed_this_day)());
-    let chosen_bases = Array.from({length: 5}, ()=>{return Math.floor(prng()*all_foliage.length)});
-    let chosen_palettes = Array.from({length: 15}, ()=>{return Math.floor(prng()*all_palettes.length)});
+    let chosen_plants = Array.from({length: 5}, (e, i)=>{return gen_plant_data(0, i+daily_random_seed+num_claimed_this_day)});
+    let chosen_bases = [];
+    let chosen_palettes = [];
+    for(let i=0; i<5; i++){
+      chosen_bases.push(chosen_plants[i]["foliage"]);
+      chosen_palettes.push(chosen_plants[i]["foliage_palette"]);
+      chosen_palettes.push(chosen_plants[i]["feature_palette"]);
+      chosen_palettes.push(chosen_plants[i]["accent_palette"]);
+    }
     document.getElementById("prompt_choose_sprite").innerHTML = "";
     document.getElementById("prompt_choose_palette").innerHTML = "";
     document.getElementById("prompt_choose_colors").innerHTML = "";
-    document.getElementById("prompt_instructions").innerText = active_prompt == "Worldbuilding" || active_prompt == "Character" ? "Write a paragraph or so to answer this question/prompt:" : "Create something that fits this prompt:";
+    document.getElementById("prompt_instructions").innerText = active_prompt == "Worldbuilding" || active_prompt == "Character" ? "write a paragraph or so to answer:" : "create something that fits this prompt:";
     if(active_prompt == "Writing" || active_prompt == "Drawing"){
       for(let i=0; i<5; i++){
-        add_prompt_square(document.getElementById("prompt_choose_sprite"), "prompt_choose_sprite_"+i, chosen_bases[i], [42, 32, 12], 0, i, prompt_chosen_offsets[0])
+        add_prompt_square(document.getElementById("prompt_choose_sprite"), "prompt_choose_sprite_"+i, chosen_bases[i], [4, 81, 91], 0, i, prompt_chosen_offsets[0])
       }
       for(let i=0; i<5; i++){
         add_prompt_square(document.getElementById("prompt_choose_palette"), "prompt_choose_palette"+i, chosen_bases[prompt_chosen_offsets[0]], [chosen_palettes[i*3], chosen_palettes[i*3+1], chosen_palettes[i*3+2]], 1, i, prompt_chosen_offsets[1])
       }
       let used_palettes = [chosen_palettes[3*prompt_chosen_offsets[1]], chosen_palettes[3*prompt_chosen_offsets[1]+1], chosen_palettes[3*prompt_chosen_offsets[1]+2]]
       for(let i=0; i<5; i++){
-        add_prompt_square(document.getElementById("prompt_choose_colors"), "prompt_choose_colors"+i, chosen_bases[prompt_chosen_offsets[0]], [used_palettes[color_arrangements[i][0]], used_palettes[color_arrangements[i][1]], used_palettes[color_arrangements[i][2]]], 2, i, prompt_chosen_offsets[2])
+        add_prompt_square(document.getElementById("prompt_choose_colors"), "prompt_choose_colors"+i, chosen_bases[prompt_chosen_offsets[0]], used_palettes, 2, i, prompt_chosen_offsets[2])
       }
     } else {
       for(let i=0; i<5; i++){
-        add_prompt_square(document.getElementById("prompt_choose_colors"), "prompt_choose_sprite"+i, chosen_bases[i], [chosen_palettes[i*3], chosen_palettes[i*3+1], chosen_palettes[i*3+2]], 2, i, prompt_chosen_offsets[2])
+        add_prompt_square(document.getElementById("prompt_choose_colors"), "prompt_choose_sprite"+i, chosen_bases[i], [chosen_palettes[i*3], chosen_palettes[i*3+1], chosen_palettes[i*3+2]], 2, i, prompt_chosen_offsets[2], true)
       }     
     }
     let prompt;
@@ -165,18 +192,18 @@
 
 
   // Largely similar to bingo squares but self_care and really I should refactor huh
-  function add_prompt_square(parent, id, base_to_use, selected_palettes, row, idx, active_idx) {
+  function add_prompt_square(parent, id, base_to_use, selected_palettes, row, idx, active_idx, is_short=false) {
       let swap_square = document.createElement('div');
       swap_square.id = id;
       swap_square.className = 'plant_box_nohover';
-      swap_square.style.borderColor = idx == active_idx ? "white" : "transparent";
-      swap_square.style.borderWidth = "thin";
+      swap_square.style.borderWidth = idx == active_idx ? "thin" : 0;
       swap_square.onclick = function(){prompt_chosen_offsets[row] = idx; change_prompt()}.bind(row, idx);
-      let plant_data = gen_plant_data(0);
+      let plant_data = gen_plant_data(0, JSON.stringify(selected_palettes));
       plant_data["foliage"] = base_to_use;
-      plant_data["foliage_palette"] = selected_palettes[0];
-      plant_data["feature_palette"] = selected_palettes[1];
-      plant_data["accent_palette"] = selected_palettes[2];
+      plant_data["foliage_palette"] = row==2 && !is_short? selected_palettes[color_arrangements[idx][0]] : selected_palettes[0];
+      plant_data["feature_palette"] = row==2 && !is_short? selected_palettes[color_arrangements[idx][1]] : selected_palettes[1];
+      plant_data["accent_palette"] = row==2 && !is_short? selected_palettes[color_arrangements[idx][2]] : selected_palettes[2];
+      console.log(JSON.stringify(plant_data));
       let seed = encode_plant_data_v2(plant_data);
       let data_url = drawPlantForSquare(seed);
       swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
@@ -194,8 +221,20 @@
   function claim_and_reroll(){
     num_claimed_this_day += 1
     localStorage["cprompt_claim"] = num_claimed_this_day;
-    collectSeed(document.getElementById("prompt_prize_box").getAttribute("seed"));
+    let target = document.getElementById("prompt_prize_box")
+    bubble_out(target, target.getAttribute("seed"));
+    collectSeed(target.getAttribute("seed"));
     change_prompt();
+  }
+
+  function claim_name_plant(){
+    let plant_data = gen_plant_data(0, document.getElementById("seed_by_name_entry_field").value);
+    let seed = encode_plant_data_v2(plant_data);
+    let target = document.getElementById("seed_by_name_display");
+    let data_url = drawPlantForSquare(seed);
+    target.style.background = 'url(' + data_url + ')  no-repeat center center';
+    bubble_out(target, seed);
+    collectSeed(seed);
   }
 
   let prompt_type_div = document.getElementById("prompt_type_select");
@@ -206,6 +245,7 @@
   addStylizedRadioButton(prompt_type_div, "prompt_type", "Worldbuilding", false, ()=>{active_prompt="Worldbuilding"; change_prompt()});
   addStylizedRadioButton(prompt_type_div, "prompt_type", "Generic", false, ()=>{active_prompt="Generic"; change_prompt()});
   document.getElementById("prompt_claim").onclick = claim_and_reroll;
+  document.getElementById("seed_by_name_button").onclick = claim_name_plant;
   change_prompt();
 
 
