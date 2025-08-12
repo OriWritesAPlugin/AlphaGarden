@@ -262,7 +262,7 @@ function draw_outline_v2(template_canvas: HTMLCanvasElement) {
             this_is_background = true;
         } else {
             this_is_background = false;
-            most_recent_color = [main_imgData[i] * 0.8, main_imgData[i + 1] * 0.8, main_imgData[i + 2] * 0.8, 255];
+            most_recent_color = [main_imgData[i] * 0.7, main_imgData[i + 1] * 0.7, main_imgData[i + 2] * 0.7, 255];
             //most_recent_color = [main_imgData[i] * 1, main_imgData[i + 1] * 1, main_imgData[i + 2] * 1, 255];
         }
         // Note: because our "pixels" are 2x2, this shouldn't cause troubles at the corners...I think

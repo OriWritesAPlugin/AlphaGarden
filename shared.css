@@ -117,6 +117,10 @@ button.layer_create,
     font-size: 1.4em;
 }
 
+.active {
+    background-color: var(--hover-color);
+}
+
 .prompt_label {
     width: 100%;
     text-align: center;
@@ -482,7 +486,6 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     padding-bottom: 4px;
     resize: none;
     text-align: left;
-    max-height: min(20vh, 120px);
     overflow: scroll;
 }
 
@@ -738,11 +741,16 @@ input.layer_label {
 }
 
 .directory_link,
+.deactivated_directory_link,
 .index_link {
     font-size: 1.4rem;
     line-height: 1.4;
     text-decoration: none;
     margin-left: 5px;
+}
+
+.deactivated_directory_link{
+    color: var(--text-outline);
 }
 
 .directory_link:hover,
@@ -837,6 +845,7 @@ particle {
     transition: all 0.75s linear;
     overflow-x: hidden;
     box-sizing: border-box;
+    background-color: var(--background-color);
 }
 
 .garden_util_box_fixed {
