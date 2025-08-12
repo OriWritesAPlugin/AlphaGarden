@@ -1,5 +1,5 @@
 import { all_palettes, FOLIAGE_SPRITE_DATA, PALETTE_PREVIEW_IMG, all_foliage } from "../data.js";
-import { getSeedCollectionAsString, addSeedPoints, getSeedPoints, collectSeed, makeSortCheckmark, buildColorMessage, toHue, getSeedCollection, bubble_out } from "../shared.js";
+import { getSeedCollectionAsString, export_save, addSeedPoints, getSeedPoints, collectSeed, makeSortCheckmark, buildColorMessage, toHue, getSeedCollection, bubble_out } from "../shared.js";
 import { gen_plant, decode_plant_data, encode_plant_data_v2, foliage_by_category, palettes_by_category, parse_plant_data, overall_palette, work_canvas_size } from "../gen_plant.js";
 import { replace_color_palette } from "../image_handling.js";
 
@@ -39,7 +39,7 @@ function checkIfRefreshNeeded() {
 }
 
 function getDisplayOptions() {
-    if (localStorage.seed_collection == undefined) {
+    if (localStorage.display_options == undefined) {
         localStorage.display_options = JSON.stringify({ "n": 0, "p": 0, "r": 1, "s": 0 });
     }
     const options = JSON.parse(localStorage.display_options);
@@ -59,22 +59,23 @@ function setDisplayOptions() {
 }
 
 function doBackup() {
-    var a = document.createElement('a');
+    /*var a = document.createElement('a');
     var blob = new Blob([getSeedCollectionAsString()], { 'type': 'application/octet-stream' });
     a.href = window.URL.createObjectURL(blob);
     a.download = "seed_collection_" + new Date().toJSON().slice(0, 10) + ".txt";
-    a.click();
+    a.click();*/
+    export_save();
     let rewarded_points = Math.min(days_since_backup * backup_sp_per_day, max_sp_for_backup);
     if (rewarded_points > 0) {
         addSeedPoints(rewarded_points);
         updateSeedPoints();
         localStorage["last_backup"] = new Date();
     }
-    document.getElementById("backup_button").value = "Backup";
+    document.getElementById("doBackup_button").value = "Backup";
 }
 
 function updateSeedPoints() {
-    document.getElementById("seedstuff_tally").textContent = "Current raw seedstuff: " + getSeedPoints();
+    document.getElementById("seedstuff_tally").textContent = "Raw seedstuff: " + getSeedPoints();
 }
 
 // Really just a "find the first instance and snip" method
@@ -101,8 +102,9 @@ function removeSeedFromCollection(seed) {
 function select_seed(seed) {
     let parent = document.getElementById("selection_display_div");
     let entry = create_collection_entry(parent.children.length, seed, document.getElementById("hide_seeds").checked, document.getElementById("show_palettes").checked);
-    entry.onclick = function () { parent.removeChild(entry) };
+    entry.onclick = function () { parent.removeChild(entry); if(parent.childNodes.length == 0){document.getElementById("copy_selection_button").value = "Copy all"}};
     parent.appendChild(entry);
+    document.getElementById("copy_selection_button").value = "Copy selection";
 }
 
 function prep_recycle_seed(seed) {
@@ -258,6 +260,9 @@ function copy_selection() {
     let seed_list = [];
     for (let child of parent.children) {
         seed_list.push(child.getAttribute("data-seed"));
+    }
+    if(seed_list.length == 0){
+        seed_list = getSeedCollection();
     }
     navigator.clipboard.writeText(seed_list.join(", "));
     button.value = "Copied!"
@@ -435,6 +440,7 @@ function display_collection(do_filter=true) {
         document.getElementById("seed_collection").value = "";
     }
     let collection = getSeedCollection();
+    document.getElementById("plant_tally").textContent = "Plants (and friends): " + collection.length;
     var sort_order_elem = document.getElementsByName('sort_order');
     var sort_order = "None";
     for (i = 0; i < sort_order_elem.length; i++) {
@@ -587,7 +593,7 @@ function doCollectionPreload() {
     if (localStorage["last_backup"] == undefined) { localStorage["last_backup"] = new Date() }
     days_since_backup = Math.round((+new Date() - +new Date(localStorage["last_backup"])) / 8.64e7);
     if (days_since_backup > 0) {
-        document.getElementById("backup_button").value = "Backup (+" + Math.min(days_since_backup * backup_sp_per_day, max_sp_for_backup) + " rs)";
+        document.getElementById("doBackup_button").value = "Backup (+" + Math.min(days_since_backup * backup_sp_per_day, max_sp_for_backup) + " rs)";
     }
     updateSeedPoints();
 }

@@ -31,6 +31,10 @@ a {
     color: var(--link-color);
 }
 
+h2, h3 {
+    margin-bottom: 5px;
+}
+
 a:hover {
     color: var(--accent-bright);
 }
@@ -220,7 +224,7 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     box-shadow: none;
 }
 
-.plant_box, .dotted_plant_box, .got_bingo_box, .swap_box, .swap_box_bought, .plant_box_nohover {
+.plant_box, .bingo_box, .dotted_plant_box, .got_bingo_box, .swap_box, .swap_box_bought, .plant_box_nohover, .self_care_choice, .todo_choice {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -240,11 +244,18 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     transition: all 0.5s ease-out;
 }
 
-.dotted_plant_box, .swap_box, .swap_box_bought {
+.self_care_choice {
+    width: var(--plant-display);
+    height: var(--plant-display);
+    border-style: dashed;
+    border-color: var(--hover-color);
+}
+
+.dotted_plant_box, .swap_box, .swap_box_bought, .bingo_box {
     border-style: dashed;
 }
 
-.dotted_plant_box:hover, .swap_box:hover {
+.dotted_plant_box:hover, .swap_box:hover, .bingo_box:hover, .self_care_choice:hover {
     background-color: var(--hover-color);
     border-color: var(--accent-bright);
     color: var(--accent-bright);
@@ -255,11 +266,20 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     color: var(--accent-bright);
 }
 
-.plant_box:hover {
+.plant_box:hover, .todo_choice:hover {
     -webkit-filter: drop-shadow(1px 1px 2px var(--accent-bright))
                     drop-shadow(-1px -1px 2px var(--accent-bright));
     filter: drop-shadow(1px 1px 2px var(--accent-bright)) 
             drop-shadow(-1px -1px 2px var(--accent-bright));
+}
+
+.todo_choice {
+    margin: auto 0;
+}
+
+.bingo_box {
+    width: 8em;
+    height: 8em;
 }
 
 .swap_box, .swap_box_bought {

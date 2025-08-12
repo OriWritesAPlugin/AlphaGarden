@@ -569,9 +569,12 @@ async function concatUint8Arrays(uint8arrays) {
 async function export_save(){
   var a = document.createElement('a');
   const compressedBytes = await compress(JSON.stringify(localStorage));
-  var blob = new Blob([compressedBytes], { 'type': 'application/octet-stream' });
+  console.log(compressedBytes);
+  // Couple bytes of gobbldygook up front so Linux stops un-gzipping my danged saves.
+  // You reading the save file """encryption""" because you're up to something? :) Yeah just delete the first 4.
+  var blob = new Blob([1,5,'a',2].concat([compressedBytes]), { 'type': 'application/octet-stream' });
   a.href = window.URL.createObjectURL(blob);
-  a.download = "endless_garden_save_" + new Date().toJSON().slice(0, 10) + ".oct";
+  a.download = "endless_garden_save_" + new Date().toJSON().slice(0, 10) + ".egsav";
   a.click();
 }
 
@@ -583,7 +586,7 @@ function import_save(){
     reader.onload = async function(content) {
       try {
         let parsed_content = new Uint8Array(content.target.result);
-        let save_data = await decompress(parsed_content);
+        let save_data = await decompress(parsed_content.slice(4));
         let newLocalData = JSON.parse(save_data);
         for(let entry in newLocalData){
             localStorage[entry] = newLocalData[entry];

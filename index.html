@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1" />
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Endless Garden</title>
         <link rel="stylesheet" type="text/css"  href="shared.css" />
         <link rel="icon" href="https://i.imgur.com/quyjlS6.png">
@@ -47,16 +46,16 @@
     <script>
 // Inevitably, even the index page ends up with javascript.
 const tutorial_stages = [
-    ["Welcome to the Endless Garden","And thanks for stopping by! This site's all about rewarding everyday achievements with a gigantic collection of plants. As you can probably guess from the number of links, there's a lot more than just collecting--splicing, trading, gardening, all sorts of stuff!<br><br>Let's just focus on collecting for now. Hit the self-care bingo link and follow the instructions, clear a few bingo squares. Once a plant (or animal, or rock...) pops up, hit the Home button in the top-left."],
-    ["Congrats on your first plant!","Or 'plant'. We used to only have plants, but now we have everything from deer to magic crystals, you never know what you'll find. Let's go admire your new friend! You can now click on the Collection link. It's got a lot going on, but right now let's just focus on Analyze (selected by default, try tapping any plant) and Backup (tap the button to make a backup). Both are on the right-hand side, or scroll down a bit if on mobile. Go make a backup and return here when you're done!"],
-    ["Saving your data","Hope you liked your collection! It'll only grow from here. How about a technical aside followed by some free stuff? Your Endless Garden data is saved automatically and stored in your browser (localStorage if we're being technical). You can download this site and run it offline if you like! On the other hand, if you use many browsers/devices, that backup file will let you sync progress between them. If you check out the Settings menu, there's an option for loading backups there, but you can also mess with the site's colors if you like. Next time you return to this page, I'll have some new plants for you!"],
-    ["More plants!","Now that you know how to make backups, let's return to the tutorial proper. You might've noticed in your collection that there's some random letters above your plants. Those are its 'seed', sort of its genetic code. If someone else pastes that seed into their own version of the site, they'll get a copy of your plant. Use seeds to share and trade! Here, copy the seeds below (commas and all), go to your Collection, and hit the newly available Add button to paste them in. Then you can hit Recycle, click any you don't like, and turn them into some fresh RS. What's RS? You'll find out when you come back!<br><br>D32UmCPUJQ, D5LzrCC883, C2cN1COiq7, D3pckB+mgC, C4tEvCFBek"],
-    ["New ways to get plants", "Welcome back! Now, as promised, RS. It stands for 'raw seedstuff'. Trade any plant you don't want for RS using Recycle, then swap it for new plants or use it to alter ones you already have (like changing the colors around). You'll get RS other ways too, like clearings tasks off the To-Do list. I just opened it, come back here when you have 20 RS! You can check your total in the Collection."],
+    ["Welcome to the Endless Garden","And thanks for stopping by! This site's all about rewarding everyday achievements with a gigantic collection of plants. There's also splicing, trading, gardens, all sorts of stuff!<br><br>For now, click Self-Care and follow the instructions, then clear a few bingo squares. Once a plant (or animal, or rock...) pops up, hit the Home button in the top-left."],
+    ["Congrats on your first plant!","Or 'plant'. We used to only have plants, but now we have everything from deer to magic crystals, you never know what you'll find. Let's go admire your new friend!<br><br>Click on Collection. It's got a lot going on, but for now let's focus on Analyze (the bigger picture of your plant) and Backup (tap the button to make a backup). Make a backup and hit Home when you're done."],
+    ["Saving your progress","Progress is saved automatically, stored in your browser, and never sent anywhere. If you use many browsers/devices, the backup file you just made will let you sync progress between them. If you check out the Settings menu, there's an option for loading backups there, but you can also mess with the site's colors if you like. Next time you return to this page, I'll have some new plants for you!"],
+    ["More plants!", "Looking at your collection, have you noticed some letters above your plant? Those are its 'seed', a sort of genetic code. If someone pastes that seed into their own collection, they'll get the exact same plant. Use seeds to share and trade! Copy the seeds below (commas and all), go to your Collection, hit the Add button, and paste them in.<br><br>D32UmCPUJQ, D5LzrCC883, C2cN1COiq7, D3pckB+mgC, C4tEvCFBek"],
+    ["New ways to get plants", "Do you like the new plants? If not, no worries--it's time to talk about RS, 'raw seedstuff'. If you ever get a plant you don't like, just go to your collection, hit Recycle, tap the plant(s), then 'Recycle Seeds'. That'll trade them for some RS, which you can swap for new plants or use to alter ones you already have. You'll get RS other ways too, like clearings tasks off the To-Do list and bingo boards. Come back here when you have 15 RS! You can check your total in the Collection."],
     ["Going shopping", "Congrats! Now that you've banked up some RS, we can trade it for more plants. Check out the Seed Swap! New plants show up every day. Get a total of 20 plants in your collection and we'll move on."],
     ["A growing collection", "You're making wonderful progress! Don't worry about speed, your garden is a marathon, not a sprint, and speaking of gardens...but you'll see that one at 35 plants! For now let's just unlock some more ways to earn plants. The general Bingo board is very powerful, and many people's main way of getting seeds. Bits 'n Bobs is for you creative types, and you can get your own 'personal' seed there either way in the second thingy. See you back here at 35 plants..."],
-    ["The garden", "So we've got the 'Endless', but where's the 'Garden'? Good news, you've just unlocked it! The Garden Creator is a big weird thing that lets you arrange your plants all sorts of ways. It's also just fun to mess with. Try it now, just hit the Randomize button a bunch of times. You'll see loads of stuff popping up on the right-hand side, you can click-drag those to reorder them and see what happens. The best way to learn the garden creator is by messing with it. Come back here after giving it a go!"],
-    ["What next?", "Congrats, you've got all the basics! By now you've probably realized there are a LOT of different plants, so we've got one more feature for you: the Completion Tracker. This will let you see how many bases/palettes/goodies (yet another thing) you've found. Check it out now. How many have you found?"],
-    ["You completed the tutorial!", "That's all for now--thanks for bearing with me through it! Any remaining links should be clickable. There's tons to do around here (have you tried mutating your seeds in the Collection? What about making your own in the Sprite Tester? Did you know color names are clickable in Analyze?), but the real heart of your garden is the personal progress it represents. I hope this site helps you and your garden bears wonderful fruit!"],
+    ["The garden", "Congratulations, your collection's large enough for a garden! The Garden Creator lets you arrange your plants in all sorts of ways. It can get fairly in-depth, but an easy way to start is hitting the Randomize button several times. You'll see layers popping up on the right-hand side, click-drag those to reorder and see what happens. The best way to learn the garden creator is by playing with it!"],
+    ["What next?", "Now that you know your way around, you've unlocked the Completion Tracker. This will let you see how many bases/palettes/goodies you've collected. Check it out now--there's quite a few!"],
+    ["You completed the tutorial!", "The tutorial's over, but there's tons left to do--try mutating your seeds in the Collection, making your own in the Sprite Tester, and generally clicking around! The real heart of your garden is the personal progress it represents. I hope this site helps you, and your garden bears wonderful fruit ♥"],
 ];
 
 function lock_link(id){
@@ -71,14 +70,15 @@ function display_tutorial(){
     let tutorial_stage = localStorage.tstage == undefined ? 0 : JSON.parse(localStorage.tstage);
     if(tutorial_stage == -1 || tutorial_stage >= tutorial_stages.length){return;}
     let skip_modal = false;
-    if(tutorial_stage == 6 || tutorial_stage == 7){
-        collection_size = (localStorage["seed_collection"] == undefined ? "" : localStorage["seed_collection"]).split(",").length;
+    if(tutorial_stage == 1 || tutorial_stage == 6 || tutorial_stage == 7){
+        collection_size = localStorage["seed_collection"] == undefined ? 0 : localStorage["seed_collection"].split(",").length;
+        if(tutorial_stage == 1 && collection_size < 1){skip_modal = true;};
         if(tutorial_stage == 6 && collection_size < 20){skip_modal = true;};
         if(tutorial_stage == 7 && collection_size < 35){skip_modal = true;};
     }
     if(tutorial_stage == 5){
         seedpoints = localStorage["seed_points"] == undefined? 0 : JSON.parse(localStorage.seed_points);
-        if(seedpoints < 20){ skip_modal = true};
+        if(seedpoints < 15){ skip_modal = true};
     }
     if(!skip_modal){
         const modal = document.createElement("div");
