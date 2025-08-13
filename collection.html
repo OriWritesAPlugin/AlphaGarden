@@ -53,6 +53,7 @@
                 </div>
                   <span id="plant_tally" title="View the total size of your collection">Plants (and friends): 0</span>
                   <span id="seedstuff_tally" title="Convert unwanted seeds to raw seedstuff using the Recycle option">Raw seedstuff: 0</span>
+                  <span id="temp_collection_disclaimer" class="unselectable" style="color: transparent">.</span>
                   <div id="collection_display_div" class="collection_display">
                     <p id="load_text">Loading plants...</p>
                   </div>
@@ -66,8 +67,8 @@
                   <input id="select_button" type="button" title="Choose seeds to copy them their text to your clipboard (for making gardens). Click a chosen seed to deselect. You can select seeds multiple times!" class="chunky_fullwidth" onclick='changeSelectedFunction("select")' value="Select"></input></br>
                   <input id="mutate_button" type="button" title="Choose seeds to splice or color-cycle" class="chunky_fullwidth" onclick='changeSelectedFunction("mutate")' value="Mutate"></input></br>
                   <input id="recycle_button" type="button" title="Choose seeds to remove from your collection (has confirmation dialogue)" class="chunky_fullwidth" onclick='changeSelectedFunction("recycle")' value="Recycle"></input></br>
-                  <input id="add_button" type="button" title="Paste in seeds to add to your collection" class="chunky_fullwidth" value="Add"></input></br>
-                  <input id="doBackup_button" type="button" title="Back up your seed collection to your computer. Do it early and often! :) You get 3 rs per day for it (max 15)" class="chunky_fullwidth" value="Backup"></input>
+                  <input id="add_button" type="button" title="Paste in seeds to add to your collection (or temporary collection!)" class="chunky_fullwidth" value="Add"></input></br>
+                  <input id="doBackup_button" type="button" title="Back up your seed collection to your computer. Do it early and often! You get 3 rs per day for it (max 15)" class="chunky_fullwidth" value="Backup"></input>
                 </div>
                 </div>
                 <div class="collection_mightcolumn" style="max-width: 50vw">
@@ -96,7 +97,7 @@
                     <div><canvas id="mutate_preview_canvas" width="128" height="128"></canvas></div>
                     <div id="color_cycle_div" style="display: flex; flex-direction: column">
                       <div id="color_cycle_panel" style="display: flex; justify-content: center; height: 100px; flex-direction: row"></div>
-                      <div><p class="collection-utility-text">Select one plant to rotate and swap around its colors, at the cost of 2 raw seedstuff per swap. Select another plant to splice instead.</p></div>
+                      <div><p class="collection-utility-text">Select one plant to rotate and swap around its colors, at the listed cost in raw seedstuff. Select another plant to splice instead.</p></div>
                     </div>
                     <div id="splice_panel" class=splice-check style="display: none; flex-direction: column" hidden>
                       <input id="splice_select_foliage" type="checkbox"></input><label for="splice_select_foliage" class=unselectable>Base</label>

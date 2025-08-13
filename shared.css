@@ -325,6 +325,10 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     margin: auto;
 }
 
+.color_flash_animate {
+    transition:color 0.75s;
+}
+
 .block_window {
     width: 100%;
     height: 100%;
@@ -440,6 +444,7 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 }
 
 .popup,
+.add_seed_popup,
 .bingo-popup,
 .wildcard-popup {
     position: fixed;
@@ -468,6 +473,13 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     display: flex;
     flex-direction: column;
     padding: 1rem;
+}
+
+.add_seed_popup {
+    padding: 3em;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem; 
 }
 
 @media screen and (max-width: 600px) {
@@ -1044,7 +1056,7 @@ particle {
 }
 
 /** GARDEN **/
-#seed_list {
+#seed_list, #seed_collection {
     border-style: solid;
     border-color: var(--text-outline);
     width: 98%;

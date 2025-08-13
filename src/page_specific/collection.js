@@ -5,6 +5,8 @@ import { replace_color_palette } from "../image_handling.js";
 
 var collection_filter = { "base": new Set(), "palette": new Set() };
 var sort_intervals = [];
+let temporary_collection = [];
+let on_temporary_collection = false;
 var days_since_backup;
 var showcase_mode;
 const backup_sp_per_day = 3;
@@ -12,11 +14,30 @@ const max_sp_for_backup = 15;
 // Take the average hue of all 4 colors of each palette
 //const rainbow_offset = all_palettes.map((x, i) => all_palettes[i]["palette"].map(x=>toHue("#"+x)).reduce((a, b) => a + b)/4);
 const rainbow_offset = all_palettes.map((x, i) => toHue("#" + all_palettes[i]["palette"][1]));
-var first_chunk_on_last_sort = getSeedCollectionAsString().slice(0, 50);
+
+function getSeedCollectionAsStringWithTemp(){if(on_temporary_collection){return temporary_collection.join(",")} else {return getSeedCollectionAsString()}};
+function getSeedCollectionWithTemp(){if(on_temporary_collection){return temporary_collection} else {return getSeedCollection()}};
+function collectSeedWithTemp(seed_string){
+    if(on_temporary_collection){ 
+        if(seed_string.length == 0){return};
+        let seeds = seed_string.split(",");
+        let verified_seeds = [];
+        for(const seed of seeds){
+            if(seed.length == 10){
+                verified_seeds.push(seed);
+            } else {
+                alert("You seem to have a malformed seed! Seeds are 10 characters long, but got "+seed+". Skipping!");
+            }
+        }
+        temporary_collection = verified_seeds.concat(temporary_collection);
+    } else {collectSeed(seed_string)}};
+
+
+var first_chunk_on_last_sort = getSeedCollectionAsStringWithTemp().slice(0, 50);
 // TODO: Potentially nasty refactor: replacing all these palette names with an enum somewhere.
 const palette_codes = { 0: "foliage_palette", 1: "feature_palette", 2: "accent_palette" };
 // Thanks to https://stackoverflow.com/questions/31128855/comparing-ecma6-sets-for-equality for this clean oneliner
-const areSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
+const areSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value))
 
 
 window.addEventListener("storage", () => { checkIfRefreshNeeded(); });
@@ -33,7 +54,7 @@ function doSeedOnclick(e) {
 }
 
 function checkIfRefreshNeeded() {
-    if (getSeedCollectionAsString().slice(0, 50) != first_chunk_on_last_sort) {
+    if (getSeedCollectionAsStringWithTemp().slice(0, 50) != first_chunk_on_last_sort) {
         display_collection();
     }
 }
@@ -59,11 +80,6 @@ function setDisplayOptions() {
 }
 
 function doBackup() {
-    /*var a = document.createElement('a');
-    var blob = new Blob([getSeedCollectionAsString()], { 'type': 'application/octet-stream' });
-    a.href = window.URL.createObjectURL(blob);
-    a.download = "seed_collection_" + new Date().toJSON().slice(0, 10) + ".txt";
-    a.click();*/
     export_save();
     let rewarded_points = Math.min(days_since_backup * backup_sp_per_day, max_sp_for_backup);
     if (rewarded_points > 0) {
@@ -80,6 +96,14 @@ function updateSeedPoints() {
 
 // Really just a "find the first instance and snip" method
 function removeSeedFromCollection(seed) {
+    if(on_temporary_collection){
+        let index = temporary_collection.indexOf(seed);
+        if(index != -1) {
+            temporary_collection.splice(index, 1);
+            return true;
+        }
+        return false;
+    }
     if (localStorage.seed_collection == undefined) { return false; }
     let seed_and_comma = seed + ",";
     let collection = getSeedCollectionAsString();
@@ -193,18 +217,20 @@ function update_cycle() {
         plant_data["feature_palette"] = feature_palette;
         plant_data["accent_palette"] = accent_palette;
         let entry = create_collection_entry(0, encode_plant_data_v2(plant_data), false, true);
-        entry.children[0].textContent = "2 rs";
+        entry.children[0].textContent = on_temporary_collection ? "free" : "2 rs";
         entry.onclick = function (e) {
-            if (getSeedPoints() >= 2) {
+            if (on_temporary_collection || getSeedPoints() >= 2) {
                 let gotten = removeSeedFromCollection(orig_seed);
                 if (!gotten) {
                     alert("Couldn't find the seed you're rotating in your collection! Palette rotation cancelled.");
                     return;
                 }
                 bubble_out(e.target, e.target.getAttribute("data-seed"));
-                addSeedPoints(-2);
-                updateSeedPoints();
-                collectSeed(e.target.getAttribute("data-seed"));
+                if(!on_temporary_collection){
+                    addSeedPoints(-2);
+                    updateSeedPoints();
+                }
+                collectSeedWithTemp(e.target.getAttribute("data-seed"));
                 prep_mutate_seed(e.target.getAttribute("data-seed"), true);
                 display_collection();
             }
@@ -242,13 +268,13 @@ function claim_splice() {
     let gotten_2 = removeSeedFromCollection(document.getElementById("second_splice").getAttribute("data-seed"));
     if (!(gotten && gotten_2)) {
         alert("At least one of the seeds used in this splice couldn't be found in your collection. Found seed (if any) refunded and splice cancelled!");
-        if (gotten) { collectSeed(document.getElementById("first_splice").getAttribute("data-seed")) };
-        if (gotten_2) { collectSeed(document.getElementById("first_splice").getAttribute("data-seed")) };
+        if (gotten) { collectSeedWithTemp(document.getElementById("first_splice").getAttribute("data-seed")) };
+        if (gotten_2) { collectSeedWithTemp(document.getElementById("first_splice").getAttribute("data-seed")) };
         display_collection();
         return;
     }
     let new_seed = document.getElementById("mutate_preview_canvas").getAttribute("data-seed");
-    collectSeed(new_seed);
+    collectSeedWithTemp(new_seed);
     prep_mutate_seed(new_seed, true);
     bubble_out(document.getElementById("mutate_preview_canvas"), new_seed);
     display_collection();
@@ -262,7 +288,7 @@ function copy_selection() {
         seed_list.push(child.getAttribute("data-seed"));
     }
     if(seed_list.length == 0){
-        seed_list = getSeedCollection();
+        seed_list = getSeedCollectionWithTemp();
     }
     navigator.clipboard.writeText(seed_list.join(", "));
     button.value = "Copied!"
@@ -276,7 +302,11 @@ function launch_recycle_dialogue() {
     modal_display.classList.add("popup");
     document.body.appendChild(modal);
     let textbox = document.createElement("text");
-    textbox.textContent = "You're about to recycle " + document.getElementById("recycle_display_div").children.length + " seed(s). These will be recycled into raw seedstuff at a rate of 1 raw seedstuff per seed found (so don't worry if you accidentally specified duplicates). If you're ready, hit the 'Claim RS' button. If these seeds were added to your collection by mistake and you just want to remove them, hit the 'Delete' button instead!";
+    if(on_temporary_collection){
+        textbox.textContent = "You're about to remove "+ document.getElementById("recycle_display_div").children.length + " seeds from your temporary collection! This won't affect your 'real' collection at all, and you won't get any raw seedstuff for it."
+    } else {
+        textbox.textContent = "You're about to recycle " + document.getElementById("recycle_display_div").children.length + " seed(s). These will be recycled into raw seedstuff at a rate of 1 raw seedstuff per seed found (so don't worry if you accidentally specified duplicates). If you're ready, hit the 'Claim RS' button. If these seeds were added to your collection by mistake and you just want to remove them, hit the 'Delete' button instead!";
+    }
     let button_container = document.createElement("div");
     button_container.style.padding = "20px";
     let cancel_button = document.createElement("input");
@@ -295,9 +325,11 @@ function launch_recycle_dialogue() {
     claim_button.onclick = function () { let earned = recycle_seeds(true); delayedExit("You now have " + getSeedPoints() + " raw seedstuff (" + earned + " more than before)") };
     claim_button.value = "Claim RS";
     claim_button.classList.add("chunky_fullwidth");
+    if(on_temporary_collection){claim_button.style.display="none";}
     let remove_button = document.createElement("input");
     remove_button.type = "button";
-    remove_button.onclick = function () { recycle_seeds(false); delayedExit("Removed errant seeds. Thank you for your honesty!") };
+    let remove_msg = on_temporary_collection? "Removed temporary seeds" : "Removed errant seeds. Thank you for your honesty!";
+    remove_button.onclick = function () { recycle_seeds(false); delayedExit(remove_msg) };
     remove_button.value = "Delete (no RS)";
     remove_button.classList.add("chunky_fullwidth");
     button_container.appendChild(textbox);
@@ -314,14 +346,14 @@ function launch_add_dialogue() {
     let modal = document.createElement("div");
     modal.classList.add("block_window");
     let modal_display = document.createElement("div");
-    modal_display.classList.add("popup");
+    modal_display.classList.add("add_seed_popup");
     document.body.appendChild(modal);
-    let textbox = document.createElement("text");
+    let textbox = document.createElement("p");
     textbox.textContent = "Paste in a list of comma-separated seeds to add them to your collection! Won't do anything if the list is empty.";
     modal_display.append(textbox);
-    let text_entry = document.createElement("input");
-    text_entry.type = "text";
+    let text_entry = document.createElement("textarea");
     text_entry.id = "seed_collection";
+    text_entry.placeholder = "Click here and paste!"
     modal_display.append(text_entry);
     let claim_button = document.createElement("button");
     claim_button.onclick = function(){display_collection(); document.body.removeChild(modal);}
@@ -329,7 +361,48 @@ function launch_add_dialogue() {
     claim_button.innerText = "Add Seeds";
     claim_button.classList.add("chunky_fullwidth");
     modal_display.appendChild(claim_button);
+
+    let tempbox = document.createElement("p");
+    tempbox.textContent = "Or add them to your temporary collection, useful for screenshots or experimenting with (mutating is free!). The temporary collection is lost on page refresh.";
+    modal_display.append(tempbox);   
+
+    let temp_button = document.createElement("button");
+    temp_button.onclick = function(){toggle_temporary_collection(0, true); document.body.removeChild(modal);}
+    temp_button.value = "Add Seeds to Temporary Collection";
+    temp_button.innerText = "Add Seeds to Temporary Collection";
+    temp_button.classList.add("chunky_fullwidth");
+    modal_display.appendChild(temp_button);
+
     modal.appendChild(modal_display);
+}
+
+function toggle_temporary_collection(_ignore, force_to=undefined){
+    let disclaimer = document.getElementById("temp_collection_disclaimer");
+    if(force_to != undefined){
+        on_temporary_collection = force_to;
+    } else {
+        on_temporary_collection = !on_temporary_collection;
+    }
+    if(on_temporary_collection){
+        disclaimer.innerHTML = "Viewing your temporary collection! <a href='javascript:void(0);'>Click to swap</a>."
+    } else {
+        disclaimer.innerHTML = "Viewing your normal collection! <a href='javascript:void(0);'>Click to swap</a>."
+    }
+    document.getElementById("first_splice").innerHTML = "";
+    document.getElementById("second_splice").innerHTML = "";
+    update_mutate();
+    display_collection();
+    flash_temporary_collection_disclaimer();
+}
+
+function flash_temporary_collection_disclaimer(){
+    let disclaimer = document.getElementById("temp_collection_disclaimer");
+    disclaimer.classList.remove("color_flash_animate");
+    disclaimer.style.color = window.getComputedStyle(document.documentElement).getPropertyValue("--accent-bright");
+    setTimeout(function(){
+    disclaimer.classList.add("color_flash_animate");
+    disclaimer.style.color = window.getComputedStyle(document.documentElement).getPropertyValue("--font-color");
+    }.bind(disclaimer), 50);
 }
 
 function recycle_seeds(claim_sp) {
@@ -425,7 +498,7 @@ function display_collection(do_filter=true) {
     if(prior_options === localStorage.display_options && !do_filter){
         return;
     }
-    first_chunk_on_last_sort = getSeedCollectionAsString().slice(0, 50);
+    first_chunk_on_last_sort = getSeedCollectionAsStringWithTemp().slice(0, 50);
     sort_intervals = [];
     var collection_div = document.getElementById("collection_display_div")
     var hide_seeds = document.getElementById("hide_seeds").checked;
@@ -436,10 +509,10 @@ function display_collection(do_filter=true) {
         var seed_string = document.getElementById("seed_collection").value.split(" ").join("").replace(/(^,)|(,$)|"/g, '');
         // This and the next line both "verify"--sloppy workaround for people putting !namedseeds in this field
         //let [new_seeds, new_named] = sortAndVerifySeedList(seed_string);
-        collectSeed(seed_string);
+        collectSeedWithTemp(seed_string);
         document.getElementById("seed_collection").value = "";
     }
-    let collection = getSeedCollection();
+    let collection = getSeedCollectionWithTemp();
     document.getElementById("plant_tally").textContent = "Plants (and friends): " + collection.length;
     var sort_order_elem = document.getElementsByName('sort_order');
     var sort_order = "None";
@@ -608,7 +681,8 @@ document.getElementById("splice_claim_button").onclick = claim_splice;
 document.getElementById("copy_selection_button").onclick = copy_selection;
 document.getElementById("launch_recycle_dialogue_button").onclick = launch_recycle_dialogue;
 document.getElementById("doBackup_button").onclick = doBackup;
+document.getElementById("temp_collection_disclaimer").onclick = toggle_temporary_collection;
 
 doCollectionPreload();
 
-export { doBackup, launch_recycle_dialogue, doFilter, forceFilter };
+export { doBackup, launch_recycle_dialogue, doFilter, forceFilter, toggle_temporary_collection };
