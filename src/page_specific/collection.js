@@ -517,8 +517,10 @@ function display_collection(do_filter=true) {
     var sort_order_elem = document.getElementsByName('sort_order');
     var sort_order = "None";
     for (i = 0; i < sort_order_elem.length; i++) {
-        if (sort_order_elem[i].checked)
+        if (sort_order_elem[i].checked){
             sort_order = sort_order_elem[i].value;
+            break;
+        }
     }
     collection = get_seed_collection_sorted_by(collection, sort_order);
     if (collection.length > 0 && !document.getElementById("first_splice").innerText) { prep_mutate_seed(collection[0]); }
@@ -682,6 +684,11 @@ document.getElementById("copy_selection_button").onclick = copy_selection;
 document.getElementById("launch_recycle_dialogue_button").onclick = launch_recycle_dialogue;
 document.getElementById("doBackup_button").onclick = doBackup;
 document.getElementById("temp_collection_disclaimer").onclick = toggle_temporary_collection;
+let sort_order_elem = document.getElementsByName('sort_order');
+for (let i = 0; i < sort_order_elem.length; i++) {
+    sort_order_elem[i].addEventListener('change', display_collection);
+}
+
 
 doCollectionPreload();
 

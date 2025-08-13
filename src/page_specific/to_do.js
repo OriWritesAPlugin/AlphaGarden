@@ -310,8 +310,10 @@ function clearCompleted() {
             checked++;
             setTimeout(function () {
                 node.classList.add("fadeout");
-                document.getElementById("desc_" + idx).style.whiteSpace = "nowrap";
-                document.getElementById("desc_" + idx).style.width = "0px";
+                let elem = document.getElementById("desc_" + idx)
+                elem.style.height = elem.offsetHeight;
+                elem.style.whiteSpace = "nowrap";
+                elem.style.width = "0px";
                 reward_rs();
                 setTimeout(function () { node.remove(); }, 760)
             }.bind(idx, checked), checked * 200);
