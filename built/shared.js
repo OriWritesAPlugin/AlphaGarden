@@ -199,6 +199,13 @@ function hexToRgb(hex) {
         parseInt(result[3], 16)
     ] : null;
 }
+function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
 function get_overlay_color_from_name(color, alpha) {
     color = color.slice(1);
     if (Object.prototype.hasOwnProperty.call(available_overlay_colors, color)) {
@@ -230,6 +237,27 @@ function addRadioButton(parent, name, label, checked, onclick = null) {
     radio_button_label.setAttribute('for', id);
     radio_button_label.textContent = label;
     radio_button_label.classList.add("unselectable");
+    if (onclick != null) {
+        radio_button.onclick = onclick;
+    }
+    parent.appendChild(radio_button);
+    parent.appendChild(radio_button_label);
+}
+function addStylizedRadioButton(parent, name, label, checked, onclick = null) {
+    let radio_button = document.createElement('input');
+    radio_button.setAttribute('type', 'radio');
+    radio_button.setAttribute('name', name);
+    radio_button.className = "radio-button";
+    radio_button.style.display = "none";
+    let id = name + "_" + label;
+    radio_button.id = id;
+    radio_button.checked = checked;
+    radio_button.value = label;
+    let radio_button_label = document.createElement('label');
+    radio_button_label.setAttribute('for', id);
+    radio_button_label.textContent = label;
+    radio_button_label.classList.add("unselectable");
+    radio_button_label.classList.add("prompt_label");
     if (onclick != null) {
         radio_button.onclick = onclick;
     }
@@ -486,9 +514,12 @@ async function concatUint8Arrays(uint8arrays) {
 async function export_save() {
     var a = document.createElement('a');
     const compressedBytes = await compress(JSON.stringify(localStorage));
-    var blob = new Blob([compressedBytes], { 'type': 'application/octet-stream' });
+    console.log(compressedBytes);
+    // Couple bytes of gobbldygook up front so Linux stops un-gzipping my danged saves.
+    // You reading the save file """encryption""" because you're up to something? :) Yeah just delete the first 4.
+    var blob = new Blob([1, 5, 'a', 2].concat([compressedBytes]), { 'type': 'application/octet-stream' });
     a.href = window.URL.createObjectURL(blob);
-    a.download = "endless_garden_save_" + new Date().toJSON().slice(0, 10) + ".oct";
+    a.download = "endless_garden_save_" + new Date().toJSON().slice(0, 10) + ".egsav";
     a.click();
 }
 // Meant to be attached to a filereader, see settings.html
@@ -499,7 +530,7 @@ function import_save() {
     reader.onload = async function (content) {
         try {
             let parsed_content = new Uint8Array(content.target.result);
-            let save_data = await decompress(parsed_content);
+            let save_data = await decompress(parsed_content.slice(4));
             let newLocalData = JSON.parse(save_data);
             for (let entry in newLocalData) {
                 localStorage[entry] = newLocalData[entry];
@@ -546,4 +577,4 @@ function delete_save(e) {
     repeat();
 }
 ;
-export { gen_toggle_button, gen_func_button, createSpacedPlacementQueue, shuffleArray, hasPixelInRow, get_overlay_color_from_name, claimCanvas, getBase64, get_hex_from_name, bubble_up, bubble_out, collectSeed, buildColorMessage, getDissolvingRS, getSeedCollection, getSeedPoints, collectGoodie, randomFromArray, randomValueFromObject, getRandomKeyFromObj, addRadioButton, makeSortCheckmark, getRadioValue, toHue, hexToRgb, addSeedPoints, getSeedCollectionAsString, getGoodieCollection, getMarkedBases, getMarkedPalettes, getOffsetColor, get_toggle_button_setting, sortAndVerifySeedList, export_save, import_save, delete_save, cycle_toggle_value };
+export { gen_toggle_button, gen_func_button, createSpacedPlacementQueue, shuffleArray, hasPixelInRow, get_overlay_color_from_name, claimCanvas, getBase64, get_hex_from_name, bubble_up, bubble_out, collectSeed, buildColorMessage, getDissolvingRS, getSeedCollection, getSeedPoints, collectGoodie, randomFromArray, randomValueFromObject, getRandomKeyFromObj, addRadioButton, makeSortCheckmark, getRadioValue, toHue, hexToRgb, addSeedPoints, getSeedCollectionAsString, getGoodieCollection, getMarkedBases, getMarkedPalettes, getOffsetColor, get_toggle_button_setting, sortAndVerifySeedList, export_save, import_save, delete_save, cycle_toggle_value, rgbToHex, addStylizedRadioButton };

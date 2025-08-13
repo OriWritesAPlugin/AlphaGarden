@@ -1,8 +1,8 @@
 /** This module holds the UI logic for garden creation. **/
-import { all_named, available_ground, available_ground_base } from "./data.js";
+import { available_ground, available_ground_base } from "./data.js";
 import { GardenLayer, DecorLayer, OverlayLayer, CelestialLayer, CelestialType, LayerType } from "./garden_layers.js";
 import { available_backgrounds, available_tileables } from "./gen_garden.js";
-import { clearCanvas, imageFromPopup } from "./image_handling.js";
+import { clearCanvas, imageFromPopup, wildcard_canvases } from "./image_handling.js";
 import { draggableLayerMouseDownHandler } from "./drag_and_drop.js";
 import { hexToRgb } from "./shared.js";
 /*const PROPERTIES = {
@@ -148,7 +148,7 @@ class LayerDiv {
     toggleVisibility() {
         this.hideButton.classList.toggle('active');
         this.layer.isVisible = !this.layer.isVisible;
-        this.hideButton.innerText = this.layer.isVisible ? "👁&#xFE0E;" : "–";
+        this.hideButton.innerHTML = this.layer.isVisible ? "👁" : "–";
         this.onEditCallback();
     }
     buildEditButton() {
@@ -410,11 +410,14 @@ class CelestialLayerDiv extends LayerDiv {
         const skyPaletteSelect = this.buildGenericDropdown("skyPalette", Object.keys(available_backgrounds));
         skyPaletteSelect.onchange = async function () {
             this.layer["skyPalette"] = skyPaletteSelect.value;
-            await this.onEditCallback();
+            console.log(skyPaletteSelect.value);
             if (skyPaletteSelect.value == "custom") {
                 this.get_custom_palette(this.layer, this.onEditCallback);
             }
-        }.bind(this, "skyPalette");
+            else {
+                await this.onEditCallback();
+            }
+        }.bind(this, skyPaletteSelect);
         const [opacityFillIn, opacityLabel] = this.buildGenericFillIn("opacity", "opacity:", this.mainColor, "opacity of layer", true);
         dropdownDiv.appendChild(contentSelect);
         dropdownDiv.appendChild(skyPaletteSelect);
@@ -594,6 +597,15 @@ class LayerManager {
         const save_obj = JSON.parse(save_string);
         this.clearAllButActive();
         let layer;
+        for (let i = 0; i < save_obj["layers"].length; i++) {
+            layer = save_obj["layers"][i];
+            if (layer["type"] == LayerType.Garden && layer["seeds"].length > 0) {
+                let parsed_seeds = this.parseSeedList(layer["seeds"].join(","), this.loadFromSaveString.bind(this, save_string));
+                if (layer["seeds"].length != parsed_seeds.length) {
+                    return;
+                }
+            }
+        }
         //await (<GardenLayer>this.activeGardenDiv.layer).updateMain();
         //await (<GardenLayer>this.activeGardenDiv.layer).updateGround();
         //this.setScale(save_string["s"]);
@@ -644,7 +656,7 @@ class LayerManager {
         for (let i = 0; i < seeds.length; i++) {
             if (seeds[i][0] == "*") {
                 const cleaned_seed = seeds[i].split("%")[0].replace("<", "");
-                if (!Object.prototype.hasOwnProperty.call(all_named, cleaned_seed)) {
+                if (!Object.prototype.hasOwnProperty.call(wildcard_canvases, cleaned_seed)) {
                     imageFromPopup(document.body, cleaned_seed, callback.bind(seedList));
                     return [];
                 }

@@ -83,7 +83,7 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     list_item.appendChild(textbox_holder);
     // Prize display, defaults to first awardable prize for the set
     prize_display_square.id = "task_" + id + "_reward";
-    prize_display_square.classList.add('plant_box');
+    prize_display_square.classList.add('todo_choice');
     list_item.appendChild(prize_display_square);
     if (reward_seed == "") {
         let salt = forced_random_seed + (Math.floor(id / num_tasks_per_set) * plants_to_choose_from + id % num_tasks_per_set);
@@ -202,7 +202,7 @@ function rememberTasks() {
     let text;
     let force_fill_plants = false;
     if (localStorage.todo_tasks == undefined) {
-        text = "uD3TIPCX7mOWelcome to the to-do list! Click a task to edit it, click the sprite to its right to pick a reward. The selection changes every three tasks, and you can pick duplicates.|SEP|uD1BB2COlGNClick the box on the left to mark a task complete, earning the reward you picked. These first three are all freebies!|SEP|uCMq71B-AIsClearing completed tasks (bottom button) may reward RS. The chance doubles once the button starts glowing. Happy tasking!";
+        text = "uD3TIPCX7mOWelcome to the to-do list! Click a task to edit it, click the sprite to its right to pick what plant it'll give you. The selection changes every five tasks, and you can pick duplicates.|SEP|uD1BB2COlGNClick the box on the left to mark a task complete and the plant will be added to your collection! These first three are all freebies.|SEP|uCMq71B-AIsClearing completed tasks (bottom button) may reward RS. The chance doubles once the button starts glowing. Happy tasking!";
         force_fill_plants = true;
     }
     else {
@@ -305,8 +305,10 @@ function clearCompleted() {
             checked++;
             setTimeout(function () {
                 node.classList.add("fadeout");
-                document.getElementById("desc_" + idx).style.whiteSpace = "nowrap";
-                document.getElementById("desc_" + idx).style.width = "0px";
+                let elem = document.getElementById("desc_" + idx);
+                elem.style.height = elem.offsetHeight;
+                elem.style.whiteSpace = "nowrap";
+                elem.style.width = "0px";
                 reward_rs();
                 setTimeout(function () { node.remove(); }, 760);
             }.bind(idx, checked), checked * 200);

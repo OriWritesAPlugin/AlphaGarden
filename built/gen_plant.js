@@ -2,12 +2,12 @@
 import { all_features, all_foliage, all_palettes, FOLIAGE_SPRITE_DATA, NAMED_SPRITE_DATA, ADDON_SPRITE_DATA, reformatted_named } from "./data.js";
 import { hexToRgb, getMarkedPalettes, getOffsetColor, getMarkedBases } from "./shared.js";
 // The colors we'll be replacing. Touch at your peril!
-const base_foliage_palette = ["#aed740", "#76c935", "#50aa37", "#2f902b"];
-const base_accent_palette = ["fef4cc", "fde47b", "ffd430", "ecb600"];
-const base_feature_palette = ["f3addd", "d87fbc", "c059a0", "aa3384"];
+const base_foliage_palette = all_palettes[0]["palette"];
+const base_accent_palette = all_palettes[19]["palette"];
+const base_feature_palette = all_palettes[20]["palette"];
 const overall_palette = base_foliage_palette.concat(base_accent_palette).concat(base_feature_palette);
 const fallback_colors = [[255, 102, 99], [254, 177, 68], [253, 253, 151], [158, 224, 158], [158, 193, 207], [204, 153, 201]]; // RGB colors to use if the plant sampler fails to find any
-const work_canvas_size = 32; // in pixels
+const work_canvas_size = 48; // in pixels
 // In case of error (probably subtly malformed seed)
 const ERROR_PLANT = {
     "foliage": 160,
@@ -74,7 +74,7 @@ for (const [key, value] of Object.entries(foliage_by_category)) {
 message += `${key}: ${value.length}\n`;
 }
 alert(message);*/
-var simple_features = [0, 1, 14];
+var simple_features = [0, 1, 14, 16, 17];
 var complex_features = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 // foliar earthen soft bold strange deep
 // metallic celestial verdant senescent
@@ -266,6 +266,7 @@ function gen_plant(plant_data, with_color_key = false, with_scale = 1) {
     }
     var plant_gen_canvas = document.createElement("canvas");
     var plant_gen_ctx = plant_gen_canvas.getContext("2d");
+    //if(max_dim > work_canvas_size){acting_canvas_size = max_canvas_size};
     plant_gen_canvas.width = work_canvas_size;
     plant_gen_canvas.height = work_canvas_size;
     plant_gen_ctx.clearRect(0, 0, work_canvas_size, work_canvas_size);
@@ -319,7 +320,7 @@ function gen_plant(plant_data, with_color_key = false, with_scale = 1) {
     }
 }
 // Draws a plant that's meant to go in a 96x96 (or otherwise) square
-function drawPlantForSquare(seed, size = 96, mark_wanted_palettes = true) {
+function drawPlantForSquare(seed, size = work_canvas_size * 3, mark_wanted_palettes = true) {
     const plant_data = decode_plant_data(seed);
     let plant_canvas;
     if (mark_wanted_palettes) {
@@ -355,14 +356,14 @@ function get_absolute_offset(inner_offset, offset_data, center_factor) {
     return 4 * (x_coord + y_coord * work_canvas_size);
 }
 // Basically, draw plants
-function draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, offset_data, palette, center, initial_offset = 0) {
+function draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, offset_data, palette, center, initial_offset = 0, overwrite = false) {
     let i = 0;
     let raw_data = offset_data['e'];
     let x_center = center ? Math.floor((work_canvas_size - offset_data["w"]) / 2) : 0;
     while (i < raw_data.length) {
         let pos = initial_offset + get_absolute_offset(i, offset_data, x_center);
         let char = raw_data.charCodeAt(i);
-        if (char == 48 || imageData.data[pos]) { /* empty */ } // 0, an empty pixel, or we already drew something with the subpart system
+        if (char == 48 || (!overwrite && imageData.data[pos])) { /* empty */ } // 0, an empty pixel, or we already drew something with the subpart system
         // 1, a hard white pixel
         else if (char == 49) {
             imageData.data[pos] = 255;
@@ -382,17 +383,33 @@ function draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data,
             if (char === 77) {
                 addon_num = plant_data["complex_feature"];
                 chance = 0.8;
+                if (addon_num == -1) { // Very special case: sprite sketcher doesn't want to do the replace
+                    imageData.data[pos] = 255;
+                    imageData.data[pos + 1] = 255;
+                    imageData.data[pos + 2] = 255;
+                    imageData.data[pos + 3] = 255;
+                    i++;
+                    continue;
+                }
             }
             else {
                 addon_num = plant_data["simple_feature"];
                 chance = 0.4;
+                if (addon_num == -1) { // Very special case: sprite sketcher doesn't want to do the replace
+                    imageData.data[pos] = 255;
+                    imageData.data[pos + 1] = 255;
+                    imageData.data[pos + 2] = 255;
+                    imageData.data[pos + 3] = 255;
+                    i++;
+                    continue;
+                }
             }
             if (chance < Math.random()) {
                 continue;
             }
             let mini_data = ADDON_SPRITE_DATA[addon_num];
             let centerpoint = work_canvas_size * work_canvas_size + Math.floor((work_canvas_size - mini_data["w"]) / 2) - work_canvas_size + Math.floor(mini_data["w"] / 2);
-            draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, ADDON_SPRITE_DATA[addon_num], palette, center, pos - 4 * centerpoint);
+            draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, ADDON_SPRITE_DATA[addon_num], palette, center, pos - 4 * centerpoint, true);
         }
         else if (char == 79 || char == 80) {
             imageData.data[pos] = palette[4][0];
@@ -476,7 +493,7 @@ function addMarkings(plant_data, plant_canvas) {
         let color_offset = colors.indexOf(plant_data[palette]);
         if (color_offset != -1) {
             ctx.fillStyle = getOffsetColor(color_offset);
-            ctx.fillRect(plant_canvas.width - 4, draw_offset, 4, 4);
+            ctx.fillRect(0, draw_offset, 4, 4);
             draw_offset += 4;
         }
     }
@@ -525,4 +542,4 @@ function samplePlantColor(seed) {
     ;
     return found_colors;
 }
-export { genWithModifiedSeedChances, palettes_by_category, foliage_by_category, calculateSeedChances, decode_plant_data, encode_plant_data_v2, overall_palette, gen_plant_data, gen_plant, gen_named, base_foliage_palette, base_feature_palette, base_accent_palette, random_from_list, work_canvas_size, parse_plant_data, samplePlantColor, assemble_categories, xmur3, mulberry32, drawPlantForSquare, addMarkings, getMainPaletteFromSeed, plant_cache };
+export { genWithModifiedSeedChances, palettes_by_category, foliage_by_category, calculateSeedChances, decode_plant_data, encode_plant_data_v2, overall_palette, gen_plant_data, gen_plant, gen_named, base_foliage_palette, base_feature_palette, base_accent_palette, random_from_list, work_canvas_size, parse_plant_data, samplePlantColor, assemble_categories, xmur3, mulberry32, drawPlantForSquare, addMarkings, getMainPaletteFromSeed, plant_cache, draw_arbitrary_onto_imageData_with_color_palette };

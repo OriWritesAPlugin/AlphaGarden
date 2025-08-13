@@ -1,5 +1,5 @@
 import { drawPlantForSquare, gen_plant_data, encode_plant_data_v2, genWithModifiedSeedChances, calculateSeedChances, foliage_by_category, palettes_by_category } from "./gen_plant.js";
-import { randomFromArray, getDissolvingRS, collectSeed, getSeedCollection, gen_toggle_button, gen_func_button, addRadioButton, makeSortCheckmark, getRadioValue, get_toggle_button_setting } from "./shared.js";
+import { randomFromArray, getDissolvingRS, collectSeed, getSeedCollection, bubble_out, gen_toggle_button, gen_func_button, addRadioButton, makeSortCheckmark, getRadioValue, get_toggle_button_setting } from "./shared.js";
 const all_challenges = {
     "e": {
         "a": { "description": "No drops", "points": 300, "category": "coli", "full": "Receive no drops from a battle" },
@@ -94,9 +94,9 @@ const all_challenges = {
         "af": { "description": "Lower breath below 15", "points": 500, "category": "coli", "full": "Be it by misses or moves, get a dragon's breath from above 15 to below it." },
     }, "s": {
         "a": { "description": "Drink a glass of water", "points": 100, "category": "self-care", "full": "Any size is good!" },
-        "b": { "description": "Head outside", "points": 100, "category": "self-care", "full": "If the weather or surroundings are bad for going outside, try cracking a window, or at least listening to some nature sounds!" },
+        "b": { "description": "Head outside", "points": 100, "category": "self-care", "full": "If the weather or surroundings are bad for going outside, crack a window or put on some nature sounds" },
         "c": { "description": "Do something energetic", "points": 100, "category": "self-care", "full": "Anything that raises your heart rate or engages your muscles works" },
-        "d": { "description": "Socialize (online OK!)", "points": 100, "category": "self-care", "full": "Interact (preferably positively!) with anyone you like" },
+        "d": { "description": "Socialize (online OK!)", "points": 100, "category": "self-care", "full": "Talk, hang out, or sit in companionable silence with someone else." },
         "e": { "description": "Another glass of water!", "points": 100, "category": "self-care", "full": "Keep it up!" },
         "f": { "description": "Get 2+ proper meals", "points": 100, "category": "self-care", "full": "The definition of \"proper meal\" is up to you! For those of us who struggle a bit, try to feel satiated" },
         "g": { "description": "Say something nice about yourself", "points": 100, "category": "self-care", "full": "For bonus points, name something that isn't inherently tied to how helpful you are to others" },
@@ -566,13 +566,14 @@ function toggle_status(e, generate_rewards = true) {
                     square_info['reward'] = { "type": "seed", "value": genSeedForSquare() };
                 }
                 revealed_seeds.push(square_info['reward']["value"]);
-                document.getElementById("bingo_seed_list").innerHTML = revealed_seeds.join(", ");
+                //document.getElementById("bingo_seed_list").innerHTML = revealed_seeds.join(", ");
                 // TODO: I can't figure out what causes this one, ugggh. Possibly a mismatch between save data and board settings?
                 if (square_info['reward']['value'] === null) {
                     console.log("encountered ungenerated seed--making an emergency one!");
                     square_info['reward']['value'] = encode_plant_data_v2(gen_plant_data(0));
                 }
                 collectSeed(square_info['reward']["value"]);
+                bubble_out(e.target, square_info['reward']["value"]);
             }
         }
         if (get_toggle_button_setting("icons") && generate_rewards && square_info["reward"]["type"] == "none") {
@@ -596,6 +597,7 @@ function toggle_status(e, generate_rewards = true) {
     }
     update_squares_til_if_present();
     const now_has_bingo = has_bingo();
+    let shimmer_color = window.getComputedStyle(document.body, null).getPropertyValue("--accent-bright");
     if (now_has_bingo != had_bingo_last_turn) { // our bingo state has changed
         had_bingo_last_turn = now_has_bingo;
         setBingoPlantVisibility(now_has_bingo);
@@ -603,11 +605,11 @@ function toggle_status(e, generate_rewards = true) {
             transition_all_bingo_borders("#ffffff", row, col);
         }
         else {
-            shimmer_bingo_borders(bingo_border_color, "#b1f2c0", row, col);
+            shimmer_bingo_borders(bingo_border_color, shimmer_color, row, col);
         }
     }
     else if (!now_has_bingo) {
-        shimmer_bingo_borders(bingo_border_color, "#b1f2c0", row, col);
+        shimmer_bingo_borders(bingo_border_color, shimmer_color, row, col);
     }
     // TODO: patch solution for the self-care board trying to save to the coli slot: disable it entirely. hopefully.
     if (forced_random_seed == null) {
@@ -663,6 +665,7 @@ function setBingoPlantVisibility(show_plant) {
         }
         target_div.style.background = 'url(' + bingo_plant_data_url + ')  no-repeat center center';
         parent_div.style.display = "block";
+        bubble_out(target_div, bingo_reward);
     }
 }
 // Go through and either hide or show all non-generated-plant icons
@@ -706,7 +709,7 @@ function add_bingo_square(parent, column, row, challenge_name) {
     let id = column + "_" + row;
     let bingo_square = document.createElement('div');
     bingo_square.id = id;
-    bingo_square.className = 'dotted_plant_box';
+    bingo_square.className = 'bingo_box';
     bingo_square.onmouseover = function () { document.getElementById("bingo_hint").textContent = challenge["full"]; };
     let label = document.createElement('label');
     let challenge;
