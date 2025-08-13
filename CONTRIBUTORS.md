@@ -67,7 +67,7 @@ Other Assets
 
 SunstonePhoenix: Names for tons of sprites and palettes
 
-Vanshira: Palette names, Dusk, Inferno, and Firstlight palettes
+Vanshira: Palette names, Dusk, Inferno, Firstlight, Alexandrite, Ruby, Topaz, Spring, Cerulean, and Bubblegum palettes
 
 Xaotician: Sand and Sand \[palette\] ground types (art was also used to make the snow ground type)
 
