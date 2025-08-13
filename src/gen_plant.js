@@ -9,7 +9,7 @@ const base_feature_palette = all_palettes[20]["palette"];
 const overall_palette = base_foliage_palette.concat(base_accent_palette).concat(base_feature_palette);
 const fallback_colors = [[255, 102, 99], [254, 177, 68], [253, 253, 151], [158, 224, 158], [158, 193, 207], [204, 153, 201]];  // RGB colors to use if the plant sampler fails to find any
 
-const work_canvas_size = 32 // in pixels
+const work_canvas_size = 48 // in pixels
 
 // In case of error (probably subtly malformed seed)
 const ERROR_PLANT = {
@@ -86,7 +86,7 @@ message += `${key}: ${value.length}\n`;
 }
 alert(message);*/
 
-var simple_features = [0, 1, 14];
+var simple_features = [0, 1, 14, 16, 17];
 var complex_features = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
 // foliar earthen soft bold strange deep
@@ -288,6 +288,7 @@ function gen_plant(plant_data, with_color_key = false, with_scale = 1) {
     if (Object.prototype.hasOwnProperty.call(encode_plant_data, seed)) { return encode_plant_data(seed); }
     var plant_gen_canvas = document.createElement("canvas");
     var plant_gen_ctx = plant_gen_canvas.getContext("2d");
+    //if(max_dim > work_canvas_size){acting_canvas_size = max_canvas_size};
     plant_gen_canvas.width = work_canvas_size;
     plant_gen_canvas.height = work_canvas_size;
     plant_gen_ctx.clearRect(0, 0, work_canvas_size, work_canvas_size);
@@ -343,7 +344,7 @@ function gen_plant(plant_data, with_color_key = false, with_scale = 1) {
 }
 
 // Draws a plant that's meant to go in a 96x96 (or otherwise) square
-function drawPlantForSquare(seed, size=96, mark_wanted_palettes=true){
+function drawPlantForSquare(seed, size=work_canvas_size*3, mark_wanted_palettes=true){
   const plant_data = decode_plant_data(seed);
   let plant_canvas;
   if(mark_wanted_palettes){
@@ -351,6 +352,7 @@ function drawPlantForSquare(seed, size=96, mark_wanted_palettes=true){
   } else {
     plant_canvas = gen_plant(plant_data, false, size/work_canvas_size);
   }
+  //alert(plant_canvas.toDataURL());
   return plant_canvas.toDataURL();
 }
 

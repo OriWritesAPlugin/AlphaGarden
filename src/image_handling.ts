@@ -23,12 +23,13 @@ function preload_single_image(url: string) {
     .then(blob => createImageBitmap(blob));*/
 }
 
-function load_sprite_from_spritesheet(img: HTMLImageElement, offset: number) {
+function load_sprite_from_groundsheet(img: HTMLImageElement, offset: number) {
     return new Promise(resolve => {
         const new_img = new Image();
         new_img.onload = () => { resolve(new_img); };
         new_img.onerror = function () { new_img.src = BAD_IMG_URL; };
         const canvas = document.createElement("canvas");
+        let work_canvas_size = 32;
         canvas.width = work_canvas_size;
         canvas.height = work_canvas_size;
         const ctx = canvas.getContext("2d");
@@ -41,7 +42,7 @@ function load_sprite_from_spritesheet(img: HTMLImageElement, offset: number) {
     }).then(x => { (<HTMLImageElement>x).decode(); return x; }, () => { console.log("Failed loading at offset " + offset); });
 }
 
-async function preload_spritesheet(name: string, URL: string, count: number) {
+async function preload_ground(name: string, URL: string, count: number) {
     const img = <HTMLImageElement> await new Promise(resolve => {
         const base64img = new Image();
         base64img.crossOrigin = "anonymous";
@@ -52,7 +53,7 @@ async function preload_spritesheet(name: string, URL: string, count: number) {
     return img.decode().then(() => {
         let offset = 0;
         while (offset < count) {
-            refs[name + offset.toString()] = load_sprite_from_spritesheet(img, offset);
+            refs[name + offset.toString()] = load_sprite_from_groundsheet(img, offset);
             offset++;
         }
     });
@@ -157,7 +158,7 @@ function clearCanvas(canvas: HTMLCanvasElement) {
 // attached to some parent. Load whatever we find into all_named
 // This is far jankier than it needs to be since Javascript only pauses for prompt, alert, and confirm
 // Largely taken from https://soshace.com/the-ultimate-guide-to-drag-and-drop-image-uploading-with-pure-javascript/
-async function imageFromPopup(parent: HTMLElement, name_of_image: string, callback: () => void) {
+async function imageFromPopup(parent: HTMLElement, name_of_image: string, callback: () => void, target_size = work_canvas_size/3*2) {
     const form = document.createElement("div");
     form.className = "wildcard-popup";
     const helptext = document.createElement("div");
@@ -176,9 +177,9 @@ async function imageFromPopup(parent: HTMLElement, name_of_image: string, callba
     confirm_button.style.width = "auto";
     urlTaker.addEventListener("input", async function () {
         if (urlTaker.files == null) {
-            preview.src = await resize_for_garden(name_of_image, urlTaker.value);
+            preview.src = await resize_for_garden(name_of_image, urlTaker.value, target_size);
         } else {
-            await handleImage(urlTaker.files, name_of_image, preview);
+            await handleImage(urlTaker.files, name_of_image, preview, target_size);
         }
     })
     urlTaker.addEventListener("paste", function (event) {
@@ -187,7 +188,7 @@ async function imageFromPopup(parent: HTMLElement, name_of_image: string, callba
             const item = items[index];
             if (item.kind === 'file') {
                 const blob = item.getAsFile();
-                handleImage([blob], name_of_image, preview);
+                handleImage([blob], name_of_image, preview, target_size);
             }
         }
     })
@@ -197,7 +198,7 @@ async function imageFromPopup(parent: HTMLElement, name_of_image: string, callba
         callback();
     })
     function preventDefault(e: { preventDefault: () => void; stopPropagation: () => void; }) { e.preventDefault(); e.stopPropagation(); }
-    function handleDrop(e) { handleImage(e.dataTransfer.files, name_of_image, preview); }
+    function handleDrop(e) { handleImage(e.dataTransfer.files, name_of_image, preview, target_size); }
     form.addEventListener("dragenter", preventDefault, false);
     form.addEventListener("dragleave", preventDefault, false);
     form.addEventListener("dragover", preventDefault, false);
@@ -213,7 +214,7 @@ async function imageFromPopup(parent: HTMLElement, name_of_image: string, callba
 }
 
 // Helper for imageFromPopup, handles image file validation
-async function handleImage(files: File[] | FileList, name_of_image: string, preview_img: HTMLImageElement) {
+async function handleImage(files: File[] | FileList, name_of_image: string, preview_img: HTMLImageElement, target_size: number) {
     if (files.length > 1) {
         alert("Multiple uploads detected, only the first will be used");
     }
@@ -223,7 +224,7 @@ async function handleImage(files: File[] | FileList, name_of_image: string, prev
         alert("Bad file type, please use a png, gif, or jpeg");
     } else {
         const dataURL = await getBase64(file)
-        preview_img.src = await resize_for_garden(name_of_image, dataURL);
+        preview_img.src = await resize_for_garden(name_of_image, dataURL, target_size);
     }
 }
 
@@ -262,7 +263,7 @@ function draw_outline_v2(template_canvas: HTMLCanvasElement) {
             this_is_background = true;
         } else {
             this_is_background = false;
-            most_recent_color = [main_imgData[i] * 0.7, main_imgData[i + 1] * 0.7, main_imgData[i + 2] * 0.7, 255];
+            most_recent_color = [main_imgData[i] * 0.75, main_imgData[i + 1] * 0.75, main_imgData[i + 2] * 0.75, 255];
             //most_recent_color = [main_imgData[i] * 1, main_imgData[i + 1] * 1, main_imgData[i + 2] * 1, 255];
         }
         // Note: because our "pixels" are 2x2, this shouldn't cause troubles at the corners...I think
@@ -328,20 +329,21 @@ function draw_outline_v2(template_canvas: HTMLCanvasElement) {
 }
 
 // Shrinks an image at a URL down to work_canvas_size, then up to x2, then loads it into our refs
-async function resize_for_garden(name_of_image: string, sourceURL: string) {
+async function resize_for_garden(name_of_image: string, sourceURL: string, target_size: number) {
     const refURL = name_of_image + "_wildcard_data_url"
     const temp_img = <HTMLImageElement> await preload_single_image(sourceURL);
-    // Forcibly resize down
+    // Forcibly resize down to the "normal entity" height
     const wildcard_canvas = document.createElement("canvas");
     wildcard_canvas.width = work_canvas_size;
     wildcard_canvas.height = work_canvas_size;
     const max_side = Math.max(temp_img.naturalHeight, temp_img.naturalWidth);
     const wildcard_ctx = wildcard_canvas.getContext("2d");
     wildcard_ctx.imageSmoothingEnabled = false;
+    target_size = target_size > max_side ? max_side : target_size;
     // Do a bit of math so that, if the image isn't a perfect square, we don't squash it.
-    wildcard_ctx.drawImage(temp_img, 0, work_canvas_size - temp_img.naturalHeight * (work_canvas_size / max_side),
-        temp_img.naturalWidth * (work_canvas_size / max_side),
-        temp_img.naturalHeight * (work_canvas_size / max_side));
+    wildcard_ctx.drawImage(temp_img, (work_canvas_size-target_size)/2, work_canvas_size - temp_img.naturalHeight * (target_size / max_side),
+        temp_img.naturalWidth * (target_size / max_side),
+        temp_img.naturalHeight * (target_size / max_side));
     const resized_dataURL = wildcard_canvas.toDataURL();//(temp_img.type);
     wildcard_canvases[name_of_image] = wildcard_canvas;
     refs[refURL] = await preload_single_image(resized_dataURL);
@@ -369,6 +371,6 @@ function drawSkyGradient(canvas: HTMLCanvasElement, actingPalette: string[], opa
 }
 
 export {
-    refs, replace_color_palette_single_image, preload_single_image, preload_spritesheet, replace_color_palette,
+    refs, replace_color_palette_single_image, preload_single_image, preload_ground, replace_color_palette,
     applyOverlay, draw_outline_v2, tile_along_y, imageFromPopup, clearCanvas, drawSkyGradient, wildcard_canvases
 };

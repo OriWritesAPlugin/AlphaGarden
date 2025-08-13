@@ -23,7 +23,7 @@
                 </div>
                 <div id="plant_previews" style="display: grid; grid-template-columns: repeat(6, 1fr)"></div>
             </div>
-            <canvas id="garden_preview" width="450" height="70" style="width: 450px; margin: auto"></canvas>
+            <canvas id="garden_preview" width="450" height="100" style="width: 450px; margin: auto"></canvas>
         </div>
 
     </body>
@@ -49,9 +49,11 @@
         };
 
         let gm;
+        let size = work_canvas_size;
         do_preload_initial().then(()=>{
             gm = new LayerManager(document.getElementById("garden_preview"), "");
             gm.scale = 1;
+            gm.height = 100;
             gm.selfDiv.style.display="none";}
         );
 
@@ -69,15 +71,20 @@
         let active_color = "#50aa37";
 
         let img_data; {let canvas = document.createElement('canvas'); let context = canvas.getContext('2d');
-            img_data = context.getImageData(0, 0, work_canvas_size, work_canvas_size).data;};
+            img_data = context.getImageData(0, 0, size, size).data;};
 
-        let parent = document.getElementById("canvas_array");
-        for(let i=0; i<work_canvas_size*work_canvas_size; i++){
-            let pixel = document.createElement("div");
-            pixel.className = "pixel";
-            pixel.id = "px_"+i;
-            parent.appendChild(pixel);
+        function setPixelArray(){
+            let parent = document.getElementById("canvas_array");
+            parent.innerHTML = "";
+            parent.style.gridTemplateColumns = "repeat("+size+", 1fr);"
+            for(let i=0; i<size*size; i++){
+                let pixel = document.createElement("div");
+                pixel.className = "pixel";
+                pixel.id = "px_"+i;
+                parent.appendChild(pixel);
+            }
         }
+        setPixelArray();
 
         parent = document.getElementById("color_selector");
         for(let i=0; i<colors.length; i++){
@@ -100,6 +107,7 @@
         }*/
 
         function doPaint(e){
+            if(e.target.id == "canvas_array"){return;}
             if(e.buttons === 1){
                 e.target.style.backgroundColor=active_color;
                 let as_list = active_color === "#0000"? [0, 0, 0, 0] : hexToRgb(active_color).concat([255]); // silly given our fairly fixed set...
@@ -116,7 +124,6 @@
             let plant_data = {"foliage": add_plant_idx, "simple_feature": -1, "complex_feature": -1};
             draw_arbitrary_onto_imageData_with_color_palette(raw_img_data, plant_data, FOLIAGE_SPRITE_DATA[add_plant_idx], overall_palette, false);
             for(let i=0; i<img_data.length; i+=4){
-                console.log(img_data);
                 if(img_data[i+3]>0){
                     parent.childNodes[i/4].style.backgroundColor = rgbToHex(img_data[i], img_data[i+1], img_data[i+2]);
                 }
@@ -144,7 +151,7 @@
                 }
             }
             for (var member in plant_cache) delete plant_cache[member];
-            FOLIAGE_SPRITE_DATA[add_plant_idx] = { "w": work_canvas_size, "h": work_canvas_size, "l": 0, "m": 0, "e": data, "x": custom_colors, "s": 1 };
+            FOLIAGE_SPRITE_DATA[add_plant_idx] = { "w": size, "h": size, "l": 0, "m": 0, "e": data, "x": custom_colors, "s": 1 };
             let color_div = document.getElementById("plant_previews");
             color_div.innerHTML = "";
             for (let i = 0; i < num_plants_to_display; i++) {
@@ -156,6 +163,7 @@
                 swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
                 color_div.appendChild(swap_square);
             }
+            console.log(JSON.stringify(FOLIAGE_SPRITE_DATA[add_plant_idx]));
             genTestGarden();
         }
 
@@ -180,7 +188,7 @@
             }
         }
 
-        document.getElementById("canvas_array").style.gridTemplateColumns = "repeat("+work_canvas_size+", 1fr)";
+        document.getElementById("canvas_array").style.gridTemplateColumns = "repeat("+size+", 1fr)";
         document.getElementById('canvas_array').addEventListener('mousedown', doPaint);
         document.getElementById('canvas_array').addEventListener('mousemove', doPaint);
         document.getElementById('canvas_array').addEventListener('mouseup', updatePlants);
@@ -188,18 +196,18 @@
             imageFromPopup(document.body, "test_sprite", ()=>{
             let canvas = wildcard_canvases["test_sprite"];
             let context = canvas.getContext('2d');
-            let raw_img_data = context.getImageData(0, 0, work_canvas_size, work_canvas_size);
+            let raw_img_data = context.getImageData((work_canvas_size-size)/2, work_canvas_size-size, size, size);
             img_data = raw_img_data.data;
             updatePlants();
             updateGrid(raw_img_data);
-            });
+            }, size);
         }));
         document.getElementById('sketcher_button_div').appendChild(gen_func_button('Download Image', function(){
             let canvas = document.createElement('canvas');
             let ctx = canvas.getContext('2d');
-            canvas.width = work_canvas_size;
-            canvas.height = work_canvas_size;
-            let imageData = ctx.getImageData(0, 0, work_canvas_size, work_canvas_size);
+            canvas.width = size;
+            canvas.height = size;
+            let imageData = ctx.getImageData(0, 0, size, size);
             const palette = overall_palette.map(hexToRgb);
             imageData = draw_arbitrary_onto_imageData_with_color_palette(imageData, {"foliage": add_plant_idx, "simple_feature": -1, "complex_feature": -1}, FOLIAGE_SPRITE_DATA[add_plant_idx], palette, false);
             ctx.putImageData(imageData, 0, 0);

@@ -21,7 +21,7 @@ import { createSpacedPlacementQueue, shuffleArray, hasPixelInRow, get_overlay_co
 import { get_canvas_for_named_component, get_canvas_for_plant, available_tileables, available_backgrounds } from "./gen_garden.js";
 import { refs, replace_color_palette_single_image, applyOverlay,  draw_outline_v2, tile_along_y, drawSkyGradient} from "./image_handling.js"
 
-const LAYER_HEIGHT = 70;
+const LAYER_HEIGHT = 100;
 const GARDEN_ITEM_SIZE = work_canvas_size;
 
 ///////////////////////  GENERIC LAYER   ///////////////////////////////////////
@@ -126,7 +126,8 @@ enum GardenItemHeightCategory {
   Tiny = 1,
   Short,
   Medium,
-  Tall
+  Tall,
+  Towering
 }
 
 /**
@@ -176,7 +177,7 @@ class GardenPlacedItem extends GardenItem {
     const place_onto_ctx = place_onto_canvas.getContext("2d");
     const acting_offset = use_offset ? this.offset : 1
     place_onto_ctx.imageSmoothingEnabled = false;
-    place_onto_ctx.drawImage(this.canvas, place_onto_canvas.width * acting_offset, place_onto_canvas.height - 70, GARDEN_ITEM_SIZE * 2, GARDEN_ITEM_SIZE * 2);
+    place_onto_ctx.drawImage(this.canvas, place_onto_canvas.width * acting_offset, 0, GARDEN_ITEM_SIZE * 2, GARDEN_ITEM_SIZE * 2);
   }
 
   flipCanvas() {
@@ -184,9 +185,9 @@ class GardenPlacedItem extends GardenItem {
     flip_canvas.width = this.canvas.width;
     flip_canvas.height = this.canvas.height;
     const ctx = flip_canvas.getContext("2d");
-    ctx.setTransform(-1, 0, 0, 1, flip_canvas.width, 0);
-    ctx.drawImage(flip_canvas, 0, 0);
-    return flip_canvas;
+    ctx.setTransform(-1, 0, 0, 1, this.canvas.width, 0);
+    ctx.drawImage(this.canvas, 0, 0);
+    this.canvas = flip_canvas;
   }
 
   getSeed(force_position = true) {
@@ -289,7 +290,7 @@ class GardenLayer extends Layer {
     Object.values(GardenItemHeightCategory).filter(value => !isNaN(Number(value))).forEach(height => {
       shuffleArray(this.smart_coords[height])
     });
-    const assign_offset = [0, 0, 0, 0, 0];
+    const assign_offset = [0, 0, 0, 0, 0, 0];
     for (const gardenItem of this.content) {
       if ((gardenItem instanceof GardenPlacedItem) && !gardenItem.offsetSpecified) {
         const placeable = <GardenPlacedItem>gardenItem;
@@ -297,7 +298,7 @@ class GardenLayer extends Layer {
         if (assign_offset[height] >= this.smart_coords[height].length) {
           // TODO: generating a spaced placement queue and then converting to fraction either
           // either way is a little silly. We do want fractions, though, in case the garden's resized
-          placeable.offset = Math.random() * (this.width - height * 24) / this.width;
+          placeable.offset = Math.random() * (this.width - height * 36) / this.width;
         } else {
           gardenItem.offset = this.smart_coords[height][assign_offset[height]] / this.width;
           assign_offset[height]++;
@@ -367,13 +368,16 @@ class GardenLayer extends Layer {
   **/
   classifyHeight(canvas: HTMLCanvasElement) {
     const image_data = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
-    if (hasPixelInRow(image_data, work_canvas_size * 0.75, canvas.width)) {
+    if (hasPixelInRow(image_data, work_canvas_size * 0.8, canvas.width)) {
+      return GardenItemHeightCategory.Towering;
+    }
+    if (hasPixelInRow(image_data, work_canvas_size * 0.6, canvas.width)) {
       return GardenItemHeightCategory.Tall;
     }
-    else if (hasPixelInRow(image_data, work_canvas_size * 0.5, canvas.width)) {
+    else if (hasPixelInRow(image_data, work_canvas_size * 0.4, canvas.width)) {
       return GardenItemHeightCategory.Medium;
     }
-    else if (!hasPixelInRow(image_data, work_canvas_size * 0.25, canvas.width)) {
+    else if (!hasPixelInRow(image_data, work_canvas_size * 0.2, canvas.width)) {
       return GardenItemHeightCategory.Short;
     }
     return GardenItemHeightCategory.Tiny;
@@ -381,7 +385,7 @@ class GardenLayer extends Layer {
 
   heightClassFromHeight(num: number) {
     // The num-1 is for the case of a height of work_canvas_size (0 offset)
-    return Math.ceil((num - 1) / 8);
+    return Math.ceil((num - 1) / (work_canvas_size/5));
   }
 
   /** Update the contents of the main canvas, which holds all the plants. **/
@@ -434,7 +438,7 @@ class GardenLayer extends Layer {
   update() {
     this.clearCanvas();
     const ctx = this.canvas.getContext("2d");
-    ctx.drawImage(this.canvasGarden, 0, 6, this.canvasGarden.width, this.canvasGarden.height);
+    ctx.drawImage(this.canvasGarden, 0, LAYER_HEIGHT-work_canvas_size*2, this.canvasGarden.width, this.canvasGarden.height);
     ctx.drawImage(this.canvasGround, 0, 0, this.canvasGround.width, this.canvasGround.height);
   }
 
@@ -689,7 +693,8 @@ class CelestialLayer extends Layer {
       } else {
         actingPalette = this.customPalette;
       }
-      applyOverlay(place_onto_canvas, actingPalette, this.opacity, true);
+      // Some day we may have fogs that are fullscreen (cover the stars)
+      applyOverlay(place_onto_canvas, actingPalette, this.opacity);//, true);
     }
   }
 

@@ -10,14 +10,15 @@ from collections import defaultdict
 from PIL import Image, ImageDraw
 
 SPRITES_PER_ROW = 10
-SPRITE_DIMENSION = 32  # ex: 32 x 32 px. Also sounds refreshing, too sweet for me though.
+SPRITE_DIMENSION = 48  # ex: 32 x 32 px. Also sounds refreshing, too sweet for me though.
+GROUND_DIMENSION = 32  # for ground tiles, which fill me with pain
 DATA_FILE = "src/data.js"
 OUTPATH = "images"
 
 
 fetch_out = [#"all_foliage",
              #"reformatted_named",
-             #"available_ground_base"
+             "available_ground_base"
             ]
 
 def to_rgb(hex):
@@ -68,6 +69,8 @@ def extract_json_from_js_var(var_name):
     return formatted        
 
 def assemble_spritesheet_from_list(var_name):
+    if(var_name == "available_ground_base"):
+        SPRITE_DIMENSION = GROUND_DIMENSION
     json_list = extract_json_from_js_var(var_name)
     num_rows = math.ceil(len(json_list)/SPRITES_PER_ROW)
     spritesheet = Image.new("RGBA",(SPRITES_PER_ROW * SPRITE_DIMENSION, num_rows * SPRITE_DIMENSION))

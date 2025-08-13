@@ -1,6 +1,6 @@
 import { FOLIAGE_SPRITE_DATA, all_foliage } from "../data.js";
 import { buildColorMessage, getSeedCollection, randomFromArray, randomValueFromObject, getGoodieCollection, getRandomKeyFromObj, claimCanvas, gen_toggle_button, gen_func_button, get_toggle_button_setting } from "../shared.js";
-import { gen_plant, decode_plant_data, parse_plant_data, gen_named, getMainPaletteFromSeed } from "../gen_plant.js";
+import { gen_plant, decode_plant_data, parse_plant_data, gen_named, getMainPaletteFromSeed, work_canvas_size } from "../gen_plant.js";
 import { available_tileables, available_backgrounds, do_preload_initial, available_ground_base } from "../gen_garden.js"
 import { CelestialLayer, GardenLayer } from "../garden_layers.js";
 import { LayerManager, GardenLayerDiv, CelestialLayerDiv } from "../garden_ui.js";
@@ -361,9 +361,9 @@ async function create_manip_entry(offset, gardenitem) {
     entry.className = 'collection_box';
     entry.onclick = function (e) { activeGardenItem = gardenitem; showManipMenu(e) };
     var scale_canvas = document.createElement("canvas");
-    let final_size = 64;
-    scale_canvas.width = final_size + 2;
-    scale_canvas.height = final_size + 2;
+    let final_size = work_canvas_size*2;
+    scale_canvas.width = final_size;
+    scale_canvas.height = final_size;
     var scale_ctx = scale_canvas.getContext("2d");
     scale_ctx.imageSmoothingEnabled = false;
     // Strip any positional info
@@ -407,7 +407,7 @@ document.getElementById("randomizer").onclick = random_from_collection;
 document.getElementById("loader").onclick = load;
 document.getElementById("regenerator").onclick = doThisRegen;
 document.getElementById("claimer").onclick = claim;
-document.getElementById("flipper").onclick = togglePositionFlipped;
+document.getElementById("seed_positioning_flip_check").onclick = togglePositionFlipped;
 document.getElementById("seed_positioning_random").onclick = togglePositionFixed;
 document.getElementById("seed_positioning_fixed").onclick = togglePositionFixed;
 document.getElementById("toggle_left_menu").onclick = () => {toggleGardenSideMenu("left");}

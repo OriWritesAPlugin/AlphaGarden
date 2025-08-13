@@ -10,7 +10,7 @@
     --link-color: #FFF4DC;
     --accent-medium: #71b280;
     --accent-bright: #c4fad1;
-    --plant-display: 110px;
+    --plant-display: 144px;
     --min-plant-display: 96px;
     --horiz-screen-cutoff: 992;  /*BEWARE! This can't be used in media selectors, hence lack of units. It's here for easy find-replace*/
     --garden-font-color: #001133 ;
@@ -230,10 +230,10 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     justify-content: center;
     flex-direction: column;
     text-align: center;
-    width: var(--min-plant-display);
-    height: var(--min-plant-display);
-    min-width: var(--min-plant-display);
-    min-height: var(--min-plant-display);
+    width: var(--plant-display);
+    height: var(--plant-display);
+    min-width: var(--plant-display);
+    min-height: var(--plant-display);
     border-color: var(--accent-medium);
     border-style: none;
     border-width: thin;
@@ -1121,7 +1121,6 @@ particle {
 
 #canvas_array{
     display: grid;
-    grid-template-columns: repeat(32, 1fr);
     width: 30vw;
     height: 30vw;
     border-style: solid;

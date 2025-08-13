@@ -1,7 +1,7 @@
 import { available_midgrounds, all_named, all_palettes, available_ground, GROUND_BASE_SPRITESHEET, available_ground_base } from "./data.js";
 import { createSpacedPlacementQueue, claimCanvas, hasPixelInRow, hexToRgb } from "./shared.js";
 import { overall_palette, base_foliage_palette, gen_named, decode_plant_data, gen_plant, random_from_list } from "./gen_plant.js";
-import { refs, preload_single_image, preload_spritesheet, imageFromPopup, tile_along_y, replace_color_palette_single_image, wildcard_canvases } from "./image_handling.js";
+import { refs, preload_single_image, preload_ground, imageFromPopup, tile_along_y, replace_color_palette_single_image, wildcard_canvases } from "./image_handling.js";
 
 var current_ground = "grass [palette]";
 const available_overlay_colors = {
@@ -719,7 +719,7 @@ async function do_preload() {
 }
 
 async function preload_ground_bases() {
-    await preload_spritesheet("ground_base", GROUND_BASE_SPRITESHEET, Object.keys(available_ground_base).length);
+    await preload_ground("ground_base", GROUND_BASE_SPRITESHEET, Object.keys(available_ground_base).length);
 }
 
 // This is the only portion that needs run for the new layer-based interface, so for now they live in parallel.
