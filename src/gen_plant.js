@@ -352,7 +352,6 @@ function drawPlantForSquare(seed, size=work_canvas_size*3, mark_wanted_palettes=
   } else {
     plant_canvas = gen_plant(plant_data, false, size/work_canvas_size);
   }
-  //alert(plant_canvas.toDataURL());
   return plant_canvas.toDataURL();
 }
 
@@ -502,7 +501,7 @@ function addMarkings(plant_data, plant_canvas){
     let color_offset = colors.indexOf(plant_data[palette]);
     if(color_offset != -1){
       ctx.fillStyle = getOffsetColor(color_offset);
-      ctx.fillRect(plant_canvas.width - 4, draw_offset, 4, 4);
+      ctx.fillRect(0, draw_offset, 4, 4);
       draw_offset += 4;
     }
   }

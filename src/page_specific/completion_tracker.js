@@ -357,4 +357,4 @@ document.getElementById("show_bases_button").onclick = () => { show_collection_c
 document.getElementById("show_palettes_button").onclick = () => { show_collection_category("palettes") };
 document.getElementById("show_goodies_button").onclick = () => { show_collection_category("goodies") };
 document.getElementById("reroll_bases_palette").onclick = gen_base_divs.bind(true);
-document.getElementById("mark_palettes").onclick = mark.bind(false);
+document.getElementById("mark_palettes").onclick = ()=>{mark(false)};

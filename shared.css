@@ -23,6 +23,7 @@
 body,
 textarea {
     font-family: monospace, Verdana, sans-serif;
+    font-variant-emoji: text;
     color: var(--font-color);
     background-color: var(--background-color);
 }
@@ -726,8 +727,11 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     border-width: thin;
     border-style: solid;
     padding: 0.1em;
-    border-top-width: thick;
     border-top-style: outset;
+    border-top-width: 0.2em;
+    border-left-width: 0.75em;
+    border-right-width: 0.6em;
+    margin-top: 0.1em;
 }
 
 #layer_manager, #garden_options_menu {
