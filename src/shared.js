@@ -569,7 +569,6 @@ async function concatUint8Arrays(uint8arrays) {
 async function export_save(){
   var a = document.createElement('a');
   const compressedBytes = await compress(JSON.stringify(localStorage));
-  console.log(compressedBytes);
   // Couple bytes of gobbldygook up front so Linux stops un-gzipping my danged saves.
   // You reading the save file """encryption""" because you're up to something? :) Yeah just delete the first 4.
   var blob = new Blob([1,5,'a',2].concat([compressedBytes]), { 'type': 'application/octet-stream' });

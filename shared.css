@@ -800,6 +800,38 @@ input.layer_label {
     left: 0;
 }
 
+#help_button {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    font-size: 4em;
+    border-style: none;
+    background-color: #0000;
+}
+
+#help_button:hover {
+    color: var(--link-color);
+    background-color: #0000;
+}
+
+#help_button_text {
+    display: none;
+    border-style: solid;
+    border-color: var(--font-color);
+    color: var(--link-color);
+    position: fixed;
+    padding: 2em;
+    background-color: var(--input-color);
+    top: 40vh;
+    right: 30%;
+    width: 40%;
+    size: 0.1em;
+}
+
+#help_button:hover + #help_button_text {
+  display: block;
+}
+
 /** FLOURISHES **/
 .rs_message {
     position: relative;

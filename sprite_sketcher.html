@@ -11,7 +11,7 @@
         <a href="./" class="index_link"><--Home</a>
         <div id="page_layout" style="display: flex; flex-wrap: wrap; flex-direction:column; align-content:center">
             <h1 id="title">Sprite Sketcher</h1>
-            <p>Draw new plants and test them in realtime! This is best for tweaking; you can copy-paste image data from ex: GIMP with "Upload Image"</p>
+            <p style="text-align: center">Draw new bases for the tool and test them in realtime! The colors on the left-hand side are the special ones replaced by the tool (plus hard white for crystals/etc). This is best for tweaking; you can copy-paste image data from ex: GIMP with "Upload Image".<br>Ctrl+z and Ctrl+y for undo/redo</p>
             <div id="sketcher_button_div" style="display: flex; justify-content: center;">
             </div>
             </br>
@@ -39,7 +39,7 @@
                   ["#f3addd", "rock/wood"], ["#d87fbc", "rock/wood"], ["#c059a0", "rock/wood"], ["#aa3384", "rock/wood"],
                   ["#fef4cc", "flower/gem/accent"], ["#fde47b", "flower/gem/accent"], ["#ffd430", "flower/gem/accent"], ["#ecb600", "flower/gem/accent"],
                   ["#e900ff", "simple feature"], ["#ff943a", "complex feature"],
-                  ["#9fe389", "10% glow"], ["#c8ffb7", "25% glow"], ["#ffffff", "white"], ["#0000", "erase"]];
+                  ["#9fe389", "10% glow"], ["#c8ffb7", "25% glow"], ["#ffffff", "white"], ["#0000", "erase"], ["#0000", "undo"], ["#0000", "redo"]];
 
         const color_lookup = {
             174: { 215: { 64: 'A' } }, 118: { 201: { 53: 'B' } }, 80: { 170: { 55: 'C' } }, 47: { 144: { 43: 'D' } },
@@ -72,6 +72,8 @@
 
         let img_data; {let canvas = document.createElement('canvas'); let context = canvas.getContext('2d');
             img_data = context.getImageData(0, 0, size, size).data;};
+        let history = [structuredClone(img_data)];
+        let history_pointer = 0;
 
         function setPixelArray(){
             let parent = document.getElementById("canvas_array");
@@ -90,9 +92,15 @@
         for(let i=0; i<colors.length; i++){
             let button = document.createElement("button");
             button.style.backgroundColor = colors[i][0];
-            button.style.color = i==colors.length-1? "white" : "black";
+            button.style.color = i>=colors.length-3? "white" : "black";
             button.innerText = colors[i][1];
-            button.onclick = function(){active_color = colors[i][0]};
+            if(colors[i][1] == "undo"){
+                button.onclick = undo_paint;
+            } else if(colors[i][1] == "redo"){
+                button.onclick = redo_paint;
+            } else {
+                button.onclick = function(){active_color = colors[i][0]};
+            }
             parent.appendChild(button);
         }
 
@@ -119,13 +127,15 @@
             }
         }
 
-        function updateGrid(raw_img_data){
+        function updateGrid(){
             let parent = document.getElementById("canvas_array");
             let plant_data = {"foliage": add_plant_idx, "simple_feature": -1, "complex_feature": -1};
-            draw_arbitrary_onto_imageData_with_color_palette(raw_img_data, plant_data, FOLIAGE_SPRITE_DATA[add_plant_idx], overall_palette, false);
+            draw_arbitrary_onto_imageData_with_color_palette({"data": img_data}, plant_data, FOLIAGE_SPRITE_DATA[add_plant_idx], overall_palette, false);
             for(let i=0; i<img_data.length; i+=4){
                 if(img_data[i+3]>0){
                     parent.childNodes[i/4].style.backgroundColor = rgbToHex(img_data[i], img_data[i+1], img_data[i+2]);
+                } else {
+                    parent.childNodes[i/4].style.backgroundColor = "transparent";
                 }
             }
         }
@@ -163,7 +173,6 @@
                 swap_square.style.background = 'url(' + data_url + ')  no-repeat center center';
                 color_div.appendChild(swap_square);
             }
-            console.log(JSON.stringify(FOLIAGE_SPRITE_DATA[add_plant_idx]));
             genTestGarden();
         }
 
@@ -188,18 +197,41 @@
             }
         }
 
+        function wipe_canvas(interim_wipe=false){
+            if(!interim_wipe){
+                history.push(structuredClone(img_data));
+            }
+            let canvas = document.createElement('canvas');
+            let context = canvas.getContext('2d');
+            img_data = context.getImageData(0, 0, size, size).data;
+            if(!interim_wipe){
+                updatePlants();
+                updateGrid();
+            }
+        }
+
+        function endPaint(){
+            if(history_pointer != 0){
+                history = history.slice(0, history.length-history_pointer);
+                history_pointer = 0;
+            }
+            history.push(structuredClone(img_data));
+            updatePlants();
+        }
+
         document.getElementById("canvas_array").style.gridTemplateColumns = "repeat("+size+", 1fr)";
         document.getElementById('canvas_array').addEventListener('mousedown', doPaint);
         document.getElementById('canvas_array').addEventListener('mousemove', doPaint);
-        document.getElementById('canvas_array').addEventListener('mouseup', updatePlants);
+        document.getElementById('canvas_array').addEventListener('mouseup', endPaint);
         document.getElementById('sketcher_button_div').appendChild(gen_func_button('Upload Image', function(){
             imageFromPopup(document.body, "test_sprite", ()=>{
+            wipe_canvas();
             let canvas = wildcard_canvases["test_sprite"];
             let context = canvas.getContext('2d');
             let raw_img_data = context.getImageData((work_canvas_size-size)/2, work_canvas_size-size, size, size);
             img_data = raw_img_data.data;
             updatePlants();
-            updateGrid(raw_img_data);
+            updateGrid();
             }, size);
         }));
         document.getElementById('sketcher_button_div').appendChild(gen_func_button('Download Image', function(){
@@ -217,8 +249,40 @@
             link.click();
         }));
 
+        function undo_paint(){
+            history_pointer ++;
+            wipe_canvas(true);
+            img_data = structuredClone(history[history.length-1-history_pointer]);
+            updatePlants();
+            updateGrid();
+        }
+
+        function redo_paint(){
+            if(history_pointer==0){
+                return;
+            }
+            history_pointer --;
+            wipe_canvas(true);
+            updateGrid();
+            img_data = structuredClone(history[history.length-1-history_pointer]);
+            updatePlants();
+            updateGrid();
+        }
+
         document.getElementById("sketcher_button_div").appendChild(gen_toggle_button("Show Grid", toggle_borders));
         //document.getElementById("sketcher_button_div").appendChild(gen_toggle_button("alt colors", swap_colors));
+        document.getElementById("sketcher_button_div").appendChild(gen_func_button("Clear Canvas", ()=>{wipe_canvas()}));
+        document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey){
+            if(event.key === 'z') {
+                undo_paint();
+            }
+            else if(event.key === 'y'){
+                redo_paint();
+            }
+        }});
+
+
         updatePlants();
     </script>
     </body>

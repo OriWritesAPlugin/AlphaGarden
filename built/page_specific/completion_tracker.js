@@ -1,6 +1,6 @@
 import { getSeedCollection, getMarkedBases, getMarkedPalettes, buildColorMessage, getGoodieCollection, collectGoodie, getOffsetColor } from "../shared.js";
 import { decode_plant_data, foliage_by_category, palettes_by_category, overall_palette, gen_plant_data, encode_plant_data_v2, gen_named, drawPlantForSquare } from "../gen_plant.js";
-import { PALETTE_PREVIEW_IMG, all_palettes, reformatted_named } from "../data.js";
+import { PALETTE_PREVIEW_IMG, all_palettes, reformatted_named, QUESTION_IMG } from "../data.js";
 import { replace_color_palette } from "../image_handling.js";
 let marking_bases = false;
 let marking_palettes = false;
@@ -146,7 +146,7 @@ function add_swap_square(parent, column_offset, id, base_to_use) {
     swap_square.style.borderColor = border_offset == -1 ? "transparent" : getOffsetColor(border_offset);
     swap_square.style.borderWidth = "thick";
     let plant_data = gen_plant_data(0);
-    let data_url = 'https://i.imgur.com/QhY0vOF.png';
+    let data_url = QUESTION_IMG;
     if (owned_bases.has(base_to_use)) {
         plant_data["foliage"] = base_to_use;
         plant_data["foliage_palette"] = selected_palettes[0];

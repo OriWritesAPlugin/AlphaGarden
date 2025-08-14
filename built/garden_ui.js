@@ -410,7 +410,6 @@ class CelestialLayerDiv extends LayerDiv {
         const skyPaletteSelect = this.buildGenericDropdown("skyPalette", Object.keys(available_backgrounds));
         skyPaletteSelect.onchange = async function () {
             this.layer["skyPalette"] = skyPaletteSelect.value;
-            console.log(skyPaletteSelect.value);
             if (skyPaletteSelect.value == "custom") {
                 this.get_custom_palette(this.layer, this.onEditCallback);
             }

@@ -41,6 +41,8 @@
                 <span>Our documentation mostly lives on <a href="https://www1.flightrising.com/forums/adopt/3112071/1#post_3112071">this thread</a>. Should have everything you need! If not, ping me over there and I'll help out. -Ori</span>
             </div>
         </div>
+<button id="help_button" onclick=toggle_help_text() alt="hover (or click) to display help text">?</button>
+<div id="help_button_text" tabindex="0"></div>
     </body>
 
     <script>
@@ -51,8 +53,8 @@ const tutorial_stages = [
     ["Saving your progress","Progress is saved automatically, stored in your browser, and never sent anywhere. If you use many browsers/devices, the backup file you just made will let you sync progress between them. If you check out the Settings menu, there's an option for loading backups there, but you can also mess with the site's colors if you like. Next time you return to this page, I'll have some new plants for you!"],
     ["More plants!", "Looking at your collection, have you noticed some letters above your plant? Those are its 'seed', a sort of genetic code. If someone pastes that seed into their own collection, they'll get the exact same plant. Use seeds to share and trade! Copy the seeds below (commas and all), go to your Collection, hit the Add button, and paste them in.<br><br>D32UmCPUJQ, D5LzrCC883, C2cN1COiq7, D3pckB+mgC, C4tEvCFBek"],
     ["New ways to get plants", "Do you like the new plants? If not, no worries--it's time to talk about RS, 'raw seedstuff'. If you ever get a plant you don't like, just go to your collection, hit Recycle, tap the plant(s), then 'Recycle Seeds'. That'll trade them for some RS, which you can swap for new plants or use to alter ones you already have. You'll get RS other ways too, like clearings tasks off the To-Do list and bingo boards. Come back here when you have 15 RS! You can check your total in the Collection."],
-    ["Going shopping", "Congrats! Now that you've banked up some RS, we can trade it for more plants. Check out the Seed Swap! New plants show up every day. Get a total of 20 plants in your collection and we'll move on."],
-    ["A growing collection", "You're making wonderful progress! Don't worry about speed, your garden is a marathon, not a sprint, and speaking of gardens...but you'll see that one at 35 plants! For now let's just unlock some more ways to earn plants. The general Bingo board is very powerful, and many people's main way of getting seeds. Bits 'n Bobs is for you creative types, and you can get your own 'personal' seed there either way in the second thingy. See you back here at 35 plants..."],
+    ["Going shopping", "Congrats! Now that you've banked up some RS, we can trade it for more plants. Check out the Seed Swap! New plants show up every day. Get a total of 10 plants in your collection and we'll move on."],
+    ["A growing collection", "You're making wonderful progress! Don't worry about speed, your garden is a marathon, not a sprint, and speaking of gardens...but you'll see that one at 15 plants! For now let's just unlock some more ways to earn plants. The general Bingo board is very powerful, and many people's main way of getting seeds. Bits 'n Bobs is for you creative types, and you can get your own 'personal' seed there either way in the second thingy. See you back here in 5 more plants..."],
     ["The garden", "Congratulations, your collection's large enough for a garden! The Garden Creator lets you arrange your plants in all sorts of ways. It can get fairly in-depth, but an easy way to start is hitting the Randomize button several times. You'll see layers popping up on the right-hand side, click-drag those to reorder and see what happens. The best way to learn the garden creator is by playing with it!"],
     ["What next?", "Now that you know your way around, you've unlocked the Completion Tracker. This will let you see how many bases/palettes/goodies you've collected. Check it out now--there's quite a few!"],
     ["You completed the tutorial!", "The tutorial's over, but there's tons left to do--try mutating your seeds in the Collection, making your own in the Sprite Tester, and generally clicking around! The real heart of your garden is the personal progress it represents. I hope this site helps you, and your garden bears wonderful fruit ♥"],
@@ -66,15 +68,27 @@ function lock_link(id){
     link.innerText = "???";
 }
 
+function toggle_help_text(){
+    let help_text = document.getElementById("help_button_text");
+    help_text.style.display = help_text.style.display == "block"? "none": "block";
+}
+
 function display_tutorial(){
     let tutorial_stage = localStorage.tstage == undefined ? 0 : JSON.parse(localStorage.tstage);
-    if(tutorial_stage == -1 || tutorial_stage >= tutorial_stages.length){return;}
+    let help_text = document.getElementById("help_button_text");
+    if(tutorial_stage == -1 || tutorial_stage >= tutorial_stages.length){
+        help_text.innerHTML = "You've already completed the tutorial! But there might be something here later...watch the thread!"
+        return;
+    } else {
+        help_text.innerHTML = tutorial_stages[tutorial_stage][0] + ": " + tutorial_stages[tutorial_stage][1];
+
+    }
     let skip_modal = false;
     if(tutorial_stage == 1 || tutorial_stage == 6 || tutorial_stage == 7){
         collection_size = localStorage["seed_collection"] == undefined ? 0 : localStorage["seed_collection"].split(",").length;
         if(tutorial_stage == 1 && collection_size < 1){skip_modal = true;};
-        if(tutorial_stage == 6 && collection_size < 20){skip_modal = true;};
-        if(tutorial_stage == 7 && collection_size < 35){skip_modal = true;};
+        if(tutorial_stage == 6 && collection_size < 10){skip_modal = true;};
+        if(tutorial_stage == 7 && collection_size < 15){skip_modal = true;};
     }
     if(tutorial_stage == 5){
         seedpoints = localStorage["seed_points"] == undefined? 0 : JSON.parse(localStorage.seed_points);
@@ -120,5 +134,6 @@ function display_tutorial(){
 }
 
     display_tutorial();
+    //document.getElementById("help_button").addEventListener("click",);
     </script>
 </html>

@@ -290,20 +290,22 @@ function update_splice() {
     document.getElementById("mutate_preview_canvas").setAttribute("data-seed", new_seed);
 }
 function claim_splice() {
-    let gotten = removeSeedFromCollection(document.getElementById("first_splice").getAttribute("data-seed"));
-    let gotten_2 = removeSeedFromCollection(document.getElementById("second_splice").getAttribute("data-seed"));
-    if (!(gotten && gotten_2)) {
-        alert("At least one of the seeds used in this splice couldn't be found in your collection. Found seed (if any) refunded and splice cancelled!");
-        if (gotten) {
-            collectSeedWithTemp(document.getElementById("first_splice").getAttribute("data-seed"));
+    if (!on_temporary_collection) {
+        let gotten = removeSeedFromCollection(document.getElementById("first_splice").getAttribute("data-seed"));
+        let gotten_2 = removeSeedFromCollection(document.getElementById("second_splice").getAttribute("data-seed"));
+        if (!(gotten && gotten_2)) {
+            alert("At least one of the seeds used in this splice couldn't be found in your collection. Found seed (if any) refunded and splice cancelled!");
+            if (gotten) {
+                collectSeedWithTemp(document.getElementById("first_splice").getAttribute("data-seed"));
+            }
+            ;
+            if (gotten_2) {
+                collectSeedWithTemp(document.getElementById("first_splice").getAttribute("data-seed"));
+            }
+            ;
+            display_collection();
+            return;
         }
-        ;
-        if (gotten_2) {
-            collectSeedWithTemp(document.getElementById("first_splice").getAttribute("data-seed"));
-        }
-        ;
-        display_collection();
-        return;
     }
     let new_seed = document.getElementById("mutate_preview_canvas").getAttribute("data-seed");
     collectSeedWithTemp(new_seed);
