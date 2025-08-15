@@ -282,7 +282,8 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 
 .todo_choice {
     margin: auto 0 0 0;
-    min-width: 96px;
+    min-width: auto;
+    min-height: auto;
 }
 
 .bingo_box {
@@ -549,7 +550,7 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 .dotted-fill-in {
     width: 100%;
     min-width: 0px;
-    max-height: 10em;
+    max-height: 15em;
     scrollbar-width: 100px;
 }
 

@@ -11,7 +11,7 @@
         <a href="./" class="index_link"><--Home</a>
         <div id="palette_sketch_page_layout">
             <h1 id="title">Sprite Sketcher</h1>
-            <p style="text-align: center">Draw new bases for the tool and test them in realtime! The colors on the left-hand side are the special ones replaced by the tool (plus hard white for crystals/etc). This is best for tweaking; you can copy-paste image data from ex: GIMP with "Upload Image".<br>Ctrl+z and Ctrl+y for undo/redo</p>
+            <p style="text-align: center">Draw new bases for the tool and test them in realtime! The colors on the left-hand side are the special ones replaced by the tool (plus hard white for crystals/etc). This is best for tweaking; you can copy-paste image data from ex: GIMP with "Upload Image"</p>
             <div id="sketcher_button_div" style="display: flex; justify-content: center;">
             </div>
             </br>
@@ -35,11 +35,11 @@
         import {LayerManager} from "./built/garden_ui.js";
         import {do_preload_initial} from "./built/gen_garden.js"
 
-        const colors = [["#aed740", "leaves/vines"], ["#76c935", "leaves/vines"], ["#50aa37", "leaves/vines"], ["#2f902b", "leaves/vines"],
-                  ["#f3addd", "rock/wood"], ["#d87fbc", "rock/wood"], ["#c059a0", "rock/wood"], ["#aa3384", "rock/wood"],
-                  ["#fef4cc", "flower/gem/accent"], ["#fde47b", "flower/gem/accent"], ["#ffd430", "flower/gem/accent"], ["#ecb600", "flower/gem/accent"],
+        const colors = [["#aed740", "leaves/vines", "q"], ["#76c935", "leaves/vines", "w"], ["#50aa37", "leaves/vines", "e"], ["#2f902b", "leaves/vines", "r"],
+                  ["#f3addd", "rock/wood", "a"], ["#d87fbc", "rock/wood", "s"], ["#c059a0", "rock/wood", "d"], ["#aa3384", "rock/wood", "f"],
+                  ["#fef4cc", "flower/gem/accent", "z"], ["#fde47b", "flower/gem/accent", "x"], ["#ffd430", "flower/gem/accent", "c"], ["#ecb600", "flower/gem/accent", "v"],
                   ["#e900ff", "simple feature"], ["#ff943a", "complex feature"],
-                  ["#9fe389", "10% glow"], ["#c8ffb7", "25% glow"], ["#ffffff", "white"], ["#0000", "erase"], ["#0000", "undo"], ["#0000", "redo"]];
+                  ["#9fe389", "10% glow"], ["#c8ffb7", "25% glow"], ["#ffffff", "white"], ["#0000", "erase"], ["#0000", "undo", "ctrl+z"], ["#0000", "redo", "ctrl+y"]];
         let show_colors = ["#aed740","#76c935","#50aa37","#2f902b","#f3addd","#d87fbc","#c059a0","#aa3384","#fef4cc","#fde47b","#ffd430","#ecb600"];
 
         const color_lookup = {
@@ -99,7 +99,7 @@
             let button = document.createElement("button");
             button.style.backgroundColor = colors[i][0];
             button.style.color = i>=colors.length-3? "white" : "black";
-            button.innerText = colors[i][1];
+            button.innerText = colors[i][1] + (colors[i].length > 2? " [" + colors[i][2]+ "]" : "");
             if(colors[i][1] == "undo"){
                 button.onclick = undo_paint;
             } else if(colors[i][1] == "redo"){
@@ -229,6 +229,9 @@
         document.getElementById('canvas_array').addEventListener('mousedown', doPaint);
         document.getElementById('canvas_array').addEventListener('mousemove', doPaint);
         document.getElementById('canvas_array').addEventListener('mouseup', endPaint);
+        document.getElementById('canvas_array').addEventListener('touchdown', doPaint);
+        document.getElementById('canvas_array').addEventListener('touchmove', doPaint);
+        document.getElementById('canvas_array').addEventListener('touchup', endPaint);
         document.getElementById('sketcher_button_div').appendChild(gen_func_button('Import Sprite', function(){
             imageFromPopup(document.body, "test_sprite", ()=>{
             wipe_canvas();
@@ -331,7 +334,16 @@
             else if(event.key === 'y'){
                 redo_paint();
             }
-        }});
+        }
+        else {
+            for(let i=0; i<colors.length; i++){
+                if(colors[i].length > 2 && event.key === colors[i][2]){
+                        active_color_idx = i;
+                        return;
+                    }
+                }
+            }
+        });
 
 
         updatePlants();

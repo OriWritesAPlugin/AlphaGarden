@@ -150,11 +150,9 @@ function makePlantSelector(element) {
     let prize_display_square = document.getElementById("task_" + id + "_reward");
     for (let i = 0; i < plants_to_choose_from; i++) {
         let prize_select_square = document.createElement('button');
-        prize_select_square.classList.add('plant_box');
-        if (size == 96) {
-            prize_select_square.style.minWidth = "96px";
-            prize_select_square.style.minHeight = "96px";
-        }
+        prize_select_square.classList.add('todo_choice');
+        prize_select_square.style.width = size + "px";
+        prize_select_square.style.height = size + "px";
         let salt = forced_random_seed + (Math.floor(id / num_tasks_per_set) * plants_to_choose_from + i % plants_to_choose_from);
         let plant_data = gen_plant_data(0, salt);
         let seed = encode_plant_data_v2(plant_data);
