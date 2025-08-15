@@ -164,6 +164,23 @@ function add_swap_square(parent, column_offset, id, base_to_use) {
             localStorage.marked_bases = marked_bases.toString();
             alert(localStorage.marked_bases);
         }
+        else if (!owned_bases.has(base_to_use)) {
+            //swap_square.style.transition = "none";
+            swap_square.style.transition = "opacity 1s ease-in-out";
+            swap_square.style.filter = "contrast(0%) opacity(50%)";
+            swap_square.style.opacity = "0";
+            setTimeout(() => {
+                let plant_data = gen_plant_data(0);
+                plant_data["foliage"] = base_to_use;
+                plant_data["foliage_palette"] = 135;
+                plant_data["feature_palette"] = 135;
+                plant_data["accent_palette"] = 135;
+                let seed = encode_plant_data_v2(plant_data);
+                let shadow_url = drawPlantForSquare(seed, swap_square.width, false);
+                swap_square.style.background = 'url(' + shadow_url + ')  no-repeat center center';
+                swap_square.style.opacity = "1";
+            }, 1000);
+        }
     };
     parent.appendChild(swap_square);
     return id;

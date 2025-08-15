@@ -14,17 +14,18 @@
         <h2 id="subtitle">Handle your data and configure the site</h2>
         <div class="center-what-i-hold-fullvert">
             <div id="data_management_div" class="generic_button_box">
-            <h2>Manage Data</h2></br>
-            <button class="chunky_fullwidth" id="export_data_button">Export Save</button></br></br>
-            <button type="file" class="chunky_fullwidth" id="import_data_button">Import Save</button></br>
+            <h2>Manage Save Data</h2></br>
+            <button id="doBackup_button" title="Download a backup copy of all your data. Do it early and often! You get 3 rs per day for it (max 15)" class="chunky_fullwidth" value="Backup">Backup</button></br></br>
+            <button type="file" class="chunky_fullwidth" id="import_data_button">Load Backup</button></br>
             <input type="file" style="display: none" id="save_file_input"></input></br>
-            <button class="chunky_fullwidth" id="delete_data_button">Delete Save</button>
+            <button class="chunky_fullwidth" id="delete_data_button">Delete All Data</button>
         </div>
         <div id="data_management_div" class="generic_button_box">
             <h2><b class="accent-text">★~*</b>Graphics<b class="accent-text">*~★</b></h2>
-            <h3>Presets</h3>
+            <div id="general_graphics_settings"></div>
+            <h3>Color Presets</h3>
             <div id="graphics_func_div" style="display: flex; flex-wrap:wrap"></div>
-            <h3>Customize</h3>
+            <h3>Customize Colors</h3>
             <label>Main:<select type="select" id="pick_background" class="generic_dropdown" value="Main Color" onChange="update_colors"></select></label>
             <label>Font:<select type="select" id="pick_font" class="generic_dropdown" value="Font Color" onChange="update_colors"></select></label>
             <label>Else:<select type="select" id="pick_accent" class="generic_dropdown" value="Accent Color" onChange="update_colors"></select></br></label>
@@ -39,9 +40,37 @@ import {decode_plant_data, gen_plant_data, encode_plant_data_v2, drawPlantForSqu
 import {all_palettes} from "./built/data.js"
 
 document.getElementById("delete_data_button").onmousedown = delete_save;
-document.getElementById("export_data_button").onmousedown = export_save;
+//document.getElementById("export_data_button").onmousedown = export_save;
 document.getElementById("import_data_button").onmousedown = function() {document.getElementById('save_file_input').click();}
 document.getElementById('save_file_input').addEventListener('change', import_save);
+if (localStorage["last_backup"] == undefined) { localStorage["last_backup"] = new Date() }
+let days_since_backup = Math.round((+new Date() - +new Date(localStorage["last_backup"])) / 8.64e7);
+const backup_sp_per_day = 3;
+const max_sp_for_backup = 15;
+console.log(days_since_backup);
+if (days_since_backup > 0) {
+    document.getElementById("doBackup_button").innerText = "Backup (+" + Math.min(days_since_backup * backup_sp_per_day, max_sp_for_backup) + " rs)";
+}
+// Direct copy of the one from the collection, once the dust settles they should probably be in Shared
+document.getElementById("doBackup_button").onclick = function(){
+    export_save();
+    let rewarded_points = Math.min(days_since_backup * backup_sp_per_day, max_sp_for_backup);
+    if (rewarded_points > 0) {
+        addSeedPoints(rewarded_points);
+        updateSeedPoints();
+        localStorage["last_backup"] = new Date();
+    }
+    document.getElementById("doBackup_button").value = "Backup";
+}
+
+function set_plants_display_palettes(){
+    let show_palettes = get_toggle_button_setting("Earnable plants show palettes");
+    if(show_palettes){localStorage["dp"] = 1;} else {localStorage["dp"] = 0;}
+    location.reload();
+}
+
+document.getElementById("general_graphics_settings").appendChild(gen_toggle_button("Earnable plants show palettes", set_plants_display_palettes, localStorage.dp==="1"));
+
 let palette_lookup = {};
 let popular_palettes = {};
 for(let i=0; i<all_palettes.length; i++){ palette_lookup[all_palettes[i]["name"]] = i; popular_palettes[i] = 0;}
@@ -93,7 +122,7 @@ function setup_options(){
     color_pickers[1].onchange = function(){update_colors()};
     color_pickers[2].onchange = function(){update_colors()};
 
-    add_preview_square(document.getElementById("preview_img"), "Hover");
+    add_preview_square(document.getElementById("preview_img"), "hover");
     add_preview_square(document.getElementById("preview_img"), "over");
     add_preview_square(document.getElementById("preview_img"), "us");
     document.getElementById("graphics_func_div").appendChild(gen_func_button("default", function(){load_palettes("shade", "flaxmetal", "wintergreen", false, false, false)}));

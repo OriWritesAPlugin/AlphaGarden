@@ -16,9 +16,9 @@ DATA_FILE = "src/data.js"
 OUTPATH = "images"
 
 
-fetch_out = [#"all_foliage",
+fetch_out = ["all_foliage",
              #"reformatted_named",
-             "available_ground_base"
+             #"available_ground_base"
             ]
 
 def to_rgb(hex):
@@ -69,8 +69,8 @@ def extract_json_from_js_var(var_name):
     return formatted        
 
 def assemble_spritesheet_from_list(var_name):
-    if(var_name == "available_ground_base"):
-        SPRITE_DIMENSION = GROUND_DIMENSION
+    #if(var_name == "available_ground_base"):
+    #    SPRITE_DIMENSION = GROUND_DIMENSION
     json_list = extract_json_from_js_var(var_name)
     num_rows = math.ceil(len(json_list)/SPRITES_PER_ROW)
     spritesheet = Image.new("RGBA",(SPRITES_PER_ROW * SPRITE_DIMENSION, num_rows * SPRITE_DIMENSION))
@@ -132,7 +132,7 @@ def assemble_spritesheet_from_list(var_name):
                     counts[2] += 1
             if(len(custom_colors.keys()) > 50):
                 print(f"{sprite_info["name"]} used {len(custom_colors.keys())} colors")
-            sprite_calc_info.append({"w":right - left, "h": height-upper, "wc": (right + left)/2 + left, "l": height-bottom, "m": max(counts, key=counts.get), "e": data, "x": custom_colors, "s": int(last_used_custom_colors)})
+            sprite_calc_info.append({"w":right - left, "h": height-upper, "wc": (right + left)/2 + left, "l": height-bottom, "m": max(counts, key=counts.get), "e": data, "x": custom_colors, "s": int(last_used_sub_elements)})
         spritesheet.paste(sprite, (x_offset + (SPRITE_DIMENSION - width)//2, y_offset + (SPRITE_DIMENSION - height)))
     spritesheet.save(f"{OUTPATH}/{var_name}-uncrushed.png")
     subprocess.run([os.path.expanduser("~/misc_tools/pngcrush/pngcrush/pngcrush"), f"{OUTPATH}/{var_name}-uncrushed.png", f"{OUTPATH}/{var_name}.png"])

@@ -65,7 +65,6 @@ async function do_stuff() {
     setTimeout(function(){document.getElementById("randomizer").classList.remove("hint_glow")}, 1000);
     }*/
    if(window.innerWidth <= pc_width){
-    toggleGardenSideMenu("left");
     toggleGardenSideMenu("right");
     }
 }
@@ -396,8 +395,10 @@ function toggleGardenSideMenu(side="left"){
     let margin_trait = side === "left" ? "marginLeft" : "marginRight";
     if(state == "hide"){
         document.getElementById(targets[1]).style[margin_trait] = "-26em"
+        document.getElementById(targets[1]).style.opacity = 0;
     } else {
         document.getElementById(targets[1]).style[margin_trait] = "0em"
+        document.getElementById(targets[1]).style.opacity = 1;
     }
 }
 
@@ -412,3 +413,6 @@ document.getElementById("seed_positioning_random").onclick = togglePositionFixed
 document.getElementById("seed_positioning_fixed").onclick = togglePositionFixed;
 document.getElementById("toggle_left_menu").onclick = () => {toggleGardenSideMenu("left");}
 document.getElementById("toggle_right_menu").onclick = () => {toggleGardenSideMenu("right");}
+document.getElementById("garden_options_menu").style.display = "none";
+toggleGardenSideMenu("left");
+setTimeout(()=>{document.getElementById("garden_options_menu").style.display = "block"}, 10);

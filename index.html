@@ -9,7 +9,7 @@
     <body>
         <script type="text/javascript" src="./built/virtually_universal_config.js"></script>
         <h1 id="title">An Endless Garden</h1>
-        <h2 id="subtitle">Pixel plants to celebrate your achievements, tools to help with them, and gardens to build from them</h2>
+        <h3 id="subtitle">Pixel plants to celebrate your achievements, tools to help with them, and gardens to build from them</h3>
         <div id=content_div>
             <div id="directory_div">
                 <h2>Tools</h2>
@@ -32,7 +32,6 @@
                 <label for="palette_link"><img src="https://i.imgur.com/pFuZrH6.png" alt="Palette tester favicon"></label><a id="palette_link" class="directory_link" href="palette_tester.html">Palette Tester</a><br> 
                 <label for="settings_link"><img src="https://i.imgur.com/ipVjeXb.png" alt="Settings favicon"></label><a id="settings_link" class="directory_link" href="settings.html">Settings</a><br><br> 
                 <h3>Legacy:</h3>
-                <label for="legacy_swap_link"><img src="https://i.imgur.com/ufm0hIO.png" alt="Seed swap favicon"></label><a id="legacy_swap_link" class="directory_link" href="seed_swap.html">Seed Swap (no RS)</a><br>
                 <label for="legacy_garden_link"><img src="https://i.imgur.com/U7WgCMt.png" alt="Garden generator favicon"></label><a id="legacy_garden_link" class="directory_link" href="random_garden.html">Old garden generator</a><br>
                 <label for="legacy_todo_link"><img src="https://i.imgur.com/SIQJ3U0.png" alt="To-do favicon"></label><a id="legacy_todo_link" class="directory_link" href="to_do_legacy.html">Old To-Do List</a><br>
                 <label for="utils_link"><img src="https://i.imgur.com/ttXOfMp.png" alt="Garden utils favicon"></label><a id="utils_link" class="directory_link" href="garden_utils.html">Utilities</a><br>
@@ -77,7 +76,7 @@ function display_tutorial(){
     let tutorial_stage = localStorage.tstage == undefined ? 0 : JSON.parse(localStorage.tstage);
     let help_text = document.getElementById("help_button_text");
     if(tutorial_stage == -1 || tutorial_stage >= tutorial_stages.length){
-        help_text.innerHTML = "You've already completed the tutorial! But there might be something here later...watch the thread!"
+        help_text.innerHTML = "You've already completed the tutorial! But there might be something here later..."
         return;
     } else {
         help_text.innerHTML = tutorial_stages[tutorial_stage][0] + ": " + tutorial_stages[tutorial_stage][1];

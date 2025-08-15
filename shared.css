@@ -498,7 +498,7 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 /** TODO LIST **/
 #top_spacer {
     opacity: 0;
-    height: 10vh;
+    height: 3em;
     display: inline-block;
 }
 
@@ -532,6 +532,12 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 
 .dotted-fill-in:hover::placeholder {
     color: var(--accent-medium);
+}
+
+.dotted-fill-in {
+    margin: 0 1em;
+    width: 100%;
+    min-width: 0px;
 }
 
 .garden-dim-bar {
@@ -588,10 +594,10 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 
 .todo_checkbox {
     accent-color: var(--flash-color);
-    min-width: 36px;
-    min-height: 36px;
-    margin-top: 60px;
-    margin-right: 8px;
+    min-width: 2.4em;
+    min-height: 2.4em;
+    margin-top: auto;
+    margin-left: 1em;
     transition: accent-color 1.5s ease;
 }
 
@@ -821,7 +827,7 @@ input.layer_label {
     color: var(--link-color);
     position: fixed;
     padding: 2em;
-    background-color: var(--input-color);
+    background-color: var(--background-color);
     top: 40vh;
     right: 30%;
     width: 40%;
@@ -1157,11 +1163,21 @@ particle {
 
 #canvas_array{
     display: grid;
-    width: 30vw;
-    height: 30vw;
+    width: 40em;
+    height: 40em;
     border-style: solid;
     border-width: thin;
     border-color: var(--hover-color);
+}
+
+@media screen and (max-width: 992px) {
+#canvas_array{
+    width: 70vw;
+    height: 70vw;
+}
+#color_selector{
+    width: 20vw;
+}
 }
 
 /** CHALLENGES **/

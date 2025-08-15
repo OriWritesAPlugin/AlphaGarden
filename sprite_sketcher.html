@@ -21,15 +21,15 @@
                     <div id="settings"></div>
                     <div id="canvas_array"></div>
                 </div>
-                <div id="plant_previews" style="display: grid; grid-template-columns: repeat(6, 1fr)"></div>
+                <div id="plant_previews" style="display: grid; grid-template-columns: repeat(4, 1fr)"></div>
             </div>
             <canvas id="garden_preview" width="450" height="100" style="width: 450px; margin: auto"></canvas>
         </div>
 
     </body>
     <script type="module">
-        import {FOLIAGE_SPRITE_DATA} from "./built/data.js";
-        import {work_canvas_size, gen_plant_data, encode_plant_data_v2, drawPlantForSquare, draw_arbitrary_onto_imageData_with_color_palette, overall_palette, plant_cache} from "./built/gen_plant.js";
+        import {FOLIAGE_SPRITE_DATA, all_palettes} from "./built/data.js";
+        import {work_canvas_size, gen_plant_data, encode_plant_data_v2, decode_plant_data, drawPlantForSquare, draw_arbitrary_onto_imageData_with_color_palette, overall_palette, plant_cache} from "./built/gen_plant.js";
         import {hexToRgb, rgbToHex, gen_toggle_button, gen_func_button, get_toggle_button_setting} from "./built/shared.js";
         import {imageFromPopup, wildcard_canvases} from "./built/image_handling.js";
         import {LayerManager} from "./built/garden_ui.js";
@@ -40,6 +40,7 @@
                   ["#fef4cc", "flower/gem/accent"], ["#fde47b", "flower/gem/accent"], ["#ffd430", "flower/gem/accent"], ["#ecb600", "flower/gem/accent"],
                   ["#e900ff", "simple feature"], ["#ff943a", "complex feature"],
                   ["#9fe389", "10% glow"], ["#c8ffb7", "25% glow"], ["#ffffff", "white"], ["#0000", "erase"], ["#0000", "undo"], ["#0000", "redo"]];
+        let show_colors = ["#aed740","#76c935","#50aa37","#2f902b","#f3addd","#d87fbc","#c059a0","#aa3384","#fef4cc","#fde47b","#ffd430","#ecb600"];
 
         const color_lookup = {
             174: { 215: { 64: 'A' } }, 118: { 201: { 53: 'B' } }, 80: { 170: { 55: 'C' } }, 47: { 144: { 43: 'D' } },
@@ -58,20 +59,25 @@
         );
 
         const add_plant_idx = FOLIAGE_SPRITE_DATA.length;
-        const num_plants_to_display = 24;
-        const display_plant_data = [];
-        for(let i=0; i<num_plants_to_display; i++){
-            let plant_data = gen_plant_data();
-            if(i%3!=0){
-                plant_data["foliage"] = add_plant_idx;
+        const num_plants_to_display = 16;
+        let display_plant_data = [];
+        function gen_preview_plants(){
+            display_plant_data = [];
+            for(let i=0; i<num_plants_to_display; i++){
+                let plant_data = gen_plant_data();
+                if((i+1)%4>1){
+                    plant_data["foliage"] = add_plant_idx;
+                }
+                display_plant_data.push(plant_data);
             }
-            display_plant_data.push(plant_data);
         }
+        gen_preview_plants();
 
-        let active_color = "#50aa37";
-
+        let active_color_idx = 0;
+        let full_img;
         let img_data; {let canvas = document.createElement('canvas'); let context = canvas.getContext('2d');
-            img_data = context.getImageData(0, 0, size, size).data;};
+            full_img = context.getImageData(0, 0, size, size);
+            img_data = full_img.data};
         let history = [structuredClone(img_data)];
         let history_pointer = 0;
 
@@ -99,7 +105,7 @@
             } else if(colors[i][1] == "redo"){
                 button.onclick = redo_paint;
             } else {
-                button.onclick = function(){active_color = colors[i][0]};
+                button.onclick = function(){active_color_idx = i};
             }
             parent.appendChild(button);
         }
@@ -117,8 +123,8 @@
         function doPaint(e){
             if(e.target.id == "canvas_array"){return;}
             if(e.buttons === 1){
-                e.target.style.backgroundColor=active_color;
-                let as_list = active_color === "#0000"? [0, 0, 0, 0] : hexToRgb(active_color).concat([255]); // silly given our fairly fixed set...
+                e.target.style.backgroundColor=active_color_idx<12? show_colors[active_color_idx] : colors[active_color_idx][0];
+                let as_list = colors[active_color_idx][0] === "#0000"? [0, 0, 0, 0] : hexToRgb(colors[active_color_idx][0]).concat([255]); // silly given our fairly fixed set...
                 let offset = Number(e.target.id.slice(3))*4;
                 img_data[offset] = as_list[0];
                 img_data[offset+1] = as_list[1];
@@ -129,11 +135,11 @@
 
         function updateGrid(){
             let parent = document.getElementById("canvas_array");
-            let plant_data = {"foliage": add_plant_idx, "simple_feature": -1, "complex_feature": -1};
-            draw_arbitrary_onto_imageData_with_color_palette({"data": img_data}, plant_data, FOLIAGE_SPRITE_DATA[add_plant_idx], overall_palette, false);
+            let lookup = {};
+            for(let i=0; i<colors.length; i++){lookup[colors[i][0]] = i < 12? show_colors[i] : colors[i][0]};
             for(let i=0; i<img_data.length; i+=4){
                 if(img_data[i+3]>0){
-                    parent.childNodes[i/4].style.backgroundColor = rgbToHex(img_data[i], img_data[i+1], img_data[i+2]);
+                    parent.childNodes[i/4].style.backgroundColor = lookup[rgbToHex(img_data[i], img_data[i+1], img_data[i+2])];
                 } else {
                     parent.childNodes[i/4].style.backgroundColor = "transparent";
                 }
@@ -223,7 +229,7 @@
         document.getElementById('canvas_array').addEventListener('mousedown', doPaint);
         document.getElementById('canvas_array').addEventListener('mousemove', doPaint);
         document.getElementById('canvas_array').addEventListener('mouseup', endPaint);
-        document.getElementById('sketcher_button_div').appendChild(gen_func_button('Upload Image', function(){
+        document.getElementById('sketcher_button_div').appendChild(gen_func_button('Import Sprite', function(){
             imageFromPopup(document.body, "test_sprite", ()=>{
             wipe_canvas();
             let canvas = wildcard_canvases["test_sprite"];
@@ -234,14 +240,15 @@
             updateGrid();
             }, size);
         }));
-        document.getElementById('sketcher_button_div').appendChild(gen_func_button('Download Image', function(){
+        document.getElementById('sketcher_button_div').appendChild(gen_func_button('Export Sprite', function(){
             let canvas = document.createElement('canvas');
             let ctx = canvas.getContext('2d');
             canvas.width = size;
             canvas.height = size;
             let imageData = ctx.getImageData(0, 0, size, size);
-            const palette = overall_palette.map(hexToRgb);
-            imageData = draw_arbitrary_onto_imageData_with_color_palette(imageData, {"foliage": add_plant_idx, "simple_feature": -1, "complex_feature": -1}, FOLIAGE_SPRITE_DATA[add_plant_idx], palette, false);
+            for (let i = 0; i < imageData.data.length; i ++) {
+                imageData.data[i] = img_data[i]; // deeply silly. read-only property on assigning the full set though?
+            }
             ctx.putImageData(imageData, 0, 0);
             let link = document.createElement('a');
             link.download = 'endless_garden_sprite.png';
@@ -269,9 +276,53 @@
             updateGrid();
         }
 
+        function update_color_swatch(seed){
+            if(seed === ""){
+                seed = "BxKYWC2atv";
+            }
+            let plant_data = decode_plant_data(seed);
+            let new_show_colors = all_palettes[plant_data["foliage_palette"]]["palette"].concat(all_palettes[plant_data["feature_palette"]]["palette"]).concat(all_palettes[plant_data["accent_palette"]]["palette"]).map(color => "#"+color);
+            let buttons = document.getElementById("color_selector");
+            let lookup = {};
+            for(let i=0; i<new_show_colors.length; i++){
+                buttons.children[i].style.backgroundColor = new_show_colors[i];
+                buttons.children[i].style.color = hexToRgb(new_show_colors[i]).reduce((a, b) => a + b)/3 < 100 ? "white" : "black";
+                let rgb_string = "rgb(" + hexToRgb(show_colors[i]).join(", ")+")";
+                lookup[rgb_string] = new_show_colors[i];
+            }
+            let childset = document.getElementById("canvas_array").children;
+            for(let i=0; i<childset.length; i++){
+                if(!childset[i].style.backgroundColor){continue;}
+                childset[i].style.backgroundColor = lookup[childset[i].style.backgroundColor];
+            }
+            show_colors = new_show_colors;
+        }
+
         document.getElementById("sketcher_button_div").appendChild(gen_toggle_button("Show Grid", toggle_borders));
         //document.getElementById("sketcher_button_div").appendChild(gen_toggle_button("alt colors", swap_colors));
         document.getElementById("sketcher_button_div").appendChild(gen_func_button("Clear Canvas", ()=>{wipe_canvas()}));
+        document.getElementById("sketcher_button_div").appendChild(gen_func_button("Scramble Plants", ()=>{gen_preview_plants(); updatePlants();}));
+        document.getElementById("sketcher_button_div").appendChild(gen_func_button("Set Ink Colors", ()=>{
+            const modal = document.createElement("div");
+            modal.classList.add("block_window");
+            document.body.appendChild(modal);
+            const modal_display = document.createElement("div");
+            modal_display.classList.add("bingo-popup");
+            modal_display.style.padding = "2em";
+            const modal_text = document.createElement("p");
+            modal_text.innerHTML = "Paste in a seed to paint in its colors! Exported sprites will still be green/magenta/yellow. Empty text resets colors.";
+            modal_display.appendChild(modal_text);
+            const seed_text = document.createElement("input");
+            seed_text.type = "text";
+            seed_text.style.margin = "1em";
+            modal_display.appendChild(seed_text);
+            const accept_button = document.createElement("button");
+            accept_button.onclick = function () { update_color_swatch(seed_text.value); document.body.removeChild(modal); };
+            accept_button.innerText = "Set Colors";
+            accept_button.classList.add("chunky_wrap");
+            modal_display.appendChild(accept_button);
+            modal.appendChild(modal_display);
+        }));
         document.addEventListener('keydown', function(event) {
         if (event.ctrlKey){
             if(event.key === 'z') {

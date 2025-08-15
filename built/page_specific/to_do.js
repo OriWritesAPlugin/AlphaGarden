@@ -30,6 +30,9 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     list_item.classList.add("center-what-i-hold");
     // Textbox, handles saving tasks and spawning selection box
     let textbox_holder = document.createElement("div");
+    textbox_holder.style.marginTop = "auto";
+    textbox_holder.style.flexGrow = 1;
+    textbox_holder.style.maxWidth = "100em";
     let textbox = document.createElement("span");
     textbox.role = "textbox";
     textbox.contentEditable = true;

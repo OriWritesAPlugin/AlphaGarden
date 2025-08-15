@@ -17,6 +17,7 @@
       <div id="prompt_type_select" class="challenge_button_box" style="flex-grow: 1; justify-content: left; align-content: center;">
       </div>
       <div id="prompt_plant_select" class="challenge_button_box" style="flex-grow: 2; justify-content: left;">
+        <p id="prompt_plant_explainer">Choose a base, palette, and palette arrangement:</p>
         <div id="prompt_choose_sprite" class="prompt_plants"></div>
         <div id="prompt_choose_palette" class="prompt_plants"></div>
         <div id="prompt_choose_colors" class="prompt_plants"></div>
@@ -26,7 +27,7 @@
         <div id="prompt_prize_box" style="width: 144px; height: 144px"></div>
         <p id="prompt_instructions" style="width: 25vw; margin-bottom: 0px;"></p>
         <p id="prompt_text" style="min-height: 6em;">[cool prompt here]</p>
-        <button id="prompt_claim">I did it!</button>
+        <button id="prompt_claim" class="chunky_wrap">I did it!</button>
       </div>
     </div>
     <h2 style="margin-bottom:0px">Plants by Name</h2>
@@ -34,7 +35,7 @@
       <div id="seed_by_name_claimer" class="challenge_button_box" style="width: auto; flex-grow: 2; text-align: center;">
         <p>This little thing turns a name/id/username/etc. into a plant. It's meant to allow you to get one unique to you! Doesn't have to be your "government name", really any snippet of text that's meaningful. If someone else enters that snippet, they'll get the same plant. Please also feel free to use it to get one for a friend, or for an OC near and dear to your heart :)</p>
         <input type="text" id="seed_by_name_entry_field" placeholder="enter text here"></input>
-        <button id="seed_by_name_button">Get it!</button>
+        <button id="seed_by_name_button" class="chunky_wrap" style="margin-top: 0.5em">Get it!</button>
         <div id="seed_by_name_display" style="width: 144px; height: 144px"></div>
       </div>
     </div>
@@ -170,7 +171,7 @@
         "current mood: ^ but not ^","her greatest invention made *s from *s","% in the end",
         "# % without the *'s *","^? only & *s","*s? those aren't mine","*s for the * god",
         "^ but not ^, at least while *s are %","the * was %, the * %","^ *","the * that % it",
-        "*, % #","* while the *'s still ^","eventually, even ^ *s are %","and so the *s %",
+        "this *, given #","* while the *'s still ^","eventually, even ^ *s are %","and so the *s %",
         "*s? where we're going, we don't need 'em","% by what he %","*s were %",
         "don't worry, i % *s","never knew a * i %","^? i wouldn't say that","they % as # as they dared",
         "she % with *s","they % with *s","she % with *s","they % with the *","# % by *s",
@@ -281,7 +282,7 @@
         "quickly","pleasantly","excitedly","exquisitely","long","always","dearly","mercifully","slowly",
         "painfully","remarkably","posthumously","humorously","remorselessly","unavoidably","clumsily",
         "uncertainly","with gusto","gracefully","mysteriously","thoroughly","gleefully","beautifully",
-        "overwhelmingly","underwhelmingly","chaotically"],
+        "overwhelmingly","underwhelmingly","chaotically", "freely"],
       "noun": [
         "joy","egg","sunrise","forest","crystal","island","night","tomorrow","unknown","spaceship",
         "idea","scroll","candle","archive","jungle","garden","food","god","friend","love","pet","objection",
@@ -340,9 +341,12 @@
     document.getElementById("prompt_choose_palette").innerHTML = "";
     document.getElementById("prompt_choose_colors").innerHTML = "";
     document.getElementById("prompt_instructions").innerText = active_prompt == "Worldbuilding" || active_prompt == "Character" ? "write a paragraph or so to answer:" : "create something that fits this prompt:";
+    document.getElementById("prompt_plant_explainer").innerText = active_prompt == "Writing" || active_prompt == "Drawing" ? "Choose a base, palette, and palette arrangement" : "Choose a plant";
+    if(active_prompt == "Generic"){document.getElementById("prompt_plant_explainer").innerText += " (a few extra choices in case of nonsense prompts)"};
+    document.getElementById("prompt_plant_explainer").innerText += ":";
     if(active_prompt == "Writing" || active_prompt == "Drawing"){
       for(let i=0; i<5; i++){
-        add_prompt_square(document.getElementById("prompt_choose_sprite"), "prompt_choose_sprite_"+i, chosen_bases[i], [4, 81, 91], 0, i, prompt_chosen_offsets[0])
+        add_prompt_square(document.getElementById("prompt_choose_sprite"), "prompt_choose_sprite_"+i, chosen_bases[i], [135, 135, 135], 0, i, prompt_chosen_offsets[0])
       }
       for(let i=0; i<5; i++){
         add_prompt_square(document.getElementById("prompt_choose_palette"), "prompt_choose_palette"+i, chosen_bases[prompt_chosen_offsets[0]], [chosen_palettes[i*3], chosen_palettes[i*3+1], chosen_palettes[i*3+2]], 1, i, prompt_chosen_offsets[1])
@@ -365,14 +369,15 @@
     let full_prng_string = daily_random_seed+num_claimed_this_day+"_prompt"+JSON.stringify(prompt_chosen_offsets);
     let full_prng = mulberry32(xmur3(full_prng_string)());
     if(active_prompt == "Generic"){
-      if(full_prng() > 0.66){
+      let tail_end_prng = mulberry32(xmur3(prng_string)()+prompt_chosen_offsets[2]);
+      if(tail_end_prng() > 0.66){
         document.getElementById("prompt_instructions").innerText = "write/draw a lore snippet/character that fits most of these:";
         let num_prompts = Math.floor(full_prng()*2+3);
         for(let i=0; i<num_prompts; i++){
-          prompt += random_prompt_gen(random_from_list(prompt_fragments["Generic"]["trait"], full_prng), full_prng) + "</br>";
+          prompt += random_prompt_gen(random_from_list(prompt_fragments["Generic"]["trait"], tail_end_prng), tail_end_prng) + "</br>";
         }
       } else {
-        prompt = random_prompt_gen(random_from_list(prompt_fragments["Generic"]["scenario"], full_prng), full_prng);
+        prompt = random_prompt_gen(random_from_list(prompt_fragments["Generic"]["scenario"], tail_end_prng), tail_end_prng);
       }
     }
     // We reaaaally don't need to recalculate these each time. Only when something is claimed. Refactor once solidified.

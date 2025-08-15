@@ -1,5 +1,5 @@
 import { all_palettes, FOLIAGE_SPRITE_DATA, PALETTE_PREVIEW_IMG, all_foliage } from "../data.js";
-import { getSeedCollectionAsString, export_save, addSeedPoints, getSeedPoints, collectSeed, makeSortCheckmark, buildColorMessage, toHue, getSeedCollection, bubble_out } from "../shared.js";
+import { getSeedCollectionAsString, export_save, addSeedPoints, getSeedPoints, collectSeed, makeSortCheckmark, toHue, getSeedCollection, bubble_out } from "../shared.js";
 import { gen_plant, decode_plant_data, encode_plant_data_v2, foliage_by_category, palettes_by_category, parse_plant_data, overall_palette, work_canvas_size } from "../gen_plant.js";
 import { replace_color_palette } from "../image_handling.js";
 var collection_filter = { "base": new Set(), "palette": new Set() };
@@ -315,7 +315,7 @@ function claim_splice() {
 }
 function copy_selection() {
     let parent = document.getElementById("selection_display_div");
-    let button = document.getElementById("select_seed_copy_button");
+    let button = document.getElementById("copy_selection_button");
     let seed_list = [];
     for (let child of parent.children) {
         seed_list.push(child.getAttribute("data-seed"));
@@ -687,6 +687,21 @@ function add_collection_entry(parent, offset, seed, hide_seed, show_palette) {
     parent.appendChild(placeholder_child);
     create_collection_entry(offset, seed, hide_seed, show_palette, placeholder_child);
 }
+function buildColorFilterMessage(raw_plant_data) {
+    let color_msg = "";
+    if (raw_plant_data["foliage"] == 160) {
+        color_msg += "This seed is malformed";
+    }
+    else {
+        for (let category of ["foliage_palette", "feature_palette", "accent_palette"]) {
+            let link_color = "#" + all_palettes[raw_plant_data[category]]["palette"][0];
+            let id = "force_filter_" + category;
+            color_msg += ("<a id=" + id + " href='javascript:void(0);' style='text-decoration-color: " + link_color + "'><span style='color: " + link_color + "'>" + all_palettes[raw_plant_data[category]]["name"] + "</a></span> ");
+            setTimeout(() => { document.getElementById(id).onclick = () => { forceFilter(-1, raw_plant_data[category]); }; }, 10);
+        }
+    }
+    return color_msg;
+}
 function analyze_seed(seed_string) {
     var canvas = document.getElementById("analysis_output_canvas");
     var ctx = canvas.getContext("2d");
@@ -709,8 +724,9 @@ function analyze_seed(seed_string) {
     preview_ctx.imageSmoothingEnabled = false;
     preview_ctx.drawImage(plant_canvas, 0, 0, preview_canvas.width, preview_canvas.height);
     var text_output = document.getElementById("analysis_output_text");
-    let color_msg = buildColorMessage(raw_plant_data);
-    text_output.innerHTML = "Name: " + "<a href='javascript:forceFilter(" + plant_data["foliage"] + ", -1);'>" + all_foliage[plant_data["foliage"]]["name"] + "</a>";
+    let color_msg = buildColorFilterMessage(raw_plant_data);
+    text_output.innerHTML = "Name: " + "<a id='base_force_filter' href='javascript:void(0);'>" + all_foliage[plant_data["foliage"]]["name"] + "</a>";
+    setTimeout(() => { document.getElementById("base_force_filter").onclick = () => { forceFilter(plant_data["foliage"], -1); }; }, 10);
     text_output.innerHTML += ("<br>Artist: " + all_foliage[plant_data["foliage"]]["artist"] + "<br>Type: " + all_foliage[plant_data["foliage"]]["categories"] + "<br>Colors: " + color_msg);
 }
 function doCollectionPreload() {

@@ -318,7 +318,7 @@ function gen_plant(plant_data, with_color_key = false, with_scale = 1) {
     } else {
         draw_plant_with_color_palette(plant_gen_ctx, plant_data, true);
         // s is for subparts
-        if (!FOLIAGE_SPRITE_DATA[plant_data["foliage"]["s"]]) {
+        if (FOLIAGE_SPRITE_DATA[plant_data["foliage"]]["s"] === 0) {
             plant_cache[seed] = plant_gen_canvas;
             plant_cache_order.push(seed);
             if (plant_cache.length > plant_cache_max_size) {
@@ -348,7 +348,7 @@ function drawPlantForSquare(seed, size=work_canvas_size*3, mark_wanted_palettes=
   const plant_data = decode_plant_data(seed);
   let plant_canvas;
   if(mark_wanted_palettes){
-    plant_canvas = addMarkings(plant_data, gen_plant(plant_data, false, size/work_canvas_size));
+    plant_canvas = addMarkings(plant_data, gen_plant(plant_data, localStorage["dp"]==="1", size/work_canvas_size));
   } else {
     plant_canvas = gen_plant(plant_data, false, size/work_canvas_size);
   }
@@ -418,7 +418,7 @@ function draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data,
                     continue;
                 }
             }
-            if (chance < Math.random()) { continue; }
+            if (chance < Math.random()) { i++; continue; }
             let mini_data = ADDON_SPRITE_DATA[addon_num];
             let centerpoint = work_canvas_size * work_canvas_size + Math.floor((work_canvas_size - mini_data["w"]) / 2) - work_canvas_size + Math.floor(mini_data["w"] / 2);
             draw_arbitrary_onto_imageData_with_color_palette(imageData, plant_data, ADDON_SPRITE_DATA[addon_num], palette, center, pos - 4 * centerpoint, true);
