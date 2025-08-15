@@ -59,6 +59,20 @@ const tutorial_stages = [
     ["You completed the tutorial!", "The tutorial's over, but there's tons left to do--try mutating your seeds in the Collection, making your own in the Sprite Tester, and generally clicking around! The real heart of your garden is the personal progress it represents. I hope this site helps you, and your garden bears wonderful fruit ♥"],
 ];
 
+
+const random_tips = [
+    "In your collection, you can click the base and color names on the Analyze box to filter by that color/base", "Missing a base and not sure what to look for? Try clicking a question mark in the Completion Tracker...",
+    "The garden creator's layers are draggable. They work more or less like layers in GIMP/photoshop.",
+    "You can change the reward in the to-do list by clicking the plant.", "This is a community tool! Most of the really nice bases and colors are community-sourced (and most of the rough ones are dev art :)).",
+    "A lot of things have hover text (not everything yet).", "If you're on mobile, I'm sorry (it used to be worse)", "Most plant-gathering pages 'reroll' on the daily. If you don't like today's selection of prompts/etc, check tomorrow!",
+    "The delete-all-your-data button needs to be held to do anything, don't worry. But still backup regularly.",
+    "The idea that a human being not only can, but must, be endlessly productive is dehumanizing in the most literal way. Needing breaks isn't being lazy, it's being a living thing!",
+    "You can get duplicate plants in the to-do list, and plants all of one color from Bits 'n Bobs prompts. Handy for splicing!",
+    "Want to play around with splices and mutation without spending RS and using up plants? Go to your collection, click add, and look at the 'add to temporary collection' option.",
+    "You don't have to do a backup every day, the points accumulate to a maximum (which should show if you hover on the button).", "Tired of purple? The site colors are editable! Check the Settings menu.",
+    "If you're looking for specific colors, you can turn on color palette display in Settings, as well as mark palettes in the 'Palettes' section of the Completion Tracker."
+]
+
 function lock_link(id){
     let link = document.getElementById(id);
     link.href = "javascript:void(0);";
@@ -76,7 +90,8 @@ function display_tutorial(){
     let tutorial_stage = localStorage.tstage == undefined ? 0 : JSON.parse(localStorage.tstage);
     let help_text = document.getElementById("help_button_text");
     if(tutorial_stage == -1 || tutorial_stage >= tutorial_stages.length){
-        help_text.innerHTML = "You've already completed the tutorial! But there might be something here later..."
+        help_text.innerHTML = "Tutorial complete. There's nothing left to unlock right now, congratulations! Have a random tip:"
+        help_text.innerHTML += ("<br><br>" + random_tips[Math.round(Math.random()*random_tips.length)]);
         return;
     } else {
         help_text.innerHTML = tutorial_stages[tutorial_stage][0] + ": " + tutorial_stages[tutorial_stage][1];
