@@ -71,4 +71,4 @@ function display_release_note() {
     ;
 }
 load_customizations();
-display_release_note();
+//display_release_note();
