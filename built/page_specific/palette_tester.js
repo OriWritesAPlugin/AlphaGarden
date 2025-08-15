@@ -38,8 +38,7 @@ async function do_stuff() {
     document.getElementById("create_garden_organizer").appendChild(gm.selfDiv);
     await gl.updateGround();
     await gm.redraw();
-    gm.toggleVisibility();
-    gm.toggleVisibility();
+    gm.selfDiv.style.display = "none";
     let palettes_by_category = assemble_categories(all_palettes);
     document.getElementById("palette_text").value = "";
     let da_box = document.getElementById("content_div");

@@ -35,11 +35,12 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     // Textbox, handles saving tasks and spawning selection box
     let textbox_holder = document.createElement("div");
     textbox_holder.style.marginTop = "auto";
-    textbox_holder.style.flexGrow = 1;
     textbox_holder.style.maxWidth = "100em";
+    textbox_holder.style.transition = "width 1s";
     let textbox = document.createElement("span");
     textbox.role = "textbox";
-    textbox.style.width = "0%"
+    textbox.style.width = "100%";
+    textbox_holder.style.width = "0px";
     textbox.contentEditable = true;
     textbox_holder.appendChild(textbox);
     textbox.className = "dotted-fill-in";
@@ -47,9 +48,10 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     textbox.placeholder = task_hints[Math.floor(Math.random() * task_hints.length)];
     if (desc != "") { textbox.textContent = desc };
     textbox.addEventListener("focusout", saveTasks, true);
-    textbox.style.margin = "0 1em";
     //let target_width = window.matchMedia('(min-width: 600px)') ? "60vw" : "90vw";
-    setTimeout(function () { textbox.style.width = "100%" }, 20);
+    setTimeout(function () { textbox_holder.style.width = "100%";
+        //textbox_holder.style.flexGrow = 1;
+     }, 200);
 
     // We'll come back to this, we just need it up front for the bind.
     let prize_display_square = document.createElement('button');
@@ -145,8 +147,8 @@ function makePlantSelector(element) {
 
     let grid = document.createElement("div");
     grid.id = "todo_plant_selector";
-    let size = window.innerWidth > 450 ? 96 : 64;
-    if (size == 64) {
+    let size = window.innerWidth > 450 ? 144 : 96;
+    if (size == 96) {
         grid.classList.add("todo_plant_selector_minified");
     } else {
         grid.classList.add("todo_plant_selector_standard");
@@ -157,9 +159,9 @@ function makePlantSelector(element) {
     for (let i = 0; i < plants_to_choose_from; i++) {
         let prize_select_square = document.createElement('button');
         prize_select_square.classList.add('plant_box');
-        if (size == 64) {
-            prize_select_square.style.minWidth = "64px";
-            prize_select_square.style.minHeight = "64px";
+        if (size == 96) {
+            prize_select_square.style.minWidth = "96px";
+            prize_select_square.style.minHeight = "96px";
         }
         let salt = forced_random_seed + (Math.floor(id / num_tasks_per_set) * plants_to_choose_from + i % plants_to_choose_from);
         let plant_data = gen_plant_data(0, salt);
@@ -168,7 +170,7 @@ function makePlantSelector(element) {
         let prize_url = data_url;
         prize_select_square.setAttribute("data-seed", seed);
         prize_select_square.style.background = 'url(' + data_url + ')  no-repeat center center';
-        if (size == 64) {
+        if (size == 96) {
             prize_url = drawPlantForSquare(seed);
         } // Return to realsize for the display.
         if (can_select) {
