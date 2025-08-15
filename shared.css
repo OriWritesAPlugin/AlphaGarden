@@ -466,7 +466,6 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     border-color: var(--font-color);
     border-width: thin;
     border-style: solid;
-    width: 40rem;
     top: 20%;
     left: 50%;
     transform: translate(-50%, -20%);

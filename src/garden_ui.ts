@@ -459,7 +459,7 @@ class CelestialLayerDiv extends LayerDiv {
     modal_display.classList.add("popup");
     document.body.appendChild(modal);
     const textbox = document.createElement("text");
-    textbox.textContent = "Enter a comma-separated list of hex colors. You can also put just one for a solid color, or a seed to use its first palette";
+    textbox.innerHTML = "Enter a comma-separated list of hex colors. You can also put just one for a solid color, or a seed to use its first palette<br>";
     const fillIn = document.createElement("input") as HTMLInputElement;
     fillIn.value = cl.customPalette.toString();
     fillIn.oninput = async function () {
