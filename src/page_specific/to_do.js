@@ -22,7 +22,6 @@ const task_hints = ["Done anything nice for yourself lately?", "Anyone you've be
     "Any big tasks you could break down into smaller ones?", "Anything to add to your calendar?"
 ];
 var active_plant_selector;
-var setup_complete = false; // Sentinel so we don't spawn a bajillion bubbles on page load.
 const checkbox_flash = window.getComputedStyle(document.documentElement).getPropertyValue("--accent-bright");
 const checkbox_neutral = window.getComputedStyle(document.documentElement).getPropertyValue("--accent-medium");
 
@@ -40,6 +39,7 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     textbox_holder.style.maxWidth = "100em";
     let textbox = document.createElement("span");
     textbox.role = "textbox";
+    textbox.style.width = "0%"
     textbox.contentEditable = true;
     textbox_holder.appendChild(textbox);
     textbox.className = "dotted-fill-in";
@@ -47,8 +47,9 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     textbox.placeholder = task_hints[Math.floor(Math.random() * task_hints.length)];
     if (desc != "") { textbox.textContent = desc };
     textbox.addEventListener("focusout", saveTasks, true);
-    let target_width = window.matchMedia('(min-width: 600px)') ? "60vw" : "90vw";
-    setTimeout(function () { textbox.style.width = target_width }, 20);
+    textbox.style.margin = "0 1em";
+    //let target_width = window.matchMedia('(min-width: 600px)') ? "60vw" : "90vw";
+    setTimeout(function () { textbox.style.width = "100%" }, 20);
 
     // We'll come back to this, we just need it up front for the bind.
     let prize_display_square = document.createElement('button');
@@ -59,6 +60,10 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     checkbox.type = "checkbox";
     checkbox.className = "todo_checkbox";
     checkbox.id = "task_" + id;
+    if (is_checked) {
+        checkbox.checked = true;
+        //setTimeout(function () { checkbox.dispatchEvent(new CustomEvent("change")) }, 75); // Let task creation finish
+    }
     if (document.body.animate) { checkbox.addEventListener('change', bubble_up); }
     checkbox.addEventListener('change', function () {
         textbox.disabled = true;
@@ -67,22 +72,16 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
         textbox.style.textDecoration = "line-through";
         textbox.contentEditable = false;
         checkbox.style.accentColor = checkbox_flash;
-        if (setup_complete) {
-            saveTasks();
-            if (active_plant_selector != undefined && active_plant_selector.getAttribute("idx") == id) {
-                gracefullyRemoveOldSelector();
-            }
-            if (Math.random() < 1 / 7 || getListStatus()["checked"] > 9) {
-                document.getElementById("todo_clear_completed").classList.add("todo_glowing");
-            }
+        saveTasks();
+        if (active_plant_selector != undefined && active_plant_selector.getAttribute("idx") == id) {
+            gracefullyRemoveOldSelector();
+        }
+        if (Math.random() < 1 / 7 || getListStatus()["checked"] > 9) {
+            document.getElementById("todo_clear_completed").classList.add("todo_glowing");
         }
         setTimeout(function () { checkbox.style.accentColor = checkbox_neutral}, 5)
         //setTimeout(function () { checkbox.style.accentColor = "#36243c"; }, 5)
     }.bind({"textbox": textbox, "checkbox": checkbox, "id": id, "prize_display_square": prize_display_square}));
-    if (is_checked) {
-        checkbox.checked = true;
-        setTimeout(function () { checkbox.dispatchEvent(new CustomEvent("change")) }, 75); // Let task creation finish
-    }
     list_item.appendChild(checkbox);
 
     // Though the checkbox needs the textbox for the onclick, we add it after to get the layout right
@@ -103,10 +102,8 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     prize_display_square.addEventListener("click", prize_choose_function, true);
 
     document.getElementById("task_div").appendChild(list_item);
-    if (setup_complete) {
-        textbox.focus();
-        textbox.scrollIntoView();
-    }
+    textbox.focus();
+    textbox.scrollIntoView();
     task_sets_generated += 1;
 }
 
@@ -242,7 +239,6 @@ function rememberTasks() {
         setTimeout(function () { generateTask() }, task_count * 150);
         task_count++;
     }
-    setTimeout(function () { setup_complete = true; }, task_count * 150 + 50);
 }
 
 
