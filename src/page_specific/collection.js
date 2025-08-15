@@ -663,7 +663,6 @@ function analyze_seed(seed_string) {
     preview_ctx.clearRect(0, 0, preview_canvas.width, preview_canvas.height);
     preview_ctx.imageSmoothingEnabled = false;
     preview_ctx.drawImage(plant_canvas, 0, 0, preview_canvas.width, preview_canvas.height);
-    console.log(plant_canvas.toDataURL());
     var text_output = document.getElementById("analysis_output_text");
     let color_msg = buildColorFilterMessage(raw_plant_data);
     text_output.innerHTML = "Name: " + "<a id='base_force_filter' href='javascript:void(0);'>" + all_foliage[plant_data["foliage"]]["name"] + "</a>";

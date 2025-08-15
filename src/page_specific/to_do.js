@@ -64,6 +64,10 @@ function generateTask(is_checked = false, reward_seed = "", desc = "") {
     checkbox.id = "task_" + id;
     if (is_checked) {
         checkbox.checked = true;
+        textbox.disabled = true;
+        checkbox.classList.add("disabled_cust");
+        textbox.style.textDecoration = "line-through";
+        textbox.contentEditable = false;
         //setTimeout(function () { checkbox.dispatchEvent(new CustomEvent("change")) }, 75); // Let task creation finish
     }
     if (document.body.animate) { checkbox.addEventListener('change', bubble_up); }
