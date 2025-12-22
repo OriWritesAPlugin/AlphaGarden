@@ -18,10 +18,12 @@
             <button id="doBackup_button" title="Download a backup copy of all your data. Do it early and often! You get 3 rs per day for it (max 15)" class="chunky_fullwidth" value="Backup">Backup</button></br></br>
             <button type="file" class="chunky_fullwidth" id="import_data_button">Load Backup</button></br>
             <input type="file" style="display: none" id="save_file_input"></input></br>
+            <button class="chunky_fullwidth" id="reset_tutorial_button">Reset Tutorial</button>
             <button class="chunky_fullwidth" id="delete_data_button">Delete All Data</button>
         </div>
         <div id="data_management_div" class="generic_button_box">
             <h2><b class="accent-text">★~*</b>Graphics<b class="accent-text">*~★</b></h2>
+            <h3>General Graphics Settings</h3>
             <div id="general_graphics_settings"></div>
             <h3>Color Presets</h3>
             <div id="graphics_func_div" style="display: flex; flex-wrap:wrap"></div>
@@ -35,7 +37,7 @@
         </div>
         </div>
 <script type="module">
-import {delete_save, export_save, import_save, getSeedCollection, gen_func_button, randomFromArray, gen_toggle_button, get_toggle_button_setting, cycle_toggle_value} from "./built/shared.js"
+import {delete_save, export_save, import_save, addSeedPoints, getSeedCollection, gen_func_button, randomFromArray, gen_toggle_button, get_toggle_button_setting, cycle_toggle_value} from "./built/shared.js"
 import {decode_plant_data, gen_plant_data, encode_plant_data_v2, drawPlantForSquare, work_canvas_size} from "./built/gen_plant.js"
 import {all_palettes} from "./built/data.js"
 
@@ -57,10 +59,15 @@ document.getElementById("doBackup_button").onclick = function(){
     let rewarded_points = Math.min(days_since_backup * backup_sp_per_day, max_sp_for_backup);
     if (rewarded_points > 0) {
         addSeedPoints(rewarded_points);
-        updateSeedPoints();
         localStorage["last_backup"] = new Date();
+        location.reload();
     }
     document.getElementById("doBackup_button").value = "Backup";
+}
+document.getElementById("reset_tutorial_button").onmousedown = function(){
+    localStorage.tstage = 0;
+    document.getElementById("reset_tutorial_button").innerText = "Tutorial Reset!";
+    setTimeout(()=>{document.getElementById("reset_tutorial_button").innerText = " Reset Tutorial"}, 1000);
 }
 
 function set_plants_display_palettes(){
