@@ -493,7 +493,7 @@ var all_palettes = [{"palette": ["aed740", "76c935", "50aa37", "2f902b"], "name"
                     {"palette": ["8e8e4f", "6d703e", "4d542b", "3b4429"], "name": "murk", "categories": ["senescent"]},
                     {"palette": ["b9d163", "b7a949", "9b6d3b", "7c352c"], "name": "decay", "categories": ["senescent"]},
                     {"palette": ["e3c510", "bc8c0e", "864a0b", "541f08"], "name": "amber", "categories": ["senescent"]},
-                    {"palette": ["452a31", "3b1817", "29100e", "1a0a06"], "name": "ebony", "categories": ["dark", "earthen"]},
+                    {"palette": ["452a31", "3b1817", "29100e", "1a0a06"], "name": "ebony", "categories": ["earthen"]},
                     {"palette": ["ba7b59", "a05d39", "7f4323", "66371c"], "name": "clay", "categories": ["earthen"]},
                     {"palette": ["bc8060", "8c6047", "76523c", "644030"], "name": "silt", "categories": ["earthen"]},
                     {"palette": ["b4a58a", "8e795e", "674d36", "432a1c"], "name": "driftwood", "categories": ["earthen"]},
@@ -552,8 +552,10 @@ var all_palettes = [{"palette": ["aed740", "76c935", "50aa37", "2f902b"], "name"
                     {"palette": ["ffe3e0", "ffb8c2", "ff6bb5", "ff1492"], "name": "bubblegum", "categories": ["bold"]},
                     {"palette": ["aabac6", "8799a2", "5d6c70", "4e4f52"], "name": "shale", "categories": ["earthen"]},
                     {"palette": ["d1cce4", "5f567b", "8d9aaa", "3d3049"], "name": "static", "categories": ["strange"]},
-                    {"palette": ["f7d0d8", "dfa0a8", "c77078", "a75058"], "name": "carnation", "categories": ["pastel"]},
-                    {"palette": ["b1c8b5", "4ca577", "3c9075", "056f57"], "name": "jade", "categories": ["metallic"]},
+                    {"palette": ["f3cc8b", "6a6653", "1f2e33", "0f191e"], "name": "inkblot", "categories": ["strange"]},
+                    {"palette": ["531232", "370c25", "2c0524", "18021a"], "name": "velvet", "categories": ["dark"]}
+                    //{"palette": ["f7d0d8", "dfa0a8", "c77078", "a75058"], "name": "carnation", "categories": ["pastel"]},
+                    //{"palette": ["b1c8b5", "4ca577", "3c9075", "056f57"], "name": "jade", "categories": ["metallic"]},
                 ]
 // END all_palettes
 //   aabac6,8799a2,5d6c70,4e4f52
