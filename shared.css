@@ -222,11 +222,11 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     user-select: none;
 }
 
-.disabled {
+.disabled, .spell_disabled {
     pointer-events: none;
     cursor: not-allowed;
-    opacity: 0.65;
-    filter: alpha(opacity=65);
+    opacity: 0.5;
+    filter: alpha(opacity=50);
     -webkit-box-shadow: none;
     box-shadow: none;
 }
@@ -338,6 +338,20 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     transition:color 0.75s;
 }
 
+@keyframes color-pulse {
+  0% { color: var(--link-color); 
+       background-color: var(--hover-color);}
+  50% { color: var(--font-color);
+        background-color: var(--input-color);
+}
+  100% { color: var(--link-color); 
+       background-color: var(--hover-color);}
+}
+
+.color_pulse_animate {
+    animation: color-pulse 4s ease-in-out infinite;
+}
+
 .block_window {
     width: 100%;
     height: 100%;
@@ -428,6 +442,7 @@ input.chunky_fullwidth, button.chunky_fullwidth {
 .todo_plant_selector_standard,
 .todo_plant_selector_minified,
 #seed_positioning_grid_div,
+.collection_showcase_display,
 .swap_row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(var(--min-plant-display), max-content));
@@ -435,6 +450,11 @@ input.chunky_fullwidth, button.chunky_fullwidth {
     margin: 2vh auto;
     justify-content: center;
     align-content: center;
+}
+
+.collection_showcase_display
+{
+    grid-template-columns: repeat(auto-fit, minmax(var(--plant-display), max-content));
 }
 
 .todo_plant_selector_standard{
@@ -1045,8 +1065,8 @@ particle {
 }
 
 .showcase_collection_box {
-    width: 128px;
-    height: 128px;
+    width: 144px;
+    height: 144px;
     border-style: none;
 }
 
@@ -1206,7 +1226,7 @@ particle {
 }
 }
 
-/** CHALLENGES **/
+/** BITS 'N BOBS **/
 #prompt_organizer{
     display:flex;
     flex-direction:row;
@@ -1224,4 +1244,222 @@ particle {
     #prompt_text{
         width: 80vw;
     }
+}
+
+/** WILDERNESS **/
+#wilderness_page_layout {
+  display: grid; 
+  grid-template-columns: 0.75fr 2.5fr 0.75fr; 
+  gap: 0px 0px; 
+}
+
+.wilderness_shop_header {
+  margin: 0 0 0.5em 0em;
+}
+
+.wilderness_shop {
+  border-radius: 25px;
+  text-align: left;
+  padding: 0.4em;
+  padding-bottom: 1.75em;
+  background-color: var(--input-color);
+  text-align: center;
+}
+
+#wilderness_main_div{
+    margin: 0 auto;
+    padding: 0 1em;
+}
+
+#wilderness_nav{
+    margin: 0 auto;
+    width: fit-content;
+}
+
+#wilderness_content_div{
+    margin: 0 2vw;
+}
+
+.wilderness_shop_body, .wilderness_shop_body_left, .camp_submenu{
+    background-color:var(--background-color);
+    height: 85vh;
+    padding: 0.2em 0.75em;
+    font-size: 0.9em;
+    overflow: scroll;
+}
+
+.wilderness_shop_body_left {
+    text-align: left;
+}
+
+.camp_submenu{
+    font-size: 1em;
+    height: fit-content;
+}
+
+.log_entry{
+    margin: 0;
+}
+
+.wilderness_tab{
+    border-style:none;
+    border-radius: 10px 10px 0 0;
+    font-size: 1em;
+    padding: 0.25em 0.5em;
+    height: 2em;
+    display: inline-flex;
+    align-items: flex-start;
+}
+
+.wilderness_tab:hover, .wilderness_tab.active{
+    height: 2.3em;
+    transition: height 200ms linear;
+    background-color: var(--input-color);
+}
+
+.wilderness_tab.active{
+    color: var(--link-color)
+}
+
+#camp_menu_div, #resource_bars{
+    background-color: var(--input-color);
+    padding: 0.4em;
+}
+
+#resource_bars{
+    border-radius: 0 0 25px 25px;
+    background-color: var(--input-color);
+    padding-bottom: 1.75em;
+}
+
+#camp_spells_menu, #resource_bars{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+#camp_spells_menu{
+    background-color: var(--background-color);
+}
+
+.wilderness_upgrade_button, .wilderness_spell_button{
+    border-style: solid;
+    border-radius: 10px;
+    height: 2.5em;
+    font-size: 1em;
+    margin: 0.25em;
+    border-color: var(--flash-color);
+    border-width: thin;
+    position: relative;
+}
+
+.wilderness_upgrade_button {
+    border-style: none;
+    height: 3em;
+    width: 100%;
+}
+
+.wilderness_tab_bar {
+    display: flex;
+    align-items: flex-start;
+    height: fit-content;
+    min-height: 2.3em;
+    gap: 10px;
+    row-gap: 0px;
+    flex-wrap:wrap-reverse;
+}
+
+/**#camp_mana_bar { 
+  height: 200px;
+  position: relative;
+  background: #555;
+  border-radius: 25px;
+  padding: 10px;
+  box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.3);
+}
+
+#camp_mana_bar > span {
+  display: block;
+  height: 100%;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  background-color: rgb(43,194,83);
+  background-image: linear-gradient(
+    center bottom,
+    rgb(43,194,83) 37%,
+    rgb(180, 243, 180) 69%
+  );
+  box-shadow: 
+    inset 0 2px 9px  rgba(255,255,255,0.3),
+    inset 0 -2px 6px rgba(0,0,0,0.4);
+  position: relative;
+  overflow: hidden;
+}**/
+
+/*#camp_mana_bar {
+  --optimum: rgb(5, 224, 253);
+  --sub-optimum: rgb(41, 43, 143);
+  --sub-sub-optimum: rgb(100, 38, 76);
+  display: block;
+  margin-bottom: 1em;
+  width: 30em;
+  height: 1em;
+}*/
+
+.spell_disabled {
+    opacity: 1;
+    filter: none;
+    border-style: none !important;
+}
+
+.camp_filling_bar, .camp_filling_bar_thin {
+    background-color: var(--background-color);
+    height: 100%;
+    border-radius: 12px;
+}
+
+.camp_filling_bar_thin {
+    height: 2em;
+}
+
+.camp_filling_bar_content {
+    display: block;
+    background-color: #ff0000;
+    width: 100%;
+    height: 3em;
+    border-radius: 15px;
+    border-style: solid;
+}
+
+.camp_filling_bar_label {
+    margin: auto;
+}
+
+#camp_mana_amount{
+background: linear-gradient(90deg,rgba(57, 181, 230, 1) 0%, rgba(87, 121, 199, 1) 39%, rgba(151, 55, 230, 1) 100%);
+background: linear-gradient(90deg,rgba(47, 149, 189, 1) 0%, rgba(74, 102, 168, 1) 39%, rgba(107, 38, 163, 1) 100%);
+border-color: navy;
+}
+
+#camp_biomass_amount{
+background: linear-gradient(90deg,rgba(44, 176, 59, 1) 0%, rgba(45, 166, 75, 1) 39%, rgba(15, 133, 94, 1) 100%);
+background: linear-gradient(90deg,rgba(48, 184, 46, 1) 0%, rgba(26, 153, 58, 1) 42%, rgba(26, 153, 58, 1) 100%);
+border-color: darkgreen;
+}
+
+#camp_health_amount{
+background: linear-gradient(90deg,rgba(223, 196, 140, 1) 0%, rgba(186, 155, 91, 1) 100%);
+background: linear-gradient(90deg,rgba(199, 172, 97, 1) 0%, rgba(189, 147, 62, 1) 100%);
+border-color: sandybrown;
+}
+
+.camp_buyable_label {
+  position: absolute;
+  font-size: 0.75em;
+  display: block;
+  width: 100%;
+  bottom: 0%;
+  right: 5px;
+  text-align: right;
 }

@@ -505,6 +505,7 @@ function display_collection(do_filter=true) {
     var collection_div = document.getElementById("collection_display_div")
     var hide_seeds = document.getElementById("hide_seeds").checked;
     showcase_mode = document.getElementById("showcase_display").checked;
+    document.getElementById("collection_display_div").className = showcase_mode ? "collection_showcase_display" : "collection_display";
     let show_palettes = document.getElementById("show_palettes").checked;
     while (collection_div.lastChild) { collection_div.removeChild(collection_div.lastChild); }
     if(document.getElementById("seed_collection")){
